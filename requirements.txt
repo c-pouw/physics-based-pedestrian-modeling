@@ -1,1 +1,8 @@
 # List required packages in this file, one per line.
+pandas
+numpy
+scipy
+tqdm
+sdeint
+matplotlib
+ipython
