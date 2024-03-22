@@ -6,10 +6,10 @@ import numpy as np
 import sdeint
 
 from physped.core.discrete_grid import DiscreteGrid
-from physped.core.discretize_grid import get_grid_index
+from physped.core.functions_to_discretize_grid import get_grid_index
 from physped.utils.functions import cart2pol, digitize_values_to_grid
 
-log = logging.getLogger("mylog")
+log = logging.getLogger(__name__)
 
 
 class LangevinModel:
@@ -28,7 +28,8 @@ class LangevinModel:
         xf, yf, uf, vf, xs, ys, us, vs = X_0
         # check stopping condition
         # Either position out of domain or position in unexplored grid cell
-        stop_condition = self.params.get("stop_condition", 0.000001)
+        # stop_condition = self.params.get("stop_condition", 0.000001)
+        stop_condition = self.params.simulation.stop_condition
         if self.stop_condition(xf, yf, stop_condition) or np.isnan(xs):
             return np.zeros(len(X_0)) * np.nan  # terminate simulation
 
@@ -36,9 +37,7 @@ class LangevinModel:
         k = 2
         X_vals = [xs, ys, rs, thetas, k]
         X_indx = get_grid_index(self.grids, X_vals)
-        xmean, xvar, ymean, yvar, umean, uvar, vmean, vvar = self.grids.fit_params[
-            *X_indx, :
-        ]
+        xmean, xvar, ymean, yvar, umean, uvar, vmean, vvar = self.grids.fit_params[*X_indx, :]
 
         # determine potential energy contributions
         # V_x = uvar/xvar*(xf - xmean)
@@ -92,9 +91,7 @@ class LangevinModel:
     def Noise(self, X_0, t):
         """Return noise matrix."""
         # diagonal, so independent driving Wiener processes
-        return np.diag(
-            [0.0, 0.0, self.params["sigma"], self.params["sigma"], 0.0, 0.0, 0.0, 0.0]
-        )
+        return np.diag([0.0, 0.0, self.params["sigma"], self.params["sigma"], 0.0, 0.0, 0.0, 0.0])
 
     def stop_condition(self, xf: float, yf: float, stop_condition: float) -> bool:
         """

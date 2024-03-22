@@ -2,7 +2,9 @@ import pandas as pd
 import numpy as np
 import logging
 
-log = logging.getLogger("mylog")
+from physped.utils.customlogging import CustomFormatter
+
+log = logging.getLogger(__name__)
 
 
 def compute_slow_modes_geert(xf: pd.Series, tau: float, dt: float) -> pd.Series:
@@ -89,9 +91,7 @@ def compute_all_slow_modes(
     return trajectories
 
 
-def add_velocity_in_polar_coordinates(
-    df: pd.DataFrame, mode: str = "f"
-) -> pd.DataFrame:
+def add_velocity_in_polar_coordinates(df: pd.DataFrame, mode: str = "f") -> pd.DataFrame:
     """
     Add columns with velocity in polar coordinates to the DataFrame.
 
@@ -128,9 +128,7 @@ def add_trajectory_step(df: pd.DataFrame, params: dict) -> pd.DataFrame:
 def preprocess_trajectories(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     log.info("Start trajectory preprocessing.")
     # print(df.columns)
-    df = add_trajectory_step(
-        df, parameters
-    )  # , colnames={"Pid": "Pid", "time": "time"})
+    df = add_trajectory_step(df, parameters)  # , colnames={"Pid": "Pid", "time": "time"})
     log.info("Trajectory step added.")
     df = add_velocity_in_polar_coordinates(df, mode="f")
     log.info("Polar coordinates added.")

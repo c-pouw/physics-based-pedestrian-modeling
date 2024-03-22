@@ -1,6 +1,7 @@
 from typing import List, Optional, Dict, Any
 from matplotlib.axes import Axes
 import logging
+from pathlib import Path
 
 import pandas as pd
 import numpy as np
@@ -13,7 +14,7 @@ import physped as pp
 plt.style.use(
     "/home/pouw/workspace/crowd-tracking/2020-XX-Pouw-Corbetta-pathintegral-codes/physped/visualization/science.mplstyle"
 )
-log = logging.getLogger("mylog")
+log = logging.getLogger(__name__)
 
 histogram_plot_params = {
     "xf": {
@@ -125,9 +126,7 @@ def create_all_histograms(
     return histograms
 
 
-def compute_KL_divergence(
-    PDF1: np.ndarray, PDF2: np.ndarray, bin_width: np.ndarray
-) -> np.ndarray:
+def compute_KL_divergence(PDF1: np.ndarray, PDF2: np.ndarray, bin_width: np.ndarray) -> np.ndarray:
     """
     Compute KL divergence between two probability density functions.
 
@@ -143,9 +142,7 @@ def compute_KL_divergence(
     return ma.masked_invalid(kl).compressed()
 
 
-def plot_multiple_histograms(
-    observables: List, histograms: dict, histogram_type: str, params: dict
-):
+def plot_multiple_histograms(observables: List, histograms: dict, histogram_type: str, params: dict):
     """
     Plot histograms for all observables.
 
@@ -162,6 +159,7 @@ def plot_multiple_histograms(
     fig = plt.figure(figsize=(3.54, 2.36), layout="constrained")
     sum_kl_div = 0
     hist_plot_params = params.get("histogram_plot", {})
+    folderpath = Path(params.folder_path)
 
     for plotid, observable in enumerate(observables):
         ax = fig.add_subplot(2, 2, plotid + 1)
@@ -189,16 +187,14 @@ def plot_multiple_histograms(
 
     handles, labels = ax.get_legend_handles_labels()
 
-    fig.legend(
-        handles, labels, bbox_to_anchor=(0.5, 1.05), ncol=2, fontsize=7, loc="center"
-    )
+    fig.legend(handles, labels, bbox_to_anchor=(0.5, 1.05), ncol=2, fontsize=7, loc="center")
     # plt.suptitle(
     #     f"Parameters: $\qquad \\tau_x = {params['taux']} \qquad \\tau_u = {params['tauu']} \qquad "
     #     f"dt = {params['dt']} \qquad \sigma = {params['sigma']} \qquad \\sum{{D_{{KL}}}} = {sum_kl_div:.2f}$",
     #     fontsize=16,
     # )
     # fig.text(-0.02, 0.5, "PDF", rotation=90)
-    filename = pp.create_folderpath(params) / f"histograms_{params.get('name', '')}.pdf"
+    filename = folderpath / f"histograms_{params.get('env_name', '')}.pdf"
     log.info("Saving histograms figure.")
     plt.savefig(filename)
 

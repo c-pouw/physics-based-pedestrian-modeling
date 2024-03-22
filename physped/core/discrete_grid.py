@@ -1,4 +1,5 @@
 """Discrete grid class"""
+
 from typing import Dict
 import logging
 
@@ -6,10 +7,7 @@ import numpy as np
 
 from physped.utils.functions import get_bin_middle
 
-# from src.utils.customlogging import generate_logger
-# log_params = {"level": "INFO", "display": "term"}
-# generate_logger(params=log_params)
-log = logging.getLogger("mylog")
+log = logging.getLogger(__name__)
 
 
 class DiscreteGrid:
@@ -30,7 +28,7 @@ class DiscreteGrid:
         Parameters:
         - bins (Dict[str, np.ndarray]): A dictionary of bin edges for each dimension of the grid.
         """
-        self.bins = bins
+        self.bins = {key: bins[key] for key in bins}
         self.bin_centers = {key: get_bin_middle(bins[key]) for key in bins}
         self.grid_shape = tuple(len(self.bin_centers[key]) for key in self.bin_centers)
         self.dimensions = tuple(self.bin_centers.keys())

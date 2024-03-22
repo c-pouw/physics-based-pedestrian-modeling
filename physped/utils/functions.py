@@ -8,11 +8,12 @@ import pandas as pd
 import numpy as np
 from scipy.signal import savgol_filter
 
-log = logging.getLogger("mylog")
+log = logging.getLogger(__name__)
 
 
-def create_folderpath(params: dict) -> Path:
+def _create_folderpath(params: dict) -> Path:
     """
+    OBSOLETE
     Create a folder path for a model based on the specified parameters.
 
     Parameters:
@@ -21,7 +22,8 @@ def create_folderpath(params: dict) -> Path:
     Returns:
     - A string representing the file path for the model.
     """
-    gridname = f"{params['name']}-tau{params['taux']}-sigma{params['sigma']}"
+    #### TODO: Create folderpath directly in the config file
+    gridname = f"{params['env_name']}-tau{params['taux']}-sigma{params['sigma']}"
     return Path.cwd() / "data" / "models" / gridname
 
 
@@ -35,9 +37,10 @@ def create_folder_if_not_exists(folderpath: Path) -> None:
     Returns:
     - None
     """
+    ### TODO: change function name to ensure_folder_exists
     if not folderpath.exists():
         folderpath.mkdir()
-        log.info(f"Folder created at {folderpath}.")
+        log.info("Folder created at %s", folderpath)
 
 
 def cart2pol(x: float, y: float) -> tuple:
@@ -61,10 +64,7 @@ def get_slice_of_multidimensional_matrix(a, slice_x, slice_y, slice_theta, slice
             print("Slice values must be ascending.")
     sl0 = np.array(range(slice_x[0], slice_x[1])).reshape(-1, 1, 1, 1) % a.shape[0]
     sl1 = np.array(range(slice_y[0], slice_y[1])).reshape(1, -1, 1, 1) % a.shape[1]
-    sl2 = (
-        np.array(range(slice_theta[0], slice_theta[1])).reshape(1, 1, -1, 1)
-        % a.shape[2]
-    )
+    sl2 = np.array(range(slice_theta[0], slice_theta[1])).reshape(1, 1, -1, 1) % a.shape[2]
     sl3 = np.array(range(slice_r[0], slice_r[1])).reshape(1, 1, 1, -1) % a.shape[3]
     return a[sl0, sl1, sl2, sl3]
 
@@ -80,8 +80,7 @@ def add_velocity(df, groupby="Pid", xpos="xf", ypos="yf"):
     pos_to_vel = {"xf": "uf", "yf": "vf"}
     for direction in [xpos, ypos]:
         df.loc[:, pos_to_vel[direction]] = df.groupby([groupby])[direction].transform(
-            lambda x: savgol_filter(x, 49, polyorder=1, deriv=1, mode="interp")
-            * unit_conversion
+            lambda x: savgol_filter(x, 49, polyorder=1, deriv=1, mode="interp") * unit_conversion
         )
     return df
 
@@ -134,9 +133,7 @@ def digitize_values_to_grid(values: pd.Series, grid: np.ndarray) -> np.ndarray:
     return indices
 
 
-def weighted_mean_of_matrix(
-    field: np.ndarray, histogram: np.ndarray, axes: Tuple = (2, 3, 4)
-) -> np.ndarray:
+def weighted_mean_of_matrix(field: np.ndarray, histogram: np.ndarray, axes: Tuple = (2, 3, 4)) -> np.ndarray:
     weighted_field = np.nansum(field * histogram, axis=axes)
     position_histogram = np.nansum(histogram, axis=axes)
     weighted_field /= np.where(position_histogram != 0, position_histogram, np.inf)

@@ -9,6 +9,7 @@ from pathlib import Path
 import pickle
 from typing import Any
 import datetime
+import hydra
 
 import polars as pl
 import pandas as pd
@@ -21,7 +22,12 @@ from physped.core.discrete_grid import DiscreteGrid
 trajectory_folder_path = Path.cwd() / "data" / "trajectories"
 parameters_folder_path = Path.cwd() / "data" / "parameter_files"
 
-log = logging.getLogger("mylog")
+log = logging.getLogger(__name__)
+
+
+def read_grid_bins(grid_name: str):
+    filename = f"data/grids/{grid_name}.npz"
+    return np.load(filename, allow_pickle=True)
 
 
 def read_parameter_file(parameter_filename: str) -> dict[Any, Any]:
@@ -69,10 +75,7 @@ def get_available_validations() -> list:
     """Get available validation names."""
     glob_pattern = "../data/parameter_files/*.json"
     parameter_files = glob.glob(glob_pattern)
-    available_validations = [
-        parameter_file.split("/")[-1].split(".")[0]
-        for parameter_file in parameter_files
-    ]
+    available_validations = [parameter_file.split("/")[-1].split(".")[0] for parameter_file in parameter_files]
     return available_validations
 
 
@@ -88,9 +91,7 @@ def read_discrete_grid_from_file(filename: Path) -> DiscreteGrid:
     """
     with open(filename, "rb") as f:
         val = pickle.load(f)
-    log.info(
-        "Successfully read `%s` validation model.", filename.relative_to(Path.cwd())
-    )
+    log.info("Successfully read `%s` validation model.", filename.relative_to(Path.cwd()))
     return val
 
 
@@ -115,9 +116,7 @@ def single_paths() -> pd.DataFrame:
     # Convert the string to a pandas DataFrame
     df2 = pd.read_csv(StringIO(data_str), sep=" ")
     df = pd.concat([df1, df2], ignore_index=True)
-    df.rename(
-        columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True
-    )
+    df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
     log.info("Finished reading single paths data set.")
     return df
 
@@ -126,9 +125,7 @@ def parallel_paths() -> pd.DataFrame:
     """Read the parallel paths data set."""
     file_path = trajectory_folder_path / "df_single_pedestrians_small.h5"
     df = pd.read_hdf(file_path)
-    df.rename(
-        columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True
-    )
+    df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
     df["Pid"] = df.groupby(["Pid", "day_id"]).ngroup()
     df = df.query("Umean>0.5").loc[abs(df.X0 - df.X1) > 2]
     df = df.groupby("Pid").filter(lambda x: max(x.uf) < 3.5)
@@ -139,9 +136,7 @@ def intersecting_paths() -> pd.DataFrame:
     """Read the intersecting paths data set."""
     file_path = trajectory_folder_path / "simulations_crossing.parquet"
     df = pd.read_parquet(file_path)
-    df.rename(
-        columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True
-    )
+    df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
     df["k"] = df.groupby("Pid").cumcount()
     return df
 
@@ -205,9 +200,7 @@ def preprocess_ehv(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def read_ehv_station_paths_from_azure(
-    datehour: datetime.datetime, freq: str
-) -> pd.DataFrame:
+def read_ehv_station_paths_from_azure(datehour: datetime.datetime, freq: str) -> pd.DataFrame:
     import crowdflow as cf
     from crowdflow.preprocessing.aggregators import KinematicsAggregator
     from crowdflow.preprocessing.pipelines import siemens_trajectory_cleaner as cleaner
@@ -248,7 +241,7 @@ def read_ehv_station_paths_from_azure(
 
 def read_preprocessed_trajectories(folderpath: str) -> pd.DataFrame:
     """Read preprocessed trajectories from file."""
-    filepath = folderpath / "preprocessed_trajectories.csv"
+    filepath = Path(folderpath) / "preprocessed_trajectories.csv"
     trajectories = pd.read_csv(filepath)
     log.info(
         "Succesfully read preprocessed trajectories %s.",

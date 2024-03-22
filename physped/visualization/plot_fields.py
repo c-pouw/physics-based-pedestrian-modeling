@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from physped.core.discretize_grid import (
+from physped.core.functions_to_discretize_grid import (
     get_slice_of_multidimensional_matrix,
     make_grid_selection,
 )
@@ -19,9 +19,7 @@ from physped.visualization.plot_trajectories import (
 from physped.utils.functions import weighted_mean_of_matrix
 
 
-def plot_quiver_force_vectors(
-    ax: plt.Axes, fields: dict, scale: int, sparseness: int
-) -> plt.Axes:
+def plot_quiver_force_vectors(ax: plt.Axes, fields: dict, scale: int, sparseness: int) -> plt.Axes:
     """Plot the force field."""
     # scale = params["force_field_plot"]["scale"]
     # sparseness = params["force_field_plot"]["sparseness"]
@@ -60,22 +58,16 @@ def plot_quiverkey(ax: plt.Axes, q: mpl.quiver.Quiver) -> plt.Axes:
     return ax
 
 
-def plot_pcolormesh_offset_field(
-    ax: plt.Axes, fields: dict, cmap="YlOrRd", bounds: tuple = (0, 0.36)
-) -> plt.Axes:
+def plot_pcolormesh_offset_field(ax: plt.Axes, fields: dict, cmap="YlOrRd", bounds: tuple = (0, 0.36)) -> plt.Axes:
     """Plot the offset field."""
     bounds = bounds or infer_bounds_from_data(fields["offset"])
     norm = mpl.colors.Normalize(vmin=bounds[0], vmax=bounds[1])
-    cs = ax.pcolormesh(
-        fields["X"], fields["Y"], fields["offset"], cmap=cmap, shading="auto", norm=norm
-    )
+    cs = ax.pcolormesh(fields["X"], fields["Y"], fields["offset"], cmap=cmap, shading="auto", norm=norm)
     ax = plot_colorbar(ax, cs)
     return ax
 
 
-def plot_contourf_offset_field(
-    ax: plt.Axes, fields: dict, cmap="YlOrRd", bounds: tuple = (0, 0.36)
-) -> plt.Axes:
+def plot_contourf_offset_field(ax: plt.Axes, fields: dict, cmap="YlOrRd", bounds: tuple = (0, 0.36)) -> plt.Axes:
     """Plot the offset field."""
     bounds = bounds or infer_bounds_from_data(fields["offset"])
     levels = np.linspace(bounds[0], bounds[1], 20)
@@ -105,10 +97,7 @@ def plot_colorbar(ax: plt.Axes, cs: mpl.contour.QuadContourSet) -> plt.Axes:
         ax=ax,
         shrink=0.5,
     )
-    cbar.set_label(
-        "$\\Delta V = 0.023\\log{\\left[\\mathbb{P}"
-        "(y_s\\mid x_s,\\vec u_s)\\right]}$"
-    )
+    cbar.set_label("$\\Delta V = 0.023\\log{\\left[\\mathbb{P}" "(y_s\\mid x_s,\\vec u_s)\\right]}$")
     return ax
 
 
@@ -151,16 +140,10 @@ def create_force_fields(grids: dict, sliced_histogram: np.ndarray) -> dict:
     for fit_param in grids.fit_param_names:
         field = grids.selection[..., grids.fit_param_names.index(fit_param)]
         fields[fit_param] = weighted_mean_of_matrix(field, sliced_histogram)
-        fields[fit_param] = np.where(
-            pos_histogram > minimum_datapoints, fields[fit_param], np.nan
-        )
+        fields[fit_param] = np.where(pos_histogram > minimum_datapoints, fields[fit_param], np.nan)
 
-    fields["dfx"] = -(fields["X"] - fields["xmu"]) / np.where(
-        fields["xvar"] != 0, fields["xvar"], np.inf
-    )
-    fields["dfy"] = -(fields["Y"] - fields["ymu"]) / np.where(
-        fields["yvar"] != 0, fields["yvar"], np.inf
-    )
+    fields["dfx"] = -(fields["X"] - fields["xmu"]) / np.where(fields["xvar"] != 0, fields["xvar"], np.inf)
+    fields["dfy"] = -(fields["Y"] - fields["ymu"]) / np.where(fields["yvar"] != 0, fields["yvar"], np.inf)
     return fields
 
 
@@ -169,9 +152,7 @@ def plot_force_field_of_selection(grids, params, selection):
     grid_selection = make_grid_selection(grids, selection)
     slices = [tuple(grid_selection[dim]["grid_ids"]) for dim in grids.dimensions]
 
-    sliced_histogram = get_slice_of_multidimensional_matrix(
-        grids.histogram_slow, slices
-    )
+    sliced_histogram = get_slice_of_multidimensional_matrix(grids.histogram_slow, slices)
 
     grids.selection = get_slice_of_multidimensional_matrix(grids.fit_params, slices)
 
@@ -186,9 +167,7 @@ def plot_force_field_of_selection(grids, params, selection):
     # )  # TODO change to figsize of mplstyle
     # width_ratios = [4, 1]
     fig = plt.figure(layout="constrained")
-    spec = mpl.gridspec.GridSpec(
-        ncols=2, nrows=1, width_ratios=width_ratios, wspace=0.1, hspace=0.1, figure=fig
-    )
+    spec = mpl.gridspec.GridSpec(ncols=2, nrows=1, width_ratios=width_ratios, wspace=0.1, hspace=0.1, figure=fig)
     plotid = 0
     ax = fig.add_subplot(spec[plotid])
 
@@ -212,9 +191,7 @@ def plot_force_field_of_selection(grids, params, selection):
     # limits = create_grid_box_limits(
     #     slices, grids.dimensions, grids.bins, obs=["r", "theta"]
     # )
-    selection_limits = [
-        grid_selection[obs]["periodic_bounds"] for obs in ["r", "theta"]
-    ]
+    selection_limits = [grid_selection[obs]["periodic_bounds"] for obs in ["r", "theta"]]
     ax = highlight_grid_box(ax, selection_limits)
     ax = apply_polar_plot_style(ax, params)
     # xlims = selection["r"]

@@ -6,24 +6,14 @@ from typing import List
 import numpy as np
 import pandas as pd
 from scipy.stats import norm
-
 from physped.utils.functions import (
     weighted_mean_of_two_matrices,
     digitize_values_to_grid,
+    pol2cart,
 )
 from physped.core.discrete_grid import DiscreteGrid
 
-# from src.io.readers as read
-# import os
-# import pickle
-# from typing import Dict
-# import json
-# import sys
-# import customlogging as cl
-# log_params = {"level": "INFO", "display": "term"}
-# cl.generate_logger(params=log_params)
-
-log = logging.getLogger("mylog")
+log = logging.getLogger(__name__)
 
 
 def trajectories_to_grid(trajectories: pd.DataFrame, grid_bins) -> DiscreteGrid:
@@ -40,21 +30,15 @@ def trajectories_to_grid(trajectories: pd.DataFrame, grid_bins) -> DiscreteGrid:
     # grids = initialize_grids(grid_vals)
     grids = DiscreteGrid(grid_bins)
     trajectories = digitize_trajectories_to_grid(grids.bins, trajectories)
-    grids.histogram = add_trajectories_to_histogram(
-        grids.histogram, trajectories, "fast_grid_indices"
-    )
-    grids.histogram_slow = add_trajectories_to_histogram(
-        grids.histogram_slow, trajectories, "slow_grid_indices"
-    )
+    grids.histogram = add_trajectories_to_histogram(grids.histogram, trajectories, "fast_grid_indices")
+    grids.histogram_slow = add_trajectories_to_histogram(grids.histogram_slow, trajectories, "slow_grid_indices")
     # trajectory_origins = trajectories.groupby('Pid')['fast_grid_indices'].first().reset_index()
     grids.fit_params = fit_trajectories_on_grid(grids.fit_params, trajectories)
     log.info("Finished converting trajectories to grid.")
     return grids
 
 
-def accumulate_grids(
-    cummulative_grids: DiscreteGrid, grids_to_add: DiscreteGrid
-) -> DiscreteGrid:
+def accumulate_grids(cummulative_grids: DiscreteGrid, grids_to_add: DiscreteGrid) -> DiscreteGrid:
     """
     Accumulate grids by taking a weighted mean of the fit parameters.
 
@@ -81,9 +65,7 @@ def accumulate_grids(
     return cummulative_grids
 
 
-def get_slice_of_multidimensional_matrix(
-    a: np.ndarray, slices: List[tuple]
-) -> np.ndarray:
+def get_slice_of_multidimensional_matrix(a: np.ndarray, slices: List[tuple]) -> np.ndarray:
     """
     Get a slice of a multidimensional NumPy array with periodic boundary conditions.
 
@@ -98,8 +80,7 @@ def get_slice_of_multidimensional_matrix(
         print("Slice values must be ascending.")
     reshape_dimension = (-1,) + (1,) * (len(slices) - 1)
     slices = [
-        np.arange(*slice).reshape(np.roll(reshape_dimension, i)) % a.shape[i]
-        for i, slice in enumerate(slices)
+        np.arange(*slice).reshape(np.roll(reshape_dimension, i)) % a.shape[i] for i, slice in enumerate(slices)
     ]
     return a[tuple(slices)]
 
@@ -118,9 +99,7 @@ def get_slice_of_multidimensional_matrix(
 #     return df.assign(rs=rs, thetas=thetas)
 
 
-def digitize_trajectories_to_grid(
-    grid_bins, trajectories: pd.DataFrame
-) -> pd.DataFrame:
+def digitize_trajectories_to_grid(grid_bins, trajectories: pd.DataFrame) -> pd.DataFrame:
     """
     Digitize trajectories to a grid.
 
@@ -132,9 +111,7 @@ def digitize_trajectories_to_grid(
     - The trajectories with the digitized grid indices.
     """
     indices = {}
-    for obs, dynamics in [
-        (obs, dynamics) for obs in grid_bins.keys() for dynamics in ["f", "s"]
-    ]:
+    for obs, dynamics in [(obs, dynamics) for obs in grid_bins.keys() for dynamics in ["f", "s"]]:
         if obs == "k":
             dobs = obs
         else:
@@ -146,14 +123,10 @@ def digitize_trajectories_to_grid(
     indices["thetas"] = np.where(indices["rs"] == 0, 0, indices["thetas"])
 
     trajectories["fast_grid_indices"] = list(
-        zip(
-            indices["xf"], indices["yf"], indices["rf"], indices["thetaf"], indices["k"]
-        )
+        zip(indices["xf"], indices["yf"], indices["rf"], indices["thetaf"], indices["k"])
     )
     trajectories["slow_grid_indices"] = list(
-        zip(
-            indices["xs"], indices["ys"], indices["rs"], indices["thetas"], indices["k"]
-        )
+        zip(indices["xs"], indices["ys"], indices["rs"], indices["thetas"], indices["k"])
     )
     return trajectories
 
@@ -190,20 +163,13 @@ def fit_trajectories_on_grid(param_grid, trajectories: pd.DataFrame):
     Returns:
     - The grid with fit parameters.
     """
-    fit_params = (
-        trajectories.groupby("slow_grid_indices")
-        .apply(fit_fast_modes)
-        .dropna()
-        .to_dict()
-    )
+    fit_params = trajectories.groupby("slow_grid_indices").apply(fit_fast_modes).dropna().to_dict()
     for key, value in fit_params.items():
         param_grid[key] = value
     return param_grid
 
 
-def add_trajectories_to_histogram(
-    histogram, trajectories: pd.DataFrame, groupbyindex: str
-) -> np.ndarray:
+def add_trajectories_to_histogram(histogram, trajectories: pd.DataFrame, groupbyindex: str) -> np.ndarray:
     """
     Add trajectories to a histogram.
 
@@ -343,6 +309,65 @@ def make_grid_selection(grids, selection):
 
         grid_selection[observable]["periodic_bounds"] = grid_boundaries
     return grid_selection
+
+
+def random_uniform_value_in_bin(values: np.ndarray, bins: np.ndarray) -> np.ndarray:
+    """Generate random uniform values within each bin.
+
+    Args:
+        values (np.ndarray): Array of bin indices.
+        bins (np.ndarray): Array of bin edges.
+
+    Returns:
+        np.ndarray: Array of random uniform values within each bin.
+    """
+    left = bins[values]
+    right = bins[values + 1]
+    return np.random.uniform(left, right)
+
+
+def sample_from_ndarray(origin_histogram: np.ndarray, N_samples: int = 1) -> np.ndarray:
+    """
+    Sample origin positions from a heatmap with initial positions.
+
+    Parameters:
+    - origin_histogram (np.ndarray): The initial position heatmap.
+    - N_samples (int): The number of samples to generate. Default is 1.
+
+    Returns:
+    - A tuple of NumPy arrays representing the sampled origin positions.
+    """
+    flat_origin_histogram = origin_histogram.ravel()
+    indices1d = np.random.choice(
+        a=range(len(flat_origin_histogram)),
+        size=N_samples,
+        replace=True,
+        p=flat_origin_histogram / np.sum(flat_origin_histogram),
+    )
+    return np.array(np.unravel_index(indices1d, origin_histogram.shape)).T
+
+
+def convert_grid_indices_to_coordinates(grids: DiscreteGrid, X_0: np.ndarray) -> np.ndarray:
+    """
+    Convert grid indices to Cartesian coordinates.
+
+    Parameters:
+    - grids (Grids): The Grids object containing the grid definitions.
+    - X_0 (List[int]): A list of grid indices.
+
+    Returns:
+    - A list of Cartesian coordinates.
+    """
+    # TODO: Add some noise within the bin.
+    # xf, yf, rf, thetaf, k = (grids.bins[dim][X_0[:,i]] for i, dim in enumerate(grids.dimensions))
+    xf = random_uniform_value_in_bin(X_0[:, 0], grids.bins["x"])
+    yf = random_uniform_value_in_bin(X_0[:, 1], grids.bins["y"])
+    rf = random_uniform_value_in_bin(X_0[:, 2], grids.bins["r"])
+    thetaf = random_uniform_value_in_bin(X_0[:, 3], grids.bins["theta"])
+    k = grids.bins["k"][X_0[:, 4]]
+
+    uf, vf = pol2cart(rf, thetaf)
+    return np.array([xf, yf, uf, vf, k]).T
 
 
 # def create_and_save_grid(name: str):

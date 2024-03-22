@@ -6,10 +6,8 @@ import logging
 
 from physped.core.discrete_grid import DiscreteGrid
 
-# from physped.utils.customlogging import generate_logger
-# log_params = {"level": "INFO", "display": "term"}
-# generate_logger(params=log_params)
-log = logging.getLogger("mylog")
+
+log = logging.getLogger(__name__)
 
 
 def save_discrete_grid(grid: DiscreteGrid, folderpath: Path):

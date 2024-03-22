@@ -1,0 +1,52 @@
+env_name: 'parallel_paths'
+taux: 2
+tauu: 2
+dt: 0.1
+sigma: 0.4
+colnames:
+  x: x_pos
+  y: y_pos
+  Pid: Pid
+  time: time
+grid_name: 'parallel_paths_grid'
+folder_path: ${hydra:runtime.cwd}/data/models/${params.env_name}_taux${params.taux}_tauu${params.tauu}_dt${params.dt}_sigma${params.sigma}_${params.grid_name}
+simulation:
+  ntrajs: 100
+  start: 0
+  end: 4
+  step: 0.1
+  stop_condition: 100
+selection:
+  x: [-0.45, -0.45]
+  y: [0.15, 0.15]
+  r: [0.75, 0.75]
+  theta: [0.15, 0.15]
+  k: [1.2, 1.2]
+trajectory_plot:
+  trajectory_type: 'recorded'
+  title: "Wide corridor"
+  save_figure: true
+  N_trajs: 50
+  plot_selection: false
+  plot_potential_cross_section: false
+  plot_walls: true
+  plot_intended_path: true
+  polar_grid_type: 'standard'
+  width_ratios: [2, 1]
+  xlims: [-2, 2.5]
+  ylims: [-4, 4]
+  yps: [2.3, 0.8, -1.7]
+  ywalls: [3.6, -3.6]
+histogram_plot:
+  xlims: [-2, 3]
+  ylims: [-4.1, 4.1]
+  rlims: [0, 2]
+  thetalims: [-3.14, 3.14]
+force_field_plot: 
+  clip: 0
+  scale: 8000
+  sparseness: 3
+  width_ratios: [2, 1]
+  xlims: [-2, 3]
+  ylims: [-4.1, 4.1]
+  figsize: [3.54, 2]

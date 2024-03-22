@@ -14,26 +14,19 @@ import matplotlib.image as mpimg
 
 import physped as pp
 
-from physped.core.discretize_grid import (
+from physped.core.functions_to_discretize_grid import (
     make_grid_selection,
     grid_bounds,
     return_grid_ids,
 )
 
-# import readers as read
-# from validation import Validation#, read_validation_model, get_bin_middle
-# import functions as fu
-# from src.utils.customlogging import generate_logger
-
 plt.style.use(
     "/home/pouw/workspace/crowd-tracking/2020-XX-Pouw-Corbetta-pathintegral-codes/physped/visualization/science.mplstyle"
 )
-log = logging.getLogger("mylog")
+log = logging.getLogger(__name__)
 
 
-def plot_position_trajectories_in_cartesian_coordinates(
-    ax: plt.Axes, df: pd.DataFrame
-) -> plt.Axes:
+def plot_position_trajectories_in_cartesian_coordinates(ax: plt.Axes, df: pd.DataFrame) -> plt.Axes:
     """Plot the trajectories of particles in the metaforum dataset."""
     for ped_id in df.Pid.unique():
         dfp = df[df["Pid"] == ped_id]
@@ -53,18 +46,8 @@ def apply_xy_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
     ax.set_xlabel("$x\; [\mathrm{m}]$")
     ax.set_ylabel("$y\; [\mathrm{m}]$")
 
-    # Default axis limits are defined by the grid dimensions
-    x0, x1, dx = params["grid"]["x"]
-    y0, y1, dy = params["grid"]["y"]
-    default_xlims = [x0 - dx, x1 + dx]
-    default_ylims = [y0 - dy, y1 + dy]
-
-    traj_plot_params = params.get("trajectory_plot", {})
-    xlims = traj_plot_params.get("xlims", default_xlims)
-    ylims = traj_plot_params.get("ylims", default_ylims)
-
-    ax.set_xlim(xlims)
-    ax.set_ylim(ylims)
+    ax.set_xlim(params.trajectory_plot.xlims)
+    ax.set_ylim(params.trajectory_plot.ylims)
     return ax
 
 
@@ -109,9 +92,7 @@ def plot_polar_grid(ax, r_grid, theta_grid):
 
     for thid, th in enumerate(theta_grid[:-1]):
         ax.plot(np.ones(100) * th, r_range, color="k", linestyle=linestyle, lw=0.6)
-        ax.text(
-            th, r_grid[-1] * 1.35, f"{th/np.pi:.1f}$\\pi$", ha="center", va="center"
-        )
+        ax.text(th, r_grid[-1] * 1.35, f"{th/np.pi:.1f}$\\pi$", ha="center", va="center")
     ax.set_ylim(0, r_grid[-1])
     return ax
 
@@ -203,35 +184,30 @@ def highlight_grid_box(ax, limits, c="k"):
 
 def plot_station_background(ax, params):
     """Plot the background image of the station."""
-    bg_pars = pd.read_json(Path.cwd() / "data" / "pss-background-config.json")
-    img = mpimg.imread(Path.cwd() / "data" / "EHV.Perron2.1_multisensor_1.png")
-    # bg_pars = pd.read_json("../data/pss-background-config.json")
-    # img = mpimg.imread("../data/EHV.Perron2.1_multisensor_1.png")
-    config = bg_pars.loc["EHV.Perron2.1_multisensor.png", "background_parameters"]
+    config = params.background
+    img = mpimg.imread(params.background.imgpath)
     ax.imshow(
         img,
         cmap="gray",
         origin="upper",
         extent=(
-            config["x_min"] / 1000,
-            config["x_max"] / 1000,
-            config["y_min"] / 1000,
-            config["y_max"] / 1000,
+            config["xmin"] / 1000,
+            config["xmax"] / 1000,
+            config["ymin"] / 1000,
+            config["ymax"] / 1000,
         ),
         alpha=1,
     )
 
-    x0, x1, dx = params["grid"]["x"]
-    y0, y1, dy = params["grid"]["y"]
-    ax.set_xlim(x0 - dx, x1 + dx)
-    ax.set_ylim(y0 - dy, y1 + dy)
+    ax.set_xlim(params.trajectory_plot.xlims)
+    ax.set_ylim(params.trajectory_plot.ylims)
     return ax
 
 
 def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = None):
     traj_plot_params = params.get("trajectory_plot", {})
-    name = params.get("name")
-    folderpath = pp.create_folderpath(params)
+    name = params.get("env_name")
+    folderpath = Path(params.folder_path)
 
     plot_title = traj_plot_params.get("title", "")
     N_trajs_to_plot = traj_plot_params.get("N_trajs", 10)
@@ -241,9 +217,7 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
     fig = plt.figure(layout="constrained")
 
     width_ratios = traj_plot_params.get("width_ratios", [2, 1])
-    spec = mpl.gridspec.GridSpec(
-        ncols=2, nrows=1, width_ratios=width_ratios, wspace=0.1, hspace=0.1, figure=fig
-    )
+    spec = mpl.gridspec.GridSpec(ncols=2, nrows=1, width_ratios=width_ratios, wspace=0.1, hspace=0.1, figure=fig)
 
     ax = fig.add_subplot(spec[0])
     ax = apply_xy_plot_style(ax, params)
@@ -298,9 +272,7 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
 
     plot_limits = []
     grids = pp.read_discrete_grid_from_file(folderpath / "model.pickle")
-    plot_potential_cross_section = traj_plot_params.get(
-        "plot_potential_cross_section", False
-    )
+    plot_potential_cross_section = traj_plot_params.get("plot_potential_cross_section", False)
     if plot_potential_cross_section and "potential_convolution" in params:
         for axis in ["x", "y"]:
             potential_convolution_params = params.get("potential_convolution", {})
@@ -328,42 +300,6 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
     fig.suptitle(plot_title, y=0.83)
     save_figure = traj_plot_params.get("save_figure", False)
     if save_figure:
-        filename = (
-            pp.create_folderpath(params)
-            / f"{trajectory_type}trajectories_{params.get('name', '')}.pdf"
-        )
+        filename = folderpath / f"{trajectory_type}trajectories_{params.get('env_name', '')}.pdf"
         log.info("Saving trajectories figure.")
         plt.savefig(filename)
-
-    # plt.savefig('/home/pouw/workspace/presentations/2024-nwo-veldhoven-poster-pedestrian-model/figures/recorded_trajectories_single_paths.png', bbox_inches='tight')
-
-
-def main():
-    plt.style.use("science.mplstyle")
-    log_params = {"level": "INFO", "display": "term"}
-    ## Make plots
-
-    # cl.generate_logger(params=log_params)
-    # validation_name = sys.argv[1]
-    # plot_type = sys.argv[2]
-
-    # make_plot = {
-    #     "position_and_velocity": lambda val: make_position_and_velocity_figure(val),
-    #     "histograms": lambda val: create_histograms_figure(val),
-    #     "heatmap": lambda val: create_heatmap_figure(val),
-    #     "force_field": lambda val: create_force_field_figure(val),
-    # }
-
-    # val = fu.read_validation_model(validation_name)
-    # val.read_validation_parameters()
-    # if plot_type in ["heatmap"]:
-    #     val.compute_position_and_velocity_heatmaps()
-
-    # if plot_type in ["force_field"]:
-    #     val.compute_grid_selection_and_fields(reread_params=True)
-
-    # make_plot[plot_type](val)
-
-
-if __name__ == "__main__":
-    main()
