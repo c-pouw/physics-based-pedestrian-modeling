@@ -4,7 +4,6 @@ __version__ = get_versions()["version"]
 del get_versions
 
 from .io.readers import (
-    read_parameter_file,
     read_grid_bins,
     trajectory_reader,
     read_discrete_grid_from_file,

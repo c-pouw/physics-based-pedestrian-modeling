@@ -6,3 +6,4 @@ tqdm
 sdeint
 matplotlib
 ipython
+hydra
