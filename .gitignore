@@ -1,7 +1,20 @@
 # Additional ignores
-*.workspace
+multirun/*
+outputs/*
+*.code-workspace
 data/models/
 data/trajectories/
+
+# -*- mode: gitignore; -*-
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
