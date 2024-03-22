@@ -2,8 +2,6 @@ import pandas as pd
 import numpy as np
 import logging
 
-from physped.utils.customlogging import CustomFormatter
-
 log = logging.getLogger(__name__)
 
 

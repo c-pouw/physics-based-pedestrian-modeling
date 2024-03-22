@@ -9,7 +9,6 @@ from pathlib import Path
 import pickle
 from typing import Any
 import datetime
-import hydra
 
 import polars as pl
 import pandas as pd
@@ -20,7 +19,6 @@ from physped.utils.functions import add_velocity
 from physped.core.discrete_grid import DiscreteGrid
 
 trajectory_folder_path = Path.cwd() / "data" / "trajectories"
-parameters_folder_path = Path.cwd() / "data" / "parameter_files"
 
 log = logging.getLogger(__name__)
 
@@ -28,55 +26,6 @@ log = logging.getLogger(__name__)
 def read_grid_bins(grid_name: str):
     filename = f"data/grids/{grid_name}.npz"
     return np.load(filename, allow_pickle=True)
-
-
-def read_parameter_file(parameter_filename: str) -> dict[Any, Any]:
-    """Read validation parameters from file."""
-    parameter_file_name = parameters_folder_path / f"{parameter_filename}.json"
-    log.info(parameter_file_name.relative_to(Path.cwd()))
-    try:
-        with open(parameter_file_name, encoding="utf-8") as f:
-            params = json.load(f)
-        log.info("Succesfully read %s validation parameters.", parameter_filename)
-        params = parse_theta_params(params)
-        return params
-    except FileNotFoundError:
-        log.warning(
-            "No parameter file for validation with the name %s.\nTry one of the following: %s",
-            parameter_filename,
-            get_available_validations(),
-        )
-        return {}
-
-
-def parse_theta_params(params: dict) -> dict:
-    """
-    Convert theta parameters from degrees to radians.
-
-    This function takes a dictionary of parameters, and multiplies each theta parameter
-    by pi, effectively converting the angles from degrees to radians.
-
-    Args:
-        params (dict): A dictionary containing the 'selection' key, which is expected to
-                       have a 'theta' key that is a list of angles in degrees.
-
-    Returns:
-        dict: The original dictionary with the theta parameters converted to radians.
-    """
-    params["grid"]["theta"] *= np.pi
-    try:
-        params["selection"]["theta"] = [x * np.pi for x in params["selection"]["theta"]]
-    except KeyError:
-        pass
-    return params
-
-
-def get_available_validations() -> list:
-    """Get available validation names."""
-    glob_pattern = "../data/parameter_files/*.json"
-    parameter_files = glob.glob(glob_pattern)
-    available_validations = [parameter_file.split("/")[-1].split(".")[0] for parameter_file in parameter_files]
-    return available_validations
 
 
 def read_discrete_grid_from_file(filename: Path) -> DiscreteGrid:

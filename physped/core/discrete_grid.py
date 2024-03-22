@@ -45,15 +45,5 @@ class DiscreteGrid:
             "vmu",
             "vvar",
         ]
-        # self.fit_param_names = [
-        #     "xmu",
-        #     "xvar",
-        #     "ymu",
-        #     "yvar",
-        #     "rmu",
-        #     "rvar",
-        #     "thetamu",
-        #     "thetavar",
-        # ]
 
         self.fit_params = np.zeros(self.grid_shape + (self.no_fit_params,))

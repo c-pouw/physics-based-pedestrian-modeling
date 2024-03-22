@@ -1,10 +1,8 @@
 """Plot trajectories of particles in the metaforum dataset."""
 
 from typing import Tuple
-import sys
 import logging
 from pathlib import Path
-import random
 
 import pandas as pd
 import numpy as np
@@ -12,12 +10,12 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-import physped as pp
-
+from physped.io.readers import read_discrete_grid_from_file
 from physped.core.functions_to_discretize_grid import (
     make_grid_selection,
     grid_bounds,
     return_grid_ids,
+    create_grid_bins,
 )
 
 plt.style.use(
@@ -106,7 +104,7 @@ def apply_polar_plot_style(ax, params):
     theta_grid = np.arange(-np.pi, np.pi + 0.01, np.pi / 3)
 
     if polar_grid_type == "custom":
-        grid_bins = pp.create_grid_bins(params["grid"])
+        grid_bins = create_grid_bins(params["grid"])
         r_grid = params["grid"]["r"]
         theta_grid = grid_bins["theta"]
 
@@ -271,7 +269,7 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
         trajectory_type = f"{trajectory_type}_"
 
     plot_limits = []
-    grids = pp.read_discrete_grid_from_file(folderpath / "model.pickle")
+    grids = read_discrete_grid_from_file(folderpath / "model.pickle")
     plot_potential_cross_section = traj_plot_params.get("plot_potential_cross_section", False)
     if plot_potential_cross_section and "potential_convolution" in params:
         for axis in ["x", "y"]:
@@ -291,7 +289,7 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
     plot_selection = traj_plot_params.get("plot_selection", False)
     if plot_selection:
         selection = params.get("selection")
-        grids = pp.read_discrete_grid_from_file(folderpath / "model.pickle")
+        grids = read_discrete_grid_from_file(folderpath / "model.pickle")
         grid_selection = make_grid_selection(grids, selection)
         plot_limits = [grid_selection[obs]["periodic_bounds"] for obs in ["r", "theta"]]
 

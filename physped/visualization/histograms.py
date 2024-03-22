@@ -7,9 +7,8 @@ import pandas as pd
 import numpy as np
 import numpy.ma as ma
 import matplotlib.pyplot as plt
-from scipy.special import kl_div
 
-import physped as pp
+from scipy.special import kl_div
 
 plt.style.use(
     "/home/pouw/workspace/crowd-tracking/2020-XX-Pouw-Corbetta-pathintegral-codes/physped/visualization/science.mplstyle"

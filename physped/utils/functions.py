@@ -11,22 +11,6 @@ from scipy.signal import savgol_filter
 log = logging.getLogger(__name__)
 
 
-def _create_folderpath(params: dict) -> Path:
-    """
-    OBSOLETE
-    Create a folder path for a model based on the specified parameters.
-
-    Parameters:
-    - parameters (dict): A dictionary of parameters for the model.
-
-    Returns:
-    - A string representing the file path for the model.
-    """
-    #### TODO: Create folderpath directly in the config file
-    gridname = f"{params['env_name']}-tau{params['taux']}-sigma{params['sigma']}"
-    return Path.cwd() / "data" / "models" / gridname
-
-
 def create_folder_if_not_exists(folderpath: Path) -> None:
     """
     Create a folder at the specified path if it does not exist.

@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 import hydra
 
-import physped as pp
+from physped.io.readers import trajectory_reader, read_preprocessed_trajectories
 from physped.visualization.histograms import (
     create_all_histograms,
     plot_multiple_histograms,
@@ -23,9 +23,9 @@ def plot_and_save_histograms(cfg):
     # Read raw and preprocess trajectories
     if name == "ehv_azure":
         datelist = pd.date_range(start="2023-10-01", end="2023-10-04", freq="1h")
-        trajs = pp.trajectory_reader[name](datelist[0])
+        trajs = trajectory_reader[name](datelist[0])
     else:
-        trajs = pp.read_preprocessed_trajectories(folderpath)
+        trajs = read_preprocessed_trajectories(folderpath)
 
     # Read simulated trajectories
     simtrajs = pd.read_csv(folderpath / "simulated_trajectories.csv")

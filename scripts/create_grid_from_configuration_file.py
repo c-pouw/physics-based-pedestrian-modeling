@@ -4,9 +4,6 @@ import logging
 import hydra
 import numpy as np
 
-import physped as pp
-
-
 log = logging.getLogger(__name__)
 
 

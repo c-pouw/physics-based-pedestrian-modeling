@@ -1,4 +1,3 @@
-import sys
 import logging
 from pathlib import Path
 
@@ -6,7 +5,9 @@ import numpy as np
 import pandas as pd
 import hydra
 
-import physped as pp
+from physped.core.langevin_model import LangevinModel
+from physped.core.functions_to_discretize_grid import sample_from_ndarray, convert_grid_indices_to_coordinates
+from physped.io.readers import read_discrete_grid_from_file
 from physped.utils.functions import cart2pol
 
 log = logging.getLogger(__name__)
@@ -24,17 +25,17 @@ def simulate_trajectories(cfg):  # name: str, no_trajs: int):
     # params = pp.read_parameter_file(name)
     folderpath = Path(cfg.params.folder_path)
 
-    grids = pp.read_discrete_grid_from_file(folderpath / "model.pickle")
+    grids = read_discrete_grid_from_file(folderpath / "model.pickle")
 
     # Create origins positions
-    origins = pp.sample_from_ndarray(grids.histogram[..., 0], cfg.params.simulation.ntrajs)
+    origins = sample_from_ndarray(grids.histogram[..., 0], cfg.params.simulation.ntrajs)
     origins = np.hstack((origins, np.zeros((origins.shape[0], 1), dtype=int)))
-    origins = pp.convert_grid_indices_to_coordinates(grids, origins)
+    origins = convert_grid_indices_to_coordinates(grids, origins)
     origins = np.hstack((origins, origins))
     origins = np.delete(origins, 4, axis=1)
 
     # Simulate trajectories
-    lm = pp.LangevinModel(grids, cfg.params)
+    lm = LangevinModel(grids, cfg.params)
     t_eval = np.arange(cfg.params.simulation.start, cfg.params.simulation.end, cfg.params.simulation.step)
     # simulation_time = params.get("simulation_time", [0, 10, 0.1])
     # t_eval = np.arange(*simulation_time)

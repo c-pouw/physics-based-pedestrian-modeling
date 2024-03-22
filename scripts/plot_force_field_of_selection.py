@@ -1,18 +1,18 @@
 import logging
-import sys
+from pathlib import Path
 
+import hydra
 import numpy as np
 import matplotlib.pyplot as plt
 
-import physped as pp
-from physped.visualization.plot_fields import (
-    plot_force_field_of_selection,
-)
+from physped.io.readers import read_discrete_grid_from_file
+from physped.visualization.plot_fields import plot_force_field_of_selection
 
 log = logging.getLogger(__name__)
 
 
-def main(name: str):
+@hydra.main(version_base=None, config_path="../conf")
+def main(cfg):
     # Read discrete grid
     selection = {
         "x": None,
@@ -21,15 +21,14 @@ def main(name: str):
         "theta": [(0.1 * np.pi), (0.2 * np.pi) - 0.01],
         "k": [0, 2],
     }
-    params = pp.read_parameter_file(name)
     # params["force_field_plot"] = {"clip": 0, "scale": 800, "sparseness": 3}
-    filepath = pp.create_filepath(params)
-    grids = pp.read_discrete_grid_from_file(filepath)
+    folderpath = Path(cfg.params.folder_path)
+    name = cfg.params.env_name
+    grids = read_discrete_grid_from_file(folderpath / "model.pickle")
 
-    plot_force_field_of_selection(grids, params, selection)
+    plot_force_field_of_selection(grids, cfg.params, selection)
     plt.savefig(f"figures/{name}_force_field_of_selection.pdf")
 
 
 if __name__ == "__main__":
-    input_name = sys.argv[1]
-    main(input_name)
+    main(cfg)
