@@ -1,17 +1,17 @@
-from typing import List, Optional, Dict, Any
-from matplotlib.axes import Axes
 import logging
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
-import pandas as pd
+import matplotlib.pyplot as plt
 import numpy as np
 import numpy.ma as ma
-import matplotlib.pyplot as plt
-
+import pandas as pd
+from matplotlib.axes import Axes
 from scipy.special import kl_div
 
 plt.style.use(
-    "/home/pouw/workspace/crowd-tracking/2020-XX-Pouw-Corbetta-pathintegral-codes/physped/visualization/science.mplstyle"
+    "/home/pouw/workspace/crowd-tracking/2020-XX-Pouw-Corbetta-pathintegral-codes/"
+    "physped/visualization/science.mplstyle"
 )
 log = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ histogram_plot_params = {
         "ylabel": {"counts": "Count($r_f$)", "PDF": "P($r_f$)"},
     },
     "thetaf": {
-        "xlabel": "$\\theta_f\;$[m/s]",
+        "xlabel": "$\\theta_f\\;$[m/s]",
         "ylabel": {"counts": "Count($\\theta_f$)", "PDF": "P($\\theta_f$)"},
     },
     "raw": {
@@ -103,6 +103,29 @@ def create_all_histograms(
 ):
     """
     Create histograms for all observables.
+
+    Args:
+        trajs (pd.DataFrame): The raw trajectories data.
+        simtrajs (pd.DataFrame): The simulated trajectories data.
+        observables (Optional[List[str]], optional): List of observables to create histograms for.
+            If not provided, histograms will be created for default observables.
+            Defaults to None.
+
+    Returns:
+        dict: A dictionary containing histograms for each observable and trajectory type.
+            The dictionary structure is as follows:
+            {
+                "raw": {
+                    "observable1": histogram1,
+                    "observable2": histogram2,
+                    ...
+                },
+                "sim": {
+                    "observable1": histogram1,
+                    "observable2": histogram2,
+                    ...
+                }
+            }
     """
     if observables is None:
         observables = ["xf", "yf", "uf", "vf", "rf", "thetaf"]
@@ -177,7 +200,6 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
             histograms,
             observable,
             hist_type=histogram_type,
-            kl_div=kldiv,
         )
         lims = hist_plot_params.get(f"{observable[0]}lims", None)
         ax.set_xlim(lims)
@@ -203,7 +225,6 @@ def plot_histogram(
     histograms: Dict[str, Any],
     observable: str,
     hist_type: str,
-    kl_div: float,
 ) -> Axes:
     """
     Plot a histogram.

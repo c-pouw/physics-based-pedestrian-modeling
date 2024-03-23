@@ -1,40 +1,36 @@
 """Infer force fields from trajectories."""
 
+import copy
 import logging
 from typing import List
 
 import numpy as np
 import pandas as pd
 from scipy.stats import norm
-from physped.utils.functions import (
-    weighted_mean_of_two_matrices,
-    digitize_values_to_grid,
-    pol2cart,
-)
+
 from physped.core.discrete_grid import DiscreteGrid
+from physped.utils.functions import digitize_values_to_grid, pol2cart, weighted_mean_of_two_matrices
 
 log = logging.getLogger(__name__)
 
 
-def trajectories_to_grid(trajectories: pd.DataFrame, grid_bins) -> DiscreteGrid:
+def cast_trajectories_to_discrete_grid(trajectories: pd.DataFrame, grid_bins: dict) -> DiscreteGrid:
     """
     Convert trajectories to a grid of histograms and parameters.
 
     Parameters:
     - trajectories (pd.DataFrame): A DataFrame of trajectories.
-    - grid_vals (dict): A dictionary of grid values for each dimension.
+    - grid_bins (dict): A dictionary of grid values for each dimension.
 
     Returns:
     - A dictionary of DiscreteGrid objects for storing histograms and parameters.
     """
-    # grids = initialize_grids(grid_vals)
     grids = DiscreteGrid(grid_bins)
     trajectories = digitize_trajectories_to_grid(grids.bins, trajectories)
     grids.histogram = add_trajectories_to_histogram(grids.histogram, trajectories, "fast_grid_indices")
     grids.histogram_slow = add_trajectories_to_histogram(grids.histogram_slow, trajectories, "slow_grid_indices")
-    # trajectory_origins = trajectories.groupby('Pid')['fast_grid_indices'].first().reset_index()
     grids.fit_params = fit_trajectories_on_grid(grids.fit_params, trajectories)
-    log.info("Finished converting trajectories to grid.")
+    log.info("Finished casting trajectories to discrete grid.")
     return grids
 
 
@@ -49,15 +45,14 @@ def accumulate_grids(cummulative_grids: DiscreteGrid, grids_to_add: DiscreteGrid
     Returns:
     - The updated cumulative grids.
     """
-    import copy
 
     for p in range(cummulative_grids.no_fit_params):  # Loop over all fit parameters
         # accumulate fit parameters
         cummulative_grids.fit_params[:, :, :, :, :, p] = weighted_mean_of_two_matrices(
-            a=copy.deepcopy(cummulative_grids.fit_params[:, :, :, :, :, p]),
-            aC=copy.deepcopy(cummulative_grids.histogram),
-            b=copy.deepcopy(grids_to_add.fit_params[:, :, :, :, :, p]),
-            bC=copy.deepcopy(grids_to_add.histogram),
+            first_matrix=copy.deepcopy(cummulative_grids.fit_params[:, :, :, :, :, p]),
+            counts_first_matrix=copy.deepcopy(cummulative_grids.histogram),
+            second_matrix=copy.deepcopy(grids_to_add.fit_params[:, :, :, :, :, p]),
+            counts_second_matrix=copy.deepcopy(grids_to_add.histogram),
         )
     # accumlate histogram
     cummulative_grids.histogram += grids_to_add.histogram
@@ -85,16 +80,16 @@ def get_slice_of_multidimensional_matrix(a: np.ndarray, slices: List[tuple]) -> 
     return a[tuple(slices)]
 
 
-def digitize_trajectories_to_grid(grid_bins, trajectories: pd.DataFrame) -> pd.DataFrame:
+def digitize_trajectories_to_grid(grid_bins: dict, trajectories: pd.DataFrame) -> pd.DataFrame:
     """
     Digitize trajectories to a grid.
 
     Parameters:
-    - grid_bins (): The grid bins to digitize the trajectories to.
+    - grid_bins (dict): The grid bins to digitize the trajectories to.
     - trajectories (pd.DataFrame): The trajectories to digitize.
 
     Returns:
-    - The trajectories with the digitized grid indices.
+    - pd.DataFrame: The trajectories with the digitized grid indices.
     """
     indices = {}
     for obs, dynamics in [(obs, dynamics) for obs in grid_bins.keys() for dynamics in ["f", "s"]]:
@@ -132,7 +127,6 @@ def fit_fast_modes(group: pd.DataFrame) -> list:
     fit_func = norm.fit  # todo: Try other fitting functions
     params = []
     for i in ["xf", "yf", "uf", "vf"]:
-        # for i in ["xf", "yf", "rf", "thetaf"]: # todo change to polar coordinate fitting
         mu, std = fit_func(group[i])  # fit normal distribution to fast modes
         params += [mu, std**2]  # store mean and variance of normal distribution
     return params

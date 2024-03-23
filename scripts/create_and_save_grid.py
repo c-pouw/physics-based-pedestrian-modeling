@@ -3,10 +3,10 @@ from pathlib import Path
 
 import hydra
 
+from physped.core.functions_to_discretize_grid import cast_trajectories_to_discrete_grid
+from physped.io.readers import read_grid_bins, read_preprocessed_trajectories
 from physped.io.writers import save_discrete_grid
-from physped.io.readers import read_preprocessed_trajectories, read_grid_bins
-from physped.core.functions_to_discretize_grid import trajectories_to_grid
-from physped.utils.functions import create_folder_if_not_exists
+from physped.utils.functions import ensure_folder_exists
 
 log = logging.getLogger(__name__)
 
@@ -17,7 +17,6 @@ log = logging.getLogger(__name__)
 def create_and_save_grid(cfg):
     """Create and save trajectories in grid."""
     # Read parameters and trajectories
-    # params = pp.read_parameter_file(name)
     folderpath = Path(cfg.params.folder_path)
     trajectories = read_preprocessed_trajectories(folderpath)
 
@@ -25,14 +24,11 @@ def create_and_save_grid(cfg):
     #     trajectories = optional_filter(trajectories)
 
     # Cast trajectories to grid
-    # grid_bins = pp.create_grid_bins(params["grid"])
     grid_bins = read_grid_bins(cfg.params.grid_name)
-    grids = trajectories_to_grid(trajectories, grid_bins)
+    grids = cast_trajectories_to_discrete_grid(trajectories, grid_bins)
 
     # Save the grid
-    # filepath = pp.create_filepath(params=params)
-    create_folder_if_not_exists(folderpath=folderpath)
-    # pp.save_parameters(parameters=cfg.params, folderpath=folderpath)  # TODO: Hydra automatically saves the config
+    ensure_folder_exists(folderpath=folderpath)
     save_discrete_grid(grids, folderpath)
 
 

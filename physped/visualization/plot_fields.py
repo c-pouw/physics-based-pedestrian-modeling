@@ -1,22 +1,17 @@
 from typing import Tuple
 
-import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import numpy as np
 
-from physped.core.functions_to_discretize_grid import (
-    get_slice_of_multidimensional_matrix,
-    make_grid_selection,
-)
-from physped.visualization.plot_trajectories import (
-    plot_station_background,
-    apply_polar_plot_style,
-    highlight_grid_box,
-    apply_xy_plot_style,
-    # create_grid_box_limits,
-)
-
+from physped.core.functions_to_discretize_grid import get_slice_of_multidimensional_matrix, make_grid_selection
 from physped.utils.functions import weighted_mean_of_matrix
+from physped.visualization.plot_trajectories import (  # create_grid_box_limits,
+    apply_polar_plot_style,
+    apply_xy_plot_style,
+    highlight_grid_box,
+    plot_station_background,
+)
 
 
 def plot_quiver_force_vectors(ax: plt.Axes, fields: dict, scale: int, sparseness: int) -> plt.Axes:

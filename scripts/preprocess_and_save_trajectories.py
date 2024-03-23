@@ -3,9 +3,9 @@ from pathlib import Path
 
 import hydra
 
-from physped.utils.functions import create_folder_if_not_exists
 from physped.io.readers import trajectory_reader
 from physped.preprocessing.trajectory_preprocessor import preprocess_trajectories
+from physped.utils.functions import ensure_folder_exists
 
 log = logging.getLogger(__name__)
 
@@ -17,12 +17,12 @@ def preprocess_and_save_trajectories(cfg):
     name = cfg.params.env_name
     folderpath = Path(cfg.params.folder_path)
 
-    create_folder_if_not_exists(folderpath=folderpath)
+    ensure_folder_exists(folderpath=folderpath)
 
     # if ... exists:
-    if (folderpath / "preprocessed_trajectories.csv").exists():
-        log.info("Preprocessed trajectories already exist. Skipping.")
-        return
+    # if (folderpath / "preprocessed_trajectories.csv").exists():
+    #     log.info("Preprocessed trajectories already exist. Skipping.")
+    #     return
 
     trajectories = trajectory_reader[name]()
 

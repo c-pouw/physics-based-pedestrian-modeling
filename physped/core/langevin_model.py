@@ -81,7 +81,8 @@ class LangevinModel:
 
         Args:
             X_0 (np.ndarray): Initial values [xf_i, yf_i, uf_i, vf_i, xs_i, ys_i, us_i, vs_i].
-            t_eval (np.ndarray, optional): Time evaluation np.arange(t_i, t_f, timestep). Defaults to np.arange(0, 10, 0.1).
+            t_eval (np.ndarray, optional): Time evaluation np.arange(t_i, t_f, timestep).
+            Defaults to np.arange(0, 10, 0.1).
 
         Returns:
             np.ndarray: Solutions in self.xf, self.yf, ..., self.us, self.vs.

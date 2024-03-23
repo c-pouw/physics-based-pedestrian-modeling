@@ -1,10 +1,10 @@
 """Custom logging module for the project."""
 
 import logging
-import time
 import os
+import time
 
-from IPython.display import display, HTML
+from IPython.display import HTML, display
 
 
 def generate_logger(params={}):
@@ -55,7 +55,7 @@ class CustomFormatter(logging.Formatter):
     red = "\x1b[31;20m"
     bold_red = "\x1b[31;1m"
     reset = "\x1b[0m"
-    format = f"[%(asctime)s][%(adjustedTime)s][" f"%(levelname)s][%(filename)s:%(lineno)d] - %(message)s"
+    format = "[%(asctime)s][%(adjustedTime)s][" "%(levelname)s][%(filename)s:%(lineno)d] - %(message)s"
 
     FORMATS = {
         logging.DEBUG: grey + format + reset,

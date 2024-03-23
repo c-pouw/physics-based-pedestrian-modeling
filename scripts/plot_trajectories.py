@@ -1,10 +1,10 @@
 import logging
 from pathlib import Path
 
-import pandas as pd
 import hydra
+import pandas as pd
 
-from physped.io.readers import trajectory_reader, read_preprocessed_trajectories
+from physped.io.readers import read_preprocessed_trajectories, trajectory_reader
 from physped.visualization.plot_trajectories import plot_trajectories
 
 log = logging.getLogger(__name__)

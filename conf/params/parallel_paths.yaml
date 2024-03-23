@@ -42,7 +42,7 @@ histogram_plot:
   ylims: [-4.1, 4.1]
   rlims: [0, 2]
   thetalims: [-3.14, 3.14]
-force_field_plot: 
+force_field_plot:
   clip: 0
   scale: 8000
   sparseness: 3

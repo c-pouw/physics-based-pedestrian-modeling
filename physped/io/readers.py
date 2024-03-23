@@ -1,22 +1,19 @@
 """Trajectory readers for the pathintegral code."""
 
+import datetime
 import logging
+import pickle
 import zipfile
 from io import StringIO
-import json
-import glob
 from pathlib import Path
-import pickle
-from typing import Any
-import datetime
 
-import polars as pl
-import pandas as pd
 import numpy as np
+import pandas as pd
+import polars as pl
 from tqdm import tqdm
 
-from physped.utils.functions import add_velocity
 from physped.core.discrete_grid import DiscreteGrid
+from physped.utils.functions import add_velocity
 
 trajectory_folder_path = Path.cwd() / "data" / "trajectories"
 

@@ -1,31 +1,41 @@
 """Plot trajectories of particles in the metaforum dataset."""
 
-from typing import Tuple
 import logging
 from pathlib import Path
+from typing import Tuple
 
-import pandas as pd
-import numpy as np
 import matplotlib as mpl
-import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
-from physped.io.readers import read_discrete_grid_from_file
 from physped.core.functions_to_discretize_grid import (
-    make_grid_selection,
-    grid_bounds,
-    return_grid_ids,
     create_grid_bins,
+    grid_bounds,
+    make_grid_selection,
+    return_grid_ids,
 )
+from physped.io.readers import read_discrete_grid_from_file
 
 plt.style.use(
-    "/home/pouw/workspace/crowd-tracking/2020-XX-Pouw-Corbetta-pathintegral-codes/physped/visualization/science.mplstyle"
+    "/home/pouw/workspace/crowd-tracking/2020-XX-Pouw-Corbetta-pathintegral-codes/"
+    "physped/visualization/science.mplstyle"
 )
 log = logging.getLogger(__name__)
 
 
 def plot_position_trajectories_in_cartesian_coordinates(ax: plt.Axes, df: pd.DataFrame) -> plt.Axes:
-    """Plot the trajectories of particles in the metaforum dataset."""
+    """
+    Plot the trajectories of pedestrians in cartesian coordinates.
+
+    Parameters:
+    - ax (plt.Axes): The matplotlib Axes object to plot on.
+    - df (pd.DataFrame): The DataFrame containing the particle data.
+
+    Returns:
+    - ax (plt.Axes): The modified matplotlib Axes object.
+    """
     for ped_id in df.Pid.unique():
         dfp = df[df["Pid"] == ped_id]
         ax.scatter(
@@ -40,20 +50,27 @@ def plot_position_trajectories_in_cartesian_coordinates(ax: plt.Axes, df: pd.Dat
 
 
 def apply_xy_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
+    """
+    Apply XY plot style to the given Axes object.
+
+    Parameters:
+        ax (plt.Axes): The Axes object to apply the style to.
+        params (dict): A dictionary containing the plot parameters.
+
+    Returns:
+        plt.Axes: The modified Axes object.
+
+    """
     ax.set_aspect("equal")
-    ax.set_xlabel("$x\; [\mathrm{m}]$")
-    ax.set_ylabel("$y\; [\mathrm{m}]$")
+    ax.set_xlabel("$x\\; [\\mathrm{m}]$")
+    ax.set_ylabel("$y\\; [\\mathrm{m}]$")
 
     ax.set_xlim(params.trajectory_plot.xlims)
     ax.set_ylim(params.trajectory_plot.ylims)
     return ax
 
 
-def plot_velocity_trajectories_in_polar_coordinates(
-    ax,
-    df,
-    # val, traj_type, N=100
-) -> plt.Axes:
+def plot_velocity_trajectories_in_polar_coordinates(ax: plt.Axes, df: pd.DataFrame) -> plt.Axes:
     """Plot the trajectories of particles in the metaforum dataset."""
     for ped_id in df.Pid.unique():
         dfp = df[df["Pid"] == ped_id]
@@ -69,7 +86,18 @@ def plot_velocity_trajectories_in_polar_coordinates(
     return ax
 
 
-def plot_polar_grid(ax, r_grid, theta_grid):
+def plot_polar_grid(ax: plt.Axes, r_grid: np.ndarray, theta_grid: np.ndarray) -> plt.Axes:
+    """
+    Plot polar grid lines on a given axes object.
+
+    Parameters:
+    - ax (matplotlib.axes.Axes): The axes object to plot on.
+    - r_grid (numpy.ndarray): Array of radial grid values.
+    - theta_grid (numpy.ndarray): Array of angular grid values.
+
+    Returns:
+    - ax (matplotlib.axes.Axes): The modified axes object.
+    """
     r_range = np.linspace(r_grid[1], r_grid[-1], 100)
     theta_range = np.linspace(0, 2 * np.pi, 100)
     linestyle = "dashed"
@@ -88,14 +116,25 @@ def plot_polar_grid(ax, r_grid, theta_grid):
             #     edgecolor='none', boxstyle='round')
         )
 
-    for thid, th in enumerate(theta_grid[:-1]):
+    for _, th in enumerate(theta_grid[:-1]):
         ax.plot(np.ones(100) * th, r_range, color="k", linestyle=linestyle, lw=0.6)
         ax.text(th, r_grid[-1] * 1.35, f"{th/np.pi:.1f}$\\pi$", ha="center", va="center")
     ax.set_ylim(0, r_grid[-1])
     return ax
 
 
-def apply_polar_plot_style(ax, params):
+def apply_polar_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
+    """
+    Applies a polar plot style to the given axes object.
+
+    Parameters:
+    - ax: The axes object to apply the polar plot style to.
+    - params: A dictionary containing parameters for customizing the plot style.
+
+    Returns:
+    - The modified axes object.
+
+    """
     ax.set_aspect("equal")
 
     polar_grid_type = params["trajectory_plot"].get("polar_grid_type", "standard")
@@ -115,51 +154,19 @@ def apply_polar_plot_style(ax, params):
     return ax
 
 
-def _create_grid_box_limits(bins, lim_idx, obs):
-    ### Should be obsolete
-    if not obs == "theta":
-        lims = [bins[x] for x in lim_idx]
-    else:  # The angle is periodic
-        lims = list(lim_idx)
+def highlight_grid_box(ax: plt.Axes, limits: Tuple, c: str = "k") -> plt.Axes:
+    """
+    Highlight the selected grid box.
 
-        if lims[0] < 0:
-            lims[0] = lims[0] * -1
-            lims[0] = -1 * bins[lims[0]] - 2 * np.pi
-        else:
-            lims[0] = bins[lims[0]]
+    Parameters:
+        ax (plt.Axes): The matplotlib Axes object to plot on.
+        limits (Tuple): The limits of the grid box as a tuple (xlims, ylims).
+        c (str): The color of the highlight box. Default is "k" (black).
 
-        if lims[1] >= len(bins):
-            lims[1] -= len(bins) - 1
-            lims[1] = bins[lims[1]] + 2 * np.pi
-        else:
-            lims[1] = bins[lims[1]]
+    Returns:
+        plt.Axes: The modified matplotlib Axes object.
 
-    return lims
-
-
-def _create_grid_box_limits(slices: list, dimensions: Tuple, bins: dict, obs: list):
-    ### Should be obsolete
-    xidx, yidx = (np.where(np.array(dimensions) == obs[i])[0][0] for i in range(2))
-    xlims = [bins[obs[0]][x] for x in slices[xidx]]
-    ylims = list(slices[yidx])
-
-    if ylims[0] < 0:
-        ylims[0] = ylims[0] * -1
-        ylims[0] = -1 * bins[obs[1]][ylims[0]] - 2 * np.pi
-    else:
-        ylims[0] = bins[obs[1]][ylims[0]]
-
-    if ylims[1] >= len(bins[obs[1]]):
-        ylims[1] -= len(bins[obs[1]]) - 1
-        ylims[1] = bins[obs[1]][ylims[1]] + 2 * np.pi
-    else:
-        ylims[1] = bins[obs[1]][ylims[1]]
-
-    return xlims, ylims
-
-
-def highlight_grid_box(ax, limits, c="k"):
-    """Highlight the selected grid box."""
+    """
     xlims, ylims = limits
 
     yrange = np.linspace(ylims[0], ylims[1], 100)
@@ -180,8 +187,18 @@ def highlight_grid_box(ax, limits, c="k"):
     return ax
 
 
-def plot_station_background(ax, params):
-    """Plot the background image of the station."""
+def plot_station_background(ax: plt.Axes, params: dict) -> plt.Axes:
+    """
+    Plot the background image of the station.
+
+    Parameters:
+        ax (plt.Axes): The matplotlib Axes object to plot on.
+        params (dict): A dictionary containing the parameters for plotting.
+
+    Returns:
+        plt.Axes: The modified matplotlib Axes object.
+
+    """
     config = params.background
     img = mpimg.imread(params.background.imgpath)
     ax.imshow(
@@ -203,13 +220,24 @@ def plot_station_background(ax, params):
 
 
 def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = None):
+    """
+    Plot trajectories of pedestrians.
+
+    Args:
+        trajs (pd.DataFrame): DataFrame containing the trajectories of pedestrians.
+        params (dict): Dictionary containing the plot parameters.
+        trajectory_type (str, optional): Type of trajectory. Defaults to None.
+
+    Returns:
+        None
+    """
     traj_plot_params = params.get("trajectory_plot", {})
     name = params.get("env_name")
     folderpath = Path(params.folder_path)
 
     plot_title = traj_plot_params.get("title", "")
-    N_trajs_to_plot = traj_plot_params.get("N_trajs", 10)
-    sampled_trajectories = trajs.Pid.drop_duplicates().sample(N_trajs_to_plot)
+    num_trajectories_to_plot = traj_plot_params.get("N_trajs", 10)
+    sampled_trajectories = trajs.Pid.drop_duplicates().sample(num_trajectories_to_plot)
     plot_trajs = trajs[trajs["Pid"].isin(sampled_trajectories)]
 
     fig = plt.figure(layout="constrained")
@@ -252,7 +280,7 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
             ax.text(
                 1.05,
                 yp,
-                f"$y_{{p}}$",
+                "$y_p$",
                 transform=ax.get_yaxis_transform(),
                 va="center",
                 ha="left",

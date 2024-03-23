@@ -2,8 +2,8 @@ import logging
 from pathlib import Path
 
 import hydra
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 from physped.io.readers import read_discrete_grid_from_file
 from physped.visualization.plot_fields import plot_force_field_of_selection
@@ -31,4 +31,4 @@ def main(cfg):
 
 
 if __name__ == "__main__":
-    main(cfg)
+    main()

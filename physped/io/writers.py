@@ -1,11 +1,9 @@
-import pickle
 import json
+import logging
+import pickle
 from pathlib import Path
 
-import logging
-
 from physped.core.discrete_grid import DiscreteGrid
-
 
 log = logging.getLogger(__name__)
 
