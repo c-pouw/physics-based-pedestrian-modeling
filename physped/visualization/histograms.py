@@ -9,10 +9,7 @@ import pandas as pd
 from matplotlib.axes import Axes
 from scipy.special import kl_div
 
-plt.style.use(
-    "/home/pouw/workspace/crowd-tracking/2020-XX-Pouw-Corbetta-pathintegral-codes/"
-    "physped/visualization/science.mplstyle"
-)
+plt.style.use(Path.cwd() / "physped/visualization/science.mplstyle")
 log = logging.getLogger(__name__)
 
 histogram_plot_params = {

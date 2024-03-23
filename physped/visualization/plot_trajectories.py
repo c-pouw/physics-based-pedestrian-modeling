@@ -18,10 +18,7 @@ from physped.core.functions_to_discretize_grid import (
 )
 from physped.io.readers import read_discrete_grid_from_file
 
-plt.style.use(
-    "/home/pouw/workspace/crowd-tracking/2020-XX-Pouw-Corbetta-pathintegral-codes/"
-    "physped/visualization/science.mplstyle"
-)
+plt.style.use(Path.cwd() / "physped/visualization/science.mplstyle")
 log = logging.getLogger(__name__)
 
 
