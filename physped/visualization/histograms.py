@@ -101,32 +101,6 @@ def create_all_histograms(
     simtrajs: pd.DataFrame,
     observables: Optional[List[str]] = None,
 ):
-    """
-    Create histograms for all observables.
-
-    Args:
-        trajs (pd.DataFrame): The raw trajectories data.
-        simtrajs (pd.DataFrame): The simulated trajectories data.
-        observables (Optional[List[str]], optional): List of observables to create histograms for.
-            If not provided, histograms will be created for default observables.
-            Defaults to None.
-
-    Returns:
-        dict: A dictionary containing histograms for each observable and trajectory type.
-            The dictionary structure is as follows:
-            {
-                "raw": {
-                    "observable1": histogram1,
-                    "observable2": histogram2,
-                    ...
-                },
-                "sim": {
-                    "observable1": histogram1,
-                    "observable2": histogram2,
-                    ...
-                }
-            }
-    """
     if observables is None:
         observables = ["xf", "yf", "uf", "vf", "rf", "thetaf"]
     histograms = {}

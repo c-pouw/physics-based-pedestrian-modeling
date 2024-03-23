@@ -11,5 +11,6 @@ Data-driven physics-based modeling of pedestrian dynamics Documentation
 
    installation
    usage
+   modules
    release-history
    min_versions

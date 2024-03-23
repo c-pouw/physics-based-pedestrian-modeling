@@ -31,11 +31,6 @@ def cart2pol(x: float, y: float) -> tuple:
     Parameters:
     x (float): The x-coordinate in cartesian coordinates.
     y (float): The y-coordinate in cartesian coordinates.
-
-    Returns:
-    tuple: A tuple containing the polar coordinates (rho, phi).
-        - rho (float): The radial distance from the origin to the point.
-        - phi (float): The angle between the positive x-axis and the line connecting the origin to the point.
     """
     rho = np.sqrt(x**2 + y**2)
     phi = np.arctan2(y, x)
@@ -105,20 +100,30 @@ def add_velocity(df: pd.DataFrame, groupby: str = "Pid", xpos: str = "xf", ypos:
     """
     Add velocity to dataframe.
 
+    This function calculates the velocity of each pedestrian in the input DataFrame
+    based on their position data. The velocity is calculated using the Savitzky-Golay
+    filter with a window size of 49 and a polynomial order of 1.
+
     Parameters:
-    - df: pandas DataFrame
-        The input DataFrame containing the position data.
-    - groupby: str, optional
-        The column name to group the data by. Default is "Pid".
-    - xpos: str, optional
-        The column name for the x-position data. Default is "xf".
-    - ypos: str, optional
-        The column name for the y-position data. Default is "yf".
+        df (pd.DataFrame): The input DataFrame containing the position data.
+        groupby (str, optional): The column name to group the data by. Default is "Pid".
+        xpos (str, optional): The column name for the x-position data. Default is "xf".
+        ypos (str, optional): The column name for the y-position data. Default is "yf".
 
     Returns:
-    - df: pandas DataFrame
-        The input DataFrame with velocity columns added.
+        pd.DataFrame: The input DataFrame with velocity columns added.
 
+    Raises:
+        ValueError: If the input DataFrame is empty or does not contain the specified columns.
+
+    Example:
+        >>> df = pd.DataFrame({'Pid': [1, 1, 2, 2], 'xf': [0, 1, 0, 1], 'yf': [0, 1, 0, 1]})
+        >>> add_velocity(df)
+           Pid  xf  yf   uf   vf
+        0    1   0   0  0.0  0.0
+        1    1   1   1  0.0  0.0
+        2    2   0   0  0.0  0.0
+        3    2   1   1  0.0  0.0
     """
     unit_conversion = 10
     pos_to_vel = {"xf": "uf", "yf": "vf"}

@@ -104,17 +104,6 @@ class LangevinModel:
         return np.array([uf, vf, ufdot, vfdot, xsdot, ysdot, usdot, vsdot])
 
     def simulate(self, X_0: np.ndarray, t_eval: np.ndarray = np.arange(0, 10, 0.1)) -> np.ndarray:
-        """Simulate trajectories.
-
-        Args:
-            X_0 (np.ndarray): Initial values [xf_i, yf_i, uf_i, vf_i, xs_i, ys_i, us_i, vs_i].
-            t_eval (np.ndarray, optional): Time evaluation np.arange(t_i, t_f, timestep).
-                Defaults to np.arange(0, 10, 0.1).
-
-        Returns:
-            np.ndarray: Solutions in self.xf, self.yf, ..., self.us, self.vs.
-
-        """
         return sdeint.itoSRI2(self.modelxy, self.Noise, y0=X_0, tspan=t_eval)
 
     def Noise(self):
