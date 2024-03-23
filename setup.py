@@ -10,7 +10,7 @@ import versioneer
 # and/or pip.
 min_version = (
     3,
-    11,
+    2,
 )
 if sys.version_info < min_version:
     error = """

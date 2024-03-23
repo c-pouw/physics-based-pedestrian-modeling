@@ -62,7 +62,9 @@ class LangevinModel:
         k = 2
         X_vals = [xs, ys, rs, thetas, k]
         X_indx = get_grid_index(self.grids, X_vals)
-        xmean, xvar, ymean, yvar, umean, uvar, vmean, vvar = self.grids.fit_params[*X_indx, :]
+        xmean, xvar, ymean, yvar, umean, uvar, vmean, vvar = self.grids.fit_params[
+            X_indx[0], X_indx[1], X_indx[2], X_indx[3], X_indx[4], :
+        ]
 
         # determine potential energy contributions
         # V_x = uvar/xvar*(xf - xmean)
