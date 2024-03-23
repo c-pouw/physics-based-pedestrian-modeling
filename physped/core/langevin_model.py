@@ -13,18 +13,43 @@ log = logging.getLogger(__name__)
 
 
 class LangevinModel:
-    """Langevin model class."""
+    """Langevin model class.
+
+    This class represents a Langevin model used for simulating pedestrian trajectories.
+    It contains methods for initializing the model, simulating trajectories, and defining stopping conditions.
+
+    Attributes:
+        grids (DiscreteGrid): The discrete grid object used for modeling.
+        params (dict): A dictionary containing the model parameters.
+        grid_counts (ndarray): The counts of grid cells visited during simulation.
+
+    """
 
     def __init__(self, grids: DiscreteGrid, params: dict):
-        """Initialize Langevin model with parameters."""
+        """Initialize Langevin model with parameters.
+
+        Args:
+            grids (DiscreteGrid): The discrete grid object used for modeling.
+            params (dict): A dictionary containing the model parameters.
+
+        """
         self.grids = grids
         self.params = params
         self.grid_counts = np.sum(grids.histogram, axis=(2, 3, 4))
-        # self.heatmap = np.sum(grids.histogram, axis=(2, 3, 4)) / np.sum(grids.histogram)
+        self.heatmap = np.sum(grids.histogram, axis=(2, 3, 4)) / np.sum(grids.histogram)
 
-    def modelxy(self, X_0, t):
-        """Given state z=(xf, yf, ..., us, vs), returns the derivatives dz/dt (excluding random noise)."""
-        # TODO: Can we precompute certain quantities to make the processing faster?
+    def modelxy(self, X_0: np.ndarray) -> np.ndarray:
+        """
+        Given state z=(xf, yf, ..., us, vs), returns the derivatives dz/dt (excluding random noise).
+
+        Parameters:
+        - X_0: Initial state vector containing the values of xf, yf, uf, vf, xs, ys, us, vs.
+
+        Returns:
+        - dz/dt: Derivatives of the state vector (uf, vf, ufdot, vfdot, xsdot, ysdot, usdot, vsdot).
+
+        """
+        # Can we precompute certain quantities to make the processing faster?
         xf, yf, uf, vf, xs, ys, us, vs = X_0
         # check stopping condition
         # Either position out of domain or position in unexplored grid cell
@@ -76,22 +101,28 @@ class LangevinModel:
         # return derivatives
         return np.array([uf, vf, ufdot, vfdot, xsdot, ysdot, usdot, vsdot])
 
-    def simulate(self, X_0: np.ndarray, t_eval: np.ndarray = np.arange(0, 10, 0.1)):
+    def simulate(self, X_0: np.ndarray, t_eval: np.ndarray = np.arange(0, 10, 0.1)) -> np.ndarray:
         """Simulate trajectories.
 
         Args:
             X_0 (np.ndarray): Initial values [xf_i, yf_i, uf_i, vf_i, xs_i, ys_i, us_i, vs_i].
             t_eval (np.ndarray, optional): Time evaluation np.arange(t_i, t_f, timestep).
-            Defaults to np.arange(0, 10, 0.1).
+                Defaults to np.arange(0, 10, 0.1).
 
         Returns:
             np.ndarray: Solutions in self.xf, self.yf, ..., self.us, self.vs.
+
         """
         return sdeint.itoSRI2(self.modelxy, self.Noise, y0=X_0, tspan=t_eval)
 
-    def Noise(self, X_0, t):
-        """Return noise matrix."""
-        # diagonal, so independent driving Wiener processes
+    def Noise(self):
+        """Return noise matrix.
+
+        Returns:
+            numpy.ndarray: A diagonal matrix representing the noise matrix. The diagonal elements
+            correspond to the independent driving Wiener processes.
+
+        """
         return np.diag([0.0, 0.0, self.params["sigma"], self.params["sigma"], 0.0, 0.0, 0.0, 0.0])
 
     def stop_condition(self, xf: float, yf: float, stop_condition: float) -> bool:
@@ -99,23 +130,14 @@ class LangevinModel:
         Customize stopping condition.
 
         Parameters:
-        - X_0 (List[float]): A list of initial values for the simulation.
+        - xf (float): The x-coordinate of the pedestrian's final position.
+        - yf (float): The y-coordinate of the pedestrian's final position.
+        - stop_condition (float): The threshold value for the stopping condition.
 
         Returns:
-        - A boolean indicating whether the stopping condition has been met.
+        - bool: A boolean indicating whether the stopping condition has been met.
+
         """
-        # return not (self.grids.bins["x"].min() < xf < self.grids.bins["x"].max()) and (
-        #     self.grids.bins["y"].min() < yf < self.grids.bins["y"].max()
-        # )
-        # print(self.heatmap.shape)
-        # print(self.heatmap)
         grid_index_x = digitize_values_to_grid(xf, self.grids.bins["x"])
         grid_index_y = digitize_values_to_grid(yf, self.grids.bins["y"])
         return self.grid_counts[grid_index_x, grid_index_y] < stop_condition
-        # print(self.heatmap[grid_index_x, grid_index_y])
-        # return self.heatmap[grid_index_x, grid_index_y] < stop_condition
-
-        # xmin, xmax, _ = self.params['grid']['x']
-        # ymin, ymax, _ = self.params['grid']['y']
-        # # returns True if (xf, yf) is outside the domain
-        # return not (xmin < xf < xmax and ymin < yf < ymax)
