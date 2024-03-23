@@ -7,3 +7,4 @@ sdeint
 matplotlib
 ipython
 hydra-core
+polars
