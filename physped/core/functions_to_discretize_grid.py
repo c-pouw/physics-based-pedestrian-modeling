@@ -123,8 +123,8 @@ def fit_fast_modes(group: pd.DataFrame) -> list:
     - A list of fitting parameters.
     """
     if len(group) < 10:
-        return None  # todo: Can we do better than this?
-    fit_func = norm.fit  # todo: Try other fitting functions
+        return None  # ? Can we do better if we have multiple files?
+    fit_func = norm.fit  # * Other functions can be implemented here
     params = []
     for i in ["xf", "yf", "uf", "vf"]:
         mu, std = fit_func(group[i])  # fit normal distribution to fast modes

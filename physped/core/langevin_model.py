@@ -38,7 +38,7 @@ class LangevinModel:
         self.grid_counts = np.sum(grids.histogram, axis=(2, 3, 4))
         self.heatmap = np.sum(grids.histogram, axis=(2, 3, 4)) / np.sum(grids.histogram)
 
-    def modelxy(self, X_0: np.ndarray) -> np.ndarray:
+    def modelxy(self, X_0: np.ndarray, t) -> np.ndarray:
         """
         Given state z=(xf, yf, ..., us, vs), returns the derivatives dz/dt (excluding random noise).
 
@@ -106,7 +106,7 @@ class LangevinModel:
     def simulate(self, X_0: np.ndarray, t_eval: np.ndarray = np.arange(0, 10, 0.1)) -> np.ndarray:
         return sdeint.itoSRI2(self.modelxy, self.Noise, y0=X_0, tspan=t_eval)
 
-    def Noise(self):
+    def Noise(self, X_0, t) -> np.ndarray:
         """Return noise matrix.
 
         Returns:

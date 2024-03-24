@@ -20,9 +20,10 @@ def preprocess_and_save_trajectories(cfg):
     ensure_folder_exists(folderpath=folderpath)
 
     # if ... exists:
-    # if (folderpath / "preprocessed_trajectories.csv").exists():
-    #     log.info("Preprocessed trajectories already exist. Skipping.")
-    #     return
+    # if cfg.params.get("force_trajectory_preprocessing", False):
+    if (folderpath / "preprocessed_trajectories.csv").exists():
+        log.info("Preprocessed trajectories already exist. Skipping.")
+        return
 
     trajectories = trajectory_reader[name]()
 
