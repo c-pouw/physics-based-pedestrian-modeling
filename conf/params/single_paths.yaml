@@ -4,10 +4,11 @@ tauu: 2
 dt: 0.1
 sigma: 0.2
 colnames:
-  x: x_pos
-  y: y_pos
+  xf: xf
+  yf: yf
   Pid: Pid
-  time: time
+  time: Rstep
+save_preprocessed_trajectories_to_file: False
 grid_name: 'single_paths_grid'
 working_directory: ${hydra:runtime.cwd}
 folder_path: ${hydra:runtime.cwd}/data/models/${params.env_name}_taux${params.taux}_tauu${params.tauu}_dt${params.dt}_sigma${params.sigma}_${params.grid_name}

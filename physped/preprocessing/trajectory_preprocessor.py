@@ -1,7 +1,13 @@
 import logging
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
+
+# from physped.io.readers import trajectory_reader
+from physped.io.writers import save_preprocessed_trajectories
+
+# from physped.utils.functions import ensure_folder_exists
 
 log = logging.getLogger(__name__)
 
@@ -116,18 +122,48 @@ def add_trajectory_step(df: pd.DataFrame, params: dict) -> pd.DataFrame:
     Returns:
     - The DataFrame with the trajectory step/observation added.
     """
-    colnames = params.get("colnames", {})
-    pid_col = colnames.get("Pid", "Pid")
-    time_col = colnames.get("time", "time")
+    # colnames = params.get("colnames", {})
+    # pid_col = colnames.get("Pid", "Pid")
+    # time_col = colnames.get("time", "time")
+    pid_col, time_col = "Pid", "time"
     df.sort_values(by=[pid_col, time_col], inplace=True)
     df["k"] = df.groupby(pid_col)[pid_col].transform(lambda x: np.arange(x.size))
     return df
 
 
+def rename_columns(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
+    """
+    Rename columns of a DataFrame.
+
+    Parameters:
+    - df (pd.DataFrame): The DataFrame to rename the columns of.
+    - colnames (dict): A dictionary with the old column names as keys and the new column names as values.
+
+    Returns:
+    - The DataFrame with the columns renamed.
+    """
+    colnames = parameters.get("colnames", {})
+    inverted_colnames = {v: k for k, v in colnames.items()}
+    df.rename(columns=inverted_colnames, inplace=True)
+    # df.rename(columns={"Rstep": "time", "Pid": "Pid", "t": "time"}, inplace=True)
+    return df
+
+
 def preprocess_trajectories(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
+    """_summary_
+
+    :param df: _description_
+    :type df: pd.DataFrame
+    :param parameters: _description_
+    :type parameters: dict
+    :return: _description_
+    :rtype: pd.DataFrame
+    """
     log.info("Start trajectory preprocessing.")
-    # print(df.columns)
-    df = add_trajectory_step(df, parameters)  # , colnames={"Pid": "Pid", "time": "time"})
+    # TODO : Use columnnames from parameters instead of renaming
+    df = rename_columns(df, parameters)
+    log.info("Columns renamed.")
+    df = add_trajectory_step(df, parameters)
     log.info("Trajectory step added.")
     df = add_velocity_in_polar_coordinates(df, mode="f")
     log.info("Polar coordinates added.")
@@ -140,8 +176,7 @@ def preprocess_trajectories(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     )
     df = add_velocity_in_polar_coordinates(df, mode="s")
     log.info("Slow modes computed.")
-    log.info("Trajectories preprocessed.")
-    # df = dg.convert_slow_velocities_to_polar(df)
+    save_preprocessed_trajectories(df, Path(parameters.folder_path))
     return df
 
 

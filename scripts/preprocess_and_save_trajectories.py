@@ -21,25 +21,16 @@ def preprocess_and_save_trajectories(cfg):
 
     # if ... exists:
     # if cfg.params.get("force_trajectory_preprocessing", False):
-    if (folderpath / "preprocessed_trajectories.csv").exists():
-        log.info("Preprocessed trajectories already exist. Skipping.")
-        return
+    # if (folderpath / "preprocessed_trajectories.csv").exists():
+    #     log.info("Preprocessed trajectories already exist. Skipping.")
+    #     return
 
     trajectories = trajectory_reader[name]()
-
+    print(Path(cfg.params.folder_path))
     # for optional_filter in optional_filters:
     #     trajectories = optional_filter(trajectories)
 
-    # Preprocess trajectories
-    trajectories.rename(columns={"Rstep": "time", "Pid": "Pid", "t": "time"}, inplace=True)
-    trajectories = preprocess_trajectories(trajectories, parameters=cfg.params)
-
-    filepath = folderpath / "preprocessed_trajectories.csv"
-    trajectories.to_csv(filepath, index=False)
-    log.info(
-        "Saved prepocessed trajectories to %s",
-        filepath.relative_to(Path.cwd()),
-    )
+    preprocess_trajectories(trajectories, parameters=cfg.params)
 
 
 if __name__ == "__main__":

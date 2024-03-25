@@ -1,6 +1,5 @@
 """Trajectory readers for the pathintegral code."""
 
-import datetime
 import logging
 import pickle
 import zipfile
@@ -9,10 +8,9 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import polars as pl
 from tqdm import tqdm
 
-from physped.core.discrete_grid import DiscreteGrid
+from physped.core.discrete_grid import DiscretePotential
 from physped.utils.functions import add_velocity
 
 trajectory_folder_path = Path.cwd() / "data" / "trajectories"
@@ -25,7 +23,7 @@ def read_grid_bins(grid_name: str):
     return np.load(filename, allow_pickle=True)
 
 
-def read_discrete_grid_from_file(filename: Path) -> DiscreteGrid:
+def read_discrete_grid_from_file(filename: Path) -> DiscretePotential:
     """
     Read a validation model from a file using pickle.
 
@@ -146,43 +144,43 @@ def preprocess_ehv(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def read_ehv_station_paths_from_azure(datehour: datetime.datetime, freq: str) -> pd.DataFrame:
-    import crowdflow as cf
-    from crowdflow.preprocessing.aggregators import KinematicsAggregator
-    from crowdflow.preprocessing.pipelines import siemens_trajectory_cleaner as cleaner
+# def read_ehv_station_paths_from_azure(datehour: datetime.datetime, freq: str) -> pd.DataFrame:
+#     import crowdflow as cf
+#     from crowdflow.preprocessing.aggregators import KinematicsAggregator
+#     from crowdflow.preprocessing.pipelines import siemens_trajectory_cleaner as cleaner
 
-    filename = "ehv_Perron2.1_siemens.json"
-    log.info("Reading %s", datehour)
-    area = cf.get_area(filename, **{"validate": False})
-    days = 1
-    if freq[1] == "d":
-        starttime = datetime.time(0)
-        endtime = datetime.time(23, 59)
-        days = int(freq[0])
-    elif freq[1] == "h":
-        starttime = datetime.time(datehour.hour)
-        endtime = datetime.time(datehour.hour + (int(freq[0]) - 1), 59)
-    df = pl.concat(
-        cf.read(
-            area,
-            "trajectorie",
-            "Siemens_Scan",
-            "azurescanpolars",
-            datehour.date(),
-            datehour.date() + datetime.timedelta(days=days),
-            starttime,
-            endtime,
-            **{"errors": "ignore", "show_progress": True},
-        )
-    )
-    df = cleaner(df, **{"NormalizeCoordinates.area": area})
-    df = df.collect()
-    ka = KinematicsAggregator(derivative="velocity")
-    df = ka.aggregate(df)
-    df = df.with_columns(pl.col("x_pos") / 1000)
-    df = df.with_columns(pl.col("y_pos") / 1000)
-    # df = df[df.traj_len > 150].copy()
-    return df.to_pandas()
+#     filename = "ehv_Perron2.1_siemens.json"
+#     log.info("Reading %s", datehour)
+#     area = cf.get_area(filename, **{"validate": False})
+#     days = 1
+#     if freq[1] == "d":
+#         starttime = datetime.time(0)
+#         endtime = datetime.time(23, 59)
+#         days = int(freq[0])
+#     elif freq[1] == "h":
+#         starttime = datetime.time(datehour.hour)
+#         endtime = datetime.time(datehour.hour + (int(freq[0]) - 1), 59)
+#     df = pl.concat(
+#         cf.read(
+#             area,
+#             "trajectorie",
+#             "Siemens_Scan",
+#             "azurescanpolars",
+#             datehour.date(),
+#             datehour.date() + datetime.timedelta(days=days),
+#             starttime,
+#             endtime,
+#             **{"errors": "ignore", "show_progress": True},
+#         )
+#     )
+#     df = cleaner(df, **{"NormalizeCoordinates.area": area})
+#     df = df.collect()
+#     ka = KinematicsAggregator(derivative="velocity")
+#     df = ka.aggregate(df)
+#     df = df.with_columns(pl.col("x_pos") / 1000)
+#     df = df.with_columns(pl.col("y_pos") / 1000)
+#     # df = df[df.traj_len > 150].copy()
+#     return df.to_pandas()
 
 
 def read_preprocessed_trajectories(folderpath: str) -> pd.DataFrame:
@@ -196,11 +194,22 @@ def read_preprocessed_trajectories(folderpath: str) -> pd.DataFrame:
     return trajectories
 
 
+def read_simulated_trajectories(folderpath: str) -> pd.DataFrame:
+    """Read simulated trajectories from file."""
+    filepath = Path(folderpath) / "simulated_trajectories.csv"
+    trajectories = pd.read_csv(filepath)
+    log.info(
+        "Succesfully read simulated trajectories %s.",
+        filepath.relative_to(Path.cwd()),
+    )
+    return trajectories
+
+
 trajectory_reader = {
     "single_paths": single_paths,
     "parallel_paths": parallel_paths,
     "intersecting_paths": intersecting_paths,
     "curved_paths": curved_paths,
     "station_paths": station_paths,
-    "ehv_azure": read_ehv_station_paths_from_azure,
+    # "ehv_azure": read_ehv_station_paths_from_azure,
 }

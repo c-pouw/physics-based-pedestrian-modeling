@@ -3,9 +3,9 @@ from pathlib import Path
 
 import hydra
 
-from physped.core.functions_to_discretize_grid import cast_trajectories_to_discrete_grid
+from physped.core.functions_to_discretize_grid import learn_potential_from_trajectories
 from physped.io.readers import read_grid_bins, read_preprocessed_trajectories
-from physped.io.writers import save_discrete_grid
+from physped.io.writers import save_discrete_potential
 from physped.utils.functions import ensure_folder_exists
 
 log = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ log = logging.getLogger(__name__)
 
 
 @hydra.main(version_base=None, config_path="../conf")
-def create_and_save_grid(cfg):
+def learn_discretized_potential(cfg):
     """Create and save trajectories in grid."""
     # Read parameters and trajectories
     folderpath = Path(cfg.params.folder_path)
@@ -25,12 +25,12 @@ def create_and_save_grid(cfg):
 
     # Cast trajectories to grid
     grid_bins = read_grid_bins(cfg.params.grid_name)
-    grids = cast_trajectories_to_discrete_grid(trajectories, grid_bins)
+    discrete_potential = learn_potential_from_trajectories(trajectories, grid_bins)
 
     # Save the grid
     ensure_folder_exists(folderpath=folderpath)
-    save_discrete_grid(grids, folderpath)
+    save_discrete_potential(discrete_potential, folderpath)
 
 
 if __name__ == "__main__":
-    create_and_save_grid()
+    learn_discretized_potential()

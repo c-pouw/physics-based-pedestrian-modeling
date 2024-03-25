@@ -8,13 +8,13 @@ import numpy as np
 import pandas as pd
 from scipy.stats import norm
 
-from physped.core.discrete_grid import DiscreteGrid
+from physped.core.discrete_grid import DiscretePotential
 from physped.utils.functions import digitize_values_to_grid, pol2cart, weighted_mean_of_two_matrices
 
 log = logging.getLogger(__name__)
 
 
-def cast_trajectories_to_discrete_grid(trajectories: pd.DataFrame, grid_bins: dict) -> DiscreteGrid:
+def learn_potential_from_trajectories(trajectories: pd.DataFrame, grid_bins: dict) -> DiscretePotential:
     """
     Convert trajectories to a grid of histograms and parameters.
 
@@ -25,7 +25,7 @@ def cast_trajectories_to_discrete_grid(trajectories: pd.DataFrame, grid_bins: di
     Returns:
     - A dictionary of DiscreteGrid objects for storing histograms and parameters.
     """
-    grids = DiscreteGrid(grid_bins)
+    grids = DiscretePotential(grid_bins)
     trajectories = digitize_trajectories_to_grid(grids.bins, trajectories)
     grids.histogram = add_trajectories_to_histogram(grids.histogram, trajectories, "fast_grid_indices")
     grids.histogram_slow = add_trajectories_to_histogram(grids.histogram_slow, trajectories, "slow_grid_indices")
@@ -34,7 +34,7 @@ def cast_trajectories_to_discrete_grid(trajectories: pd.DataFrame, grid_bins: di
     return grids
 
 
-def accumulate_grids(cummulative_grids: DiscreteGrid, grids_to_add: DiscreteGrid) -> DiscreteGrid:
+def accumulate_grids(cummulative_grids: DiscretePotential, grids_to_add: DiscretePotential) -> DiscretePotential:
     """
     Accumulate grids by taking a weighted mean of the fit parameters.
 
@@ -149,7 +149,9 @@ def fit_trajectories_on_grid(param_grid, trajectories: pd.DataFrame):
     return param_grid
 
 
-def add_trajectories_to_histogram(histogram, trajectories: pd.DataFrame, groupbyindex: str) -> np.ndarray:
+def add_trajectories_to_histogram(
+    histogram: np.ndarray, trajectories: pd.DataFrame, groupbyindex: str
+) -> np.ndarray:
     """
     Add trajectories to a histogram.
 
@@ -187,7 +189,7 @@ def create_grid_bins(grid_vals: dict) -> dict:
     return grid_bins
 
 
-def get_grid_index(grids: DiscreteGrid, X: List[float]) -> np.ndarray:
+def get_grid_index(potential_grid: DiscretePotential, X: List[float]) -> np.ndarray:
     """
     Given a point (xs, ys, thetas, rs), returns the grid index of the point.
 
@@ -199,8 +201,8 @@ def get_grid_index(grids: DiscreteGrid, X: List[float]) -> np.ndarray:
     - A tuple of grid indices.
     """
     indices = np.array([], dtype=int)
-    for val, obs in zip(X, grids.dimensions):
-        grid = grids.bins[obs]
+    for val, obs in zip(X, potential_grid.dimensions):
+        grid = potential_grid.bins[obs]
         indices = np.append(indices, digitize_values_to_grid(val, grid))
 
     if indices[2] == 0:
@@ -327,7 +329,7 @@ def sample_from_ndarray(origin_histogram: np.ndarray, N_samples: int = 1) -> np.
     return np.array(np.unravel_index(indices1d, origin_histogram.shape)).T
 
 
-def convert_grid_indices_to_coordinates(grids: DiscreteGrid, X_0: np.ndarray) -> np.ndarray:
+def convert_grid_indices_to_coordinates(potential_grid: DiscretePotential, X_0: np.ndarray) -> np.ndarray:
     """
     Convert grid indices to Cartesian coordinates.
 
@@ -340,11 +342,11 @@ def convert_grid_indices_to_coordinates(grids: DiscreteGrid, X_0: np.ndarray) ->
     """
     # TODO: Add some noise within the bin.
     # xf, yf, rf, thetaf, k = (grids.bins[dim][X_0[:,i]] for i, dim in enumerate(grids.dimensions))
-    xf = random_uniform_value_in_bin(X_0[:, 0], grids.bins["x"])
-    yf = random_uniform_value_in_bin(X_0[:, 1], grids.bins["y"])
-    rf = random_uniform_value_in_bin(X_0[:, 2], grids.bins["r"])
-    thetaf = random_uniform_value_in_bin(X_0[:, 3], grids.bins["theta"])
-    k = grids.bins["k"][X_0[:, 4]]
+    xf = random_uniform_value_in_bin(X_0[:, 0], potential_grid.bins["x"])
+    yf = random_uniform_value_in_bin(X_0[:, 1], potential_grid.bins["y"])
+    rf = random_uniform_value_in_bin(X_0[:, 2], potential_grid.bins["r"])
+    thetaf = random_uniform_value_in_bin(X_0[:, 3], potential_grid.bins["theta"])
+    k = potential_grid.bins["k"][X_0[:, 4]]
 
     uf, vf = pol2cart(rf, thetaf)
     return np.array([xf, yf, uf, vf, k]).T

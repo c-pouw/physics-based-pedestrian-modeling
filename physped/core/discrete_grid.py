@@ -10,7 +10,7 @@ from physped.utils.functions import get_bin_middle
 log = logging.getLogger(__name__)
 
 
-class DiscreteGrid:
+class DiscretePotential:
     """
     A class for creating a discrete grid based on a set of bin edges.
 
@@ -45,5 +45,5 @@ class DiscreteGrid:
             "vmu",
             "vvar",
         ]
-
+        # Initialize potential grid
         self.fit_params = np.zeros(self.grid_shape + (self.no_fit_params,))

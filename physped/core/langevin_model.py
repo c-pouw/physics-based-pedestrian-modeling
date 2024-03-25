@@ -5,7 +5,7 @@ import logging
 import numpy as np
 import sdeint
 
-from physped.core.discrete_grid import DiscreteGrid
+from physped.core.discrete_grid import DiscretePotential
 from physped.core.functions_to_discretize_grid import get_grid_index
 from physped.utils.functions import cart2pol, digitize_values_to_grid
 
@@ -25,7 +25,7 @@ class LangevinModel:
 
     """
 
-    def __init__(self, grids: DiscreteGrid, params: dict):
+    def __init__(self, grids: DiscretePotential, params: dict):
         """Initialize Langevin model with parameters.
 
         Args:
