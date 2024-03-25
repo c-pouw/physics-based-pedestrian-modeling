@@ -4,7 +4,6 @@ from typing import Tuple
 
 import numpy as np
 import pandas as pd
-from scipy.signal import savgol_filter
 
 log = logging.getLogger(__name__)
 
@@ -94,44 +93,6 @@ def get_bin_middle(bins):
 
     """
     return (bins[1:] + bins[:-1]) / 2
-
-
-def add_velocity(df: pd.DataFrame, groupby: str = "Pid", xpos: str = "xf", ypos: str = "yf") -> pd.DataFrame:
-    """
-    Add velocity to dataframe.
-
-    This function calculates the velocity of each pedestrian in the input DataFrame
-    based on their position data. The velocity is calculated using the Savitzky-Golay
-    filter with a window size of 49 and a polynomial order of 1.
-
-    Parameters:
-        df (pd.DataFrame): The input DataFrame containing the position data.
-        groupby (str, optional): The column name to group the data by. Default is "Pid".
-        xpos (str, optional): The column name for the x-position data. Default is "xf".
-        ypos (str, optional): The column name for the y-position data. Default is "yf".
-
-    Returns:
-        pd.DataFrame: The input DataFrame with velocity columns added.
-
-    Raises:
-        ValueError: If the input DataFrame is empty or does not contain the specified columns.
-
-    Example:
-        >>> df = pd.DataFrame({'Pid': [1, 1, 2, 2], 'xf': [0, 1, 0, 1], 'yf': [0, 1, 0, 1]})
-        >>> add_velocity(df)
-           Pid  xf  yf   uf   vf
-        0    1   0   0  0.0  0.0
-        1    1   1   1  0.0  0.0
-        2    2   0   0  0.0  0.0
-        3    2   1   1  0.0  0.0
-    """
-    unit_conversion = 10
-    pos_to_vel = {"xf": "uf", "yf": "vf"}
-    for direction in [xpos, ypos]:
-        df.loc[:, pos_to_vel[direction]] = df.groupby([groupby])[direction].transform(
-            lambda x: savgol_filter(x, 49, polyorder=1, deriv=1, mode="interp") * unit_conversion
-        )
-    return df
 
 
 def weighted_mean_of_two_matrices(

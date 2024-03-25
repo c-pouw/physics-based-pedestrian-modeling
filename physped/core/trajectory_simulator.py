@@ -21,7 +21,7 @@ def sample_trajectory_origins_from_heatmap(potential_grid, parameters: dict) -> 
     return origins
 
 
-def simulate_trajectories(potential_grid, parameters: dict):
+def simulate_trajectories(potential_grid, parameters: dict) -> pd.DataFrame:
     origins = sample_trajectory_origins_from_heatmap(potential_grid, parameters)
     # Simulate trajectories
     lm = LangevinModel(potential_grid, parameters)
@@ -40,6 +40,5 @@ def simulate_trajectories(potential_grid, parameters: dict):
     trajectories = pd.concat(trajectories)
     trajectories["rf"], trajectories["thetaf"] = cart2pol(trajectories.uf, trajectories.vf)
     trajectories["rs"], trajectories["thetas"] = cart2pol(trajectories.us, trajectories.vs)
-    # print(trajectories.head())
-    # return trajectories
     save_simulated_trajectories(trajectories, Path(parameters.folder_path))
+    return trajectories

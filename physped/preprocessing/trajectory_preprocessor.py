@@ -3,11 +3,9 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from scipy.signal import savgol_filter
 
-# from physped.io.readers import trajectory_reader
 from physped.io.writers import save_preprocessed_trajectories
-
-# from physped.utils.functions import ensure_folder_exists
 
 log = logging.getLogger(__name__)
 
@@ -149,6 +147,56 @@ def rename_columns(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     return df
 
 
+def prune_short_trajectories(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
+    # df.reset_index(inplace=True, drop=True)
+    df["traj_len"] = df.groupby(["Pid"])["Pid"].transform("size")
+    df = df[df.traj_len > parameters.minimum_trajectory_length].copy()
+    return df
+
+
+def add_velocity(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
+    """
+    Add velocity to dataframe.
+
+    This function calculates the velocity of each pedestrian in the input DataFrame
+    based on their position data. The velocity is calculated using the Savitzky-Golay
+    filter with a window size of 49 and a polynomial order of 1.
+
+    Parameters:
+        df (pd.DataFrame): The input DataFrame containing the position data.
+        groupby (str, optional): The column name to group the data by. Default is "Pid".
+        xpos (str, optional): The column name for the x-position data. Default is "xf".
+        ypos (str, optional): The column name for the y-position data. Default is "yf".
+
+    Returns:
+        pd.DataFrame: The input DataFrame with velocity columns added.
+
+    Raises:
+        ValueError: If the input DataFrame is empty or does not contain the specified columns.
+
+    Example:
+        >>> df = pd.DataFrame({'Pid': [1, 1, 2, 2], 'xf': [0, 1, 0, 1], 'yf': [0, 1, 0, 1]})
+        >>> add_velocity(df)
+           Pid  xf  yf   uf   vf
+        0    1   0   0  0.0  0.0
+        1    1   1   1  0.0  0.0
+        2    2   0   0  0.0  0.0
+        3    2   1   1  0.0  0.0
+    """
+    framerate = 1 / parameters["dt"]
+    groupby = "Pid"
+    xpos = "xf"
+    ypos = "yf"
+    pos_to_vel = {"xf": "uf", "yf": "vf"}
+    window_length = parameters.minimum_trajectory_length - 1
+    for direction in [xpos, ypos]:
+        df.loc[:, pos_to_vel[direction]] = df.groupby([groupby])[direction].transform(
+            lambda x: savgol_filter(x, window_length=window_length, polyorder=2, deriv=1, mode="interp")
+            * framerate
+        )
+    return df
+
+
 def preprocess_trajectories(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     """_summary_
 
@@ -163,6 +211,10 @@ def preprocess_trajectories(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     # TODO : Use columnnames from parameters instead of renaming
     df = rename_columns(df, parameters)
     log.info("Columns renamed.")
+    df = prune_short_trajectories(df, parameters)
+    log.info("Short trajectories pruned.")
+    df = add_velocity(df, parameters)
+    log.info("Velocity added.")
     df = add_trajectory_step(df, parameters)
     log.info("Trajectory step added.")
     df = add_velocity_in_polar_coordinates(df, mode="f")

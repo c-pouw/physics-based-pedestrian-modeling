@@ -11,7 +11,8 @@ import pandas as pd
 from tqdm import tqdm
 
 from physped.core.discrete_grid import DiscretePotential
-from physped.utils.functions import add_velocity
+
+# from physped.utils.functions import add_velocity
 
 trajectory_folder_path = Path.cwd() / "data" / "trajectories"
 
@@ -140,7 +141,7 @@ def preprocess_ehv(df: pd.DataFrame) -> pd.DataFrame:
     df["xf"] /= 1000
     df["yf"] /= 1000
 
-    df = add_velocity(df, groupby="Pid", xpos="xf", ypos="yf")
+    # df = add_velocity(df, groupby="Pid", xpos="xf", ypos="yf")
     return df
 
 
