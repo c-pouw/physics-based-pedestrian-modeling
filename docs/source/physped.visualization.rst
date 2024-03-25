@@ -12,29 +12,29 @@ physped.visualization.force\_field module
    :undoc-members:
    :show-inheritance:
 
-physped.visualization.histograms module
----------------------------------------
+.. physped.visualization.histograms module
+.. ---------------------------------------
 
-.. automodule:: physped.visualization.histograms
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. .. automodule:: physped.visualization.histograms
+..    :members:
+..    :undoc-members:
+..    :show-inheritance:
 
-physped.visualization.plot\_fields module
------------------------------------------
+.. physped.visualization.plot\_fields module
+.. -----------------------------------------
 
-.. automodule:: physped.visualization.plot_fields
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. .. automodule:: physped.visualization.plot_fields
+..    :members:
+..    :undoc-members:
+..    :show-inheritance:
 
-physped.visualization.plot\_trajectories module
------------------------------------------------
+.. physped.visualization.plot\_trajectories module
+.. -----------------------------------------------
 
-.. automodule:: physped.visualization.plot_trajectories
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. .. automodule:: physped.visualization.plot_trajectories
+..    :members:
+..    :undoc-members:
+..    :show-inheritance:
 
 Module contents
 ---------------
