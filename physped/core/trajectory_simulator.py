@@ -12,8 +12,7 @@ from physped.utils.functions import cart2pol
 log = logging.getLogger(__name__)
 
 
-def sample_origins(potential_grid, parameters: dict) -> np.ndarray:
-    # Create origins positions
+def sample_trajectory_origins_from_heatmap(potential_grid, parameters: dict) -> np.ndarray:
     origins = sample_from_ndarray(potential_grid.histogram[..., 0], parameters.simulation.ntrajs)
     origins = np.hstack((origins, np.zeros((origins.shape[0], 1), dtype=int)))
     origins = convert_grid_indices_to_coordinates(potential_grid, origins)
@@ -23,7 +22,7 @@ def sample_origins(potential_grid, parameters: dict) -> np.ndarray:
 
 
 def simulate_trajectories(potential_grid, parameters: dict):
-    origins = sample_origins(potential_grid, parameters)
+    origins = sample_trajectory_origins_from_heatmap(potential_grid, parameters)
     # Simulate trajectories
     lm = LangevinModel(potential_grid, parameters)
     t_eval = np.arange(parameters.simulation.start, parameters.simulation.end, parameters.simulation.step)
