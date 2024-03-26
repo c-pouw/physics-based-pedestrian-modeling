@@ -28,6 +28,14 @@ physped.core.langevin\_model module
    :undoc-members:
    :show-inheritance:
 
+physped.core.trajectory\_simulator module
+-----------------------------------------
+
+.. automodule:: physped.core.trajectory_simulator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

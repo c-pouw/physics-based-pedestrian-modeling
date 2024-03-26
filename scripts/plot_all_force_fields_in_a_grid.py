@@ -7,7 +7,7 @@ import numpy as np
 from matplotlib import gridspec
 
 # from physped.core.functions_to_discretize_grid import make_grid_selection
-from physped.io.readers import read_discrete_grid_from_file
+from physped.io.readers import read_piecewise_potential_from_file
 from physped.visualization.plot_fields import (
     clip_fields,
     create_force_fields,
@@ -29,7 +29,7 @@ def main_r_theta(cfg):
     params = cfg.params
     name = cfg.params.env_name
     folderpath = Path(params.folder_path)
-    grids = read_discrete_grid_from_file(folderpath / "model.pickle")
+    grids = read_piecewise_potential_from_file(folderpath / "model.pickle")
 
     N_idr_vals = grids.fit_params.shape[2]
     N_idtheta_vals = grids.fit_params.shape[3]

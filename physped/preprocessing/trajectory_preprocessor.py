@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from scipy.signal import savgol_filter
 
-from physped.io.writers import save_preprocessed_trajectories
+from physped.io.writers import save_trajectories
 
 log = logging.getLogger(__name__)
 
@@ -228,7 +228,8 @@ def preprocess_trajectories(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     )
     df = add_velocity_in_polar_coordinates(df, mode="s")
     log.info("Slow modes computed.")
-    save_preprocessed_trajectories(df, Path(parameters.folder_path))
+    folderpath = Path(parameters["folder_path"])
+    save_trajectories(df, folderpath, "preprocessed_trajectories.csv")
     return df
 
 

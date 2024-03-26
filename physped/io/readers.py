@@ -5,14 +5,13 @@ import pickle
 import zipfile
 from io import StringIO
 from pathlib import Path
+from zipfile import ZipFile
 
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from physped.core.discrete_grid import DiscretePotential
-
-# from physped.utils.functions import add_velocity
+from physped.core.discrete_grid import PiecewisePotential
 
 trajectory_folder_path = Path.cwd() / "data" / "trajectories"
 
@@ -21,18 +20,16 @@ log = logging.getLogger(__name__)
 
 def read_grid_bins(grid_name: str):
     filename = f"data/grids/{grid_name}.npz"
-    return np.load(filename, allow_pickle=True)
+    return dict(np.load(filename, allow_pickle=True))
 
 
-def read_discrete_grid_from_file(filename: Path) -> DiscretePotential:
+def read_piecewise_potential_from_file(filename: Path) -> PiecewisePotential:
     """
-    Read a validation model from a file using pickle.
+    Reads a validation model from a file using pickle.
 
-    Parameters:
-    - filename (str): The path to the file containing the validation model.
-
-    Returns:
-    - The validation model object.
+    :param filename: The path to the file containing the validation model.
+    :type filename: str
+    :return: The validation model object.
     """
     with open(filename, "rb") as f:
         val = pickle.load(f)
@@ -40,7 +37,24 @@ def read_discrete_grid_from_file(filename: Path) -> DiscretePotential:
     return val
 
 
-def single_paths() -> pd.DataFrame:
+def read_minimal_dataset_for_testing() -> pd.DataFrame:
+    """Read the single paths data set."""
+    # Specify the file path
+    log.info("Start reading single paths data set.")
+    trajectory_folder_path = Path.cwd() / "data" / "trajectories"
+    # Open the zip file
+    with ZipFile(trajectory_folder_path / "minimal_test_dataset.zip", "r") as archive:
+        # Open the CSV file within the zip file
+        with archive.open("single_paths_rtl.csv") as f:
+            # Read the CSV file directly into a pandas DataFrame
+            paths = pd.read_csv(f)
+
+    # Convert the string to a pandas DataFrame
+    log.info("Finished reading single paths data set.")
+    return paths
+
+
+def read_single_paths() -> pd.DataFrame:
     """Read the single paths data set."""
     # Specify the file path
     log.info("Start reading single paths data set.")
@@ -66,7 +80,7 @@ def single_paths() -> pd.DataFrame:
     return df
 
 
-def parallel_paths() -> pd.DataFrame:
+def read_parallel_paths() -> pd.DataFrame:
     """Read the parallel paths data set."""
     file_path = trajectory_folder_path / "df_single_pedestrians_small.h5"
     df = pd.read_hdf(file_path)
@@ -77,7 +91,7 @@ def parallel_paths() -> pd.DataFrame:
     return df
 
 
-def intersecting_paths() -> pd.DataFrame:
+def read_intersecting_paths() -> pd.DataFrame:
     """Read the intersecting paths data set."""
     file_path = trajectory_folder_path / "simulations_crossing.parquet"
     df = pd.read_parquet(file_path)
@@ -86,7 +100,7 @@ def intersecting_paths() -> pd.DataFrame:
     return df
 
 
-def curved_paths() -> pd.DataFrame:
+def read_curved_paths() -> pd.DataFrame:
     """Read the curved paths data set."""
     file_path = trajectory_folder_path / "artificial_measurements_ellipse.parquet"
     df = pd.read_parquet(file_path)
@@ -94,7 +108,7 @@ def curved_paths() -> pd.DataFrame:
     return df
 
 
-def station_paths() -> pd.DataFrame:
+def read_station_paths() -> pd.DataFrame:
     """Read the station paths data set."""
     file_path = trajectory_folder_path / "trajectories_EHV_platform_2_1_refined.parquet"
     df = pd.read_parquet(file_path)
@@ -102,7 +116,7 @@ def station_paths() -> pd.DataFrame:
     return df
 
 
-def ehv_train_station_multifile(filelist) -> pd.DataFrame:
+def read_ehv_train_station_multifile(filelist) -> pd.DataFrame:
     df_list = []
     for file in tqdm(filelist, ascii=True):
         df = pd.read_parquet(file)
@@ -184,9 +198,8 @@ def preprocess_ehv(df: pd.DataFrame) -> pd.DataFrame:
 #     return df.to_pandas()
 
 
-def read_preprocessed_trajectories(folderpath: str) -> pd.DataFrame:
-    """Read preprocessed trajectories from file."""
-    filepath = Path(folderpath) / "preprocessed_trajectories.csv"
+def read_trajectories_from_path(filepath: Path) -> pd.DataFrame:
+    """Read trajectories from file."""
     trajectories = pd.read_csv(filepath)
     log.info(
         "Succesfully read preprocessed trajectories %s.",
@@ -195,22 +208,12 @@ def read_preprocessed_trajectories(folderpath: str) -> pd.DataFrame:
     return trajectories
 
 
-def read_simulated_trajectories(folderpath: str) -> pd.DataFrame:
-    """Read simulated trajectories from file."""
-    filepath = Path(folderpath) / "simulated_trajectories.csv"
-    trajectories = pd.read_csv(filepath)
-    log.info(
-        "Succesfully read simulated trajectories %s.",
-        filepath.relative_to(Path.cwd()),
-    )
-    return trajectories
-
-
 trajectory_reader = {
-    "single_paths": single_paths,
-    "parallel_paths": parallel_paths,
-    "intersecting_paths": intersecting_paths,
-    "curved_paths": curved_paths,
-    "station_paths": station_paths,
+    "single_paths": read_single_paths,
+    "parallel_paths": read_parallel_paths,
+    "intersecting_paths": read_intersecting_paths,
+    "curved_paths": read_curved_paths,
+    "station_paths": read_station_paths,
+    "minimal_dataset_for_testing": read_minimal_dataset_for_testing,
     # "ehv_azure": read_ehv_station_paths_from_azure,
 }

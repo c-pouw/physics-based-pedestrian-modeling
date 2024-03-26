@@ -16,9 +16,8 @@ from physped.core.functions_to_discretize_grid import (
     make_grid_selection,
     return_grid_ids,
 )
-from physped.io.readers import read_discrete_grid_from_file
+from physped.io.readers import read_piecewise_potential_from_file
 
-plt.style.use(Path.cwd() / "physped/visualization/science.mplstyle")
 log = logging.getLogger(__name__)
 
 
@@ -35,6 +34,7 @@ def plot_position_trajectories_in_cartesian_coordinates(ax: plt.Axes, df: pd.Dat
     """
     for ped_id in df.Pid.unique():
         dfp = df[df["Pid"] == ped_id]
+        # TODO : The color of the starting circle and the trajectory do not match
         ax.scatter(
             dfp["xf"].iloc[0],
             dfp["yf"].iloc[0],
@@ -83,6 +83,22 @@ def plot_velocity_trajectories_in_polar_coordinates(ax: plt.Axes, df: pd.DataFra
     return ax
 
 
+def plot_velocity_trajectories_in_cartesian_coordinates(ax: plt.Axes, df: pd.DataFrame) -> plt.Axes:
+    """Plot the trajectories of particles in the metaforum dataset."""
+    for ped_id in df.Pid.unique():
+        dfp = df[df["Pid"] == ped_id]
+        ax.plot(
+            dfp["uf"],
+            dfp["vf"],
+            lw=0.9,
+            alpha=0.8,
+            zorder=0,
+            c=f"C{int(ped_id%len(plt.rcParams['axes.prop_cycle'].by_key()['color']))}",
+        )
+
+    return ax
+
+
 def plot_polar_grid(ax: plt.Axes, r_grid: np.ndarray, theta_grid: np.ndarray) -> plt.Axes:
     """
     Plot polar grid lines on a given axes object.
@@ -120,6 +136,19 @@ def plot_polar_grid(ax: plt.Axes, r_grid: np.ndarray, theta_grid: np.ndarray) ->
     return ax
 
 
+def plot_polar_grid_on_cartesian_plot(ax, r_grid, theta_grid):
+    for radius in r_grid:
+        circle = plt.Circle((0, 0), radius, color="k", linestyle="dashed", fill=False, lw=0.5, alpha=0.8)
+        ax.add_patch(circle)
+    for angle in theta_grid:
+        x1 = np.cos(angle) * 0.4
+        x2 = np.cos(angle) * 10
+        y1 = np.sin(angle) * 0.4
+        y2 = np.sin(angle) * 10
+        ax.plot([x1, x2], [y1, y2], color="k", linestyle="dashed", lw=0.5, alpha=0.8)
+    return ax
+
+
 def apply_polar_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
     """
     Applies a polar plot style to the given axes object.
@@ -148,6 +177,32 @@ def apply_polar_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
     ax.set_xticks([])
     ax = plot_polar_grid(ax, r_grid, theta_grid)
 
+    return ax
+
+
+def apply_cartesian_velocity_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
+    """
+    Applies a polar plot style to the given axes object.
+
+    Parameters:
+    - ax: The axes object to apply the polar plot style to.
+    - params: A dictionary containing parameters for customizing the plot style.
+
+    Returns:
+    - The modified axes object.
+
+    """
+    ax.set_aspect("equal")
+    ax.grid(False)
+    log.warning("Under construction: Hardcoded grids and limits")
+    r_grid = np.arange(0, 4, 0.4)
+    theta_grid = np.linspace(-np.pi, np.pi + 0.01, 7)
+    ax.set_xlim(-2.4, 2.4)
+    ax.set_ylim(-2.4, 2.4)
+
+    ax.set_xlabel("u [m/s]")
+    ax.set_ylabel("v [m/s]")
+    ax = plot_polar_grid_on_cartesian_plot(ax, r_grid, theta_grid)
     return ax
 
 
@@ -248,6 +303,7 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
     ax.set_title("Positions $\\vec{x}$ [m]", y=1)
     plot_walls = traj_plot_params.get("plot_walls", False)
     yfillbetween = [10, -10]
+    # TODO Move walls to separate function
     if plot_walls:
         ywalls = traj_plot_params.get("ywalls", [])
         for i, ywall in enumerate(ywalls):
@@ -270,6 +326,7 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
                 ha="left",
             )
     plot_intended_path = traj_plot_params.get("plot_intended_path", False)
+    # TODO Move intended path to separate function
     if plot_intended_path:
         yps = traj_plot_params.get("yps", [])
         for yp in yps:
@@ -294,13 +351,13 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
         trajectory_type = f"{trajectory_type}_"
 
     plot_limits = []
-    grids = read_discrete_grid_from_file(folderpath / "model.pickle")
+    piecewise_potential = read_piecewise_potential_from_file(folderpath / "model.pickle")
     plot_potential_cross_section = traj_plot_params.get("plot_potential_cross_section", False)
     if plot_potential_cross_section and "potential_convolution" in params:
         for axis in ["x", "y"]:
             potential_convolution_params = params.get("potential_convolution", {})
             value = potential_convolution_params[axis]
-            bins = grids.bins.get(axis)
+            bins = piecewise_potential.bins.get(axis)
             idx = return_grid_ids(bins, value)["grid_idx"]
             obs_limits = grid_bounds(bins, axis, idx)
             plot_limits.append(obs_limits)
@@ -310,12 +367,16 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
     ax = fig.add_subplot(spec[1], polar=True)
     ax = apply_polar_plot_style(ax, params)
     ax = plot_velocity_trajectories_in_polar_coordinates(ax, plot_trajs)
+    # ax = fig.add_subplot(spec[1])  # , polar=True)
+    # ax = apply_cartesian_velocity_plot_style(ax, params)
+    # ax = plot_velocity_trajectories_in_cartesian_coordinates(ax, plot_trajs)
+
     ax.set_title("Velocities $\\vec{u}$ [m/s]", y=1.1)
     plot_selection = traj_plot_params.get("plot_selection", False)
     if plot_selection:
         selection = params.get("selection")
-        grids = read_discrete_grid_from_file(folderpath / "model.pickle")
-        grid_selection = make_grid_selection(grids, selection)
+        piecewise_potential = read_piecewise_potential_from_file(folderpath / "model.pickle")
+        grid_selection = make_grid_selection(piecewise_potential, selection)
         plot_limits = [grid_selection[obs]["periodic_bounds"] for obs in ["r", "theta"]]
 
         ax = highlight_grid_box(ax, plot_limits)

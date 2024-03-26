@@ -4,7 +4,7 @@ from pathlib import Path
 import hydra
 
 from physped.core.trajectory_simulator import simulate_trajectories
-from physped.io.readers import read_discrete_grid_from_file
+from physped.io.readers import read_piecewise_potential_from_file
 
 log = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ def sim_and_save_trajs(cfg):
     """
     folderpath = Path(cfg.params.folder_path)
 
-    discrete_potential = read_discrete_grid_from_file(folderpath / "model.pickle")
+    discrete_potential = read_piecewise_potential_from_file(folderpath / "model.pickle")
 
     simulate_trajectories(discrete_potential, cfg.params)
 

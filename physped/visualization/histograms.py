@@ -9,7 +9,6 @@ import pandas as pd
 from matplotlib.axes import Axes
 from scipy.special import kl_div
 
-plt.style.use(Path.cwd() / "physped/visualization/science.mplstyle")
 log = logging.getLogger(__name__)
 
 histogram_plot_params = {

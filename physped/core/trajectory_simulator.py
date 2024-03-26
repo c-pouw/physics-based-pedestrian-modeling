@@ -6,25 +6,25 @@ import pandas as pd
 
 from physped.core.functions_to_discretize_grid import convert_grid_indices_to_coordinates, sample_from_ndarray
 from physped.core.langevin_model import LangevinModel
-from physped.io.writers import save_simulated_trajectories
+from physped.io.writers import save_trajectories
 from physped.utils.functions import cart2pol
 
 log = logging.getLogger(__name__)
 
 
-def sample_trajectory_origins_from_heatmap(potential_grid, parameters: dict) -> np.ndarray:
-    origins = sample_from_ndarray(potential_grid.histogram[..., 0], parameters.simulation.ntrajs)
+def sample_trajectory_origins_from_heatmap(piecewise_potential, parameters: dict) -> np.ndarray:
+    origins = sample_from_ndarray(piecewise_potential.histogram[..., 0], parameters.simulation.ntrajs)
     origins = np.hstack((origins, np.zeros((origins.shape[0], 1), dtype=int)))
-    origins = convert_grid_indices_to_coordinates(potential_grid, origins)
+    origins = convert_grid_indices_to_coordinates(piecewise_potential, origins)
     origins = np.hstack((origins, origins))
     origins = np.delete(origins, 4, axis=1)
     return origins
 
 
-def simulate_trajectories(potential_grid, parameters: dict) -> pd.DataFrame:
-    origins = sample_trajectory_origins_from_heatmap(potential_grid, parameters)
+def simulate_trajectories(piecewise_potential, parameters: dict) -> pd.DataFrame:
+    origins = sample_trajectory_origins_from_heatmap(piecewise_potential, parameters)
     # Simulate trajectories
-    lm = LangevinModel(potential_grid, parameters)
+    lm = LangevinModel(piecewise_potential, parameters)
     t_eval = np.arange(parameters.simulation.start, parameters.simulation.end, parameters.simulation.step)
     # simulation_time = params.get("simulation_time", [0, 10, 0.1])
     # t_eval = np.arange(*simulation_time)
@@ -40,5 +40,6 @@ def simulate_trajectories(potential_grid, parameters: dict) -> pd.DataFrame:
     trajectories = pd.concat(trajectories)
     trajectories["rf"], trajectories["thetaf"] = cart2pol(trajectories.uf, trajectories.vf)
     trajectories["rs"], trajectories["thetas"] = cart2pol(trajectories.us, trajectories.vs)
-    save_simulated_trajectories(trajectories, Path(parameters.folder_path))
+    folderpath = Path(parameters.folder_path)
+    save_trajectories(trajectories, folderpath, "simulated_trajectories.csv")
     return trajectories

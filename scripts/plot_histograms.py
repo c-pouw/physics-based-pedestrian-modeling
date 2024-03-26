@@ -1,19 +1,19 @@
+# This script plots a comparison between the probability distributions of the original and simulated trajectories
 import logging
 from pathlib import Path
 
 import hydra
 import pandas as pd
 
-from physped.io.readers import read_preprocessed_trajectories, trajectory_reader
+from physped.io.readers import read_trajectories_from_path, trajectory_reader
 from physped.visualization.histograms import create_all_histograms, plot_multiple_histograms
 
 log = logging.getLogger(__name__)
+# plt.style.use(Path.cwd() / "physped/visualization/science.mplstyle")
 
 
 @hydra.main(version_base=None, config_path="../conf")
 def plot_and_save_histograms(cfg):
-    # Read parameters
-    # params = pp.read_parameter_file(name)
     folderpath = Path(cfg.params.folder_path)
     name = cfg.params.env_name
 
@@ -22,7 +22,7 @@ def plot_and_save_histograms(cfg):
         datelist = pd.date_range(start="2023-10-01", end="2023-10-04", freq="1h")
         trajs = trajectory_reader[name](datelist[0])
     else:
-        trajs = read_preprocessed_trajectories(folderpath)
+        trajs = read_trajectories_from_path(folderpath / "preprocessed_trajectories.csv")
 
     # Read simulated trajectories
     simtrajs = pd.read_csv(folderpath / "simulated_trajectories.csv")

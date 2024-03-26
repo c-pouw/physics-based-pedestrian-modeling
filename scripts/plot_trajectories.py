@@ -4,7 +4,7 @@ from pathlib import Path
 import hydra
 import pandas as pd
 
-from physped.io.readers import read_preprocessed_trajectories, trajectory_reader
+from physped.io.readers import read_trajectories_from_path, trajectory_reader
 from physped.visualization.plot_trajectories import plot_trajectories
 
 log = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ def plot_and_save_trajectories(cfg):
             datelist = pd.date_range(start="2023-10-01", end="2023-10-04", freq="1h")
             trajs = trajectory_reader[name](datelist[0])
         else:
-            trajs = read_preprocessed_trajectories(folderpath)
+            trajs = read_trajectories_from_path(folderpath / "preprocessed_trajectories.csv")
             # trajs = pp.trajectory_reader[name]()
             # print(trajs.columns)
 
