@@ -228,8 +228,9 @@ def preprocess_trajectories(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     )
     df = add_velocity_in_polar_coordinates(df, mode="s")
     log.info("Slow modes computed.")
-    folderpath = Path(parameters["folder_path"])
-    save_trajectories(df, folderpath, "preprocessed_trajectories.csv")
+    if parameters.save_preprocessed_trajectories_to_file:
+        folderpath = Path(parameters["folder_path"])
+        save_trajectories(df, folderpath, "preprocessed_trajectories.csv")
     return df
 
 

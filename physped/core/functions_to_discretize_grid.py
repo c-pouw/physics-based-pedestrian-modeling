@@ -25,13 +25,17 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, grid_bins: dic
     Returns:
     - A dictionary of DiscreteGrid objects for storing histograms and parameters.
     """
-    grids = PiecewisePotential(grid_bins)
-    trajectories = digitize_trajectories_to_grid(grids.bins, trajectories)
-    grids.histogram = add_trajectories_to_histogram(grids.histogram, trajectories, "fast_grid_indices")
-    grids.histogram_slow = add_trajectories_to_histogram(grids.histogram_slow, trajectories, "slow_grid_indices")
-    grids.fit_params = fit_trajectories_on_grid(grids.fit_params, trajectories)
+    piecewise_potential = PiecewisePotential(grid_bins)
+    trajectories = digitize_trajectories_to_grid(piecewise_potential.bins, trajectories)
+    piecewise_potential.histogram = add_trajectories_to_histogram(
+        piecewise_potential.histogram, trajectories, "fast_grid_indices"
+    )
+    piecewise_potential.histogram_slow = add_trajectories_to_histogram(
+        piecewise_potential.histogram_slow, trajectories, "slow_grid_indices"
+    )
+    piecewise_potential.fit_params = fit_trajectories_on_grid(piecewise_potential.fit_params, trajectories)
     log.info("Finished casting trajectories to discrete grid.")
-    return grids
+    return piecewise_potential
 
 
 def accumulate_grids(
