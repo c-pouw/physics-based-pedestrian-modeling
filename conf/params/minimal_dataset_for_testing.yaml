@@ -14,7 +14,7 @@ save_piecewise_potential_to_file: False
 save_simulated_trajectories_to_file: False
 grid_name: 'single_paths_grid'
 working_directory: ${hydra:runtime.cwd}
-folder_path: ${hydra:runtime.cwd}/data/models/${params.env_name}_taux${params.taux}_tauu${params.tauu}_dt${params.dt}_sigma${params.sigma}_${params.grid_name}
+folder_path: ${hydra:runtime.cwd}/data/
 simulation:
   ntrajs: 100
   start: 0
