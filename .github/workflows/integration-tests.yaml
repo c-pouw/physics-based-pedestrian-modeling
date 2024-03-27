@@ -59,5 +59,10 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: generated-figure
-          path: data/histograms_minimal_dataset_for_testing.pdf
+          name: artifacts-minimal-test-dataset
+          path: |
+            data/preprocessed_trajectories.csv
+            data/recorded_trajectories_minimal_dataset_for_testing.pdf
+            data/piecewise_potential.pickle
+            data/simulated_trajectories_minimal_dataset_for_testing.pdf
+            data/histograms_minimal_dataset_for_testing.pdf

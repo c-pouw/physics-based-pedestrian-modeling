@@ -1,4 +1,4 @@
-env_name: 'minimal_dataset_for_testing'
+env_name: minimal_dataset_for_testing
 taux: 2
 tauu: 2
 dt: 0.1
@@ -9,10 +9,11 @@ colnames:
   yf: Y_SG
   Pid: Pid
   time: Rstep
-save_preprocessed_trajectories_to_file: False
-save_piecewise_potential_to_file: False
-save_simulated_trajectories_to_file: False
-grid_name: 'single_paths_grid'
+save_preprocessed_trajectories_to_file: True
+save_piecewise_potential_to_file: True
+save_simulated_trajectories_to_file: True
+plot_style: physped/visualization/science.mplstyle
+grid_name: single_paths_grid
 working_directory: ${hydra:runtime.cwd}
 folder_path: ${hydra:runtime.cwd}/data/
 simulation:
@@ -28,8 +29,8 @@ selection:
   theta: [0.15, 0.15]
   k: [1.2, 1.2]
 trajectory_plot:
-  trajectory_type: 'recorded'
-  title: "Narrow corridor"
+  trajectory_type: recorded
+  title: 'Narrow corridor'
   save_figure: true
   N_trajs: 30
   plot_selection: false

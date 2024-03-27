@@ -10,7 +10,9 @@ from physped.utils.functions import ensure_folder_exists
 log = logging.getLogger(__name__)
 
 
-def save_piecewise_potential(grid: PiecewisePotential, folderpath: Path, filename: str = "model.pickle") -> None:
+def save_piecewise_potential(
+    grid: PiecewisePotential, folderpath: Path, filename: str = "piecewise_potential.pickle"
+) -> None:
     """
     Save a PiecewisePotential object to a file using pickle.
 

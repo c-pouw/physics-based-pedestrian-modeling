@@ -29,7 +29,7 @@ def main_r_theta(cfg):
     params = cfg.params
     name = cfg.params.env_name
     folderpath = Path(params.folder_path)
-    grids = read_piecewise_potential_from_file(folderpath / "model.pickle")
+    grids = read_piecewise_potential_from_file(folderpath / "piecewise_potential.pickle")
 
     N_idr_vals = grids.fit_params.shape[2]
     N_idtheta_vals = grids.fit_params.shape[3]
