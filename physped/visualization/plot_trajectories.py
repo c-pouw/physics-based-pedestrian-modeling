@@ -351,10 +351,10 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
         trajectory_type = f"{trajectory_type}_"
 
     plot_limits = []
-    piecewise_potential = read_piecewise_potential_from_file(folderpath / "model.pickle")
     plot_potential_cross_section = traj_plot_params.get("plot_potential_cross_section", False)
     if plot_potential_cross_section and "potential_convolution" in params:
         for axis in ["x", "y"]:
+            piecewise_potential = read_piecewise_potential_from_file(folderpath / "model.pickle")
             potential_convolution_params = params.get("potential_convolution", {})
             value = potential_convolution_params[axis]
             bins = piecewise_potential.bins.get(axis)
