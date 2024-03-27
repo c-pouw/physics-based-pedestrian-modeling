@@ -55,4 +55,4 @@ jobs:
       - name: Test with pytest
         run: |
           set -vxeuo pipefail
-          ./process.sh -e 'minimal_dataset_for_testing'
+          python scripts/main.py +params='minimal_dataset_for_testing'

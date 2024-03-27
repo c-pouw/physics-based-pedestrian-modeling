@@ -9,16 +9,16 @@ echo "---- Preprocess and save trajectories ----"
 python scripts/preprocess_and_save_trajectories.py +params=$env
 echo
 
+echo "---- Plot recorded trajectories ----";
+python scripts/plot_trajectories.py +params=$env ++params.trajectory_plot.trajectory_type='recorded'
+echo
+
 echo "---- Learn dynamics from $env ----";
-python scripts/create_and_save_grid.py +params=$env
+python scripts/learn_piecewise_potential_from_trajectories.py +params=$env
 echo
 
 echo "---- Simulate $ntrajs trajectories ----";
 python scripts/simulate_trajectories.py +params=$env
-echo
-
-echo "---- Plot recorded trajectories ----";
-python scripts/plot_trajectories.py +params=$env ++params.trajectory_plot.trajectory_type='recorded'
 echo
 
 echo "---- Plot simulated trajectories ----";

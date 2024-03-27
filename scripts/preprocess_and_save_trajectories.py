@@ -26,7 +26,6 @@ def preprocess_and_save_trajectories(cfg):
     #     return
 
     trajectories = trajectory_reader[name]()
-    print(Path(cfg.params.folder_path))
     # for optional_filter in optional_filters:
     #     trajectories = optional_filter(trajectories)
 
