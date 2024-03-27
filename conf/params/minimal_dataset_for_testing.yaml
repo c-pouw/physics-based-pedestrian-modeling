@@ -12,7 +12,7 @@ colnames:
 save_preprocessed_trajectories_to_file: True
 save_piecewise_potential_to_file: True
 save_simulated_trajectories_to_file: True
-plot_style: physped/visualization/science.mplstyle
+plot_style: conf/science_no_latex.mplstyle
 grid_name: single_paths_grid
 working_directory: ${hydra:runtime.cwd}
 folder_path: ${hydra:runtime.cwd}/data/

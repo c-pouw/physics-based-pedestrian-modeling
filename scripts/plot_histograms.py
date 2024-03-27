@@ -9,7 +9,6 @@ from physped.io.readers import read_trajectories_from_path, trajectory_reader
 from physped.visualization.histograms import create_all_histograms, plot_multiple_histograms
 
 log = logging.getLogger(__name__)
-# plt.style.use(Path.cwd() / "physped/visualization/science.mplstyle")
 
 
 @hydra.main(version_base=None, config_path="../conf")
