@@ -41,5 +41,6 @@ def simulate_trajectories(piecewise_potential, parameters: dict) -> pd.DataFrame
     trajectories["rf"], trajectories["thetaf"] = cart2pol(trajectories.uf, trajectories.vf)
     trajectories["rs"], trajectories["thetas"] = cart2pol(trajectories.us, trajectories.vs)
     folderpath = Path(parameters.folder_path)
-    save_trajectories(trajectories, folderpath, "simulated_trajectories.csv")
+    if parameters.save_simulated_trajectories_to_file:
+        save_trajectories(trajectories, folderpath, "simulated_trajectories.csv")
     return trajectories

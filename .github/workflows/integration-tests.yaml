@@ -52,7 +52,12 @@ jobs:
           pip install -r requirements-dev.txt
           pip list
 
-      - name: Test with pytest
+      - name: Test Integration
         run: |
           set -vxeuo pipefail
           python scripts/main.py +params='minimal_dataset_for_testing'
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: generated-figure
+          path: data/histograms_minimal_dataset_for_testing.pdf

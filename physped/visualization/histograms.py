@@ -185,9 +185,9 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
     #     fontsize=16,
     # )
     # fig.text(-0.02, 0.5, "PDF", rotation=90)
-    filename = folderpath / f"histograms_{params.get('env_name', '')}.pdf"
-    log.info("Saving histograms figure.")
-    plt.savefig(filename)
+    filepath = folderpath / f"histograms_{params.get('env_name', '')}.pdf"
+    log.info("Saving histograms figure to %s.", filepath.relative_to(Path.cwd()))
+    plt.savefig(filepath)
 
 
 def plot_histogram(

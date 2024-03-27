@@ -384,6 +384,6 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
     fig.suptitle(plot_title, y=0.83)
     save_figure = traj_plot_params.get("save_figure", False)
     if save_figure:
-        filename = folderpath / f"{trajectory_type}trajectories_{params.get('env_name', '')}.pdf"
-        log.info("Saving trajectories figure.")
-        plt.savefig(filename)
+        filepath = folderpath / f"{trajectory_type}trajectories_{params.get('env_name', '')}.pdf"
+        log.info("Saving trajectories figure to %s.", filepath.relative_to(Path.cwd()))
+        plt.savefig(filepath)

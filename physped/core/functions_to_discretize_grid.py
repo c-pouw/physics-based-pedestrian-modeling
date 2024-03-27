@@ -34,7 +34,7 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, grid_bins: dic
         piecewise_potential.histogram_slow, trajectories, "slow_grid_indices"
     )
     piecewise_potential.fit_params = fit_trajectories_on_grid(piecewise_potential.fit_params, trajectories)
-    log.info("Finished casting trajectories to discrete grid.")
+    log.info("Finished learning piecewise potential from trajectories.")
     return piecewise_potential
 
 
