@@ -20,7 +20,13 @@ def plot_1d_gaussian_fits(params):
     trajs = read_trajectories_from_path(folderpath / "preprocessed_trajectories.csv")
     trajs = digitize_trajectories_to_grid(piecewise_potential.bins, trajs)
 
-    fit_params = piecewise_potential.fit_params[*grid_selection_by_indices, :]
+    fit_params = piecewise_potential.fit_params[
+        grid_selection_by_indices[0],
+        grid_selection_by_indices[1],
+        grid_selection_by_indices[2],
+        grid_selection_by_indices[3],
+        grid_selection_by_indices[4, :],
+    ]
     points_inside_grid_cell = trajs[trajs.slow_grid_indices == tuple(grid_selection_by_indices)]
 
     plt.figure(layout="constrained")
