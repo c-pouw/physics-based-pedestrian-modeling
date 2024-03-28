@@ -20,6 +20,22 @@ physped.visualization.histograms module
    :undoc-members:
    :show-inheritance:
 
+physped.visualization.plot\_1d\_gaussian\_fits module
+-----------------------------------------------------
+
+.. automodule:: physped.visualization.plot_1d_gaussian_fits
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+physped.visualization.plot\_discrete\_grid module
+-------------------------------------------------
+
+.. automodule:: physped.visualization.plot_discrete_grid
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 physped.visualization.plot\_fields module
 -----------------------------------------
 

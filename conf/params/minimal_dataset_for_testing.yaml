@@ -1,3 +1,6 @@
+defaults:
+  - grid: single_paths
+
 env_name: minimal_dataset_for_testing
 taux: 2
 tauu: 2

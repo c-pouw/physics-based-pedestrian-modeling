@@ -195,7 +195,7 @@ def create_grid_bins(grid_vals: dict) -> dict:
     return grid_bins
 
 
-def get_grid_index(potential_grid: PiecewisePotential, X: List[float]) -> np.ndarray:
+def get_grid_indices(potential_grid: PiecewisePotential, X: List[float]) -> np.ndarray:
     """
     Given a point (xs, ys, thetas, rs), returns the grid index of the point.
 
@@ -217,18 +217,30 @@ def get_grid_index(potential_grid: PiecewisePotential, X: List[float]) -> np.nda
     return indices
 
 
-def digitize_grid_val(value, grid):
-    """Return the grid index of a given value."""
-    if value > np.max(grid):
-        value -= np.max(grid) - np.min(grid)
-        grid_idx = np.digitize(value, grid)
-        grid_idx += len(grid) - 1
-    elif value < np.min(grid):
-        value += np.max(grid) - np.min(grid)
-        grid_idx = np.digitize(value, grid)
-        grid_idx -= len(grid) - 1
+def get_grid_index_single_value(value: float, bins: np.array) -> int:
+    """
+    Returns the index of the grid cell that corresponds to the given value.
+    If a value is outside the grid, it is wrapped around to the other side.
+    Following a periodic boundary condition.
+
+    Parameters:
+    value (float): The value to be discretized.
+    bins (np.array): An array of bin edges defining the grid cells.
+
+    Returns:
+    int: The index of the grid cell that corresponds to the given value.
+    """
+
+    if value > np.max(bins):
+        value -= np.max(bins) - np.min(bins)
+        grid_idx = np.digitize(value, bins)
+        grid_idx += len(bins) - 1
+    elif value < np.min(bins):
+        value += np.max(bins) - np.min(bins)
+        grid_idx = np.digitize(value, bins)
+        grid_idx -= len(bins) - 1
     else:
-        grid_idx = np.digitize(value, grid)
+        grid_idx = np.digitize(value, bins)
     return grid_idx
 
 
@@ -240,13 +252,13 @@ def return_grid_ids(grid, value):
     if isinstance(value, int):
         value = float(value)
     if isinstance(value, float):
-        grid_id = digitize_grid_val(value, grid)
+        grid_id = get_grid_index_single_value(value, grid)
         grid_idx = [grid_id - 1, grid_id]
 
     elif (isinstance(value, list)) and (len(value) == 2):
         grid_idx = [
-            digitize_grid_val(value[0], grid) - 1,
-            digitize_grid_val(value[1], grid),
+            get_grid_index_single_value(value[0], grid) - 1,
+            get_grid_index_single_value(value[1], grid),
         ]
     else:
         grid_idx = [0, len(grid) - 1]
@@ -255,40 +267,47 @@ def return_grid_ids(grid, value):
     }
 
 
-def grid_bounds(bins, observable, values):
+def get_boundary_coordinates_of_selection(bins, observable, values):
     """Return the grid bounds of a given observable and value."""
-    # grid = self.grid_observable[observable]
-    # grid = grids.bins[observable]
     if observable == "theta":
         grid_sides = [
-            bins[values[0] % (len(bins) - 1)],
-            bins[values[1] % (len(bins) - 1)],
+            bins[(values[0] - 1) % (len(bins) - 1)],
+            bins[(values[1]) % (len(bins) - 1)],
         ]
     else:
-        grid_sides = [bins[values[0]], bins[values[1]]]
+        grid_sides = [bins[values[0] - 1], bins[values[1]]]
     return grid_sides
 
 
-def make_grid_selection(grids, selection):
+def selection_to_bounds(bins, selection_coordinates, dimension):
+    selection_grid_indices = [get_grid_index_single_value(x, bins) for x in selection_coordinates]
+    selection_boundary_coordinates = get_boundary_coordinates_of_selection(bins, dimension, selection_grid_indices)
+    return selection_boundary_coordinates
+
+
+def make_grid_selection(piecewise_potential, selection):
     """Make selection."""
+    # TODO: Remove dependency on PiecewisePotential object
     grid_selection = {}
     for observable, value in selection.items():
+        print(observable, value)
         # for observable, value in zip(["x", "y", "r", "theta"], [x, y, r, theta, k]):
         grid_selection[observable] = {}
         # grid = grid.grid_observable[observable]
-        grid = grids.bins.get(observable)
+        grid_bins = piecewise_potential.bins.get(observable)
+        print(grid_bins)
 
         if not value:  # if None select full grid
-            value = [grid[0], grid[-2]]
+            value = [grid_bins[0], grid_bins[-2]]
         elif isinstance(value, int):  # if int select single value on grid
             value = [float(value), float(value)]
         elif isinstance(value, float):  # if float select single value on grid
             value = [value, value]
 
         grid_selection[observable]["selection"] = value
-        grid_ids = return_grid_ids(grid, value)["grid_idx"]
+        grid_ids = return_grid_ids(grid_bins, value)["grid_idx"]
         grid_selection[observable]["grid_ids"] = grid_ids
-        grid_boundaries = grid_bounds(grid, observable, grid_ids)
+        grid_boundaries = get_boundary_coordinates_of_selection(grid_bins, observable, grid_ids)
         grid_selection[observable]["bounds"] = grid_boundaries
 
         if observable == "theta":

@@ -1,14 +1,21 @@
+defaults:
+  - grid: parallel_paths
+
 env_name: 'parallel_paths'
 taux: 2
 tauu: 2
 dt: 0.1
 sigma: 0.4
+minimum_trajectory_length: 10
 colnames:
   x: x_pos
   y: y_pos
   Pid: Pid
   time: time
+save_preprocessed_trajectories_to_file: True
+save_simulated_trajectories_to_file: True
 grid_name: 'parallel_paths_grid'
+plot_style: conf/science.mplstyle
 folder_path: ${hydra:runtime.cwd}/data/models/${params.env_name}_taux${params.taux}_tauu${params.tauu}_dt${params.dt}_sigma${params.sigma}_${params.grid_name}
 simulation:
   ntrajs: 100

@@ -1,3 +1,6 @@
+defaults:
+  - grid: single_paths
+
 env_name: 'single_paths'
 taux: 2
 tauu: 2
@@ -9,8 +12,10 @@ colnames:
   yf: yf
   Pid: Pid
   time: Rstep
-save_preprocessed_trajectories_to_file: False
+save_preprocessed_trajectories_to_file: True
+save_simulated_trajectories_to_file: True
 grid_name: 'single_paths_grid'
+plot_style: conf/science.mplstyle
 working_directory: ${hydra:runtime.cwd}
 folder_path: ${hydra:runtime.cwd}/data/models/${params.env_name}_taux${params.taux}_tauu${params.tauu}_dt${params.dt}_sigma${params.sigma}_${params.grid_name}
 simulation:
@@ -22,8 +27,8 @@ simulation:
 selection:
   x: [-0.45, -0.45]
   y: [0.15, 0.15]
-  r: [0.75, 0.75]
-  theta: [0.15, 0.15]
+  r: [0.75, 0.95]
+  theta: [-0.1, 0.1]
   k: [1.2, 1.2]
 trajectory_plot:
   trajectory_type: 'recorded'

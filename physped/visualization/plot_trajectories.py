@@ -11,8 +11,7 @@ import numpy as np
 import pandas as pd
 
 from physped.core.functions_to_discretize_grid import (
-    create_grid_bins,
-    grid_bounds,
+    get_boundary_coordinates_of_selection,
     make_grid_selection,
     return_grid_ids,
 )
@@ -131,7 +130,7 @@ def plot_polar_grid(ax: plt.Axes, r_grid: np.ndarray, theta_grid: np.ndarray) ->
 
     for _, th in enumerate(theta_grid[:-1]):
         ax.plot(np.ones(100) * th, r_range, color="k", linestyle=linestyle, lw=0.6)
-        ax.text(th, r_grid[-1] * 1.35, f"{th/np.pi:.1f}$\\pi$", ha="center", va="center")
+        ax.text(th, r_grid[-1] * 1.3, f"{th/np.pi:.1f}$\\pi$", ha="center", va="center")
     ax.set_ylim(0, r_grid[-1])
     return ax
 
@@ -163,19 +162,19 @@ def apply_polar_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
     """
     ax.set_aspect("equal")
 
-    polar_grid_type = params["trajectory_plot"].get("polar_grid_type", "standard")
+    # polar_grid_type = params["trajectory_plot"].get("polar_grid_type", "standard")
 
-    r_grid = [0, 0.4, 1.1, 1.8]
-    theta_grid = np.arange(-np.pi, np.pi + 0.01, np.pi / 3)
+    # r_grid = [0, 0.4, 1.1, 1.8]
+    # theta_grid = np.arange(-np.pi, np.pi + 0.01, np.pi / 3)
 
-    if polar_grid_type == "custom":
-        grid_bins = create_grid_bins(params["grid"])
-        r_grid = params["grid"]["r"]
-        theta_grid = grid_bins["theta"]
+    # if polar_grid_type == "custom":
+    #     grid_bins = create_grid_bins(params["grid"])
+    #     r_grid = params["grid"]["r"]
+    #     theta_grid = grid_bins["theta"]
 
     ax.set_yticks([])
     ax.set_xticks([])
-    ax = plot_polar_grid(ax, r_grid, theta_grid)
+    # ax = plot_polar_grid(ax, r_grid, theta_grid)
 
     return ax
 
@@ -220,7 +219,6 @@ def highlight_grid_box(ax: plt.Axes, limits: Tuple, c: str = "k") -> plt.Axes:
 
     """
     xlims, ylims = limits
-
     yrange = np.linspace(ylims[0], ylims[1], 100)
     colors = {
         "k": (0, 0, 0, 1),
@@ -354,12 +352,12 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
     plot_potential_cross_section = traj_plot_params.get("plot_potential_cross_section", False)
     if plot_potential_cross_section and "potential_convolution" in params:
         for axis in ["x", "y"]:
-            piecewise_potential = read_piecewise_potential_from_file(folderpath / "model.pickle")
+            piecewise_potential = read_piecewise_potential_from_file(folderpath / "piecewise_potential.pickle")
             potential_convolution_params = params.get("potential_convolution", {})
             value = potential_convolution_params[axis]
             bins = piecewise_potential.bins.get(axis)
             idx = return_grid_ids(bins, value)["grid_idx"]
-            obs_limits = grid_bounds(bins, axis, idx)
+            obs_limits = get_boundary_coordinates_of_selection(bins, axis, idx)
             plot_limits.append(obs_limits)
 
         ax = highlight_grid_box(ax, plot_limits[::-1])
@@ -375,7 +373,7 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
     plot_selection = traj_plot_params.get("plot_selection", False)
     if plot_selection:
         selection = params.get("selection")
-        piecewise_potential = read_piecewise_potential_from_file(folderpath / "model.pickle")
+        piecewise_potential = read_piecewise_potential_from_file(folderpath / "piecewise_potentail.pickle")
         grid_selection = make_grid_selection(piecewise_potential, selection)
         plot_limits = [grid_selection[obs]["periodic_bounds"] for obs in ["r", "theta"]]
 

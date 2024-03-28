@@ -6,7 +6,7 @@ import numpy as np
 import sdeint
 
 from physped.core.discrete_grid import PiecewisePotential
-from physped.core.functions_to_discretize_grid import get_grid_index
+from physped.core.functions_to_discretize_grid import get_grid_indices
 from physped.utils.functions import cart2pol, digitize_values_to_grid
 
 log = logging.getLogger(__name__)
@@ -61,7 +61,7 @@ class LangevinModel:
         rs, thetas = cart2pol(us, vs)
         k = 2
         X_vals = [xs, ys, rs, thetas, k]
-        X_indx = get_grid_index(self.grids, X_vals)
+        X_indx = get_grid_indices(self.grids, X_vals)
         xmean, xvar, ymean, yvar, umean, uvar, vmean, vvar = self.grids.fit_params[
             X_indx[0], X_indx[1], X_indx[2], X_indx[3], X_indx[4], :
         ]

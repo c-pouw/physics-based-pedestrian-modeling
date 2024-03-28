@@ -18,7 +18,7 @@ def sim_and_save_trajs(cfg):
     """
     folderpath = Path(cfg.params.folder_path)
 
-    discrete_potential = read_piecewise_potential_from_file(folderpath / "model.pickle")
+    discrete_potential = read_piecewise_potential_from_file(folderpath / "piecewise_potential.pickle")
 
     simulate_trajectories(discrete_potential, cfg.params)
 

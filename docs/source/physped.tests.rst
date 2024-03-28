@@ -1,6 +1,14 @@
 physped.tests package
 =====================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   physped.tests.core
+
 Submodules
 ----------
 

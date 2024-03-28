@@ -28,6 +28,14 @@ physped.core.langevin\_model module
    :undoc-members:
    :show-inheritance:
 
+physped.core.piecewise\_potential\_handling module
+--------------------------------------------------
+
+.. automodule:: physped.core.piecewise_potential_handling
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 physped.core.trajectory\_simulator module
 -----------------------------------------
 

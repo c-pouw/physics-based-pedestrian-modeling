@@ -48,8 +48,8 @@ savefig.pad_inches : 0.01
 # font.family : serif
 # axes.formatter.use_mathtext : True
 # mathtext.fontset : cm
-font.family: sans-serif
-font.sans-serif: "Helvetica"
+#font.family: sans-serif
+#font.sans-serif: "Helvetica"
 
 
 # Use LaTeX for math formatting
