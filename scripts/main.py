@@ -18,6 +18,7 @@ log = logging.getLogger(__name__)
 @hydra.main(version_base=None, config_path="../conf")
 def main(cfg):
     name = cfg.params.env_name
+    # log.info(f"Configuration: {cfg.params.trajectory_plot.xlims}")
     plt.style.use(Path.cwd() / cfg.params.plot_style)
     log.info("---- Preprocess recorded trajectories ----")
     trajectories = trajectory_reader[name]()
