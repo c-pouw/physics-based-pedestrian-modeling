@@ -14,7 +14,6 @@ log = logging.getLogger(__name__)
 def plot_and_save_trajectories(cfg):
     # Read parameters
     # params = pp.read_parameter_file(name)
-    folderpath = Path(cfg.params.folder_path)
     name = cfg.params.env_name
     trajectory_type = cfg.params.trajectory_plot.trajectory_type
     # Read raw and preprocess trajectories
@@ -23,7 +22,7 @@ def plot_and_save_trajectories(cfg):
             datelist = pd.date_range(start="2023-10-01", end="2023-10-04", freq="1h")
             trajs = trajectory_reader[name](datelist[0])
         else:
-            trajs = read_trajectories_from_path(folderpath / "preprocessed_trajectories.csv")
+            trajs = read_trajectories_from_path(Path.cwd().parent / "preprocessed_trajectories.csv")
             # trajs = pp.trajectory_reader[name]()
             # print(trajs.columns)
 
@@ -31,7 +30,7 @@ def plot_and_save_trajectories(cfg):
         # trajs = pp.preprocess_trajectories(trajs, params)
     elif trajectory_type == "simulated":
         # Read simulated trajectories
-        trajs = pd.read_csv(folderpath / "simulated_trajectories.csv")
+        trajs = pd.read_csv(Path.cwd().parent / "simulated_trajectories.csv")
 
     # Plot trajectories
     plot_trajectories(trajs, cfg.params, trajectory_type)

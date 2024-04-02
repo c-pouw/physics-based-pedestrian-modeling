@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from scipy.signal import savgol_filter
 
+from physped.io.readers import read_trajectories_from_path
 from physped.io.writers import save_trajectories
 
 log = logging.getLogger(__name__)
@@ -207,6 +208,15 @@ def preprocess_trajectories(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     :return: _description_
     :rtype: pd.DataFrame
     """
+    filepath = Path.cwd().parent / "preprocessed_trajectories.csv"
+    if filepath.exists():
+        log.warning("Preprocessed trajectories already exist.")
+        if parameters["read_preprocessed_trajectories_from_file"]:
+            log.warning("Reading preprocessed trajectories from file.")
+            return read_trajectories_from_path(filepath)
+        else:
+            log.warning("Overwriting preprocessed trajectories.")
+
     log.info("Start trajectory preprocessing.")
     # TODO : Use columnnames from parameters instead of renaming
     df = rename_columns(df, parameters)
@@ -228,9 +238,9 @@ def preprocess_trajectories(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     )
     df = add_velocity_in_polar_coordinates(df, mode="s")
     log.info("Slow modes computed.")
+    # if parameters.intermediate_save.preprocessed_trajectories:
     if parameters.save_preprocessed_trajectories_to_file:
-        folderpath = Path(parameters["folder_path"])
-        save_trajectories(df, folderpath, "preprocessed_trajectories.csv")
+        save_trajectories(df, Path.cwd().parent, "preprocessed_trajectories.csv")
     return df
 
 

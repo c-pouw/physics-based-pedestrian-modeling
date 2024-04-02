@@ -1,8 +1,10 @@
 import logging
+import pprint
 from pathlib import Path
 
 import hydra
 import matplotlib.pyplot as plt
+from hydra.utils import get_original_cwd
 
 from physped.core.functions_to_discretize_grid import learn_potential_from_trajectories
 from physped.core.trajectory_simulator import simulate_trajectories
@@ -15,11 +17,14 @@ from physped.visualization.plot_trajectories import plot_trajectories
 log = logging.getLogger(__name__)
 
 
-@hydra.main(version_base=None, config_path="../conf")
+@hydra.main(version_base=None, config_path="../conf", config_name="config")
 def main(cfg):
     name = cfg.params.env_name
-    # log.info(f"Configuration: {cfg.params.trajectory_plot.xlims}")
-    plt.style.use(Path.cwd() / cfg.params.plot_style)
+    log.debug("Configuration: \n%s", pprint.pformat(dict(cfg)))
+    log.debug("Working directory %s", Path.cwd())
+    log.debug("Project root %s", get_original_cwd())
+
+    plt.style.use(Path(get_original_cwd()) / cfg.params.plot_style)
     log.info("---- Preprocess recorded trajectories ----")
     trajectories = trajectory_reader[name]()
     preprocessed_trajectories = preprocess_trajectories(trajectories, parameters=cfg.params)
@@ -32,7 +37,7 @@ def main(cfg):
     log.info("---- Learn piecewise potetential from trajectories ----")
     grid_bins = read_grid_bins(cfg.params.grid_name)
     piecewise_potential = learn_potential_from_trajectories(preprocessed_trajectories, grid_bins)
-    save_piecewise_potential(piecewise_potential, Path(cfg.params.folder_path))
+    save_piecewise_potential(piecewise_potential, Path.cwd().parent)
 
     print("\n")
     log.info("---- Simulate trajectories with piecewise potential ----")

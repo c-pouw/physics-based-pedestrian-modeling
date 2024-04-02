@@ -1,7 +1,9 @@
 import logging
-from pathlib import Path
 
 import hydra
+
+# from pathlib import Path
+
 
 # import pandas as pd
 
@@ -17,10 +19,10 @@ log = logging.getLogger(__name__)
 def create_and_save_grid(cfg):
     """Create and save trajectories in grid."""
     # Read parameters and trajectories
-    folderpath = Path(cfg.params.folder_path)
-    print(folderpath)
-    # name = cfg.params.env_name
-    # params = cfg.params
+
+    name = cfg.params.env_name
+    params = cfg.params
+    print(name, params)
 
 
 #     # datelist = pd.date_range(start="2023-10-01", end="2023-10-07", freq="1d")

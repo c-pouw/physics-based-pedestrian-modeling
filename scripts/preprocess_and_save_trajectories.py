@@ -1,11 +1,11 @@
 import logging
-from pathlib import Path
 
 import hydra
 
 from physped.io.readers import trajectory_reader
 from physped.preprocessing.trajectory_preprocessor import preprocess_trajectories
-from physped.utils.functions import ensure_folder_exists
+
+# from physped.utils.functions import ensure_folder_exists
 
 log = logging.getLogger(__name__)
 
@@ -15,9 +15,7 @@ def preprocess_and_save_trajectories(cfg):
     """Preprocess and save trajectories"""
     log.info("Starting script.")
     name = cfg.params.env_name
-    folderpath = Path(cfg.params.folder_path)
-
-    ensure_folder_exists(folderpath=folderpath)
+    # ensure_folder_exists(folderpath=folderpath)
 
     # if ... exists:
     # if cfg.params.get("force_trajectory_preprocessing", False):

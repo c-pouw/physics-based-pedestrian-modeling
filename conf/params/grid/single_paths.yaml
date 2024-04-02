@@ -9,7 +9,7 @@ y:
   step: 0.1
 r:
   min: 0
-  max: 2.4
+  max: 2
   step: 0.4
 theta:
   chunks: 6

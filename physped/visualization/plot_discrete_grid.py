@@ -148,7 +148,6 @@ def plot_discrete_grid(params: dict):
     ax.set_ylim(params.grid.y.min, params.grid.y.max)
     ax.set_aspect("equal")
 
-    # folderpath = Path(params.folder_path)
     # piecewise_potential = read_piecewise_potential_from_file(folderpath / "piecewise_potential.pickle")
     # grid_selection = make_grid_selection(piecewise_potential, params.selection)
     ax = highlight_position_selection(ax, params)

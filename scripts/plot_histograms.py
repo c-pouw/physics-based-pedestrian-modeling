@@ -13,7 +13,6 @@ log = logging.getLogger(__name__)
 
 @hydra.main(version_base=None, config_path="../conf")
 def plot_and_save_histograms(cfg):
-    folderpath = Path(cfg.params.folder_path)
     name = cfg.params.env_name
 
     # Read raw and preprocess trajectories
@@ -21,10 +20,10 @@ def plot_and_save_histograms(cfg):
         datelist = pd.date_range(start="2023-10-01", end="2023-10-04", freq="1h")
         trajs = trajectory_reader[name](datelist[0])
     else:
-        trajs = read_trajectories_from_path(folderpath / "preprocessed_trajectories.csv")
+        trajs = read_trajectories_from_path(Path.cwd().parent / "preprocessed_trajectories.csv")
 
     # Read simulated trajectories
-    simtrajs = pd.read_csv(folderpath / "simulated_trajectories.csv")
+    simtrajs = pd.read_csv(Path.cwd().parent / "simulated_trajectories.csv")
 
     # Create histograms
     observables = ["xf", "yf", "rf", "thetaf"]

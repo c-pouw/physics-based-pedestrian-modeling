@@ -16,10 +16,7 @@ def sim_and_save_trajs(cfg):
     :param cfg: The configuration object containing simulation parameters.
     :type cfg: object
     """
-    folderpath = Path(cfg.params.folder_path)
-
-    discrete_potential = read_piecewise_potential_from_file(folderpath / "piecewise_potential.pickle")
-
+    discrete_potential = read_piecewise_potential_from_file(Path.cwd().parent / "piecewise_potential.pickle")
     simulate_trajectories(discrete_potential, cfg.params)
 
 

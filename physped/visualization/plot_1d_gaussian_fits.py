@@ -10,14 +10,13 @@ from physped.io.readers import read_piecewise_potential_from_file, read_trajecto
 
 
 def plot_1d_gaussian_fits(params):
-    folderpath = Path(params.folder_path)
-    piecewise_potential = read_piecewise_potential_from_file(folderpath / "piecewise_potential.pickle")
+    piecewise_potential = read_piecewise_potential_from_file(Path.cwd().parent / "piecewise_potential.pickle")
     selection = params.get("selection")
     selection = [[selection[d][0], piecewise_potential.bins[d]] for d in piecewise_potential.dimensions]
 
     grid_selection_by_indices = [get_most_left_boundary(v, b) for v, b in selection]
 
-    trajs = read_trajectories_from_path(folderpath / "preprocessed_trajectories.csv")
+    trajs = read_trajectories_from_path(Path.cwd() / "preprocessed_trajectories.csv")
     trajs = digitize_trajectories_to_grid(piecewise_potential.bins, trajs)
 
     fit_params = piecewise_potential.fit_params[

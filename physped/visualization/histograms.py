@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import numpy.ma as ma
 import pandas as pd
+from hydra.utils import get_original_cwd
 from matplotlib.axes import Axes
 from scipy.special import kl_div
 
@@ -151,7 +152,6 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
     fig = plt.figure(figsize=(3.54, 2.36), layout="constrained")
     sum_kl_div = 0
     hist_plot_params = params.get("histogram_plot", {})
-    folderpath = Path(params.folder_path)
 
     for plotid, observable in enumerate(observables):
         ax = fig.add_subplot(2, 2, plotid + 1)
@@ -185,8 +185,8 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
     #     fontsize=16,
     # )
     # fig.text(-0.02, 0.5, "PDF", rotation=90)
-    filepath = folderpath / f"histograms_{params.get('env_name', '')}.pdf"
-    log.info("Saving histograms figure to %s.", filepath.relative_to(Path.cwd()))
+    filepath = Path.cwd() / f"histograms_{params.get('env_name', '')}.pdf"
+    log.info("Saving histograms figure to %s.", filepath.relative_to(get_original_cwd()))
     plt.savefig(filepath)
 
 

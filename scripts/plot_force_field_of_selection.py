@@ -22,9 +22,8 @@ def main(cfg):
         "k": [0, 2],
     }
     # params["force_field_plot"] = {"clip": 0, "scale": 800, "sparseness": 3}
-    folderpath = Path(cfg.params.folder_path)
     name = cfg.params.env_name
-    grids = read_piecewise_potential_from_file(folderpath / "piecewise_potential.pickle")
+    grids = read_piecewise_potential_from_file(Path.cwd().parent / "piecewise_potential.pickle")
 
     plot_force_field_of_selection(grids, cfg.params, selection)
     plt.savefig(f"figures/{name}_force_field_of_selection.pdf")

@@ -3,8 +3,7 @@ defaults:
   - trajectory_plot: single_paths
   - histogram_plot: single_paths
   - force_field_plot: single_paths
-
-env_name: 'single_paths'
+env_name: single_paths
 taux: 2
 tauu: 2
 dt: 0.1
@@ -15,12 +14,11 @@ colnames:
   yf: yf
   Pid: Pid
   time: Rstep
+read_preprocessed_trajectories_from_file: True
 save_preprocessed_trajectories_to_file: True
 save_simulated_trajectories_to_file: True
-grid_name: 'single_paths_grid'
+grid_name: single_paths_grid
 plot_style: conf/science.mplstyle
-working_directory: ${hydra:runtime.cwd}
-folder_path: ${hydra:runtime.cwd}/data/models/${params.env_name}_taux${params.taux}_tauu${params.tauu}_dt${params.dt}_sigma${params.sigma}_${params.grid_name}
 simulation:
   ntrajs: 100
   start: 0

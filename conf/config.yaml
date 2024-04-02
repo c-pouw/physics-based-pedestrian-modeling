@@ -1,0 +1,21 @@
+processing_steps:
+  preprocessing: true
+  create_grid: true
+  learn_potential: true
+  simulate_trajectories: true
+  plot_trajectories: true
+  plot_histograms: true
+  plot_force_field: false
+intermediate_save:
+  preprocessed_trajectories: False
+  piecewise_potential: False
+  simulated_trajectories: False
+  plots: False
+parameter_combinations: taux${params.taux}_tauu${params.tauu}_dt${params.dt}_sigma${params.sigma}_${params.grid_name}
+hydra:
+  verbose: False
+  job:
+    name: ${params.env_name}_${parameter_combinations}
+    chdir: True
+  run:
+    dir: outputs/${params.env_name}/${parameter_combinations}/${now:%Y-%m-%d_%H-%M-%S}

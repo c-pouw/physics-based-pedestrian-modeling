@@ -8,7 +8,8 @@ import pandas as pd
 log = logging.getLogger(__name__)
 
 
-def ensure_folder_exists(folderpath: Path) -> None:
+def _ensure_folder_exists(folderpath: Path) -> None:
+    # ! Should be obsolete due to the use of hydra
     """
     Create a folder at the specified path if it does not exist.
 

@@ -1,6 +1,8 @@
 defaults:
   - grid: single_paths
-
+  - trajectory_plot: single_paths
+  - histogram_plot: single_paths
+  - force_field_plot: single_paths
 env_name: minimal_dataset_for_testing
 taux: 2
 tauu: 2
@@ -12,13 +14,11 @@ colnames:
   yf: Y_SG
   Pid: Pid
   time: Rstep
+read_preprocessed_trajectories_from_file: True
 save_preprocessed_trajectories_to_file: True
-save_piecewise_potential_to_file: True
 save_simulated_trajectories_to_file: True
-plot_style: conf/science_no_latex.mplstyle
 grid_name: single_paths_grid
-working_directory: ${hydra:runtime.cwd}
-folder_path: ${hydra:runtime.cwd}/data/
+plot_style: conf/science_no_latex.mplstyle
 simulation:
   ntrajs: 100
   start: 0
@@ -28,33 +28,6 @@ simulation:
 selection:
   x: [-0.45, -0.45]
   y: [0.15, 0.15]
-  r: [0.75, 0.75]
-  theta: [0.15, 0.15]
+  r: [0.75, 0.95]
+  theta: [-0.1, 0.1]
   k: [1.2, 1.2]
-trajectory_plot:
-  trajectory_type: recorded
-  title: 'Narrow corridor'
-  save_figure: true
-  N_trajs: 30
-  plot_selection: false
-  plot_potential_cross_section: false
-  plot_walls: true
-  plot_intended_path: true
-  width_ratios: [2, 1]
-  xlims: [-1.1, 1.1]
-  ylims: [-0.7, 0.7]
-  yps: [0]
-  ywalls: [0.6, -0.6]
-histogram_plot:
-  xlims: [-1.1, 1.1]
-  ylims: [-0.5, 0.5]
-  rlims: [0, 2]
-  thetalims: [-3.14, 3.14]
-force_field_plot:
-  clip: 0
-  scale: 8000
-  sparseness: 3
-  width_ratios: [2, 1]
-  xlims: [-1.1, 1.1]
-  ylims: [-0.5, 0.5]
-  figsize: [3.54, 2]

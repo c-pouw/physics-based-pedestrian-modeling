@@ -9,6 +9,7 @@ import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from hydra.utils import get_original_cwd
 
 from physped.core.functions_to_discretize_grid import (
     get_boundary_coordinates_of_selection,
@@ -283,7 +284,6 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
     """
     traj_plot_params = params.get("trajectory_plot", {})
     name = params.get("env_name")
-    folderpath = Path(params.folder_path)
 
     plot_title = traj_plot_params.get("title", "")
     num_trajectories_to_plot = traj_plot_params.get("N_trajs", 10)
@@ -352,7 +352,9 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
     plot_potential_cross_section = traj_plot_params.get("plot_potential_cross_section", False)
     if plot_potential_cross_section and "potential_convolution" in params:
         for axis in ["x", "y"]:
-            piecewise_potential = read_piecewise_potential_from_file(folderpath / "piecewise_potential.pickle")
+            piecewise_potential = read_piecewise_potential_from_file(
+                Path.cwd().parent / "piecewise_potential.pickle"
+            )
             potential_convolution_params = params.get("potential_convolution", {})
             value = potential_convolution_params[axis]
             bins = piecewise_potential.bins.get(axis)
@@ -373,7 +375,7 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
     plot_selection = traj_plot_params.get("plot_selection", False)
     if plot_selection:
         selection = params.get("selection")
-        piecewise_potential = read_piecewise_potential_from_file(folderpath / "piecewise_potentail.pickle")
+        piecewise_potential = read_piecewise_potential_from_file(Path.cwd().parent / "piecewise_potentail.pickle")
         grid_selection = make_grid_selection(piecewise_potential, selection)
         plot_limits = [grid_selection[obs]["periodic_bounds"] for obs in ["r", "theta"]]
 
@@ -382,6 +384,6 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
     fig.suptitle(plot_title, y=0.83)
     save_figure = traj_plot_params.get("save_figure", False)
     if save_figure:
-        filepath = folderpath / f"{trajectory_type}trajectories_{params.get('env_name', '')}.pdf"
-        log.info("Saving trajectory plot to %s.", filepath.relative_to(Path.cwd()))
+        filepath = Path.cwd() / f"{trajectory_type}trajectories_{params.get('env_name', '')}.pdf"
+        log.info("Saving trajectory plot to %s.", filepath.relative_to(get_original_cwd()))
         plt.savefig(filepath)

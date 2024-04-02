@@ -3,9 +3,11 @@ import pickle
 from pathlib import Path
 
 import pandas as pd
+from hydra.utils import get_original_cwd
 
 from physped.core.discrete_grid import PiecewisePotential
-from physped.utils.functions import ensure_folder_exists
+
+# from physped.utils.functions import ensure_folder_exists
 
 log = logging.getLogger(__name__)
 
@@ -26,7 +28,7 @@ def save_piecewise_potential(
     filepath = folderpath / filename
     with open(filepath, "wb") as f:
         pickle.dump(grid, f)
-    log.info("Validation model saved to %s.", filepath.relative_to(Path.cwd()))
+    log.info("Validation model saved to %s.", filepath.relative_to(get_original_cwd()))
 
 
 def save_trajectories(trajectories: pd.DataFrame, folderpath: Path, filename: str) -> None:
@@ -40,7 +42,7 @@ def save_trajectories(trajectories: pd.DataFrame, folderpath: Path, filename: st
 
     :return: None
     """
-    ensure_folder_exists(folderpath)
+    # ensure_folder_exists(folderpath)
     filepath = folderpath / filename
     trajectories.to_csv(filepath)
-    log.info("Trajectories saved to %s.", filepath.relative_to(Path.cwd()))
+    log.info("Trajectories saved to %s.", filepath.relative_to(get_original_cwd()))

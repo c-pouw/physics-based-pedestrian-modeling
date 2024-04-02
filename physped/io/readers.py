@@ -9,6 +9,7 @@ from zipfile import ZipFile
 
 import numpy as np
 import pandas as pd
+from hydra.utils import get_original_cwd
 from tqdm import tqdm
 
 from physped.core.discrete_grid import PiecewisePotential
@@ -19,7 +20,7 @@ log = logging.getLogger(__name__)
 
 
 def read_grid_bins(grid_name: str):
-    filename = f"data/grids/{grid_name}.npz"
+    filename = Path(get_original_cwd()) / f"data/grids/{grid_name}.npz"
     return dict(np.load(filename, allow_pickle=True))
 
 
@@ -33,7 +34,7 @@ def read_piecewise_potential_from_file(filename: Path) -> PiecewisePotential:
     """
     with open(filename, "rb") as f:
         val = pickle.load(f)
-    log.info("Successfully read `%s` validation model.", filename.relative_to(Path.cwd()))
+    log.info("Successfully read `%s` validation model.", filename.relative_to(get_original_cwd()))
     return val
 
 
@@ -41,7 +42,6 @@ def read_minimal_dataset_for_testing() -> pd.DataFrame:
     """Read the single paths data set."""
     # Specify the file path
     log.info("Start reading single paths data set.")
-    trajectory_folder_path = Path.cwd() / "data" / "trajectories"
     # Open the zip file
     with ZipFile(trajectory_folder_path / "minimal_test_dataset.zip", "r") as archive:
         # Open the CSV file within the zip file
@@ -200,12 +200,15 @@ def preprocess_ehv(df: pd.DataFrame) -> pd.DataFrame:
 
 def read_trajectories_from_path(filepath: Path) -> pd.DataFrame:
     """Read trajectories from file."""
-    trajectories = pd.read_csv(filepath)
-    log.info(
-        "Succesfully read preprocessed trajectories %s.",
-        filepath.relative_to(Path.cwd()),
-    )
-    return trajectories
+    try:
+        trajectories = pd.read_csv(filepath)
+        log.info(
+            "Succesfully read trajectories %s.",
+            filepath.relative_to(get_original_cwd()),
+        )
+        return trajectories
+    except FileNotFoundError as e:
+        log.error("Trajectories not found: %s", e)
 
 
 trajectory_reader = {
