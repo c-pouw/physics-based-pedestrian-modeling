@@ -28,7 +28,7 @@ def save_piecewise_potential(
     filepath = folderpath / filename
     with open(filepath, "wb") as f:
         pickle.dump(grid, f)
-    log.info("Validation model saved to %s.", filepath.relative_to(get_original_cwd()))
+    log.info("Piecewise potential saved to %s.", filepath.relative_to(get_original_cwd()))
 
 
 def save_trajectories(trajectories: pd.DataFrame, folderpath: Path, filename: str) -> None:

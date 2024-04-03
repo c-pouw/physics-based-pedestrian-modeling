@@ -26,15 +26,15 @@ def read_grid_bins(grid_name: str):
 
 def read_piecewise_potential_from_file(filename: Path) -> PiecewisePotential:
     """
-    Reads a validation model from a file using pickle.
+    Reads a piecewise potential from a file using pickle.
 
-    :param filename: The path to the file containing the validation model.
+    :param filename: The path to the file containing the piecewise potential.
     :type filename: str
-    :return: The validation model object.
+    :return: The piecewise potential.
     """
     with open(filename, "rb") as f:
         val = pickle.load(f)
-    log.info("Successfully read `%s` validation model.", filename.relative_to(get_original_cwd()))
+    log.info("Successfully read piecewise potential from %s.", filename.relative_to(get_original_cwd()))
     return val
 
 
