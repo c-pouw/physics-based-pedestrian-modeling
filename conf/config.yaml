@@ -8,6 +8,7 @@ processing_steps:
   plot_force_field: false
 intermediate_save:
   preprocessed_trajectories: False
+  gridbins: True
   piecewise_potential: False
   simulated_trajectories: False
   plots: False

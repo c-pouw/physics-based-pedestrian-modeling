@@ -2,6 +2,7 @@ import logging
 import pickle
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 from hydra.utils import get_original_cwd
 
@@ -46,3 +47,16 @@ def save_trajectories(trajectories: pd.DataFrame, folderpath: Path, filename: st
     filepath = folderpath / filename
     trajectories.to_csv(filepath)
     log.info("Trajectories saved to %s.", filepath.relative_to(get_original_cwd()))
+
+
+def save_grid_bins(gridbins: dict, gridname: str) -> None:
+    filename = Path.cwd().parent / f"{gridname}.npz"
+    np.savez(
+        file=filename,
+        x=gridbins["x"],
+        y=gridbins["y"],
+        r=gridbins["r"],
+        theta=gridbins["theta"],
+        k=gridbins["k"],
+    )
+    log.info("Grid bins saved to %s", filename.relative_to(get_original_cwd()))

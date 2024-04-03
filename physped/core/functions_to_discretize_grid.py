@@ -9,9 +9,27 @@ import pandas as pd
 from scipy.stats import norm
 
 from physped.core.discrete_grid import PiecewisePotential
+from physped.io.writers import save_grid_bins
 from physped.utils.functions import digitize_values_to_grid, pol2cart, weighted_mean_of_two_matrices
 
 log = logging.getLogger(__name__)
+
+
+def create_grid_bins_from_conf(cfg: dict) -> dict:
+    grid_conf = cfg.params.grid
+    xbins = np.arange(grid_conf.x.min, grid_conf.x.max, grid_conf.x.step)
+    ybins = np.arange(grid_conf.y.min, grid_conf.y.max, grid_conf.y.step)
+    rbins = np.arange(grid_conf.r.min, grid_conf.r.max, grid_conf.r.step)
+    thetabins = np.linspace(-np.pi, np.pi + 0.01, grid_conf.theta.chunks)
+    kbins = np.array([0, 1, 10**10])
+    gridbins = {"x": xbins, "y": ybins, "r": rbins, "theta": thetabins, "k": kbins}
+    log.info("Bins succesfully created with limits: %s", grid_conf)
+    log.debug("Grid bins: %s", gridbins)
+
+    log.info("Intermediate_save.gridbins: %s", cfg.intermediate_save.gridbins)
+    if cfg.intermediate_save.gridbins:
+        save_grid_bins(gridbins, cfg.params.env_name)
+    return gridbins
 
 
 def learn_potential_from_trajectories(trajectories: pd.DataFrame, grid_bins: dict) -> PiecewisePotential:

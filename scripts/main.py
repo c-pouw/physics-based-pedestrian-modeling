@@ -6,9 +6,9 @@ import hydra
 import matplotlib.pyplot as plt
 from hydra.utils import get_original_cwd
 
-from physped.core.functions_to_discretize_grid import learn_potential_from_trajectories
+from physped.core.functions_to_discretize_grid import create_grid_bins_from_conf, learn_potential_from_trajectories
 from physped.core.trajectory_simulator import simulate_trajectories
-from physped.io.readers import read_grid_bins, trajectory_reader
+from physped.io.readers import trajectory_reader
 from physped.io.writers import save_piecewise_potential
 from physped.preprocessing.trajectory_preprocessor import preprocess_trajectories
 from physped.visualization.histograms import create_all_histograms, plot_multiple_histograms
@@ -34,8 +34,11 @@ def main(cfg):
     plot_trajectories(preprocessed_trajectories, cfg.params, "recorded")
 
     print("\n")
+    log.info(" ---- Create grid bins from configuration file ----")
+    grid_bins = create_grid_bins_from_conf(cfg)
+
+    print("\n")
     log.info("---- Learn piecewise potetential from trajectories ----")
-    grid_bins = read_grid_bins(cfg.params.grid_name)
     piecewise_potential = learn_potential_from_trajectories(preprocessed_trajectories, grid_bins)
     save_piecewise_potential(piecewise_potential, Path.cwd().parent)
 
