@@ -270,7 +270,7 @@ def plot_station_background(ax: plt.Axes, params: dict) -> plt.Axes:
     return ax
 
 
-def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = None):
+def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = None):
     """
     Plot trajectories of pedestrians.
 
@@ -282,6 +282,7 @@ def plot_trajectories(trajs: pd.DataFrame, params: dict, trajectory_type: str = 
     Returns:
         None
     """
+    params = config.params
     traj_plot_params = params.get("trajectory_plot", {})
     name = params.get("env_name")
 

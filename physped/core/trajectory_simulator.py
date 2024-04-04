@@ -21,7 +21,8 @@ def sample_trajectory_origins_from_heatmap(piecewise_potential, parameters: dict
     return origins
 
 
-def simulate_trajectories(piecewise_potential, parameters: dict) -> pd.DataFrame:
+def simulate_trajectories(piecewise_potential, config: dict) -> pd.DataFrame:
+    parameters = config.params
     origins = sample_trajectory_origins_from_heatmap(piecewise_potential, parameters)
     # Simulate trajectories
     lm = LangevinModel(piecewise_potential, parameters)

@@ -198,7 +198,7 @@ def add_velocity(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     return df
 
 
-def preprocess_trajectories(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
+def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     """_summary_
 
     :param df: _description_
@@ -208,6 +208,8 @@ def preprocess_trajectories(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     :return: _description_
     :rtype: pd.DataFrame
     """
+    parameters = config.params
+
     filepath = Path.cwd().parent / "preprocessed_trajectories.csv"
     if filepath.exists():
         log.warning("Preprocessed trajectories already exist.")
