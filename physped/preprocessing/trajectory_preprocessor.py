@@ -3,6 +3,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from hydra.utils import get_original_cwd
 from scipy.signal import savgol_filter
 
 from physped.io.readers import read_trajectories_from_path
@@ -209,19 +210,20 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     :rtype: pd.DataFrame
     """
     parameters = config.params
-
     filepath = Path.cwd().parent / "preprocessed_trajectories.csv"
 
-    if parameters.read_preprocessed_trajectories_from_file:
-        log.debug("parameter 'read_preprocessed_trajectories_from_file' is set to True.")
+    # TODO : Move to separate function
+    if config.read.preprocessed_trajectories:
+        log.debug("Configuration 'read.preprocessed_trajectories' is set to True.")
         try:
             preprocessed_trajectories = read_trajectories_from_path(filepath)
-            log.info("Preprocessed trajectories read from file.")
+            log.info("---- Preprocessed trajectories succesfully read from file ----")
+            log.debug("Filepath %s", filepath.relative_to(get_original_cwd()))
             return preprocessed_trajectories
         except FileNotFoundError as e:
-            log.error("Preprocessed trajectories not found: %s", e)
+            log.warning("Preprocessed trajectories not found: %s", e)
 
-    log.info("Start trajectory preprocessing.")
+    log.info("---- Preprocess recorded trajectories ----")
     # TODO : Use columnnames from parameters instead of renaming
     df = rename_columns(df, parameters)
     log.info("Columns renamed.")
@@ -243,7 +245,8 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     df = add_velocity_in_polar_coordinates(df, mode="s")
     log.info("Slow modes computed.")
     # if parameters.intermediate_save.preprocessed_trajectories:
-    if parameters.save_preprocessed_trajectories_to_file:
+    if config.save.preprocessed_trajectories:
+        log.debug("Configuration 'save.preprocessed_trajectories' is set to True.")
         save_trajectories(df, Path.cwd().parent, "preprocessed_trajectories.csv")
     return df
 

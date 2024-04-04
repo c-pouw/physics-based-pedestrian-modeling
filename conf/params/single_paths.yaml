@@ -14,10 +14,6 @@ colnames:
   yf: yf
   Pid: Pid
   time: Rstep
-read_preprocessed_trajectories_from_file: True
-save_preprocessed_trajectories_to_file: True
-save_simulated_trajectories_to_file: True
-grid_name: single_paths_grid
 plot_style: conf/science.mplstyle
 simulation:
   ntrajs: 100

@@ -3,9 +3,11 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from hydra.utils import get_original_cwd
 
 from physped.core.functions_to_discretize_grid import convert_grid_indices_to_coordinates, sample_from_ndarray
 from physped.core.langevin_model import LangevinModel
+from physped.io.readers import read_trajectories_from_path
 from physped.io.writers import save_trajectories
 from physped.utils.functions import cart2pol
 
@@ -23,6 +25,20 @@ def sample_trajectory_origins_from_heatmap(piecewise_potential, parameters: dict
 
 def simulate_trajectories(piecewise_potential, config: dict) -> pd.DataFrame:
     parameters = config.params
+    filepath = Path.cwd().parent / "simulated_trajectories.csv"
+
+    # TODO : Move to separate function
+    if config.read.simulated_trajectories:
+        log.debug("Configuration 'read.simulated_trajectories' is set to True.")
+        try:
+            simulated_trajectories = read_trajectories_from_path(filepath)
+            log.info("---- Simulated trajectories succesfully read from file ----")
+            log.debug("Filepath %s", filepath.relative_to(get_original_cwd()))
+            return simulated_trajectories
+        except FileNotFoundError as e:
+            log.warning("Preprocessed trajectories not found: %s", e)
+
+    log.info("---- Simulate trajectories with piecewise potential ----")
     origins = sample_trajectory_origins_from_heatmap(piecewise_potential, parameters)
     # Simulate trajectories
     lm = LangevinModel(piecewise_potential, parameters)
@@ -41,6 +57,7 @@ def simulate_trajectories(piecewise_potential, config: dict) -> pd.DataFrame:
     trajectories = pd.concat(trajectories)
     trajectories["rf"], trajectories["thetaf"] = cart2pol(trajectories.uf, trajectories.vf)
     trajectories["rs"], trajectories["thetas"] = cart2pol(trajectories.us, trajectories.vs)
-    if parameters.save_simulated_trajectories_to_file:
+    if config.save.simulated_trajectories:
+        log.debug("Configuration 'save.simulated_trajectories' is set to True.")
         save_trajectories(trajectories, Path.cwd().parent, "simulated_trajectories.csv")
     return trajectories

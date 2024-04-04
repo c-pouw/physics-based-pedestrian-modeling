@@ -2,21 +2,23 @@
 
 import copy
 import logging
+from pathlib import Path
 from typing import List
 
 import numpy as np
 import pandas as pd
+from hydra.utils import get_original_cwd
 from scipy.stats import norm
 
 from physped.core.discrete_grid import PiecewisePotential
-from physped.io.writers import save_grid_bins
+from physped.io.readers import read_piecewise_potential_from_file
 from physped.utils.functions import digitize_values_to_grid, pol2cart, weighted_mean_of_two_matrices
 
 log = logging.getLogger(__name__)
 
 
-def create_grid_bins_from_config(cfg: dict) -> dict:
-    grid_conf = cfg.params.grid
+def create_grid_bins_from_config(config: dict) -> dict:
+    grid_conf = config.params.grid
     xbins = np.arange(grid_conf.x.min, grid_conf.x.max, grid_conf.x.step)
     ybins = np.arange(grid_conf.y.min, grid_conf.y.max, grid_conf.y.step)
     rbins = np.arange(grid_conf.r.min, grid_conf.r.max, grid_conf.r.step)
@@ -26,13 +28,13 @@ def create_grid_bins_from_config(cfg: dict) -> dict:
     log.info("Bins succesfully created with limits: %s", grid_conf)
     log.debug("Grid bins: %s", gridbins)
 
-    log.info("Intermediate_save.gridbins: %s", cfg.intermediate_save.gridbins)
-    if cfg.intermediate_save.gridbins:
-        save_grid_bins(gridbins, cfg.params.env_name)
+    # log.info("Intermediate_save.gridbins: %s", config.intermediate_save.gridbins)
     return gridbins
 
 
-def learn_potential_from_trajectories(trajectories: pd.DataFrame, grid_bins: dict) -> PiecewisePotential:
+def learn_potential_from_trajectories(
+    trajectories: pd.DataFrame, grid_bins: dict, config: dict
+) -> PiecewisePotential:
     """
     Convert trajectories to a grid of histograms and parameters.
 
@@ -43,6 +45,17 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, grid_bins: dic
     Returns:
     - A dictionary of DiscreteGrid objects for storing histograms and parameters.
     """
+    filepath = Path.cwd().parent / "piecewise_potential.pickle"
+    if config.read.simulated_trajectories:
+        log.debug("Configuration 'read.simulated_trajectories' is set to True.")
+        try:
+            piecewise_potential = read_piecewise_potential_from_file(filepath)
+            log.info("---- Piecewise potential succesfully read from file ----")
+            log.debug("Filepath %s", filepath.relative_to(get_original_cwd()))
+            return piecewise_potential
+        except FileNotFoundError as e:
+            log.warning("Piecewise potential not found: %s", e)
+
     piecewise_potential = PiecewisePotential(grid_bins)
     trajectories = digitize_trajectories_to_grid(piecewise_potential.bins, trajectories)
     piecewise_potential.histogram = add_trajectories_to_histogram(
