@@ -1,9 +1,11 @@
 # Additional ignores
 multirun/*
 outputs/*
+figures/*
 *.code-workspace
 data/models/
 data/trajectories/
+develop/*
 
 # -*- mode: gitignore; -*-
 *~
