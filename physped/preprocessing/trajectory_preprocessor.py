@@ -211,13 +211,15 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     parameters = config.params
 
     filepath = Path.cwd().parent / "preprocessed_trajectories.csv"
-    if filepath.exists():
-        log.warning("Preprocessed trajectories already exist.")
-        if parameters["read_preprocessed_trajectories_from_file"]:
-            log.warning("Reading preprocessed trajectories from file.")
-            return read_trajectories_from_path(filepath)
-        else:
-            log.warning("Overwriting preprocessed trajectories.")
+
+    if parameters.read_preprocessed_trajectories_from_file:
+        log.debug("parameter 'read_preprocessed_trajectories_from_file' is set to True.")
+        try:
+            preprocessed_trajectories = read_trajectories_from_path(filepath)
+            log.info("Preprocessed trajectories read from file.")
+            return preprocessed_trajectories
+        except FileNotFoundError as e:
+            log.error("Preprocessed trajectories not found: %s", e)
 
     log.info("Start trajectory preprocessing.")
     # TODO : Use columnnames from parameters instead of renaming
