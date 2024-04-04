@@ -1,14 +1,15 @@
+import logging
+from pathlib import Path
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+from hydra.utils import get_original_cwd
 
 from physped.core.piecewise_potential_handling import get_the_boundaries_that_enclose_the_selected_values
 from physped.visualization.plot_trajectories import apply_polar_plot_style, apply_xy_plot_style
 
-# from pathlib import Path
-
-
-# from physped.io.readers import read_piecewise_potential_from_file
+log = logging.getLogger(__name__)
 
 
 def plot_cartesian_spatial_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
@@ -114,7 +115,6 @@ def highlight_velocity_selection(ax: plt.Axes, params: dict) -> plt.Axes:
     thetabins = np.linspace(-np.pi, np.pi + 0.01, params.grid.theta.chunks + 1)
     r_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.r, rbins)
     theta_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.theta, thetabins)
-    print(np.round(theta_bounds, 2))
     theta_range = np.linspace(theta_bounds[0], theta_bounds[1], 100)
     c = "r"
     colors = {
@@ -134,7 +134,8 @@ def highlight_velocity_selection(ax: plt.Axes, params: dict) -> plt.Axes:
     return ax
 
 
-def plot_discrete_grid(params: dict):
+def plot_discrete_grid(config: dict):
+    params = config.params
     fig = plt.figure(layout="constrained")
     width_ratios = [2, 1]
     spec = mpl.gridspec.GridSpec(ncols=2, nrows=1, width_ratios=width_ratios, wspace=0.1, hspace=0.1, figure=fig)
@@ -148,9 +149,8 @@ def plot_discrete_grid(params: dict):
     ax.set_ylim(params.grid.y.min, params.grid.y.max)
     ax.set_aspect("equal")
 
-    # piecewise_potential = read_piecewise_potential_from_file(folderpath / "piecewise_potential.pickle")
-    # grid_selection = make_grid_selection(piecewise_potential, params.selection)
-    ax = highlight_position_selection(ax, params)
+    if params.grid_plot.highlight_selection:
+        ax = highlight_position_selection(ax, params)
     ax.set_title("Spatial grid", y=1.1)
 
     ax = fig.add_subplot(spec[1], polar=True)
@@ -158,6 +158,9 @@ def plot_discrete_grid(params: dict):
     ax = plot_polar_velocity_grid(ax, params.grid)
     ax = plot_polar_labels(ax, params.grid)
     ax.set_ylim(params.grid.r.min, params.grid.r.max - params.grid.r.step)
-    ax = highlight_velocity_selection(ax, params)
+    if params.grid_plot.highlight_selection:
+        ax = highlight_velocity_selection(ax, params)
     ax.set_title("Velocity grid", y=1.1)
-    plt.savefig("figures/discrete_grid.pdf", bbox_inches="tight")
+    filepath = Path.cwd() / params.grid.name
+    plt.savefig(filepath, bbox_inches="tight")
+    log.info("Saving trajectory plot to %s.", filepath.relative_to(get_original_cwd()))

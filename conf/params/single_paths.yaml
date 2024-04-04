@@ -3,6 +3,7 @@ defaults:
   - trajectory_plot: single_paths
   - histogram_plot: single_paths
   - force_field_plot: single_paths
+  - grid_plot: default
 env_name: single_paths
 taux: 2
 tauu: 2

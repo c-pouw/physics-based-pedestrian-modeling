@@ -14,6 +14,7 @@ from physped.core.trajectory_simulator import simulate_trajectories
 from physped.io.readers import read_grid_bins, trajectory_reader
 from physped.io.writers import save_piecewise_potential
 from physped.preprocessing.trajectory_preprocessor import preprocess_trajectories
+from physped.visualization.plot_discrete_grid import plot_discrete_grid
 from physped.visualization.plot_histograms import create_all_histograms, plot_multiple_histograms
 from physped.visualization.plot_trajectories import plot_trajectories
 
@@ -32,7 +33,8 @@ def main(cfg):
     trajectories = trajectory_reader[env_name]()
     preprocessed_trajectories = preprocess_trajectories(trajectories, config=cfg)
 
-    if cfg.plot.preprocessed_trajectories:  # * Optional plotting
+    # * Optional plotting of preprocessed trajectories
+    if cfg.plot.preprocessed_trajectories:
         print("\n")
         log.info("---- Plot preprocessed trajectories ----")
         log.debug("Configuration 'plot.preprocessed_trajectories' is set to True.")
@@ -62,7 +64,8 @@ def main(cfg):
     print("\n")
     simulated_trajectories = simulate_trajectories(piecewise_potential, cfg)
 
-    if cfg.plot.simulated_trajectories:  # * Optional plotting
+    # * Optional plotting of simulated trajectories
+    if cfg.plot.simulated_trajectories:
         print("\n")
         log.info("---- Plot simulated trajectories ----")
         log.debug("Configuration 'plot.simulated_trajectories' is set to True.")
@@ -70,7 +73,8 @@ def main(cfg):
     else:
         log.warning("Configuration 'plot.simulated_trajectories' is set to False.")
 
-    if cfg.plot.histograms:  # * Optional plotting
+    # * Optional plotting of probability distributions
+    if cfg.plot.histograms:
         print("\n")
         log.info("---- Plot probability distribution comparison ----")
         log.debug("Configuration 'plot.histograms' is set to True.")
@@ -79,6 +83,15 @@ def main(cfg):
         plot_multiple_histograms(observables, histograms, "PDF", cfg)
     else:
         log.warning("Configuration 'plot.simulated_trajectories' is set to False.")
+
+    # * Optional plotting of the grid
+    if cfg.plot.grid:
+        print("\n")
+        log.info("---- Plot grid ----")
+        log.debug("Configuration 'plot.grid' is set to True.")
+        plot_discrete_grid(cfg)
+    else:
+        log.info("Configuration 'plot.grid' is set to False.")
 
 
 if __name__ == "__main__":
