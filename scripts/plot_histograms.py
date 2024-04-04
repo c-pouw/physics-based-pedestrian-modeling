@@ -6,7 +6,7 @@ import hydra
 import pandas as pd
 
 from physped.io.readers import read_trajectories_from_path, trajectory_reader
-from physped.visualization.histograms import create_all_histograms, plot_multiple_histograms
+from physped.visualization.plot_histograms import create_all_histograms, plot_multiple_histograms
 
 log = logging.getLogger(__name__)
 
