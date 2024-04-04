@@ -15,7 +15,7 @@ from physped.utils.functions import digitize_values_to_grid, pol2cart, weighted_
 log = logging.getLogger(__name__)
 
 
-def create_grid_bins_from_conf(cfg: dict) -> dict:
+def create_grid_bins_from_config(cfg: dict) -> dict:
     grid_conf = cfg.params.grid
     xbins = np.arange(grid_conf.x.min, grid_conf.x.max, grid_conf.x.step)
     ybins = np.arange(grid_conf.y.min, grid_conf.y.max, grid_conf.y.step)

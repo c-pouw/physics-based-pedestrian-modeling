@@ -6,7 +6,10 @@ import hydra
 import matplotlib.pyplot as plt
 from hydra.utils import get_original_cwd
 
-from physped.core.functions_to_discretize_grid import create_grid_bins_from_conf, learn_potential_from_trajectories
+from physped.core.functions_to_discretize_grid import (
+    create_grid_bins_from_config,
+    learn_potential_from_trajectories,
+)
 from physped.core.trajectory_simulator import simulate_trajectories
 from physped.io.readers import trajectory_reader
 from physped.io.writers import save_piecewise_potential
@@ -35,7 +38,7 @@ def main(cfg):
 
     print("\n")
     log.info(" ---- Create grid bins from configuration file ----")
-    grid_bins = create_grid_bins_from_conf(cfg)
+    grid_bins = create_grid_bins_from_config(cfg)
 
     print("\n")
     log.info("---- Learn piecewise potetential from trajectories ----")

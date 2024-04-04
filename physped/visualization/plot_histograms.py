@@ -135,7 +135,7 @@ def compute_KL_divergence(PDF1: np.ndarray, PDF2: np.ndarray, bin_width: np.ndar
     return ma.masked_invalid(kl).compressed()
 
 
-def plot_multiple_histograms(observables: List, histograms: dict, histogram_type: str, params: dict):
+def plot_multiple_histograms(observables: List, histograms: dict, histogram_type: str, config: dict):
     """
     Plot histograms for all observables.
 
@@ -149,6 +149,7 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
     Returns:
     - The axes object.
     """
+    params = config.params
     fig = plt.figure(figsize=(3.54, 2.36), layout="constrained")
     sum_kl_div = 0
     hist_plot_params = params.get("histogram_plot", {})
