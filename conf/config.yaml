@@ -1,7 +1,12 @@
+defaults:
+  - _self_
+  - params: default_params
+  - override hydra/job_logging: colorlog
+  - override hydra/hydra_logging: colorlog
 read:
   preprocessed_trajectories: True
-  piecewise_potential: True
-  simulated_trajectories: True
+  piecewise_potential: False
+  simulated_trajectories: False
   grid:
     from_file: False
     filename: single_paths.npz

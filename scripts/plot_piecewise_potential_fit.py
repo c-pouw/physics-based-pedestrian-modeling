@@ -1,16 +1,27 @@
 # This script plots a comparison between the probability distributions of the original and simulated trajectories
+import glob
 import logging
+import shutil
+from pathlib import Path
 
 import hydra
+import matplotlib.pyplot as plt
+from hydra.utils import get_original_cwd
 
-from physped.visualization.plot_1d_gaussian_fits import plot_1d_gaussian_fits
+from physped.visualization.plot_1d_gaussian_fits import learn_piece_of_potential_plot
+from physped.visualization.plot_discrete_grid import plot_discrete_grid
 
 log = logging.getLogger(__name__)
 
 
-@hydra.main(version_base=None, config_path="../conf")
+@hydra.main(version_base=None, config_path="../conf", config_name="config")
 def plot_piecewise_potential_fit(cfg):
-    plot_1d_gaussian_fits(cfg.params)
+    plt.style.use(Path(get_original_cwd()) / cfg.params.plot_style)
+    plot_discrete_grid(cfg)
+    learn_piece_of_potential_plot(cfg)
+    output_figures = glob.glob("*.pdf")
+    for figure in output_figures:
+        shutil.copyfile(figure, Path.cwd().parent / figure)
 
 
 if __name__ == "__main__":

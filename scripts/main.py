@@ -1,5 +1,7 @@
+import glob
 import logging
 import pprint
+import shutil
 from pathlib import Path
 
 import hydra
@@ -13,7 +15,7 @@ from physped.core.functions_to_discretize_grid import (
 from physped.core.trajectory_simulator import simulate_trajectories
 from physped.io.readers import read_grid_bins, trajectory_reader
 from physped.io.writers import save_piecewise_potential
-from physped.preprocessing.trajectory_preprocessor import preprocess_trajectories
+from physped.preprocessing.trajectories import preprocess_trajectories
 from physped.visualization.plot_discrete_grid import plot_discrete_grid
 from physped.visualization.plot_histograms import create_all_histograms, plot_multiple_histograms
 from physped.visualization.plot_trajectories import plot_trajectories
@@ -92,6 +94,10 @@ def main(cfg):
         plot_discrete_grid(cfg)
     else:
         log.info("Configuration 'plot.grid' is set to False.")
+
+    output_figures = glob.glob("*.pdf")
+    for figure in output_figures:
+        shutil.copyfile(figure, Path.cwd().parent / figure)
 
 
 if __name__ == "__main__":

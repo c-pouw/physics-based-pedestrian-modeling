@@ -7,4 +7,5 @@ sdeint
 matplotlib
 ipython
 hydra-core
+hydra_colorlog
 polars

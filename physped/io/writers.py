@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from hydra.utils import get_original_cwd
 
-from physped.core.discrete_grid import PiecewisePotential
+from physped.core.piecewise_potential import PiecewisePotential
 
 # from physped.utils.functions import ensure_folder_exists
 

@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from physped.core.discrete_grid import PiecewisePotential
+from physped.core.piecewise_potential import PiecewisePotential
 
 trajectory_folder_path = Path.cwd() / "data" / "trajectories"
 

@@ -10,7 +10,7 @@ import pandas as pd
 from hydra.utils import get_original_cwd
 from scipy.stats import norm
 
-from physped.core.discrete_grid import PiecewisePotential
+from physped.core.piecewise_potential import PiecewisePotential
 from physped.io.readers import read_piecewise_potential_from_file
 from physped.utils.functions import digitize_values_to_grid, pol2cart, weighted_mean_of_two_matrices
 
@@ -149,7 +149,7 @@ def digitize_trajectories_to_grid(grid_bins: dict, trajectories: pd.DataFrame) -
     return trajectories
 
 
-def fit_fast_modes(group: pd.DataFrame) -> list:
+def fit_probability_distributions(group: pd.DataFrame) -> list:
     """
     Fits normal distribution to a group of data points and returns fitting parameters.
 
@@ -180,7 +180,7 @@ def fit_trajectories_on_grid(param_grid, trajectories: pd.DataFrame):
     Returns:
     - The grid with fit parameters.
     """
-    fit_params = trajectories.groupby("slow_grid_indices").apply(fit_fast_modes).dropna().to_dict()
+    fit_params = trajectories.groupby("slow_grid_indices").apply(fit_probability_distributions).dropna().to_dict()
     for key, value in fit_params.items():
         param_grid[key] = value
     return param_grid
@@ -204,26 +204,26 @@ def add_trajectories_to_histogram(
     return histogram
 
 
-def create_grid_bins(grid_vals: dict) -> dict:
-    """
-    Create bins for a grid.
+# def create_grid_bins(grid_vals: dict) -> dict:
+#     """
+#     Create bins for a grid.
 
-    Parameters:
-    - grid_vals (dict): The values of the grid.
+#     Parameters:
+#     - grid_vals (dict): The values of the grid.
 
-    Returns:
-    - A dictionary of bins for each dimension of the grid.
-    """
-    grid_bins = {}
-    if "x" in grid_vals and "y" in grid_vals:
-        grid_bins = {key: np.arange(*grid_vals[key]) for key in ["x", "y"]}
-    if "r" in grid_vals:
-        grid_bins["r"] = np.array(grid_vals["r"])
-    if "theta" in grid_vals:
-        grid_bins["theta"] = np.arange(-np.pi, np.pi + 0.01, grid_vals["theta"])
-    if "k" in grid_vals:
-        grid_bins["k"] = np.array(grid_vals["k"])
-    return grid_bins
+#     Returns:
+#     - A dictionary of bins for each dimension of the grid.
+#     """
+#     grid_bins = {}
+#     if "x" in grid_vals and "y" in grid_vals:
+#         grid_bins = {key: np.arange(*grid_vals[key]) for key in ["x", "y"]}
+#     if "r" in grid_vals:
+#         grid_bins["r"] = np.array(grid_vals["r"])
+#     if "theta" in grid_vals:
+#         grid_bins["theta"] = np.arange(-np.pi, np.pi + 0.01, grid_vals["theta"])
+#     if "k" in grid_vals:
+#         grid_bins["k"] = np.array(grid_vals["k"])
+#     return grid_bins
 
 
 def get_grid_indices(potential_grid: PiecewisePotential, X: List[float]) -> np.ndarray:

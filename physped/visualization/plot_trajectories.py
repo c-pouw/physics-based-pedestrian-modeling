@@ -383,8 +383,6 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
         ax = highlight_grid_box(ax, plot_limits)
 
     fig.suptitle(plot_title, y=0.83)
-    save_figure = traj_plot_params.get("save_figure", False)
-    if save_figure:
-        filepath = Path.cwd() / f"{trajectory_type}trajectories_{params.get('env_name', '')}.pdf"
-        log.info("Saving trajectory plot to %s.", filepath.relative_to(get_original_cwd()))
-        plt.savefig(filepath)
+    filepath = Path.cwd() / f"{trajectory_type}trajectories_{params.get('env_name', '')}.pdf"
+    log.info("Saving trajectory plot to %s.", filepath.relative_to(get_original_cwd()))
+    plt.savefig(filepath)

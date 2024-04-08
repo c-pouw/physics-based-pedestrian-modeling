@@ -6,7 +6,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from hydra.utils import get_original_cwd
 
-from physped.core.piecewise_potential_handling import get_the_boundaries_that_enclose_the_selected_values
+from physped.core.functions_to_select_grid_piece import (  # get_the_boundaries_that_enclose_the_selected_values,
+    evaluate_selection_range,
+)
 from physped.visualization.plot_trajectories import apply_polar_plot_style, apply_xy_plot_style
 
 log = logging.getLogger(__name__)
@@ -86,11 +88,12 @@ def plot_polar_labels(ax: plt.Axes, grid_params: dict) -> plt.Axes:
 
 
 def highlight_position_selection(ax: plt.Axes, params: dict) -> plt.Axes:
-    xbins = np.arange(params.grid.x.min, params.grid.x.max, params.grid.x.step)
-    x_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.x, xbins)
-
-    ybins = np.arange(params.grid.y.min, params.grid.y.max, params.grid.y.step)
-    y_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.y, ybins)
+    # xbins = np.arange(params.grid.x.min, params.grid.x.max, params.grid.x.step)
+    # x_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.x, xbins)
+    x_bounds = params.selection.range.x_bounds
+    # ybins = np.arange(params.grid.y.min, params.grid.y.max, params.grid.y.step)
+    # y_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.y, ybins)
+    y_bounds = params.selection.range.y_bounds
     xrange = np.linspace(x_bounds[0], x_bounds[1], 100)
     c = "r"
     colors = {
@@ -111,10 +114,12 @@ def highlight_position_selection(ax: plt.Axes, params: dict) -> plt.Axes:
 
 
 def highlight_velocity_selection(ax: plt.Axes, params: dict) -> plt.Axes:
-    rbins = np.arange(params.grid.r.min, params.grid.r.max, params.grid.r.step)
-    thetabins = np.linspace(-np.pi, np.pi + 0.01, params.grid.theta.chunks + 1)
-    r_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.r, rbins)
-    theta_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.theta, thetabins)
+    # rbins = np.arange(params.grid.r.min, params.grid.r.max, params.grid.r.step)
+    # thetabins = np.linspace(-np.pi, np.pi + 0.01, params.grid.theta.chunks + 1)
+    # r_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.r, rbins)
+    # theta_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.theta, thetabins)
+    r_bounds = params.selection.range.r_bounds
+    theta_bounds = params.selection.range.theta_bounds
     theta_range = np.linspace(theta_bounds[0], theta_bounds[1], 100)
     c = "r"
     colors = {
@@ -136,31 +141,39 @@ def highlight_velocity_selection(ax: plt.Axes, params: dict) -> plt.Axes:
 
 def plot_discrete_grid(config: dict):
     params = config.params
+    config = evaluate_selection_range(config)
+    plot_params = config.params.grid_plot
     fig = plt.figure(layout="constrained")
-    width_ratios = [2, 1]
-    spec = mpl.gridspec.GridSpec(ncols=2, nrows=1, width_ratios=width_ratios, wspace=0.1, hspace=0.1, figure=fig)
+    spec = mpl.gridspec.GridSpec(
+        ncols=2, nrows=1, width_ratios=plot_params.subplot_width_ratio, wspace=0.1, hspace=0.1, figure=fig
+    )
 
-    ax = fig.add_subplot(spec[0])
-    ax = apply_xy_plot_style(ax, params)
-    ax = plot_cartesian_spatial_grid(ax, params.grid)
-    ax.set_xlabel("$x\\; [\\mathrm{m}]$")
-    ax.set_ylabel("$y\\; [\\mathrm{m}]$")
-    ax.set_xlim(params.grid.x.min, params.grid.x.max)
-    ax.set_ylim(params.grid.y.min, params.grid.y.max)
-    ax.set_aspect("equal")
+    # * Subplot left: spatial grid
+    ax1 = fig.add_subplot(spec[0])
+    ax1 = apply_xy_plot_style(ax1, params)
+    ax1 = plot_cartesian_spatial_grid(ax1, params.grid)
+    ax1.set_xlabel(plot_params.position.xlabel)
+    ax1.set_ylabel(plot_params.position.ylabel)
+    ax1.set_xlim(params.grid.x.min, params.grid.x.max)
+    ax1.set_ylim(params.grid.y.min, params.grid.y.max)
+    ax1.set_aspect("equal")
+    ax1.grid(False)
+    ax1.set_title(plot_params.title.position, y=1.1)
 
-    if params.grid_plot.highlight_selection:
-        ax = highlight_position_selection(ax, params)
-    ax.set_title("Spatial grid", y=1.1)
+    # * Subplot right: velocity grid
+    ax2 = fig.add_subplot(spec[1], polar=True)
+    ax2 = apply_polar_plot_style(ax2, params)
+    ax2 = plot_polar_velocity_grid(ax2, params.grid)
+    ax2 = plot_polar_labels(ax2, params.grid)
+    ax2.set_ylim(params.grid.r.min, params.grid.r.max - params.grid.r.step)
+    ax2.grid(False)
+    ax2.set_title(plot_params.title.velocity, y=1.1)
 
-    ax = fig.add_subplot(spec[1], polar=True)
-    ax = apply_polar_plot_style(ax, params)
-    ax = plot_polar_velocity_grid(ax, params.grid)
-    ax = plot_polar_labels(ax, params.grid)
-    ax.set_ylim(params.grid.r.min, params.grid.r.max - params.grid.r.step)
-    if params.grid_plot.highlight_selection:
-        ax = highlight_velocity_selection(ax, params)
-    ax.set_title("Velocity grid", y=1.1)
-    filepath = Path.cwd() / params.grid.name
+    if plot_params.highlight_selection:
+        ax1 = highlight_position_selection(ax1, params)
+        ax2 = highlight_velocity_selection(ax2, params)
+
+    fig.suptitle(plot_params.title.figure, y=0.85)
+    filepath = Path.cwd() / (params.grid.name + ".pdf")
     plt.savefig(filepath, bbox_inches="tight")
-    log.info("Saving trajectory plot to %s.", filepath.relative_to(get_original_cwd()))
+    log.info("Saving plot of the grid to %s.", filepath.relative_to(get_original_cwd()))

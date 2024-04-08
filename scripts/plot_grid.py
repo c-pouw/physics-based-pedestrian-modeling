@@ -8,7 +8,7 @@ from physped.visualization.plot_discrete_grid import plot_discrete_grid
 log = logging.getLogger(__name__)
 
 
-@hydra.main(version_base=None, config_path="../conf")
+@hydra.main(version_base=None, config_path="../conf", config_name="config")
 def plot_grid(cfg):
     plot_discrete_grid(cfg)
 

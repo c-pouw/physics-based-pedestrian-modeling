@@ -38,6 +38,7 @@ class PiecewisePotential:
         self.dimensions = tuple(self.bin_centers.keys())
         self.histogram = np.zeros(self.grid_shape)
         self.histogram_slow = np.zeros(self.grid_shape)
+        self.fit_dimensions = ("x", "y", "u", "v")
         self.fit_param_names = [
             "xmu",
             "xvar",
