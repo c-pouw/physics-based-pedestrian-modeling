@@ -42,7 +42,7 @@ def plot_cartesian_spatial_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
 
 def plot_polar_velocity_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
     rbins = np.arange(grid_params.r.min, grid_params.r.max, grid_params.r.step)
-    thetabins = np.linspace(-np.pi, np.pi + 0.01, grid_params.theta.chunks + 1)
+    thetabins = np.linspace(-np.pi, np.pi + 0.01, grid_params.theta.segments + 1)
     linestyle = "dashed"
     alpha = 0.8
     color = "k"
@@ -70,7 +70,7 @@ def plot_polar_velocity_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
 
 def plot_polar_labels(ax: plt.Axes, grid_params: dict) -> plt.Axes:
     rbins = np.arange(grid_params.r.min, grid_params.r.max, grid_params.r.step)
-    thetabins = np.linspace(-np.pi, np.pi + 0.01, grid_params.theta.chunks + 1)
+    thetabins = np.linspace(-np.pi, np.pi + 0.01, grid_params.theta.segments + 1)
     for r in rbins[1:]:
         ax.text(
             np.pi / 2,
@@ -115,7 +115,7 @@ def highlight_position_selection(ax: plt.Axes, params: dict) -> plt.Axes:
 
 def highlight_velocity_selection(ax: plt.Axes, params: dict) -> plt.Axes:
     # rbins = np.arange(params.grid.r.min, params.grid.r.max, params.grid.r.step)
-    # thetabins = np.linspace(-np.pi, np.pi + 0.01, params.grid.theta.chunks + 1)
+    # thetabins = np.linspace(-np.pi, np.pi + 0.01, params.grid.theta.segments + 1)
     # r_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.r, rbins)
     # theta_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.theta, thetabins)
     r_bounds = params.selection.range.r_bounds

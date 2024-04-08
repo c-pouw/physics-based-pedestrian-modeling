@@ -10,7 +10,7 @@ from hydra.utils import get_original_cwd
 from scipy.stats import norm
 
 from physped.core.functions_to_discretize_grid import digitize_trajectories_to_grid
-from physped.core.piecewise_potential_handling import evaluate_selection_range
+from physped.core.functions_to_select_grid_piece import evaluate_selection_range
 from physped.io.readers import read_piecewise_potential_from_file, read_trajectories_from_path
 from physped.visualization.plot_discrete_grid import plot_discrete_grid
 

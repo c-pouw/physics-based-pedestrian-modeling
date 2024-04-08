@@ -6,7 +6,9 @@ from pathlib import Path
 
 import hydra
 import matplotlib.pyplot as plt
+import numpy as np
 from hydra.utils import get_original_cwd
+from omegaconf import OmegaConf
 
 from physped.core.functions_to_discretize_grid import (
     create_grid_bins_from_config,
@@ -21,6 +23,8 @@ from physped.visualization.plot_histograms import create_all_histograms, plot_mu
 from physped.visualization.plot_trajectories import plot_trajectories
 
 log = logging.getLogger(__name__)
+
+OmegaConf.register_new_resolver("parse_pi", lambda a: a * np.pi)
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="config")
