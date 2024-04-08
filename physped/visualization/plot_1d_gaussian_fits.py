@@ -12,6 +12,7 @@ from scipy.stats import norm
 from physped.core.functions_to_discretize_grid import digitize_trajectories_to_grid
 from physped.core.functions_to_select_grid_piece import evaluate_selection_range
 from physped.io.readers import read_piecewise_potential_from_file, read_trajectories_from_path
+from physped.omegaconf_resolvers import register_new_resolvers
 from physped.visualization.plot_discrete_grid import plot_discrete_grid
 
 log = logging.getLogger(__name__)
@@ -60,6 +61,7 @@ def learn_piece_of_potential_plot(config: dict):
         config.params.selection.range.y_indices[0],
         config.params.selection.range.r_indices[0],
         config.params.selection.range.theta_indices[0],
+        config.params.selection.range.k_indices[0],
     ]
     points_inside_grid_cell = trajs[trajs.slow_grid_indices == tuple(grid_selection_by_indices)]
 
@@ -78,6 +80,7 @@ def learn_piece_of_potential_plot(config: dict):
         (gauss_line,) = ax.plot(x, y, c="C3", zorder=10, lw=1.5)
 
         hist_bins = np.linspace(plot_params.xlimits[axis][0], plot_params.xlimits[axis][1], 50)
+        # hist_bins = 50
         fast_hist = plt.hist(
             points_inside_grid_cell[f"{axis}f"], bins=hist_bins, density=True, alpha=1, ec="k", fc="#77AADD"
         )
@@ -92,7 +95,7 @@ def learn_piece_of_potential_plot(config: dict):
         "$\\mathbb{P}(\\vec{x}, \\vec{u} \\,|\\, \\vec{x}_p, \\vec{u}_p)$",
         "Fit of $\\mathbb{P}(\\vec{x}, \\vec{u} \\,|\\, \\vec{x}_p, \\vec{u}_p)$",
     ]
-    plt.figlegend(lines, labels, loc="center", bbox_to_anchor=(0.5, 1.05), bbox_transform=fig.transFigure, ncol=2)
+    plt.figlegend(lines, labels, loc="center", bbox_to_anchor=(0.5, -0.05), bbox_transform=fig.transFigure, ncol=2)
 
     filepath = Path.cwd() / "gaussian_fits_1d.pdf"
     plt.savefig(filepath, bbox_inches="tight")
@@ -110,4 +113,5 @@ def plot_piecewise_potential_fit(cfg):
 
 
 if __name__ == "__main__":
+    register_new_resolvers()
     plot_piecewise_potential_fit()

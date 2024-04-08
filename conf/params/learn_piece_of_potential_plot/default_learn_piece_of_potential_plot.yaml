@@ -1,15 +1,15 @@
 xlimits:
   x: [0, 1]
   y: [-0.5, 0.5]
-  u: [0.5, 1.5]
+  u: [0, 1.0]
   v: [-0.5, 0.5]
 xlabel:
-  x: "$(x \\, |\\, x_p)$ [m]"
-  y: "$(y \\, |\\, y_p)$ [m]"
-  u: "$(u \\, |\\, u_p)$ [m/s]"
-  v: "$(v \\, |\\, v_p)$ [m/s]"
+  x: "$(x \\, |\\, \\vec{x}_p, \\vec{u}_p)$ [m]"
+  y: "$(y \\, |\\, \\vec{x}_p, \\vec{u}_p)$ [m]"
+  u: "$(u \\, |\\, \\vec{x}_p, \\vec{u}_p)$ [m/s]"
+  v: "$(v \\, |\\, \\vec{x}_p, \\vec{u}_p)$ [m/s]"
 ylabel:
-  x: "$\\mathbb{P}(x \\, |\\, x_p)$"
-  y: "$\\mathbb{P}(y \\, |\\, y_p)$"
-  u: "$\\mathbb{P}(u \\, |\\, u_p)$"
-  v: "$\\mathbb{P}(v \\, |\\, v_p)$"
+  x: "$\\mathbb{P}(x \\, |\\, \\vec{x}_p, \\vec{u}_p)$"
+  y: "$\\mathbb{P}(y \\, |\\, \\vec{x}_p, \\vec{u}_p)$"
+  u: "$\\mathbb{P}(u \\, |\\, \\vec{x}_p, \\vec{u}_p)$"
+  v: "$\\mathbb{P}(v \\, |\\, \\vec{x}_p, \\vec{u}_p)$"

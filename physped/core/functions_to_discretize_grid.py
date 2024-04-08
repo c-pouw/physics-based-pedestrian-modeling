@@ -22,7 +22,6 @@ def create_grid_bins_from_config(config: dict) -> dict:
     xbins = np.arange(grid_conf.x.min, grid_conf.x.max + 0.01, grid_conf.x.step)
     ybins = np.arange(grid_conf.y.min, grid_conf.y.max + 0.01, grid_conf.y.step)
     rbins = np.arange(grid_conf.r.min, grid_conf.r.max + 0.01, grid_conf.r.step)
-    log.critical(grid_conf.theta.min)
     thetabins = np.linspace(
         grid_conf.theta.min, grid_conf.theta.min + 2 * np.pi + 0.0001, grid_conf.theta.segments + 1
     )
@@ -33,9 +32,7 @@ def create_grid_bins_from_config(config: dict) -> dict:
     return gridbins
 
 
-def learn_potential_from_trajectories(
-    trajectories: pd.DataFrame, grid_bins: dict, config: dict
-) -> PiecewisePotential:
+def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: dict) -> PiecewisePotential:
     """
     Convert trajectories to a grid of histograms and parameters.
 
@@ -46,6 +43,7 @@ def learn_potential_from_trajectories(
     Returns:
     - A dictionary of DiscreteGrid objects for storing histograms and parameters.
     """
+    grid_bins = dict(config.params.grid.bins)
     filepath = Path.cwd().parent / "piecewise_potential.pickle"
     if config.read.simulated_trajectories:
         log.debug("Configuration 'read.simulated_trajectories' is set to True.")

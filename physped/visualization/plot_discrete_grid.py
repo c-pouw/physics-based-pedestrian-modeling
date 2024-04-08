@@ -15,8 +15,8 @@ log = logging.getLogger(__name__)
 
 
 def plot_cartesian_spatial_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
-    xbins = np.arange(grid_params.x.min, grid_params.x.max, grid_params.x.step)
-    ybins = np.arange(grid_params.y.min, grid_params.y.max, grid_params.y.step)
+    xbins = grid_params.bins.x
+    ybins = grid_params.bins.y
     linestyle = "dashed"
     alpha = 0.8
     color = "k"
@@ -41,8 +41,8 @@ def plot_cartesian_spatial_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
 
 
 def plot_polar_velocity_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
-    rbins = np.arange(grid_params.r.min, grid_params.r.max, grid_params.r.step)
-    thetabins = np.linspace(-np.pi, np.pi + 0.01, grid_params.theta.segments + 1)
+    rbins = grid_params.bins.r
+    thetabins = grid_params.bins.theta
     linestyle = "dashed"
     alpha = 0.8
     color = "k"
@@ -69,22 +69,33 @@ def plot_polar_velocity_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
 
 
 def plot_polar_labels(ax: plt.Axes, grid_params: dict) -> plt.Axes:
-    rbins = np.arange(grid_params.r.min, grid_params.r.max, grid_params.r.step)
-    thetabins = np.linspace(-np.pi, np.pi + 0.01, grid_params.theta.segments + 1)
+    rbins = grid_params.bins.r
+    thetabins = grid_params.bins.theta
     for r in rbins[1:]:
         ax.text(
-            np.pi / 2,
-            r + 0.15,
+            np.pi / 2 + 0.4,
+            r,
             f"{r:.1f}",
             ha="center",
             va="center",
-            # bbox = dict(
-            #     facecolor='white', alpha=0.5,
-            #     edgecolor='none', boxstyle='round')
+            fontsize=5,
+            bbox=dict(facecolor="white", alpha=1, edgecolor="none", boxstyle="round"),
         )
     for theta in thetabins[:-1]:
-        ax.text(theta, rbins[-1] * 1.35, f"{theta/np.pi:.1f}$\\pi$", ha="center", va="center")
+        ax.text(
+            theta,
+            rbins[-1] + 0.3 + np.abs(np.cos(theta)) / 4,
+            f"{theta/np.pi:.1f}$\\pi$",
+            ha="center",
+            va="center",
+            fontsize=7,
+        )
+        # ax.text(theta, rbins[-1] * 1.35, f"{convert_rad_to_deg(theta):.1f}$^\\circ$", ha="center", va="center")
     return ax
+
+
+def convert_rad_to_deg(theta: float) -> float:
+    return theta * 180 / np.pi
 
 
 def highlight_position_selection(ax: plt.Axes, params: dict) -> plt.Axes:
@@ -165,7 +176,7 @@ def plot_discrete_grid(config: dict):
     ax2 = apply_polar_plot_style(ax2, params)
     ax2 = plot_polar_velocity_grid(ax2, params.grid)
     ax2 = plot_polar_labels(ax2, params.grid)
-    ax2.set_ylim(params.grid.r.min, params.grid.r.max - params.grid.r.step)
+    ax2.set_ylim(params.grid.r.min, params.grid.r.max)
     ax2.grid(False)
     ax2.set_title(plot_params.title.velocity, y=1.1)
 

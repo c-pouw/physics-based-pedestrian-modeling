@@ -9,8 +9,14 @@ y:
   step: 0.2
 r:
   min: 0
-  max: 2.5
-  step: 0.5
+  max: 1.8
+  step: 0.6
 theta:
   min: ${parse_pi:-0.5}
   segments: 6
+bins:
+  x: ${generate_linear_bins:${params.grid.x.min},${params.grid.x.max},${params.grid.x.step}}
+  y: ${generate_linear_bins:${params.grid.y.min},${params.grid.y.max},${params.grid.y.step}}
+  r: ${generate_linear_bins:${params.grid.r.min},${params.grid.r.max},${params.grid.r.step}}
+  theta: ${generate_angular_bins:${params.grid.theta.min},${params.grid.theta.segments}}
+  k: ${cast_numpy_array:[0,1,100000000000]}
