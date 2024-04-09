@@ -27,7 +27,7 @@ def main(cfg):
     log.info("Working directory %s", Path.cwd())
     log.info("Project root %s", cfg.root_dir)
 
-    plt.style.use(Path(cfg.root_dir) / cfg.params.plot_style)
+    plt.style.use(cfg.root_dir / cfg.params.plot_style)
 
     trajectories = trajectory_reader[env_name]()
     preprocessed_trajectories = preprocess_trajectories(trajectories, config=cfg)
