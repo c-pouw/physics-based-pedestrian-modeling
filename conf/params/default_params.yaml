@@ -1,6 +1,6 @@
 defaults:
   - grid: single_paths
-  - trajectory_plot: default_simulation_params
+  - simulation: default_simulation_params
   - selection: default_selection
   - trajectory_plot: default_trajectory_plot_params
   - histogram_plot: default_histogram_plot_params

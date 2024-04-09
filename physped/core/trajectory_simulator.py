@@ -3,7 +3,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from hydra.utils import get_original_cwd
 
 from physped.core.functions_to_discretize_grid import convert_grid_indices_to_coordinates, sample_from_ndarray
 from physped.core.langevin_model import LangevinModel
@@ -33,7 +32,7 @@ def simulate_trajectories(piecewise_potential, config: dict) -> pd.DataFrame:
         try:
             simulated_trajectories = read_trajectories_from_path(filepath)
             log.info("---- Simulated trajectories succesfully read from file ----")
-            log.debug("Filepath %s", filepath.relative_to(get_original_cwd()))
+            log.debug("Filepath %s", filepath.relative_to(config.root_dir))
             return simulated_trajectories
         except FileNotFoundError as e:
             log.warning("Preprocessed trajectories not found: %s", e)

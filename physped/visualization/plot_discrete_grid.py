@@ -3,7 +3,6 @@ from pathlib import Path
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from hydra.utils import get_original_cwd
 
 from physped.core.functions_to_select_grid_piece import (  # get_the_boundaries_that_enclose_the_selected_values,
     evaluate_selection_range,
@@ -58,4 +57,4 @@ def plot_discrete_grid(config: dict):
     fig.suptitle(plot_params.title.figure, y=0.85)
     filepath = Path.cwd() / (params.grid.name + ".pdf")
     plt.savefig(filepath, bbox_inches="tight")
-    log.info("Saving plot of the grid to %s.", filepath.relative_to(get_original_cwd()))
+    log.info("Saving plot of the grid to %s.", filepath.relative_to(config.root_dir))

@@ -7,20 +7,29 @@ from io import StringIO
 from pathlib import Path
 from zipfile import ZipFile
 
-import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
 from physped.core.piecewise_potential import PiecewisePotential
 
-trajectory_folder_path = Path.cwd() / "data" / "trajectories"
+# trajectory_folder_path = Path.cwd() / "data" / "trajectories"
+# TODO : Fix absolute folder path
+trajectory_folder_path = (
+    Path("/home")
+    / "pouw"
+    / "workspace"
+    / "crowd-tracking"
+    / "physics-based-pedestrian-modeling"
+    / "data"
+    / "trajectories"
+)
 
 log = logging.getLogger(__name__)
 
 
-def read_grid_bins(filename: str):
-    filepath = Path.cwd().parent / filename
-    return dict(np.load(filepath, allow_pickle=True))
+# def read_grid_bins(filename: str):
+#     filepath = Path.cwd().parent / filename
+#     return dict(np.load(filepath, allow_pickle=True))
 
 
 def read_piecewise_potential_from_file(filepath: Path) -> PiecewisePotential:

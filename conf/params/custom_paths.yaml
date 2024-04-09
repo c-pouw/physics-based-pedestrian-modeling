@@ -1,54 +1,37 @@
-env_name: 'custom_paths'
+defaults:
+  - grid: single_paths
+  - simulation: default_simulation_params
+  - selection: default_selection
+  - trajectory_plot: default_trajectory_plot_params
+  - histogram_plot: default_histogram_plot_params
+  - force_field_plot: default_force_field_plot_params
+  - grid_plot: default_grid_plot
+  - learn_piece_of_potential_plot: default_learn_piece_of_potential_plot
+  - _self_
+env_name: custom_paths
 taux: 2
 tauu: 2
+fps: 10
 dt: 0.1
 sigma: 0.2
+minimum_trajectory_length: 10
 colnames:
   xf: xf
   yf: yf
   Pid: Pid
   time: time
-minimum_trajectory_length: 50
-save_preprocessed_trajectories_to_file: False
-grid_name: 'custom_paths_grid'
-working_directory: ${hydra:runtime.cwd}
-folder_path: ${hydra:runtime.cwd}/data/models/${params.env_name}_taux${params.taux}_tauu${params.tauu}_dt${params.dt}_sigma${params.sigma}_${params.grid_name}
 simulation:
   ntrajs: 100
   start: 0
   end: 10
   step: 0.1
   stop_condition: 100
-selection:
-  x: [-0.45, -0.45]
-  y: [0.15, 0.15]
-  r: [0.75, 0.75]
-  theta: [0.15, 0.15]
-  k: [1.2, 1.2]
+plot_style: conf/science.mplstyle
 trajectory_plot:
-  trajectory_type: 'recorded'
-  title: ""
-  save_figure: true
-  N_trajs: 30
-  plot_selection: false
-  plot_potential_cross_section: false
-  plot_walls: false
-  plot_intended_path: false
-  width_ratios: [2, 1]
+  title: "Narrow corridor"
   xlims: [-1.1, 1.1]
   ylims: [-0.7, 0.7]
   yps: [0]
   ywalls: [0.6, -0.6]
-histogram_plot:
-  xlims: [-1.1, 1.1]
-  ylims: [-0.5, 0.5]
-  rlims: [0, 2]
-  thetalims: [-3.14, 3.14]
-force_field_plot:
-  clip: 0
-  scale: 8000
-  sparseness: 3
-  width_ratios: [2, 1]
-  xlims: [-1.1, 1.1]
-  ylims: [-0.5, 0.5]
-  figsize: [3.54, 2]
+  plot_walls: true
+  plot_intended_path: true

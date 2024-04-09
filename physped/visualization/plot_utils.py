@@ -5,7 +5,6 @@ from typing import Tuple
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
-from hydra.utils import get_original_cwd
 
 log = logging.getLogger(__name__)
 
@@ -161,7 +160,7 @@ def highlight_grid_box(ax: plt.Axes, limits: Tuple, c: str = "k") -> plt.Axes:
     return ax
 
 
-def plot_station_background(ax: plt.Axes, params: dict) -> plt.Axes:
+def plot_station_background(ax: plt.Axes, config: dict) -> plt.Axes:
     """
     Plot the background image of the station.
 
@@ -173,16 +172,16 @@ def plot_station_background(ax: plt.Axes, params: dict) -> plt.Axes:
         plt.Axes: The modified matplotlib Axes object.
 
     """
-    img = mpimg.imread(Path(get_original_cwd()) / params.background.imgpath)
+    img = mpimg.imread(Path(config.root_dir) / config.params.background.imgpath)
     ax.imshow(
         img,
         cmap="gray",
         origin="upper",
         extent=(
-            params.background["xmin"] / 1000,
-            params.background["xmax"] / 1000,
-            params.background["ymin"] / 1000,
-            params.background["ymax"] / 1000,
+            config.params.background["xmin"] / 1000,
+            config.params.background["xmax"] / 1000,
+            config.params.background["ymin"] / 1000,
+            config.params.background["ymax"] / 1000,
         ),
         alpha=1,
     )

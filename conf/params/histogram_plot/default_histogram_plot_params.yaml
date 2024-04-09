@@ -1,7 +1,9 @@
-xlims: [-1.1, 1.1]
-ylims: [-0.5, 0.5]
-rlims: [0, 2]
-thetalims: [-3.1415,3.1415]
+xflims: [-1.1, 1.1]
+yflims: [-0.5, 0.5]
+uflims: [-2, 2]
+vflims: [-2, 2]
+rflims: [0, 2]
+thetaflims: [-3.1415, 3.1415]
 recorded:
   edgecolor: "C3"
   facecolor: "C3"

@@ -7,7 +7,6 @@ from typing import List
 
 import numpy as np
 import pandas as pd
-from hydra.utils import get_original_cwd
 from scipy.stats import norm
 
 from physped.core.piecewise_potential import PiecewisePotential
@@ -50,7 +49,7 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: dict) 
         try:
             piecewise_potential = read_piecewise_potential_from_file(filepath)
             log.info("---- Piecewise potential succesfully read from file ----")
-            log.debug("Filepath %s", filepath.relative_to(get_original_cwd()))
+            log.debug("Filepath %s", filepath.relative_to(config.root_dir))
             return piecewise_potential
         except FileNotFoundError as e:
             log.warning("Piecewise potential not found: %s", e)

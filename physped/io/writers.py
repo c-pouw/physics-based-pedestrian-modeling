@@ -4,7 +4,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from hydra.utils import get_original_cwd
 
 from physped.core.piecewise_potential import PiecewisePotential
 
@@ -29,7 +28,7 @@ def save_piecewise_potential(
     filepath = folderpath / filename
     with open(filepath, "wb") as f:
         pickle.dump(grid, f)
-    log.info("Piecewise potential saved to %s.", filepath.relative_to(get_original_cwd()))
+    log.info("Piecewise potential saved as %s.", filename)
 
 
 def save_trajectories(trajectories: pd.DataFrame, folderpath: Path, filename: str) -> None:
@@ -46,17 +45,18 @@ def save_trajectories(trajectories: pd.DataFrame, folderpath: Path, filename: st
     # ensure_folder_exists(folderpath)
     filepath = folderpath / filename
     trajectories.to_csv(filepath)
-    log.info("Trajectories saved to %s.", filepath.relative_to(get_original_cwd()))
+    log.info("Trajectories saved as %s.", filename)
 
 
 def save_grid_bins(gridbins: dict, gridname: str) -> None:
-    filename = Path.cwd().parent / f"{gridname}.npz"
+    filename = f"{gridname}.npz"
+    filepath = Path.cwd().parent / filename
     np.savez(
-        file=filename,
+        file=filepath,
         x=gridbins["x"],
         y=gridbins["y"],
         r=gridbins["r"],
         theta=gridbins["theta"],
         k=gridbins["k"],
     )
-    log.info("Grid bins saved to %s", filename.relative_to(get_original_cwd()))
+    log.info("Grid bins saved as %s", filename)

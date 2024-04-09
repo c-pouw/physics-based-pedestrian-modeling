@@ -1,5 +1,10 @@
+import os
+from pathlib import Path
+
 import numpy as np
 from omegaconf import OmegaConf
+
+ROOT_DIR = Path(os.path.dirname(os.path.abspath(__file__))).parent
 
 
 def apply_periodic_conditions_to_the_angle_theta(theta: float):
@@ -17,6 +22,7 @@ def apply_periodic_conditions_to_the_angle_theta(theta: float):
 
 
 def register_new_resolvers():
+    OmegaConf.register_new_resolver("get_root_dir", lambda: ROOT_DIR)
     OmegaConf.register_new_resolver("parse_pi", lambda a: a * np.pi)
     OmegaConf.register_new_resolver(
         "generate_linear_bins", lambda min, max, step: np.arange(min, max + 0.01, step)

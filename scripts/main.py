@@ -6,7 +6,6 @@ from pathlib import Path
 
 import hydra
 import matplotlib.pyplot as plt
-from hydra.utils import get_original_cwd
 
 from physped.core.functions_to_discretize_grid import learn_potential_from_trajectories
 from physped.core.trajectory_simulator import simulate_trajectories
@@ -26,9 +25,9 @@ def main(cfg):
     env_name = cfg.params.env_name
     log.debug("Configuration: \n%s", pprint.pformat(dict(cfg)))
     log.debug("Working directory %s", Path.cwd())
-    log.debug("Project root %s", get_original_cwd())
+    log.debug("Project root %s", cfg.root_dir)
 
-    plt.style.use(Path(get_original_cwd()) / cfg.params.plot_style)
+    plt.style.use(Path(cfg.root_dir) / cfg.params.plot_style)
 
     trajectories = trajectory_reader[env_name]()
     preprocessed_trajectories = preprocess_trajectories(trajectories, config=cfg)

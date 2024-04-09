@@ -3,7 +3,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from hydra.utils import get_original_cwd
 from scipy.signal import savgol_filter
 
 from physped.io.readers import read_trajectories_from_path
@@ -216,7 +215,7 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         try:
             preprocessed_trajectories = read_trajectories_from_path(filepath)
             log.info("---- Preprocessed trajectories succesfully read from file ----")
-            log.debug("Filepath %s", filepath.relative_to(get_original_cwd()))
+            log.debug("Filepath %s", filepath.relative_to(config.root_dir))
             return preprocessed_trajectories
         except FileNotFoundError as e:
             log.warning("Preprocessed trajectories not found: %s", e)

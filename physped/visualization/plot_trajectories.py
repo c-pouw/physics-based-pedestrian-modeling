@@ -6,7 +6,6 @@ from pathlib import Path
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
-from hydra.utils import get_original_cwd
 
 from physped.core.functions_to_discretize_grid import (
     get_boundary_coordinates_of_selection,
@@ -151,7 +150,7 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
                 ha="left",
             )
     if traj_plot_params.show_background:
-        ax = plot_station_background(ax, params)
+        ax = plot_station_background(ax, config)
 
     # TODO retrieve size from config
     if name == "single_paths":
@@ -201,5 +200,5 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
 
     fig.suptitle(plot_title, y=0.83)
     filepath = Path.cwd() / f"{trajectory_type}trajectories_{params.get('env_name', '')}.pdf"
-    log.info("Saving trajectory plot to %s.", filepath.relative_to(get_original_cwd()))
+    log.info("Saving trajectory plot to %s.", filepath.relative_to(config.root_dir))
     plt.savefig(filepath)

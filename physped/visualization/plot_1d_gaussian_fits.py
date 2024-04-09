@@ -6,7 +6,6 @@ from pathlib import Path
 import hydra
 import matplotlib.pyplot as plt
 import numpy as np
-from hydra.utils import get_original_cwd
 from scipy.stats import norm
 
 from physped.core.functions_to_discretize_grid import digitize_trajectories_to_grid
@@ -99,12 +98,12 @@ def learn_piece_of_potential_plot(config: dict):
 
     filepath = Path.cwd() / "gaussian_fits_1d.pdf"
     plt.savefig(filepath, bbox_inches="tight")
-    log.info("Saved plot to %s", filepath.relative_to(get_original_cwd()))
+    log.info("Saved plot to %s", filepath.relative_to(config.root_dir))
 
 
 @hydra.main(version_base=None, config_path="../../conf", config_name="config")
 def plot_piecewise_potential_fit(cfg):
-    plt.style.use(Path(get_original_cwd()) / cfg.params.plot_style)
+    plt.style.use(Path(cfg.root_dir) / cfg.params.plot_style)
     plot_discrete_grid(cfg)
     learn_piece_of_potential_plot(cfg)
     output_figures = glob.glob("*.pdf")

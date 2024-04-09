@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import numpy.ma as ma
 import pandas as pd
-from hydra.utils import get_original_cwd
 from matplotlib.axes import Axes
 from scipy.special import kl_div
 
@@ -168,7 +167,7 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
             hist_type=histogram_type,
             config=config,
         )
-        lims = hist_plot_params.get(f"{observable[0]}lims", None)
+        lims = hist_plot_params.get(f"{observable}lims", None)
         ax.set_xlim(lims)
 
         sum_kl_div += kldiv
@@ -183,5 +182,5 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
     # )
     # fig.text(-0.02, 0.5, "PDF", rotation=90)
     filepath = Path.cwd() / f"histograms_{params.get('env_name', '')}.pdf"
-    log.info("Saving histograms figure to %s.", filepath.relative_to(get_original_cwd()))
+    log.info("Saving histograms figure to %s.", filepath.relative_to(config.root_dir))
     plt.savefig(filepath)
