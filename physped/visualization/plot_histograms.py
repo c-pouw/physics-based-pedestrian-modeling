@@ -12,47 +12,6 @@ from scipy.special import kl_div
 
 log = logging.getLogger(__name__)
 
-histogram_plot_params = {
-    "xf": {
-        "xlabel": r"$x_f\;$[m]",
-        "ylabel": {"counts": "Count($x_f$)", "PDF": "P($x_f$)"},
-    },
-    "yf": {
-        "xlabel": r"$y_f\;$[m]",
-        "ylabel": {"counts": "Count($y_f$)", "PDF": "P($y_f$)"},
-    },
-    "uf": {
-        "xlabel": r"$u_f\;$[m/s]",
-        "ylabel": {"counts": "Count($u_f$)", "PDF": "P($u_f$)"},
-    },
-    "vf": {
-        "xlabel": r"$v_f\;$[m/s]",
-        "ylabel": {"counts": "Count($v_f$)", "PDF": "P($v_f$)"},
-    },
-    "rf": {
-        "xlabel": r"$r_f\;$[m/s]",
-        "ylabel": {"counts": "Count($r_f$)", "PDF": "P($r_f$)"},
-    },
-    "thetaf": {
-        "xlabel": "$\\theta_f\\;$[m/s]",
-        "ylabel": {"counts": "Count($\\theta_f$)", "PDF": "P($\\theta_f$)"},
-    },
-    "raw": {
-        "edgecolor": "C3",
-        "facecolor": "C3",
-        "marker": "o",
-        "markersize": 8,
-        "label": "Recordings",
-    },
-    "sim": {
-        "edgecolor": "k",
-        "facecolor": None,
-        "marker": "o",
-        "markersize": 4,
-        "label": "Simulations",
-    },
-}
-
 
 def create_automatic_bins(values: pd.Series) -> np.ndarray:
     """
@@ -102,11 +61,11 @@ def create_all_histograms(
         observables = ["xf", "yf", "uf", "vf", "rf", "thetaf"]
     histograms = {}
     bin_generator = create_automatic_bins
-    for traj_type, trajectories in zip(["raw", "sim"], [trajs, simtrajs]):
+    for traj_type, trajectories in zip(["recorded", "simulated"], [trajs, simtrajs]):
         histograms[traj_type] = {}
         for observable in observables:
             values = trajectories[observable]
-            if traj_type == "raw":
+            if traj_type == "recorded":
                 if observable == "rf":
                     bins = np.linspace(0, 3, 50)
                 # elif observable == "thetaf":
@@ -114,7 +73,7 @@ def create_all_histograms(
                 else:
                     bins = bin_generator(values)
             else:
-                bins = histograms["raw"][observable]["bin_edges"]
+                bins = histograms["recorded"][observable]["bin_edges"]
             histograms[traj_type][observable] = create_histogram(values, bins)
     return histograms
 
@@ -140,6 +99,7 @@ def plot_histogram(
     histograms: Dict[str, Any],
     observable: str,
     hist_type: str,
+    config: dict,
 ) -> Axes:
     """
     Plot a histogram.
@@ -154,7 +114,8 @@ def plot_histogram(
     Returns:
     - The axes object.
     """
-    for traj_type in ["raw", "sim"]:
+    histogram_plot_params = config.params.histogram_plot
+    for traj_type in ["recorded", "simulated"]:
         ax.scatter(
             histograms[traj_type][observable]["bin_centers"],
             histograms[traj_type][observable][hist_type],
@@ -194,9 +155,9 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
 
         kldiv = sum(
             compute_KL_divergence(
-                histograms["raw"][observable][histogram_type],
-                histograms["sim"][observable][histogram_type],
-                histograms["raw"][observable]["bin_width"],
+                histograms["recorded"][observable][histogram_type],
+                histograms["simulated"][observable][histogram_type],
+                histograms["recorded"][observable]["bin_width"],
             )
         )
 
@@ -205,6 +166,7 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
             histograms,
             observable,
             hist_type=histogram_type,
+            config=config,
         )
         lims = hist_plot_params.get(f"{observable[0]}lims", None)
         ax.set_xlim(lims)

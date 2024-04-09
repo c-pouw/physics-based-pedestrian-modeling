@@ -65,7 +65,7 @@ def main(cfg):
         print("\n")
         log.info("---- Plot probability distribution comparison ----")
         log.debug("Configuration 'plot.histograms' is set to True.")
-        observables = ["xf", "yf", "rf", "thetaf"]
+        observables = ["xf", "yf", "uf", "vf"]
         histograms = create_all_histograms(preprocessed_trajectories, simulated_trajectories, observables)
         plot_multiple_histograms(observables, histograms, "PDF", cfg)
     else:
