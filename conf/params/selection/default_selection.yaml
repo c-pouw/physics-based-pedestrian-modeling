@@ -4,7 +4,7 @@ point:
   r: 1.1
   theta: 3.2
   k: 1.2
-  theta_periodic: ???
+  theta_periodic: ??? #${apply_periodic_conditions_to_the_angle_theta:${params.selection.point.theta}}
   x_index: ???
   y_index: ???
   r_index: ???

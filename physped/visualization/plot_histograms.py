@@ -135,6 +135,40 @@ def compute_KL_divergence(PDF1: np.ndarray, PDF2: np.ndarray, bin_width: np.ndar
     return ma.masked_invalid(kl).compressed()
 
 
+def plot_histogram(
+    ax: Axes,
+    histograms: Dict[str, Any],
+    observable: str,
+    hist_type: str,
+) -> Axes:
+    """
+    Plot a histogram.
+
+    Parameters:
+    - ax (plt.Axes): The axes to plot the histogram on.
+    - histograms (Dict[str, Any]): The histograms to plot.
+    - observable (str): The observable to plot the histogram for.
+    - hist_type (str): The type of histogram to plot.
+    - kl_div (float): The KL divergence value for the histogram.
+
+    Returns:
+    - The axes object.
+    """
+    for traj_type in ["raw", "sim"]:
+        ax.scatter(
+            histograms[traj_type][observable]["bin_centers"],
+            histograms[traj_type][observable][hist_type],
+            ec=histogram_plot_params[traj_type]["edgecolor"],
+            fc=histogram_plot_params[traj_type]["facecolor"],
+            label=histogram_plot_params[traj_type]["label"],
+            s=histogram_plot_params[traj_type]["markersize"],
+        )
+    # ax.set_title(f"$D_{{KL}}={kl_div:.2f}$")
+    ax.set_xlabel(histogram_plot_params[observable]["xlabel"])
+    ax.set_ylabel(histogram_plot_params[observable]["ylabel"][hist_type])
+    return ax
+
+
 def plot_multiple_histograms(observables: List, histograms: dict, histogram_type: str, config: dict):
     """
     Plot histograms for all observables.
@@ -189,37 +223,3 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
     filepath = Path.cwd() / f"histograms_{params.get('env_name', '')}.pdf"
     log.info("Saving histograms figure to %s.", filepath.relative_to(get_original_cwd()))
     plt.savefig(filepath)
-
-
-def plot_histogram(
-    ax: Axes,
-    histograms: Dict[str, Any],
-    observable: str,
-    hist_type: str,
-) -> Axes:
-    """
-    Plot a histogram.
-
-    Parameters:
-    - ax (plt.Axes): The axes to plot the histogram on.
-    - histograms (Dict[str, Any]): The histograms to plot.
-    - observable (str): The observable to plot the histogram for.
-    - hist_type (str): The type of histogram to plot.
-    - kl_div (float): The KL divergence value for the histogram.
-
-    Returns:
-    - The axes object.
-    """
-    for traj_type in ["raw", "sim"]:
-        ax.scatter(
-            histograms[traj_type][observable]["bin_centers"],
-            histograms[traj_type][observable][hist_type],
-            ec=histogram_plot_params[traj_type]["edgecolor"],
-            fc=histogram_plot_params[traj_type]["facecolor"],
-            label=histogram_plot_params[traj_type]["label"],
-            s=histogram_plot_params[traj_type]["markersize"],
-        )
-    # ax.set_title(f"$D_{{KL}}={kl_div:.2f}$")
-    ax.set_xlabel(histogram_plot_params[observable]["xlabel"])
-    ax.set_ylabel(histogram_plot_params[observable]["ylabel"][hist_type])
-    return ax

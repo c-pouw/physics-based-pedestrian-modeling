@@ -122,10 +122,7 @@ def add_trajectory_step(df: pd.DataFrame, params: dict) -> pd.DataFrame:
     Returns:
     - The DataFrame with the trajectory step/observation added.
     """
-    # colnames = params.get("colnames", {})
-    # pid_col = colnames.get("Pid", "Pid")
-    # time_col = colnames.get("time", "time")
-    pid_col, time_col = "Pid", "time"
+    pid_col, time_col = params.colnames.Pid, params.colnames.time
     df.sort_values(by=[pid_col, time_col], inplace=True)
     df["k"] = df.groupby(pid_col)[pid_col].transform(lambda x: np.arange(x.size))
     return df
@@ -185,7 +182,7 @@ def add_velocity(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
         2    2   0   0  0.0  0.0
         3    2   1   1  0.0  0.0
     """
-    framerate = 1 / parameters["dt"]
+    framerate = parameters.fps
     groupby = "Pid"
     xpos = "xf"
     ypos = "yf"

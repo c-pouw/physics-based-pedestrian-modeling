@@ -8,11 +8,9 @@ import hydra
 import matplotlib.pyplot as plt
 from hydra.utils import get_original_cwd
 
-from physped.core.functions_to_discretize_grid import (  # create_grid_bins_from_config,
-    learn_potential_from_trajectories,
-)
+from physped.core.functions_to_discretize_grid import learn_potential_from_trajectories
 from physped.core.trajectory_simulator import simulate_trajectories
-from physped.io.readers import trajectory_reader  # read_grid_bins,
+from physped.io.readers import trajectory_reader
 from physped.io.writers import save_piecewise_potential
 from physped.omegaconf_resolvers import register_new_resolvers
 from physped.preprocessing.trajectories import preprocess_trajectories
@@ -43,19 +41,6 @@ def main(cfg):
         plot_trajectories(preprocessed_trajectories, cfg, "recorded")
     else:
         log.warning("Configuration 'plot.preprocessed_trajectories' is set to False.")
-
-    # print("\n")
-    # if cfg.read.grid.from_file:
-    #     log.debug("Configuration 'read.grid.from_file' is set to True.")
-    #     log.info(" ---- Create grid bins from configuration file ----")
-    #     log.warning(
-    #         "Note: this is only needed for grids with nonuniform bin sizes "
-    #         "otherwise it is adviced to create the bins from the configuration."
-    #     )
-    #     grid_bins = read_grid_bins(cfg.read.grid.filename)
-    # else:
-    #     log.info(" ---- Create grid bins from configuration file ----")
-    #     grid_bins = create_grid_bins_from_config(cfg)
 
     print("\n")
     log.info("---- Learn piecewise potential from trajectories ----")

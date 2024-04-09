@@ -4,8 +4,6 @@ from typing import List
 import numpy as np
 from omegaconf import OmegaConf
 
-from physped.core.functions_to_discretize_grid import create_grid_bins_from_config
-
 log = logging.getLogger(__name__)
 
 
@@ -89,9 +87,9 @@ def get_index_of_the_enclosing_bin(selected_value: float, bins: np.ndarray) -> i
 def evaluate_selection_point(config):
     selection = config.params.selection
     selected_point = selection.point
-    grid_bins = create_grid_bins_from_config(config)
+    grid_bins = config.params.grid.bins
 
-    selected_point.theta_periodic = apply_periodic_conditions_to_the_angle_theta(selected_point.theta)
+    # selected_point.theta_periodic = apply_periodic_conditions_to_the_angle_theta(selected_point.theta)
     is_selected_point_within_grid(selected_point, grid_bins)
     selected_point.x_index = get_index_of_the_enclosing_bin(selected_point.x, grid_bins["x"])
     selected_point.y_index = get_index_of_the_enclosing_bin(selected_point.y, grid_bins["y"])
@@ -176,7 +174,7 @@ def get_boundaries_that_enclose_the_selected_range(selected_range: OmegaConf, bi
 
 def evaluate_selection_range(config):
     selected_range = config.params.selection.range
-    grid_bins = create_grid_bins_from_config(config)
+    grid_bins = config.params.grid.bins
     selected_range.theta_periodic = [
         apply_periodic_conditions_to_the_angle_theta(theta) for theta in selected_range.theta
     ]

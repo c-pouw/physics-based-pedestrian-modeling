@@ -3,151 +3,22 @@ from pathlib import Path
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import numpy as np
 from hydra.utils import get_original_cwd
 
 from physped.core.functions_to_select_grid_piece import (  # get_the_boundaries_that_enclose_the_selected_values,
     evaluate_selection_range,
 )
-from physped.visualization.plot_trajectories import apply_polar_plot_style, apply_xy_plot_style
+from physped.visualization.plot_utils import (
+    apply_polar_plot_style,
+    apply_xy_plot_style,
+    highlight_position_selection,
+    highlight_velocity_selection,
+    plot_cartesian_spatial_grid,
+    plot_polar_labels,
+    plot_polar_velocity_grid,
+)
 
 log = logging.getLogger(__name__)
-
-
-def plot_cartesian_spatial_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
-    xbins = grid_params.bins.x
-    ybins = grid_params.bins.y
-    linestyle = "dashed"
-    alpha = 0.8
-    color = "k"
-    linewidth = 0.6
-    for x in xbins:
-        ax.axvline(
-            x,
-            color=color,
-            linestyle=linestyle,
-            lw=linewidth,
-            alpha=alpha,
-        )
-    for y in ybins:
-        ax.axhline(
-            y,
-            color=color,
-            linestyle=linestyle,
-            lw=linewidth,
-            alpha=alpha,
-        )
-    return ax
-
-
-def plot_polar_velocity_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
-    rbins = grid_params.bins.r
-    thetabins = grid_params.bins.theta
-    linestyle = "dashed"
-    alpha = 0.8
-    color = "k"
-    linewidth = 0.6
-    for r in rbins:
-        ax.plot(
-            np.linspace(0, 2 * np.pi, 100),
-            np.ones(100) * r,
-            color=color,
-            linestyle=linestyle,
-            lw=linewidth,
-            alpha=alpha,
-        )
-    for theta in thetabins:
-        ax.plot(
-            [theta, theta],
-            [rbins[1], rbins[-1]],
-            color=color,
-            alpha=alpha,
-            linestyle=linestyle,
-            linewidth=linewidth,
-        )
-    return ax
-
-
-def plot_polar_labels(ax: plt.Axes, grid_params: dict) -> plt.Axes:
-    rbins = grid_params.bins.r
-    thetabins = grid_params.bins.theta
-    for r in rbins[1:]:
-        ax.text(
-            np.pi / 2 + 0.4,
-            r,
-            f"{r:.1f}",
-            ha="center",
-            va="center",
-            fontsize=5,
-            bbox=dict(facecolor="white", alpha=1, edgecolor="none", boxstyle="round"),
-        )
-    for theta in thetabins[:-1]:
-        ax.text(
-            theta,
-            rbins[-1] + 0.3 + np.abs(np.cos(theta)) / 4,
-            f"{theta/np.pi:.1f}$\\pi$",
-            ha="center",
-            va="center",
-            fontsize=7,
-        )
-        # ax.text(theta, rbins[-1] * 1.35, f"{convert_rad_to_deg(theta):.1f}$^\\circ$", ha="center", va="center")
-    return ax
-
-
-def convert_rad_to_deg(theta: float) -> float:
-    return theta * 180 / np.pi
-
-
-def highlight_position_selection(ax: plt.Axes, params: dict) -> plt.Axes:
-    # xbins = np.arange(params.grid.x.min, params.grid.x.max, params.grid.x.step)
-    # x_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.x, xbins)
-    x_bounds = params.selection.range.x_bounds
-    # ybins = np.arange(params.grid.y.min, params.grid.y.max, params.grid.y.step)
-    # y_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.y, ybins)
-    y_bounds = params.selection.range.y_bounds
-    xrange = np.linspace(x_bounds[0], x_bounds[1], 100)
-    c = "r"
-    colors = {
-        "k": (0, 0, 0, 1),
-        "r": (1, 0, 0, 1),
-        "g": (0, 1, 0, 1),
-        "b": (0, 0, 1, 1),
-    }
-    args = {
-        "fc": (1, 1, 1, 0.6),
-        "ec": colors[c],
-        "zorder": 10,
-        "lw": 1.5,
-        "label": "$S$",
-    }
-    ax.fill_between(xrange, y_bounds[0], y_bounds[1], **args)
-    return ax
-
-
-def highlight_velocity_selection(ax: plt.Axes, params: dict) -> plt.Axes:
-    # rbins = np.arange(params.grid.r.min, params.grid.r.max, params.grid.r.step)
-    # thetabins = np.linspace(-np.pi, np.pi + 0.01, params.grid.theta.segments + 1)
-    # r_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.r, rbins)
-    # theta_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.theta, thetabins)
-    r_bounds = params.selection.range.r_bounds
-    theta_bounds = params.selection.range.theta_bounds
-    theta_range = np.linspace(theta_bounds[0], theta_bounds[1], 100)
-    c = "r"
-    colors = {
-        "k": (0, 0, 0, 1),
-        "r": (1, 0, 0, 1),
-        "g": (0, 1, 0, 1),
-        "b": (0, 0, 1, 1),
-    }
-    args = {
-        "fc": (1, 1, 1, 0.6),
-        "ec": colors[c],
-        "zorder": 10,
-        "lw": 1.5,
-        "label": "$S$",
-    }
-    ax.fill_between(theta_range, r_bounds[0], r_bounds[1], **args)
-    return ax
 
 
 def plot_discrete_grid(config: dict):
