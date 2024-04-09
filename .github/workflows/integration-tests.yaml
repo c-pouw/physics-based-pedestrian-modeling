@@ -55,15 +55,15 @@ jobs:
       - name: Test Integration
         run: |
           set -vxeuo pipefail
-          python scripts/main.py params=minimal_dataset_for_testingtig ++hydra.run.dir=outputs/
+          python scripts/main.py params=minimal_dataset_for_testing
 
       - uses: actions/upload-artifact@v3
         with:
           name: artifacts-minimal-test-dataset
           path: |
-            preprocessed_trajectories.csv
-            simulated_trajectories.csv
-            piecewise_potential.pickle
-            outputs/recorded_trajectories_minimal_dataset_for_testing.pdf
-            outputs/simulated_trajectories_minimal_dataset_for_testing.pdf
-            outputs/histograms_minimal_dataset_for_testing.pdf
+            minimal_dataset_for_testing/taux2_tauu2_dt0.1_sigma0.2_single_paths_grid/preprocessed_trajectories.csv
+            minimal_dataset_for_testing/taux2_tauu2_dt0.1_sigma0.2_single_paths_grid/simulated_trajectories.csv
+            minimal_dataset_for_testing/taux2_tauu2_dt0.1_sigma0.2_single_paths_grid/piecewise_potential.pickle
+            minimal_dataset_for_testing/taux2_tauu2_dt0.1_sigma0.2_single_paths_grid/recorded_trajectories_minimal_dataset_for_testing.pdf
+            minimal_dataset_for_testing/taux2_tauu2_dt0.1_sigma0.2_single_paths_grid/simulated_trajectories_minimal_dataset_for_testing.pdf
+            minimal_dataset_for_testing/taux2_tauu2_dt0.1_sigma0.2_single_paths_grid/histograms_minimal_dataset_for_testing.pdf

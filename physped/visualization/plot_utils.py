@@ -45,23 +45,11 @@ def apply_polar_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
     """
     ax.set_aspect("equal")
 
-    # polar_grid_type = params["trajectory_plot"].get("polar_grid_type", "standard")
-
-    # r_grid = [0, 0.4, 1.1, 1.8]
-    # theta_grid = np.arange(-np.pi, np.pi + 0.01, np.pi / 3)
-
-    # if polar_grid_type == "custom":
-    #     grid_bins = create_grid_bins(params["grid"])
-    #     r_grid = params["grid"]["r"]
-    #     theta_grid = grid_bins["theta"]
-
     ax.set_yticks([])
     ax.set_xticks([])
     ax = plot_polar_velocity_grid(ax, params.grid)
     ax = plot_polar_labels(ax, params.grid)
     ax.set_ylim(0, params.grid.bins.r[-1])
-    # ax = plot_polar_grid(ax, r_grid, theta_grid)
-
     return ax
 
 
@@ -286,11 +274,7 @@ def convert_rad_to_deg(theta: float) -> float:
 
 
 def highlight_position_selection(ax: plt.Axes, params: dict) -> plt.Axes:
-    # xbins = np.arange(params.grid.x.min, params.grid.x.max, params.grid.x.step)
-    # x_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.x, xbins)
     x_bounds = params.selection.range.x_bounds
-    # ybins = np.arange(params.grid.y.min, params.grid.y.max, params.grid.y.step)
-    # y_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.y, ybins)
     y_bounds = params.selection.range.y_bounds
     xrange = np.linspace(x_bounds[0], x_bounds[1], 100)
     c = "r"
@@ -312,10 +296,6 @@ def highlight_position_selection(ax: plt.Axes, params: dict) -> plt.Axes:
 
 
 def highlight_velocity_selection(ax: plt.Axes, params: dict) -> plt.Axes:
-    # rbins = np.arange(params.grid.r.min, params.grid.r.max, params.grid.r.step)
-    # thetabins = np.linspace(-np.pi, np.pi + 0.01, params.grid.theta.segments + 1)
-    # r_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.r, rbins)
-    # theta_bounds = get_the_boundaries_that_enclose_the_selected_values(params.selection.theta, thetabins)
     r_bounds = params.selection.range.r_bounds
     theta_bounds = params.selection.range.theta_bounds
     theta_range = np.linspace(theta_bounds[0], theta_bounds[1], 100)
