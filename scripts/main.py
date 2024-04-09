@@ -31,7 +31,6 @@ def main(cfg):
     plt.style.use(Path(get_original_cwd()) / cfg.params.plot_style)
 
     trajectories = trajectory_reader[env_name]()
-    log.critical(trajectories.head())
     preprocessed_trajectories = preprocess_trajectories(trajectories, config=cfg)
 
     # * Optional plotting of preprocessed trajectories

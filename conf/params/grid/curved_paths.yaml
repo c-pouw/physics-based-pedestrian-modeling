@@ -1,3 +1,5 @@
+defaults:
+  - bins: default_bins
 name: 'curved_paths_grid'
 x:
   min: -2.7

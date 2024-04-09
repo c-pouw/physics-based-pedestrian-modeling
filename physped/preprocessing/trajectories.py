@@ -122,7 +122,8 @@ def add_trajectory_step(df: pd.DataFrame, params: dict) -> pd.DataFrame:
     Returns:
     - The DataFrame with the trajectory step/observation added.
     """
-    pid_col, time_col = params.colnames.Pid, params.colnames.time
+    # pid_col, time_col = params.colnames.Pid, params.colnames.time
+    pid_col, time_col = "Pid", "time"
     df.sort_values(by=[pid_col, time_col], inplace=True)
     df["k"] = df.groupby(pid_col)[pid_col].transform(lambda x: np.arange(x.size))
     return df
