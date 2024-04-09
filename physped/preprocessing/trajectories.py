@@ -223,9 +223,11 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
 
     log.info("---- Preprocess recorded trajectories ----")
     # TODO : Use columnnames from parameters instead of renaming
+    log.critical(df.head())
     df = rename_columns(df, parameters)
     log.info("Columns renamed.")
     df = prune_short_trajectories(df, parameters)
+    log.critical(df.head())
     log.info("Short trajectories pruned.")
     df = add_velocity(df, parameters)
     log.info("Velocity added.")

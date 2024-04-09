@@ -1,5 +1,4 @@
 defaults:
-  - _self_
   - grid: intersecting_paths
   - simulation: default_simulation_params
   - selection: default_selection
@@ -8,6 +7,7 @@ defaults:
   - force_field_plot: default_force_field_plot_params
   - grid_plot: default_grid_plot
   - learn_piece_of_potential_plot: default_learn_piece_of_potential_plot
+  - _self_
 env_name: intersecting_paths
 taux: 2
 tauu: 2

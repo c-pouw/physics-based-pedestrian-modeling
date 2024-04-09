@@ -1,9 +1,11 @@
 import logging
+from pathlib import Path
 from typing import Tuple
 
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
+from hydra.utils import get_original_cwd
 
 log = logging.getLogger(__name__)
 
@@ -183,23 +185,19 @@ def plot_station_background(ax: plt.Axes, params: dict) -> plt.Axes:
         plt.Axes: The modified matplotlib Axes object.
 
     """
-    config = params.background
-    img = mpimg.imread(params.background.imgpath)
+    img = mpimg.imread(Path(get_original_cwd()) / params.background.imgpath)
     ax.imshow(
         img,
         cmap="gray",
         origin="upper",
         extent=(
-            config["xmin"] / 1000,
-            config["xmax"] / 1000,
-            config["ymin"] / 1000,
-            config["ymax"] / 1000,
+            params.background["xmin"] / 1000,
+            params.background["xmax"] / 1000,
+            params.background["ymin"] / 1000,
+            params.background["ymax"] / 1000,
         ),
         alpha=1,
     )
-
-    ax.set_xlim(params.trajectory_plot.xlims)
-    ax.set_ylim(params.trajectory_plot.ylims)
     return ax
 
 

@@ -1,9 +1,11 @@
 save_figure: true
+width_ratios: [2, 1]
 N_trajs: 30
 plot_selection: false
 plot_potential_cross_section: false
 plot_walls: false
 plot_intended_path: false
+show_background: false
 velocity_grid: polar
 plot_polar_grid: True
 grid_type: potential
@@ -11,4 +13,3 @@ axis_labels:
   polar:
     x: "$u\\, [\\mathrm{m/s}]$"
     y: "$v\\, [\\mathrm{m/s}]$"
-width_ratios: [2, 1]

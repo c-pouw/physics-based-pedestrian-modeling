@@ -150,13 +150,14 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
                 va="center",
                 ha="left",
             )
+    if traj_plot_params.show_background:
+        ax = plot_station_background(ax, params)
+
     # TODO retrieve size from config
     if name == "single_paths":
         fig.set_size_inches(3.54, 2.36)
     elif name == "parallel_paths":
         fig.set_size_inches(3.54, 5)
-    elif name == "station_paths":
-        ax = plot_station_background(ax, params)
 
     if trajectory_type:
         # plot_title = f"{trajectory_type.capitalize()} {plot_title.lower()}"
