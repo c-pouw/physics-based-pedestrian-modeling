@@ -1,11 +1,12 @@
 defaults:
   - grid: single_paths
-  - trajectory_plot: single_paths
-  - histogram_plot: single_paths
-  - force_field_plot: single_paths
+  - trajectory_plot: default_simulation_params
+  - selection: default_selection
+  - trajectory_plot: default_trajectory_plot_params
+  - histogram_plot: default_histogram_plot_params
+  - force_field_plot: default_force_field_plot_params
   - grid_plot: default_grid_plot
   - learn_piece_of_potential_plot: default_learn_piece_of_potential_plot
-  - selection: default_selection
   - _self_
 env_name: single_paths
 taux: 2
@@ -20,9 +21,11 @@ colnames:
   Pid: Pid
   time: Rstep
 plot_style: conf/science.mplstyle
-simulation:
-  ntrajs: 100
-  start: 0
-  end: 4
-  step: 0.1
-  stop_condition: 100
+trajectory_plot:
+  title: "Narrow corridor"
+  xlims: [-1.1, 1.1]
+  ylims: [-0.7, 0.7]
+  yps: [0]
+  ywalls: [0.6, -0.6]
+  plot_walls: true
+  plot_intended_path: true

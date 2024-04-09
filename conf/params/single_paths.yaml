@@ -29,9 +29,3 @@ trajectory_plot:
   ywalls: [0.6, -0.6]
   plot_walls: true
   plot_intended_path: true
-learn_piece_of_potential_plot:
-  xlimits:
-    x: [0, 1]
-    y: [-0.5, 0.5]
-    u: [0.5, 1.5]
-    v: [-0.5, 0.5]
