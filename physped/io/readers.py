@@ -95,6 +95,7 @@ def read_intersecting_paths() -> pd.DataFrame:
     df = pd.read_parquet(file_path)
     df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
     df["k"] = df.groupby("Pid").cumcount()
+    df["time"] = df["k"]
     return df
 
 

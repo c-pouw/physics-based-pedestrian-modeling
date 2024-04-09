@@ -15,5 +15,6 @@ twine
 ipython
 matplotlib
 numpydoc
+fastparquet
 sphinx-copybutton
 sphinx_rtd_theme
