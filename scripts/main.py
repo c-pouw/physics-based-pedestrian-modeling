@@ -24,8 +24,8 @@ log = logging.getLogger(__name__)
 def main(cfg):
     env_name = cfg.params.env_name
     log.debug("Configuration: \n%s", pprint.pformat(dict(cfg)))
-    log.debug("Working directory %s", Path.cwd())
-    log.debug("Project root %s", cfg.root_dir)
+    log.info("Working directory %s", Path.cwd())
+    log.info("Project root %s", cfg.root_dir)
 
     plt.style.use(Path(cfg.root_dir) / cfg.params.plot_style)
 
