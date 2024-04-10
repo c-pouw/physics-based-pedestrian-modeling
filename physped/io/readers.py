@@ -12,23 +12,7 @@ from tqdm import tqdm
 
 from physped.core.piecewise_potential import PiecewisePotential
 
-# TODO : Fix absolute folder path
-# trajectory_data_dir = (
-#     Path("/home")
-#     / "pouw"
-#     / "workspace"
-#     / "crowd-tracking"
-#     / "physics-based-pedestrian-modeling"
-#     / "data"
-#     / "trajectories"
-# )
-
 log = logging.getLogger(__name__)
-
-
-# def read_grid_bins(filename: str):
-#     filepath = Path.cwd().parent / filename
-#     return dict(np.load(filepath, allow_pickle=True))
 
 
 def read_piecewise_potential_from_file(filepath: Path) -> PiecewisePotential:
