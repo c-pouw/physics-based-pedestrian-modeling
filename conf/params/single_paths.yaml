@@ -21,10 +21,10 @@ colnames:
   Pid: Pid
   time: Rstep
 plot_style: conf/science.mplstyle
+default_xlims: [-1.1,1.1]
+default_ylims:  [-0.7,0.7]
 trajectory_plot:
   title: "Narrow corridor"
-  xlims: [-1.1, 1.1]
-  ylims: [-0.7, 0.7]
   yps: [0]
   ywalls: [0.6, -0.6]
   plot_walls: true

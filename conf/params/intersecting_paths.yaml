@@ -28,19 +28,12 @@ selection:
     theta: [0.15, 0.15]
     k: [1.2, 1.2]
 plot_style: conf/science.mplstyle
+xlims: [-4, 4]
+ylims: [-2.5, 2.5]
 trajectory_plot:
   title: "Intersecting paths"
-  xlims: [-4, 4]
-  ylims: [-2.5, 2.5]
-histogram_plot:
-  xlims: [-4, 4]
-  ylims: [-3, 3]
-  rlims: [0, 2]
-  thetalims: [-3.14, 3.14]
 force_field_plot:
   figsize: [3.54, 2]
-  xlims: [-4, 4]
-  ylims: [-3, 3]
 learn_piece_of_potential_plot:
   xlimits:
     x: [0, 1]

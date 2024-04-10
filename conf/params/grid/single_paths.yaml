@@ -15,4 +15,4 @@ r:
   step: 0.6
 theta:
   min: ${parse_pi:-0.5}
-  segments: 8
+  segments: 6

@@ -1,5 +1,8 @@
 save_figure: true
+y_title: 1
 width_ratios: [2, 1]
+xlims: ${params.default_xlims}
+ylims: ${params.default_ylims}
 N_trajs: 30
 plot_selection: false
 plot_potential_cross_section: false

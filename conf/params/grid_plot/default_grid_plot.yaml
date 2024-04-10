@@ -1,3 +1,5 @@
+xlims: ${params.default_xlims}
+ylims: ${params.default_ylims}
 title:
   figure: 'Discretization of the slow variables'
   position: 'Positions $\vec{x}_p$'

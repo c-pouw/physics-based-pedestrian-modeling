@@ -28,19 +28,12 @@ selection:
     theta: [0.15, 0.15]
     k: [1.2, 1.2]
 plot_style: conf/science.mplstyle
+default_xlims: [-2, 2.5]
+default_ylims: [-4, 4]
 trajectory_plot:
   title: "Wide corridor"
   width_ratios: [2, 1]
-  xlims: [-2, 2.5]
-  ylims: [-4, 4]
   yps: [2.3, 0.8, -1.7]
   ywalls: [3.6, -3.6]
-histogram_plot:
-  xlims: [-2, 3]
-  ylims: [-4.1, 4.1]
-  rlims: [0, 2]
-  thetalims: [-3.14, 3.14]
 force_field_plot:
   figsize: [3.54, 2]
-  xlims: [-2, 3]
-  ylims: [-4.1, 4.1]

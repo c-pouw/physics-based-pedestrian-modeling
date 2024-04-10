@@ -14,12 +14,19 @@ log = logging.getLogger(__name__)
 
 
 def sample_trajectory_origins_from_heatmap(piecewise_potential, parameters: dict) -> np.ndarray:
-    origins = sample_from_ndarray(piecewise_potential.histogram[..., 0], parameters.simulation.ntrajs)
-    origins = np.hstack((origins, np.zeros((origins.shape[0], 1), dtype=int)))
-    origins = convert_grid_indices_to_coordinates(piecewise_potential, origins)
-    origins = np.hstack((origins, origins))
-    origins = np.delete(origins, 4, axis=1)
-    return origins
+    sampled_origins = sample_from_ndarray(piecewise_potential.histogram[..., 0], parameters.simulation.ntrajs)
+    sampled_origins = np.hstack((sampled_origins, np.zeros((sampled_origins.shape[0], 1), dtype=int)))
+    sampled_origins = convert_grid_indices_to_coordinates(piecewise_potential, sampled_origins)
+    sampled_origins = np.hstack((sampled_origins, sampled_origins))
+    sampled_origins = np.delete(sampled_origins, 4, axis=1)
+    return sampled_origins
+
+
+def sample_trajectory_origins_from_trajectories(piecewise_potential, parameters: dict) -> np.ndarray:
+    sampled_origins = piecewise_potential.trajectory_origins.sample(n=parameters.simulation.ntrajs)
+    # Stacking to go from [x,y,u,v] to [x,y,u,v,xs,ys,us,vs]
+    sampled_origins = np.hstack((sampled_origins, sampled_origins))
+    return sampled_origins
 
 
 def simulate_trajectories(piecewise_potential, config: dict) -> pd.DataFrame:
@@ -38,7 +45,14 @@ def simulate_trajectories(piecewise_potential, config: dict) -> pd.DataFrame:
             log.warning("Preprocessed trajectories not found: %s", e)
 
     log.info("---- Simulate trajectories with piecewise potential ----")
-    origins = sample_trajectory_origins_from_heatmap(piecewise_potential, parameters)
+    match config.params.simulation.sample_origins_from:
+        case "heatmap":
+            log.warning("Trajectory origins are sampled from a heatmap.")
+            origins = sample_trajectory_origins_from_heatmap(piecewise_potential, parameters)
+        case "trajectories":
+            log.warning("Trajectory origins are sampled from the input trajectories.")
+            origins = sample_trajectory_origins_from_trajectories(piecewise_potential, parameters)
+
     # Simulate trajectories
     lm = LangevinModel(piecewise_potential, parameters)
     t_eval = np.arange(parameters.simulation.start, parameters.simulation.end, parameters.simulation.step)

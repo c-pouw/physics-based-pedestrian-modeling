@@ -62,6 +62,8 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: dict) 
     piecewise_potential.histogram_slow = add_trajectories_to_histogram(
         piecewise_potential.histogram_slow, trajectories, "slow_grid_indices"
     )
+    if config.params.simulation.sample_origins_from == "trajectories":
+        piecewise_potential.trajectory_origins = trajectories.groupby("Pid").first()[["xf", "yf", "uf", "vf"]]
     piecewise_potential.fit_params = fit_trajectories_on_grid(piecewise_potential.fit_params, trajectories)
     log.info("Finished learning piecewise potential from trajectories.")
     return piecewise_potential

@@ -82,6 +82,7 @@ def read_single_paths() -> pd.DataFrame:
     # Convert the string to a pandas DataFrame
     df2 = pd.read_csv(StringIO(data_str), sep=" ")
     df = pd.concat([df1, df2], ignore_index=True)
+    df["X_SG"] = df["X_SG"] + 0.1
     df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
     log.info("Finished reading single paths data set.")
     return df

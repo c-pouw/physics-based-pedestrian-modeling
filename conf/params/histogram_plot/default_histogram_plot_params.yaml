@@ -1,5 +1,5 @@
-xflims: [-1.1, 1.1]
-yflims: [-0.5, 0.5]
+xflims: ${params.default_xlims}
+yflims: ${params.default_ylims}
 uflims: [-2, 2]
 vflims: [-2, 2]
 rflims: [0, 2]

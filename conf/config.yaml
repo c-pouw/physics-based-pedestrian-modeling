@@ -7,9 +7,9 @@ read:
   preprocessed_trajectories: True
   piecewise_potential: False
   simulated_trajectories: False
-  grid:
-    from_file: False
-    filename: single_paths.npz
+#  grid:
+#    from_file: False
+#    filename: single_paths.npz
 save:
   preprocessed_trajectories: True
   piecewise_potential: True

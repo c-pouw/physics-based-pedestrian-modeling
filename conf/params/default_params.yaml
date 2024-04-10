@@ -8,7 +8,7 @@ defaults:
   - grid_plot: default_grid_plot
   - learn_piece_of_potential_plot: default_learn_piece_of_potential_plot
   - _self_
-env_name: single_paths
+env_name: minimal_dataset_for_testing
 taux: 2
 tauu: 2
 fps: 15
@@ -16,8 +16,8 @@ dt: 0.1
 sigma: 0.2
 minimum_trajectory_length: 10
 colnames:
-  xf: xf
-  yf: yf
+  xf: X_SG
+  yf: Y_SG
   Pid: Pid
   time: Rstep
 plot_style: conf/science.mplstyle
