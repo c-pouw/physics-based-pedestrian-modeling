@@ -13,7 +13,7 @@ from tqdm import tqdm
 from physped.core.piecewise_potential import PiecewisePotential
 
 # TODO : Fix absolute folder path
-# trajectory_folder_path = (
+# trajectory_data_dir = (
 #     Path("/home")
 #     / "pouw"
 #     / "workspace"
@@ -47,8 +47,8 @@ def read_piecewise_potential_from_file(filepath: Path) -> PiecewisePotential:
 def read_minimal_dataset_for_testing(config) -> pd.DataFrame:
     """Read the single paths data set."""
     log.info("Start reading single paths data set.")
-    trajectory_folder_path = Path(config.trajectory_folder_path)
-    with ZipFile(trajectory_folder_path / "minimal_test_dataset.zip", "r") as archive:
+    trajectory_data_dir = Path(config.trajectory_data_dir)
+    with ZipFile(trajectory_data_dir / "minimal_test_dataset.zip", "r") as archive:
         with archive.open("single_paths_rtl.csv") as f:
             paths = pd.read_csv(f)
 
@@ -58,9 +58,9 @@ def read_minimal_dataset_for_testing(config) -> pd.DataFrame:
 
 def read_single_paths(config) -> pd.DataFrame:
     """Read the single paths data set."""
-    trajectory_folder_path = Path(config.trajectory_folder_path)
+    trajectory_data_dir = Path(config.trajectory_data_dir)
     log.info("Start reading single paths data set.")
-    archive = zipfile.ZipFile(trajectory_folder_path / "data.zip")
+    archive = zipfile.ZipFile(trajectory_data_dir / "data.zip")
 
     with archive.open("left-to-right.ssv") as f:
         data_str = f.read().decode("utf-8")
@@ -80,8 +80,8 @@ def read_single_paths(config) -> pd.DataFrame:
 
 def read_parallel_paths(config) -> pd.DataFrame:
     """Read the parallel paths data set."""
-    trajectory_folder_path = Path(config.trajectory_folder_path)
-    file_path = trajectory_folder_path / "df_single_pedestrians_small.h5"
+    trajectory_data_dir = Path(config.trajectory_data_dir)
+    file_path = trajectory_data_dir / "df_single_pedestrians_small.h5"
     df = pd.read_hdf(file_path)
     df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
     df["Pid"] = df.groupby(["Pid", "day_id"]).ngroup()
@@ -92,8 +92,8 @@ def read_parallel_paths(config) -> pd.DataFrame:
 
 def read_intersecting_paths(config) -> pd.DataFrame:
     """Read the intersecting paths data set."""
-    trajectory_folder_path = Path(config.trajectory_folder_path)
-    file_path = trajectory_folder_path / "simulations_crossing.parquet"
+    trajectory_data_dir = Path(config.trajectory_data_dir)
+    file_path = trajectory_data_dir / "simulations_crossing.parquet"
     df = pd.read_parquet(file_path)
     df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
     df["k"] = df.groupby("Pid").cumcount()
@@ -103,8 +103,8 @@ def read_intersecting_paths(config) -> pd.DataFrame:
 
 def read_curved_paths(config) -> pd.DataFrame:
     """Read the curved paths data set."""
-    trajectory_folder_path = Path(config.trajectory_folder_path)
-    file_path = trajectory_folder_path / "artificial_measurements_ellipse.parquet"
+    trajectory_data_dir = Path(config.trajectory_data_dir)
+    file_path = trajectory_data_dir / "artificial_measurements_ellipse.parquet"
     df = pd.read_parquet(file_path)
     df = df.rename(columns={"x": "xf", "y": "yf", "xdot": "uf", "ydot": "vf"})
     return df
@@ -112,8 +112,8 @@ def read_curved_paths(config) -> pd.DataFrame:
 
 def read_station_paths(config) -> pd.DataFrame:
     """Read the station paths data set."""
-    trajectory_folder_path = Path(config.trajectory_folder_path)
-    file_path = trajectory_folder_path / "trajectories_EHV_platform_2_1_refined.parquet"
+    trajectory_data_dir = Path(config.trajectory_data_dir)
+    file_path = trajectory_data_dir / "trajectories_EHV_platform_2_1_refined.parquet"
     df = pd.read_parquet(file_path)
     df.rename({"xf": "yf", "yf": "xf", "uf": "vf", "vf": "uf"}, axis=1, inplace=True)
     return df
