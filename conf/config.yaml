@@ -20,6 +20,7 @@ plot:
   histograms: True
   grid: True
 root_dir: ${get_root_dir:}
+trajectory_data_dir: ${root_dir}/data/trajectories
 parameter_combinations: taux${params.taux}_tauu${params.tauu}_dt${params.dt}_sigma${params.sigma}_${params.grid.name}
 hydra:
   verbose: False

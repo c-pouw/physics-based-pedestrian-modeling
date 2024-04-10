@@ -29,7 +29,7 @@ def main(cfg):
 
     plt.style.use(cfg.root_dir / cfg.params.plot_style)
 
-    trajectories = trajectory_reader[env_name]()
+    trajectories = trajectory_reader[env_name](cfg)
     preprocessed_trajectories = preprocess_trajectories(trajectories, config=cfg)
 
     # * Optional plotting of preprocessed trajectories

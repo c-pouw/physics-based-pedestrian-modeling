@@ -12,17 +12,16 @@ from tqdm import tqdm
 
 from physped.core.piecewise_potential import PiecewisePotential
 
-# trajectory_folder_path = Path.cwd() / "data" / "trajectories"
 # TODO : Fix absolute folder path
-trajectory_folder_path = (
-    Path("/home")
-    / "pouw"
-    / "workspace"
-    / "crowd-tracking"
-    / "physics-based-pedestrian-modeling"
-    / "data"
-    / "trajectories"
-)
+# trajectory_folder_path = (
+#     Path("/home")
+#     / "pouw"
+#     / "workspace"
+#     / "crowd-tracking"
+#     / "physics-based-pedestrian-modeling"
+#     / "data"
+#     / "trajectories"
+# )
 
 log = logging.getLogger(__name__)
 
@@ -45,41 +44,32 @@ def read_piecewise_potential_from_file(filepath: Path) -> PiecewisePotential:
     return val
 
 
-def read_minimal_dataset_for_testing() -> pd.DataFrame:
+def read_minimal_dataset_for_testing(config) -> pd.DataFrame:
     """Read the single paths data set."""
-    # Specify the file path
     log.info("Start reading single paths data set.")
-    # Open the zip file
+    trajectory_folder_path = Path(config.trajectory_folder_path)
     with ZipFile(trajectory_folder_path / "minimal_test_dataset.zip", "r") as archive:
-        # Open the CSV file within the zip file
         with archive.open("single_paths_rtl.csv") as f:
-            # Read the CSV file directly into a pandas DataFrame
             paths = pd.read_csv(f)
 
-    # Convert the string to a pandas DataFrame
     log.info("Finished reading single paths data set.")
     return paths
 
 
-def read_single_paths() -> pd.DataFrame:
+def read_single_paths(config) -> pd.DataFrame:
     """Read the single paths data set."""
-    # Specify the file path
+    trajectory_folder_path = Path(config.trajectory_folder_path)
     log.info("Start reading single paths data set.")
-    # Open the zip file
     archive = zipfile.ZipFile(trajectory_folder_path / "data.zip")
 
-    # Read the .ssv file as a string
     with archive.open("left-to-right.ssv") as f:
         data_str = f.read().decode("utf-8")
 
-    # Convert the string to a pandas DataFrame
     df1 = pd.read_csv(StringIO(data_str), sep=" ")
 
-    # Read the .ssv file as a string
     with archive.open("right-to-left.ssv") as f:
         data_str = f.read().decode("utf-8")
 
-    # Convert the string to a pandas DataFrame
     df2 = pd.read_csv(StringIO(data_str), sep=" ")
     df = pd.concat([df1, df2], ignore_index=True)
     df["X_SG"] = df["X_SG"] + 0.1
@@ -88,8 +78,9 @@ def read_single_paths() -> pd.DataFrame:
     return df
 
 
-def read_parallel_paths() -> pd.DataFrame:
+def read_parallel_paths(config) -> pd.DataFrame:
     """Read the parallel paths data set."""
+    trajectory_folder_path = Path(config.trajectory_folder_path)
     file_path = trajectory_folder_path / "df_single_pedestrians_small.h5"
     df = pd.read_hdf(file_path)
     df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
@@ -99,8 +90,9 @@ def read_parallel_paths() -> pd.DataFrame:
     return df
 
 
-def read_intersecting_paths() -> pd.DataFrame:
+def read_intersecting_paths(config) -> pd.DataFrame:
     """Read the intersecting paths data set."""
+    trajectory_folder_path = Path(config.trajectory_folder_path)
     file_path = trajectory_folder_path / "simulations_crossing.parquet"
     df = pd.read_parquet(file_path)
     df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
@@ -109,16 +101,18 @@ def read_intersecting_paths() -> pd.DataFrame:
     return df
 
 
-def read_curved_paths() -> pd.DataFrame:
+def read_curved_paths(config) -> pd.DataFrame:
     """Read the curved paths data set."""
+    trajectory_folder_path = Path(config.trajectory_folder_path)
     file_path = trajectory_folder_path / "artificial_measurements_ellipse.parquet"
     df = pd.read_parquet(file_path)
     df = df.rename(columns={"x": "xf", "y": "yf", "xdot": "uf", "ydot": "vf"})
     return df
 
 
-def read_station_paths() -> pd.DataFrame:
+def read_station_paths(config) -> pd.DataFrame:
     """Read the station paths data set."""
+    trajectory_folder_path = Path(config.trajectory_folder_path)
     file_path = trajectory_folder_path / "trajectories_EHV_platform_2_1_refined.parquet"
     df = pd.read_parquet(file_path)
     df.rename({"xf": "yf", "yf": "xf", "uf": "vf", "vf": "uf"}, axis=1, inplace=True)
