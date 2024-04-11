@@ -1,0 +1,7 @@
+figsize: [3.54, 2]
+xlims: ${params.default_xlims}
+ylims: ${params.default_ylims}
+clip: 0
+scale: 8000
+sparseness: 3
+width_ratios: [2, 1]

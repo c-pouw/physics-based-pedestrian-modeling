@@ -51,7 +51,9 @@ jobs:
           pip list
 
       - name: Build Docs
-        run: make -C docs/ html
+        run: |
+          sphinx-apidoc -f -o docs/source physped
+          make -C docs/ html
 
       - uses: actions/upload-artifact@v3
         with:

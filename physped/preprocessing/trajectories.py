@@ -121,9 +121,7 @@ def add_trajectory_step(df: pd.DataFrame, params: dict) -> pd.DataFrame:
     Returns:
     - The DataFrame with the trajectory step/observation added.
     """
-    # colnames = params.get("colnames", {})
-    # pid_col = colnames.get("Pid", "Pid")
-    # time_col = colnames.get("time", "time")
+    # pid_col, time_col = params.colnames.Pid, params.colnames.time
     pid_col, time_col = "Pid", "time"
     df.sort_values(by=[pid_col, time_col], inplace=True)
     df["k"] = df.groupby(pid_col)[pid_col].transform(lambda x: np.arange(x.size))
@@ -184,7 +182,7 @@ def add_velocity(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
         2    2   0   0  0.0  0.0
         3    2   1   1  0.0  0.0
     """
-    framerate = 1 / parameters["dt"]
+    framerate = parameters.fps
     groupby = "Pid"
     xpos = "xf"
     ypos = "yf"
@@ -209,17 +207,20 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     :rtype: pd.DataFrame
     """
     parameters = config.params
-
     filepath = Path.cwd().parent / "preprocessed_trajectories.csv"
-    if filepath.exists():
-        log.warning("Preprocessed trajectories already exist.")
-        if parameters["read_preprocessed_trajectories_from_file"]:
-            log.warning("Reading preprocessed trajectories from file.")
-            return read_trajectories_from_path(filepath)
-        else:
-            log.warning("Overwriting preprocessed trajectories.")
 
-    log.info("Start trajectory preprocessing.")
+    # TODO : Move to separate function
+    if config.read.preprocessed_trajectories:
+        log.debug("Configuration 'read.preprocessed_trajectories' is set to True.")
+        try:
+            preprocessed_trajectories = read_trajectories_from_path(filepath)
+            log.info("---- Preprocessed trajectories succesfully read from file ----")
+            log.debug("Filepath %s", filepath.relative_to(config.root_dir))
+            return preprocessed_trajectories
+        except FileNotFoundError as e:
+            log.warning("Preprocessed trajectories not found: %s", e)
+
+    log.info("---- Preprocess recorded trajectories ----")
     # TODO : Use columnnames from parameters instead of renaming
     df = rename_columns(df, parameters)
     log.info("Columns renamed.")
@@ -241,7 +242,8 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     df = add_velocity_in_polar_coordinates(df, mode="s")
     log.info("Slow modes computed.")
     # if parameters.intermediate_save.preprocessed_trajectories:
-    if parameters.save_preprocessed_trajectories_to_file:
+    if config.save.preprocessed_trajectories:
+        log.debug("Configuration 'save.preprocessed_trajectories' is set to True.")
         save_trajectories(df, Path.cwd().parent, "preprocessed_trajectories.csv")
     return df
 

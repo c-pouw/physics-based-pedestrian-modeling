@@ -6,52 +6,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import numpy.ma as ma
 import pandas as pd
-from hydra.utils import get_original_cwd
 from matplotlib.axes import Axes
 from scipy.special import kl_div
 
 log = logging.getLogger(__name__)
-
-histogram_plot_params = {
-    "xf": {
-        "xlabel": r"$x_f\;$[m]",
-        "ylabel": {"counts": "Count($x_f$)", "PDF": "P($x_f$)"},
-    },
-    "yf": {
-        "xlabel": r"$y_f\;$[m]",
-        "ylabel": {"counts": "Count($y_f$)", "PDF": "P($y_f$)"},
-    },
-    "uf": {
-        "xlabel": r"$u_f\;$[m/s]",
-        "ylabel": {"counts": "Count($u_f$)", "PDF": "P($u_f$)"},
-    },
-    "vf": {
-        "xlabel": r"$v_f\;$[m/s]",
-        "ylabel": {"counts": "Count($v_f$)", "PDF": "P($v_f$)"},
-    },
-    "rf": {
-        "xlabel": r"$r_f\;$[m/s]",
-        "ylabel": {"counts": "Count($r_f$)", "PDF": "P($r_f$)"},
-    },
-    "thetaf": {
-        "xlabel": "$\\theta_f\\;$[m/s]",
-        "ylabel": {"counts": "Count($\\theta_f$)", "PDF": "P($\\theta_f$)"},
-    },
-    "raw": {
-        "edgecolor": "C3",
-        "facecolor": "C3",
-        "marker": "o",
-        "markersize": 8,
-        "label": "Recordings",
-    },
-    "sim": {
-        "edgecolor": "k",
-        "facecolor": None,
-        "marker": "o",
-        "markersize": 4,
-        "label": "Simulations",
-    },
-}
 
 
 def create_automatic_bins(values: pd.Series) -> np.ndarray:
@@ -102,11 +60,11 @@ def create_all_histograms(
         observables = ["xf", "yf", "uf", "vf", "rf", "thetaf"]
     histograms = {}
     bin_generator = create_automatic_bins
-    for traj_type, trajectories in zip(["raw", "sim"], [trajs, simtrajs]):
+    for traj_type, trajectories in zip(["recorded", "simulated"], [trajs, simtrajs]):
         histograms[traj_type] = {}
         for observable in observables:
             values = trajectories[observable]
-            if traj_type == "raw":
+            if traj_type == "recorded":
                 if observable == "rf":
                     bins = np.linspace(0, 3, 50)
                 # elif observable == "thetaf":
@@ -114,7 +72,7 @@ def create_all_histograms(
                 else:
                     bins = bin_generator(values)
             else:
-                bins = histograms["raw"][observable]["bin_edges"]
+                bins = histograms["recorded"][observable]["bin_edges"]
             histograms[traj_type][observable] = create_histogram(values, bins)
     return histograms
 
@@ -135,66 +93,12 @@ def compute_KL_divergence(PDF1: np.ndarray, PDF2: np.ndarray, bin_width: np.ndar
     return ma.masked_invalid(kl).compressed()
 
 
-def plot_multiple_histograms(observables: List, histograms: dict, histogram_type: str, params: dict):
-    """
-    Plot histograms for all observables.
-
-    Parameters:
-    - ax (plt.Axes): The axes to plot the histogram on.
-    - histograms (dict): The histograms to plot.
-    - observable (str): The observable to plot the histogram for.
-    - hist_type (str): The type of histogram to plot.
-    - kl_div (float): The KL divergence value for the histogram.
-
-    Returns:
-    - The axes object.
-    """
-    fig = plt.figure(figsize=(3.54, 2.36), layout="constrained")
-    sum_kl_div = 0
-    hist_plot_params = params.get("histogram_plot", {})
-
-    for plotid, observable in enumerate(observables):
-        ax = fig.add_subplot(2, 2, plotid + 1)
-        # ax = fig.add_subplot(1, len(observables), plotid + 1)
-
-        kldiv = sum(
-            compute_KL_divergence(
-                histograms["raw"][observable][histogram_type],
-                histograms["sim"][observable][histogram_type],
-                histograms["raw"][observable]["bin_width"],
-            )
-        )
-
-        ax = plot_histogram(
-            ax,
-            histograms,
-            observable,
-            hist_type=histogram_type,
-        )
-        lims = hist_plot_params.get(f"{observable[0]}lims", None)
-        ax.set_xlim(lims)
-
-        sum_kl_div += kldiv
-
-    handles, labels = ax.get_legend_handles_labels()
-
-    fig.legend(handles, labels, bbox_to_anchor=(0.5, 1.05), ncol=2, fontsize=7, loc="center")
-    # plt.suptitle(
-    #     f"Parameters: $\qquad \\tau_x = {params['taux']} \qquad \\tau_u = {params['tauu']} \qquad "
-    #     f"dt = {params['dt']} \qquad \sigma = {params['sigma']} \qquad \\sum{{D_{{KL}}}} = {sum_kl_div:.2f}$",
-    #     fontsize=16,
-    # )
-    # fig.text(-0.02, 0.5, "PDF", rotation=90)
-    filepath = Path.cwd() / f"histograms_{params.get('env_name', '')}.pdf"
-    log.info("Saving histograms figure to %s.", filepath.relative_to(get_original_cwd()))
-    plt.savefig(filepath)
-
-
 def plot_histogram(
     ax: Axes,
     histograms: Dict[str, Any],
     observable: str,
     hist_type: str,
+    config: dict,
 ) -> Axes:
     """
     Plot a histogram.
@@ -209,7 +113,8 @@ def plot_histogram(
     Returns:
     - The axes object.
     """
-    for traj_type in ["raw", "sim"]:
+    histogram_plot_params = config.params.histogram_plot
+    for traj_type in ["recorded", "simulated"]:
         ax.scatter(
             histograms[traj_type][observable]["bin_centers"],
             histograms[traj_type][observable][hist_type],
@@ -222,3 +127,60 @@ def plot_histogram(
     ax.set_xlabel(histogram_plot_params[observable]["xlabel"])
     ax.set_ylabel(histogram_plot_params[observable]["ylabel"][hist_type])
     return ax
+
+
+def plot_multiple_histograms(observables: List, histograms: dict, histogram_type: str, config: dict):
+    """
+    Plot histograms for all observables.
+
+    Parameters:
+    - ax (plt.Axes): The axes to plot the histogram on.
+    - histograms (dict): The histograms to plot.
+    - observable (str): The observable to plot the histogram for.
+    - hist_type (str): The type of histogram to plot.
+    - kl_div (float): The KL divergence value for the histogram.
+
+    Returns:
+    - The axes object.
+    """
+    params = config.params
+    fig = plt.figure(figsize=(3.54, 2.36), layout="constrained")
+    sum_kl_div = 0
+    hist_plot_params = params.get("histogram_plot", {})
+
+    for plotid, observable in enumerate(observables):
+        ax = fig.add_subplot(2, 2, plotid + 1)
+        # ax = fig.add_subplot(1, len(observables), plotid + 1)
+
+        kldiv = sum(
+            compute_KL_divergence(
+                histograms["recorded"][observable][histogram_type],
+                histograms["simulated"][observable][histogram_type],
+                histograms["recorded"][observable]["bin_width"],
+            )
+        )
+
+        ax = plot_histogram(
+            ax,
+            histograms,
+            observable,
+            hist_type=histogram_type,
+            config=config,
+        )
+        lims = hist_plot_params.get(f"{observable}lims", None)
+        ax.set_xlim(lims)
+
+        sum_kl_div += kldiv
+
+    handles, labels = ax.get_legend_handles_labels()
+
+    fig.legend(handles, labels, bbox_to_anchor=(0.5, 1.05), ncol=2, fontsize=7, loc="center")
+    # plt.suptitle(
+    #     f"Parameters: $\qquad \\tau_x = {params['taux']} \qquad \\tau_u = {params['tauu']} \qquad "
+    #     f"dt = {params['dt']} \qquad \sigma = {params['sigma']} \qquad \\sum{{D_{{KL}}}} = {sum_kl_div:.2f}$",
+    #     fontsize=16,
+    # )
+    # fig.text(-0.02, 0.5, "PDF", rotation=90)
+    filepath = Path.cwd() / f"histograms_{params.get('env_name', '')}.pdf"
+    log.info("Saving histograms figure to %s.", filepath.relative_to(config.root_dir))
+    plt.savefig(filepath)

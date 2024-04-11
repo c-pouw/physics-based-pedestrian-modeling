@@ -1,0 +1,34 @@
+point:
+  x: -1.4
+  y: -0.15
+  r: 1.1
+  theta: 3.2
+  k: 1.2
+  theta_periodic: ??? #${apply_periodic_conditions_to_the_angle_theta:${params.selection.point.theta}}
+  x_index: ???
+  y_index: ???
+  r_index: ???
+  theta_index: ???
+  k_index: ???
+  x_bounds: ???
+  y_bounds: ???
+  r_bounds: ???
+  theta_bounds: ???
+  k_bounds: ???
+range:
+  x: [-0.5, -0.5]
+  y: [0.1, 0.1]
+  r: [0.9, 0.9]
+  theta: [0, 0]
+  k: [1.2, 1.3]
+  theta_periodic: ???
+  x_indices: ???
+  y_indices: ???
+  r_indices: ???
+  theta_indices: ???
+  k_indices: ???
+  x_bounds: ???
+  y_bounds: ???
+  r_bounds: ???
+  theta_bounds: ???
+  k_bounds: ???

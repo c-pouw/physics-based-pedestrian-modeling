@@ -1,0 +1,48 @@
+xflims: ${params.default_xlims}
+yflims: ${params.default_ylims}
+uflims: [-2, 2]
+vflims: [-2, 2]
+rflims: [0, 2]
+thetaflims: [-3.1415, 3.1415]
+recorded:
+  edgecolor: "C3"
+  facecolor: "C3"
+  marker: "o"
+  markersize: 8
+  label: "Recordings"
+simulated:
+  edgecolor: "k"
+  facecolor: None
+  marker: "o"
+  markersize: 4
+  label: "Simulations"
+xf:
+  xlabel: "$x\\;$[m]"
+  ylabel:
+    counts: "Count($x$)"
+    PDF: "$\\mathbb{P}(x)$"
+yf:
+  xlabel: "$y\\;$[m]"
+  ylabel:
+    counts: "Count($y$)"
+    PDF: "$\\mathbb{P}(y)$"
+uf:
+  xlabel: "$u\\;$[m/s]"
+  ylabel:
+    counts: "Count($u$)"
+    PDF: "$\\mathbb{P}(u)$"
+vf:
+  xlabel: "$v\\;$[m/s]"
+  ylabel:
+    counts: "Count($v$)"
+    PDF: "$\\mathbb{P}(v)$"
+rf:
+  xlabel: "$r\\;$[m/s]"
+  ylabel:
+    counts: "Count($r$)"
+    PDF: "$\\mathbb{P}(r)$"
+thetaf:
+  xlabel: "$\\theta\\;$[degrees]"
+  ylabel:
+    counts: "Count($\\theta_f$)"
+    PDF: "$\\mathbb{P}(\\theta)$"

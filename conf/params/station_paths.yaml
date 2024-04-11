@@ -1,58 +1,56 @@
-env_name: 'station_paths'
+defaults:
+  - grid: station_paths
+  - simulation: default_simulation_params
+  - selection: default_selection
+  - trajectory_plot: default_trajectory_plot_params
+  - histogram_plot: default_histogram_plot_params
+  - force_field_plot: default_force_field_plot_params
+  - grid_plot: default_grid_plot
+  - learn_piece_of_potential_plot: default_learn_piece_of_potential_plot
+  - _self_
+env_name: station_paths
 taux: 2
 tauu: 2
+fps: 10
 dt: 0.1
 sigma: 0.2
+minimum_trajectory_length: 10
 colnames:
-  x: x_pos
-  y: y_pos
+  xf: xf
+  yf: yf
   Pid: Pid
-  time: time
-grid_name: 'station_paths_grid'
-working_directory: ${hydra:runtime.cwd}
-folder_path: ${hydra:runtime.cwd}/data/models/${params.env_name}_taux${params.taux}_tauu${params.tauu}_dt${params.dt}_sigma${params.sigma}_${params.grid_name}
-simulation:
-  ntrajs: 100
-  start: 0
-  end: 30
-  step: 0.1
-  stop_condition: 100
+  time: date_time_utc
 selection:
-  x: [-0.45, -0.45]
-  y: [0.15, 0.15]
-  r: [0.1, 1.6]
-  theta: [-0.05, 0.05]
-  k: [0, 2]
-trajectory_plot:
-  trajectory_type: 'recorded'
-  title: "Station paths"
-  save_figure: true
-  N_trajs: 20
-  plot_selection: false
-  plot_potential_cross_section: false
-  plot_walls: true
-  plot_intended_path: true
-  width_ratios: [2, 1]
-  xlims: [47, 73]
-  ylims: [-10, 4]
-  yps: []
-  ywalls: []
+  point:
+    x: 50
+    y: 0.15
+    r: 0.75
+    theta: 0.15
+    k: 1.2
+  range:
+    x: [50, 50]
+    y: [0.15, 0.15]
+    r: [0.75, 0.75]
+    theta: [0.15, 0.15]
+    k: [1.2, 1.2]
+plot_style: conf/science.mplstyle
+default_xlims: [47, 73]
+default_ylims: [-10, 4]
 background:
-  imgpath: ${hydra:runtime.cwd}/data/backgrounds/EHV.Perron2.1_multisensor_1.png
+  imgpath: 'data/backgrounds/EHV.Perron2.1_multisensor_1.png'
   xmin: -6039
   xmax: 75091
   ymin: -16539
   ymax: 10909
-histogram_plot:
-  xlims: [47, 73]
-  ylims: [-10, 4]
-  rlims: [0, 2]
-  thetalims: [-3.14, 3.14]
+trajectory_plot:
+  title: "Station paths"
+  y_title: 1
+  show_background: true
 force_field_plot:
-  clip: 0
-  scale: 800
-  sparseness: 3
-  width_ratios: [2, 1]
-  xlims: [-4, 4]
-  ylims: [-3, 3]
   figsize: [3.54, 2]
+learn_piece_of_potential_plot:
+  xlimits:
+    x: [0, 1]
+    y: [-0.5, 0.5]
+    u: [0.5, 1.5]
+    v: [-0.5, 0.5]

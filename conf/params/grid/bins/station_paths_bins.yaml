@@ -1,0 +1,5 @@
+x: ${generate_linear_bins:${params.grid.x.min},${params.grid.x.max},${params.grid.x.step}}
+y: ${generate_linear_bins:${params.grid.y.min},${params.grid.y.max},${params.grid.y.step}}
+r: ${cast_numpy_array:[0,0.4,1.1,1.8]}
+theta: ${generate_angular_bins:${params.grid.theta.min},${params.grid.theta.segments}}
+k: ${cast_numpy_array:[0,1,100000000000]}

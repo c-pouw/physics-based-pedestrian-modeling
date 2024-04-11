@@ -5,8 +5,8 @@ import logging
 import numpy as np
 import sdeint
 
-from physped.core.discrete_grid import PiecewisePotential
 from physped.core.functions_to_discretize_grid import get_grid_indices
+from physped.core.piecewise_potential import PiecewisePotential
 from physped.utils.functions import cart2pol, digitize_values_to_grid
 
 log = logging.getLogger(__name__)

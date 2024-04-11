@@ -7,24 +7,15 @@ from io import StringIO
 from pathlib import Path
 from zipfile import ZipFile
 
-import numpy as np
 import pandas as pd
-from hydra.utils import get_original_cwd
 from tqdm import tqdm
 
-from physped.core.discrete_grid import PiecewisePotential
-
-trajectory_folder_path = Path.cwd() / "data" / "trajectories"
+from physped.core.piecewise_potential import PiecewisePotential
 
 log = logging.getLogger(__name__)
 
 
-def read_grid_bins(grid_name: str):
-    filename = Path(get_original_cwd()) / f"data/grids/{grid_name}.npz"
-    return dict(np.load(filename, allow_pickle=True))
-
-
-def read_piecewise_potential_from_file(filename: Path) -> PiecewisePotential:
+def read_piecewise_potential_from_file(filepath: Path) -> PiecewisePotential:
     """
     Reads a piecewise potential from a file using pickle.
 
@@ -32,57 +23,49 @@ def read_piecewise_potential_from_file(filename: Path) -> PiecewisePotential:
     :type filename: str
     :return: The piecewise potential.
     """
-    with open(filename, "rb") as f:
+    with open(filepath, "rb") as f:
         val = pickle.load(f)
-    log.info("Successfully read piecewise potential from %s.", filename.relative_to(get_original_cwd()))
     return val
 
 
-def read_minimal_dataset_for_testing() -> pd.DataFrame:
+def read_minimal_dataset_for_testing(config) -> pd.DataFrame:
     """Read the single paths data set."""
-    # Specify the file path
     log.info("Start reading single paths data set.")
-    # Open the zip file
-    with ZipFile(trajectory_folder_path / "minimal_test_dataset.zip", "r") as archive:
-        # Open the CSV file within the zip file
+    trajectory_data_dir = Path(config.trajectory_data_dir)
+    with ZipFile(trajectory_data_dir / "minimal_test_dataset.zip", "r") as archive:
         with archive.open("single_paths_rtl.csv") as f:
-            # Read the CSV file directly into a pandas DataFrame
             paths = pd.read_csv(f)
 
-    # Convert the string to a pandas DataFrame
     log.info("Finished reading single paths data set.")
     return paths
 
 
-def read_single_paths() -> pd.DataFrame:
+def read_single_paths(config) -> pd.DataFrame:
     """Read the single paths data set."""
-    # Specify the file path
+    trajectory_data_dir = Path(config.trajectory_data_dir)
     log.info("Start reading single paths data set.")
-    # Open the zip file
-    archive = zipfile.ZipFile(trajectory_folder_path / "data.zip")
+    archive = zipfile.ZipFile(trajectory_data_dir / "data.zip")
 
-    # Read the .ssv file as a string
     with archive.open("left-to-right.ssv") as f:
         data_str = f.read().decode("utf-8")
 
-    # Convert the string to a pandas DataFrame
     df1 = pd.read_csv(StringIO(data_str), sep=" ")
 
-    # Read the .ssv file as a string
     with archive.open("right-to-left.ssv") as f:
         data_str = f.read().decode("utf-8")
 
-    # Convert the string to a pandas DataFrame
     df2 = pd.read_csv(StringIO(data_str), sep=" ")
     df = pd.concat([df1, df2], ignore_index=True)
+    df["X_SG"] = df["X_SG"] + 0.1
     df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
     log.info("Finished reading single paths data set.")
     return df
 
 
-def read_parallel_paths() -> pd.DataFrame:
+def read_parallel_paths(config) -> pd.DataFrame:
     """Read the parallel paths data set."""
-    file_path = trajectory_folder_path / "df_single_pedestrians_small.h5"
+    trajectory_data_dir = Path(config.trajectory_data_dir)
+    file_path = trajectory_data_dir / "df_single_pedestrians_small.h5"
     df = pd.read_hdf(file_path)
     df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
     df["Pid"] = df.groupby(["Pid", "day_id"]).ngroup()
@@ -91,26 +74,30 @@ def read_parallel_paths() -> pd.DataFrame:
     return df
 
 
-def read_intersecting_paths() -> pd.DataFrame:
+def read_intersecting_paths(config) -> pd.DataFrame:
     """Read the intersecting paths data set."""
-    file_path = trajectory_folder_path / "simulations_crossing.parquet"
+    trajectory_data_dir = Path(config.trajectory_data_dir)
+    file_path = trajectory_data_dir / "simulations_crossing.parquet"
     df = pd.read_parquet(file_path)
     df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
     df["k"] = df.groupby("Pid").cumcount()
+    df["time"] = df["k"]
     return df
 
 
-def read_curved_paths() -> pd.DataFrame:
+def read_curved_paths(config) -> pd.DataFrame:
     """Read the curved paths data set."""
-    file_path = trajectory_folder_path / "artificial_measurements_ellipse.parquet"
+    trajectory_data_dir = Path(config.trajectory_data_dir)
+    file_path = trajectory_data_dir / "artificial_measurements_ellipse.parquet"
     df = pd.read_parquet(file_path)
     df = df.rename(columns={"x": "xf", "y": "yf", "xdot": "uf", "ydot": "vf"})
     return df
 
 
-def read_station_paths() -> pd.DataFrame:
+def read_station_paths(config) -> pd.DataFrame:
     """Read the station paths data set."""
-    file_path = trajectory_folder_path / "trajectories_EHV_platform_2_1_refined.parquet"
+    trajectory_data_dir = Path(config.trajectory_data_dir)
+    file_path = trajectory_data_dir / "trajectories_EHV_platform_2_1_refined.parquet"
     df = pd.read_parquet(file_path)
     df.rename({"xf": "yf", "yf": "xf", "uf": "vf", "vf": "uf"}, axis=1, inplace=True)
     return df
@@ -200,15 +187,7 @@ def preprocess_ehv(df: pd.DataFrame) -> pd.DataFrame:
 
 def read_trajectories_from_path(filepath: Path) -> pd.DataFrame:
     """Read trajectories from file."""
-    try:
-        trajectories = pd.read_csv(filepath)
-        log.info(
-            "Succesfully read trajectories %s.",
-            filepath.relative_to(get_original_cwd()),
-        )
-        return trajectories
-    except FileNotFoundError as e:
-        log.error("Trajectories not found: %s", e)
+    return pd.read_csv(filepath)
 
 
 trajectory_reader = {

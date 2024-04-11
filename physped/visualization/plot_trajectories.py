@@ -2,14 +2,10 @@
 
 import logging
 from pathlib import Path
-from typing import Tuple
 
 import matplotlib as mpl
-import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
-from hydra.utils import get_original_cwd
 
 from physped.core.functions_to_discretize_grid import (
     get_boundary_coordinates_of_selection,
@@ -17,6 +13,13 @@ from physped.core.functions_to_discretize_grid import (
     return_grid_ids,
 )
 from physped.io.readers import read_piecewise_potential_from_file
+from physped.visualization.plot_utils import (
+    apply_cartesian_velocity_plot_style,
+    apply_polar_plot_style,
+    apply_xy_plot_style,
+    highlight_grid_box,
+    plot_station_background,
+)
 
 log = logging.getLogger(__name__)
 
@@ -43,27 +46,6 @@ def plot_position_trajectories_in_cartesian_coordinates(ax: plt.Axes, df: pd.Dat
             zorder=10,
         )
         ax.plot(dfp["xf"], dfp["yf"], lw=0.9, alpha=0.8, zorder=10)
-    return ax
-
-
-def apply_xy_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
-    """
-    Apply XY plot style to the given Axes object.
-
-    Parameters:
-        ax (plt.Axes): The Axes object to apply the style to.
-        params (dict): A dictionary containing the plot parameters.
-
-    Returns:
-        plt.Axes: The modified Axes object.
-
-    """
-    ax.set_aspect("equal")
-    ax.set_xlabel("$x\\; [\\mathrm{m}]$")
-    ax.set_ylabel("$y\\; [\\mathrm{m}]$")
-
-    ax.set_xlim(params.trajectory_plot.xlims)
-    ax.set_ylim(params.trajectory_plot.ylims)
     return ax
 
 
@@ -96,177 +78,6 @@ def plot_velocity_trajectories_in_cartesian_coordinates(ax: plt.Axes, df: pd.Dat
             c=f"C{int(ped_id%len(plt.rcParams['axes.prop_cycle'].by_key()['color']))}",
         )
 
-    return ax
-
-
-def plot_polar_grid(ax: plt.Axes, r_grid: np.ndarray, theta_grid: np.ndarray) -> plt.Axes:
-    """
-    Plot polar grid lines on a given axes object.
-
-    Parameters:
-    - ax (matplotlib.axes.Axes): The axes object to plot on.
-    - r_grid (numpy.ndarray): Array of radial grid values.
-    - theta_grid (numpy.ndarray): Array of angular grid values.
-
-    Returns:
-    - ax (matplotlib.axes.Axes): The modified axes object.
-    """
-    r_range = np.linspace(r_grid[1], r_grid[-1], 100)
-    theta_range = np.linspace(0, 2 * np.pi, 100)
-    linestyle = "dashed"
-    for r in r_grid:
-        if r == 0:
-            continue
-        ax.plot(theta_range, np.ones(100) * r, color="k", linestyle=linestyle, lw=0.6)
-        ax.text(
-            np.pi / 2,
-            r + 0.2,
-            f"{r}",
-            ha="center",
-            va="center",
-            # bbox = dict(
-            #     facecolor='white', alpha=0.5,
-            #     edgecolor='none', boxstyle='round')
-        )
-
-    for _, th in enumerate(theta_grid[:-1]):
-        ax.plot(np.ones(100) * th, r_range, color="k", linestyle=linestyle, lw=0.6)
-        ax.text(th, r_grid[-1] * 1.3, f"{th/np.pi:.1f}$\\pi$", ha="center", va="center")
-    ax.set_ylim(0, r_grid[-1])
-    return ax
-
-
-def plot_polar_grid_on_cartesian_plot(ax, r_grid, theta_grid):
-    for radius in r_grid:
-        circle = plt.Circle((0, 0), radius, color="k", linestyle="dashed", fill=False, lw=0.5, alpha=0.8)
-        ax.add_patch(circle)
-    for angle in theta_grid:
-        x1 = np.cos(angle) * 0.4
-        x2 = np.cos(angle) * 10
-        y1 = np.sin(angle) * 0.4
-        y2 = np.sin(angle) * 10
-        ax.plot([x1, x2], [y1, y2], color="k", linestyle="dashed", lw=0.5, alpha=0.8)
-    return ax
-
-
-def apply_polar_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
-    """
-    Applies a polar plot style to the given axes object.
-
-    Parameters:
-    - ax: The axes object to apply the polar plot style to.
-    - params: A dictionary containing parameters for customizing the plot style.
-
-    Returns:
-    - The modified axes object.
-
-    """
-    ax.set_aspect("equal")
-
-    # polar_grid_type = params["trajectory_plot"].get("polar_grid_type", "standard")
-
-    # r_grid = [0, 0.4, 1.1, 1.8]
-    # theta_grid = np.arange(-np.pi, np.pi + 0.01, np.pi / 3)
-
-    # if polar_grid_type == "custom":
-    #     grid_bins = create_grid_bins(params["grid"])
-    #     r_grid = params["grid"]["r"]
-    #     theta_grid = grid_bins["theta"]
-
-    ax.set_yticks([])
-    ax.set_xticks([])
-    # ax = plot_polar_grid(ax, r_grid, theta_grid)
-
-    return ax
-
-
-def apply_cartesian_velocity_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
-    """
-    Applies a polar plot style to the given axes object.
-
-    Parameters:
-    - ax: The axes object to apply the polar plot style to.
-    - params: A dictionary containing parameters for customizing the plot style.
-
-    Returns:
-    - The modified axes object.
-
-    """
-    ax.set_aspect("equal")
-    ax.grid(False)
-    log.warning("Under construction: Hardcoded grids and limits")
-    r_grid = np.arange(0, 4, 0.4)
-    theta_grid = np.linspace(-np.pi, np.pi + 0.01, 7)
-    ax.set_xlim(-2.4, 2.4)
-    ax.set_ylim(-2.4, 2.4)
-
-    ax.set_xlabel("u [m/s]")
-    ax.set_ylabel("v [m/s]")
-    ax = plot_polar_grid_on_cartesian_plot(ax, r_grid, theta_grid)
-    return ax
-
-
-def highlight_grid_box(ax: plt.Axes, limits: Tuple, c: str = "k") -> plt.Axes:
-    """
-    Highlight the selected grid box.
-
-    Parameters:
-        ax (plt.Axes): The matplotlib Axes object to plot on.
-        limits (Tuple): The limits of the grid box as a tuple (xlims, ylims).
-        c (str): The color of the highlight box. Default is "k" (black).
-
-    Returns:
-        plt.Axes: The modified matplotlib Axes object.
-
-    """
-    xlims, ylims = limits
-    yrange = np.linspace(ylims[0], ylims[1], 100)
-    colors = {
-        "k": (0, 0, 0, 1),
-        "r": (1, 0, 0, 1),
-        "g": (0, 1, 0, 1),
-        "b": (0, 0, 1, 1),
-    }
-    args = {
-        "fc": (1, 1, 1, 0.6),
-        "ec": colors[c],
-        "zorder": 10,
-        "lw": 1.5,
-        "label": "$S$",
-    }
-    ax.fill_between(yrange, xlims[0], xlims[1], **args)
-    return ax
-
-
-def plot_station_background(ax: plt.Axes, params: dict) -> plt.Axes:
-    """
-    Plot the background image of the station.
-
-    Parameters:
-        ax (plt.Axes): The matplotlib Axes object to plot on.
-        params (dict): A dictionary containing the parameters for plotting.
-
-    Returns:
-        plt.Axes: The modified matplotlib Axes object.
-
-    """
-    config = params.background
-    img = mpimg.imread(params.background.imgpath)
-    ax.imshow(
-        img,
-        cmap="gray",
-        origin="upper",
-        extent=(
-            config["xmin"] / 1000,
-            config["xmax"] / 1000,
-            config["ymin"] / 1000,
-            config["ymax"] / 1000,
-        ),
-        alpha=1,
-    )
-
-    ax.set_xlim(params.trajectory_plot.xlims)
-    ax.set_ylim(params.trajectory_plot.ylims)
     return ax
 
 
@@ -338,12 +149,14 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
                 va="center",
                 ha="left",
             )
+    if traj_plot_params.show_background:
+        ax = plot_station_background(ax, config)
+
+    # TODO retrieve size from config
     if name == "single_paths":
         fig.set_size_inches(3.54, 2.36)
     elif name == "parallel_paths":
         fig.set_size_inches(3.54, 5)
-    elif name == "station_paths":
-        ax = plot_station_background(ax, params)
 
     if trajectory_type:
         # plot_title = f"{trajectory_type.capitalize()} {plot_title.lower()}"
@@ -365,12 +178,15 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
 
         ax = highlight_grid_box(ax, plot_limits[::-1])
 
-    ax = fig.add_subplot(spec[1], polar=True)
-    ax = apply_polar_plot_style(ax, params)
-    ax = plot_velocity_trajectories_in_polar_coordinates(ax, plot_trajs)
-    # ax = fig.add_subplot(spec[1])  # , polar=True)
-    # ax = apply_cartesian_velocity_plot_style(ax, params)
-    # ax = plot_velocity_trajectories_in_cartesian_coordinates(ax, plot_trajs)
+    match traj_plot_params.velocity_grid:
+        case "polar":
+            ax = fig.add_subplot(spec[1], polar=True)
+            ax = apply_polar_plot_style(ax, params)
+            ax = plot_velocity_trajectories_in_polar_coordinates(ax, plot_trajs)
+        case "cartesian":
+            ax = fig.add_subplot(spec[1])
+            ax = apply_cartesian_velocity_plot_style(ax, params)
+            ax = plot_velocity_trajectories_in_cartesian_coordinates(ax, plot_trajs)
 
     ax.set_title("Velocities $\\vec{u}$ [m/s]", y=1.1)
     plot_selection = traj_plot_params.get("plot_selection", False)
@@ -382,9 +198,7 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
 
         ax = highlight_grid_box(ax, plot_limits)
 
-    fig.suptitle(plot_title, y=0.83)
-    save_figure = traj_plot_params.get("save_figure", False)
-    if save_figure:
-        filepath = Path.cwd() / f"{trajectory_type}trajectories_{params.get('env_name', '')}.pdf"
-        log.info("Saving trajectory plot to %s.", filepath.relative_to(get_original_cwd()))
-        plt.savefig(filepath)
+    fig.suptitle(plot_title, y=traj_plot_params.y_title)
+    filepath = Path.cwd() / f"{trajectory_type}trajectories_{params.get('env_name', '')}.pdf"
+    log.info("Saving trajectory plot to %s.", filepath.relative_to(config.root_dir))
+    plt.savefig(filepath)

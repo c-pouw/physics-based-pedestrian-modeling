@@ -1,22 +1,31 @@
-processing_steps:
-  preprocessing: true
-  create_grid: true
-  learn_potential: true
-  simulate_trajectories: true
-  plot_trajectories: true
-  plot_histograms: true
-  plot_force_field: false
-intermediate_save:
-  preprocessed_trajectories: False
-  gridbins: True
+defaults:
+  - params: default_params
+  - override hydra/job_logging: colorlog
+  - override hydra/hydra_logging: colorlog
+  - _self_
+read:
+  preprocessed_trajectories: True
   piecewise_potential: False
   simulated_trajectories: False
-  plots: False
-parameter_combinations: taux${params.taux}_tauu${params.tauu}_dt${params.dt}_sigma${params.sigma}_${params.grid_name}
+#  grid:
+#    from_file: False
+#    filename: single_paths.npz
+save:
+  preprocessed_trajectories: True
+  piecewise_potential: True
+  simulated_trajectories: True
+plot:
+  preprocessed_trajectories: True
+  simulated_trajectories: True
+  histograms: True
+  grid: True
+root_dir: ${get_root_dir:}
+trajectory_data_dir: ${root_dir}/data/trajectories
+parameter_combinations: taux${params.taux}_tauu${params.tauu}_dt${params.dt}_sigma${params.sigma}_${params.grid.name}
 hydra:
   verbose: False
   job:
     name: ${params.env_name}_${parameter_combinations}
     chdir: True
   run:
-    dir: outputs/${params.env_name}/${parameter_combinations}/${now:%Y-%m-%d_%H-%M-%S}
+    dir: ${root_dir}/outputs/${params.env_name}/${parameter_combinations}/${now:%Y-%m-%d_%H-%M-%S}

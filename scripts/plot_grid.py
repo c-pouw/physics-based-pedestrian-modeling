@@ -8,13 +8,9 @@ from physped.visualization.plot_discrete_grid import plot_discrete_grid
 log = logging.getLogger(__name__)
 
 
-@hydra.main(version_base=None, config_path="../conf")
+@hydra.main(version_base=None, config_path="../conf", config_name="config")
 def plot_grid(cfg):
-    # name = cfg.params.env_name
-    # selection = cfg.params.get("selection")
-
-    # grid_selection = make_grid_selection(discrete_potential, selection)
-    plot_discrete_grid(cfg.params)
+    plot_discrete_grid(cfg)
 
 
 if __name__ == "__main__":

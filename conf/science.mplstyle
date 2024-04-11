@@ -44,13 +44,8 @@ savefig.bbox : tight
 savefig.pad_inches : 0.01
 
 # Use serif fonts
-# font.serif : cmr10, Computer Modern Serif, DejaVu Serif
-# font.family : serif
-# axes.formatter.use_mathtext : True
-# mathtext.fontset : cm
-font.family: sans-serif
-font.sans-serif: "Helvetica"
-
+font.family : serif
+mathtext.fontset : dejavuserif
 
 # Use LaTeX for math formatting
 text.usetex : True

@@ -2,37 +2,36 @@
 
 import copy
 import logging
+from pathlib import Path
 from typing import List
 
 import numpy as np
 import pandas as pd
 from scipy.stats import norm
 
-from physped.core.discrete_grid import PiecewisePotential
-from physped.io.writers import save_grid_bins
+from physped.core.piecewise_potential import PiecewisePotential
+from physped.io.readers import read_piecewise_potential_from_file
 from physped.utils.functions import digitize_values_to_grid, pol2cart, weighted_mean_of_two_matrices
 
 log = logging.getLogger(__name__)
 
 
-def create_grid_bins_from_conf(cfg: dict) -> dict:
-    grid_conf = cfg.params.grid
-    xbins = np.arange(grid_conf.x.min, grid_conf.x.max, grid_conf.x.step)
-    ybins = np.arange(grid_conf.y.min, grid_conf.y.max, grid_conf.y.step)
-    rbins = np.arange(grid_conf.r.min, grid_conf.r.max, grid_conf.r.step)
-    thetabins = np.linspace(-np.pi, np.pi + 0.01, grid_conf.theta.chunks)
-    kbins = np.array([0, 1, 10**10])
-    gridbins = {"x": xbins, "y": ybins, "r": rbins, "theta": thetabins, "k": kbins}
-    log.info("Bins succesfully created with limits: %s", grid_conf)
-    log.debug("Grid bins: %s", gridbins)
-
-    log.info("Intermediate_save.gridbins: %s", cfg.intermediate_save.gridbins)
-    if cfg.intermediate_save.gridbins:
-        save_grid_bins(gridbins, cfg.params.env_name)
-    return gridbins
+# def create_grid_bins_from_config(config: dict) -> dict:
+#     grid_conf = config.params.grid
+#     xbins = np.arange(grid_conf.x.min, grid_conf.x.max + 0.01, grid_conf.x.step)
+#     ybins = np.arange(grid_conf.y.min, grid_conf.y.max + 0.01, grid_conf.y.step)
+#     rbins = np.arange(grid_conf.r.min, grid_conf.r.max + 0.01, grid_conf.r.step)
+#     thetabins = np.linspace(
+#         grid_conf.theta.min, grid_conf.theta.min + 2 * np.pi + 0.0001, grid_conf.theta.segments + 1
+#     )
+#     kbins = np.array([0, 1, 10**10])
+#     gridbins = {"x": xbins, "y": ybins, "r": rbins, "theta": thetabins, "k": kbins}
+#     log.info("Bins succesfully created with limits: %s", grid_conf)
+#     log.debug("Grid bins: %s", gridbins)
+#     return gridbins
 
 
-def learn_potential_from_trajectories(trajectories: pd.DataFrame, grid_bins: dict) -> PiecewisePotential:
+def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: dict) -> PiecewisePotential:
     """
     Convert trajectories to a grid of histograms and parameters.
 
@@ -43,6 +42,18 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, grid_bins: dic
     Returns:
     - A dictionary of DiscreteGrid objects for storing histograms and parameters.
     """
+    grid_bins = dict(config.params.grid.bins)
+    filepath = Path.cwd().parent / "piecewise_potential.pickle"
+    if config.read.simulated_trajectories:
+        log.debug("Configuration 'read.simulated_trajectories' is set to True.")
+        try:
+            piecewise_potential = read_piecewise_potential_from_file(filepath)
+            log.info("---- Piecewise potential succesfully read from file ----")
+            log.debug("Filepath %s", filepath.relative_to(config.root_dir))
+            return piecewise_potential
+        except FileNotFoundError as e:
+            log.warning("Piecewise potential not found: %s", e)
+
     piecewise_potential = PiecewisePotential(grid_bins)
     trajectories = digitize_trajectories_to_grid(piecewise_potential.bins, trajectories)
     piecewise_potential.histogram = add_trajectories_to_histogram(
@@ -51,6 +62,8 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, grid_bins: dic
     piecewise_potential.histogram_slow = add_trajectories_to_histogram(
         piecewise_potential.histogram_slow, trajectories, "slow_grid_indices"
     )
+    if config.params.simulation.sample_origins_from == "trajectories":
+        piecewise_potential.trajectory_origins = trajectories.groupby("Pid").first()[["xf", "yf", "uf", "vf"]]
     piecewise_potential.fit_params = fit_trajectories_on_grid(piecewise_potential.fit_params, trajectories)
     log.info("Finished learning piecewise potential from trajectories.")
     return piecewise_potential
@@ -136,7 +149,7 @@ def digitize_trajectories_to_grid(grid_bins: dict, trajectories: pd.DataFrame) -
     return trajectories
 
 
-def fit_fast_modes(group: pd.DataFrame) -> list:
+def fit_probability_distributions(group: pd.DataFrame) -> list:
     """
     Fits normal distribution to a group of data points and returns fitting parameters.
 
@@ -167,7 +180,7 @@ def fit_trajectories_on_grid(param_grid, trajectories: pd.DataFrame):
     Returns:
     - The grid with fit parameters.
     """
-    fit_params = trajectories.groupby("slow_grid_indices").apply(fit_fast_modes).dropna().to_dict()
+    fit_params = trajectories.groupby("slow_grid_indices").apply(fit_probability_distributions).dropna().to_dict()
     for key, value in fit_params.items():
         param_grid[key] = value
     return param_grid
@@ -191,26 +204,26 @@ def add_trajectories_to_histogram(
     return histogram
 
 
-def create_grid_bins(grid_vals: dict) -> dict:
-    """
-    Create bins for a grid.
+# def create_grid_bins(grid_vals: dict) -> dict:
+#     """
+#     Create bins for a grid.
 
-    Parameters:
-    - grid_vals (dict): The values of the grid.
+#     Parameters:
+#     - grid_vals (dict): The values of the grid.
 
-    Returns:
-    - A dictionary of bins for each dimension of the grid.
-    """
-    grid_bins = {}
-    if "x" in grid_vals and "y" in grid_vals:
-        grid_bins = {key: np.arange(*grid_vals[key]) for key in ["x", "y"]}
-    if "r" in grid_vals:
-        grid_bins["r"] = np.array(grid_vals["r"])
-    if "theta" in grid_vals:
-        grid_bins["theta"] = np.arange(-np.pi, np.pi + 0.01, grid_vals["theta"])
-    if "k" in grid_vals:
-        grid_bins["k"] = np.array(grid_vals["k"])
-    return grid_bins
+#     Returns:
+#     - A dictionary of bins for each dimension of the grid.
+#     """
+#     grid_bins = {}
+#     if "x" in grid_vals and "y" in grid_vals:
+#         grid_bins = {key: np.arange(*grid_vals[key]) for key in ["x", "y"]}
+#     if "r" in grid_vals:
+#         grid_bins["r"] = np.array(grid_vals["r"])
+#     if "theta" in grid_vals:
+#         grid_bins["theta"] = np.arange(-np.pi, np.pi + 0.01, grid_vals["theta"])
+#     if "k" in grid_vals:
+#         grid_bins["k"] = np.array(grid_vals["k"])
+#     return grid_bins
 
 
 def get_grid_indices(potential_grid: PiecewisePotential, X: List[float]) -> np.ndarray:
