@@ -103,7 +103,7 @@ def learn_piece_of_potential_plot(config: dict):
 
 @hydra.main(version_base=None, config_path="../../conf", config_name="config")
 def plot_piecewise_potential_fit(cfg):
-    plt.style.use(Path(cfg.root_dir) / cfg.params.plot_style)
+    plt.style.use(str(cfg.root_dir / cfg.params.plot_style))
     plot_discrete_grid(cfg)
     learn_piece_of_potential_plot(cfg)
     output_figures = glob.glob("*.pdf")

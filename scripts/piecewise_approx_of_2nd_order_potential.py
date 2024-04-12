@@ -1,12 +1,10 @@
 # %%
-from pathlib import Path
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
 
-plt.style.use(Path.cwd() / "../conf/science.mplstyle")
+# plt.style.use(Path.cwd() / "../conf/science.mplstyle")
 
 x = np.linspace(-6, 6, 100)
 y = 0.5 * x**2
