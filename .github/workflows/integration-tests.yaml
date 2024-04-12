@@ -55,7 +55,7 @@ jobs:
       - name: Test Integration
         run: |
           set -vxeuo pipefail
-          python scripts/main.py params=minimal_dataset_for_testing
+          python scripts/main.py params=minimal_dataset_for_testing root_dir=$GITHUB_WORKSPACE
 
       - uses: actions/upload-artifact@v3
         with:
