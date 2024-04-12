@@ -26,8 +26,8 @@ def main(cfg):
     log.debug("Configuration: \n%s", pprint.pformat(dict(cfg)))
     log.info("Working directory %s", Path.cwd())
     log.info("Project root %s", cfg.root_dir)
-    log.info(cfg.params.plot_style)
-    plt.style.use(str(cfg.root_dir / cfg.params.plot_style))
+    if env_name != "minimal_dataset_for_testing":
+        plt.style.use(cfg.root_dir / cfg.params.plot_style)
 
     trajectories = trajectory_reader[env_name](cfg)
     preprocessed_trajectories = preprocess_trajectories(trajectories, config=cfg)
