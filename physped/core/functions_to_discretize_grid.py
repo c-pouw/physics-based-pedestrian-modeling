@@ -43,7 +43,7 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: dict) 
     - A dictionary of DiscreteGrid objects for storing histograms and parameters.
     """
     grid_bins = dict(config.params.grid.bins)
-    filepath = Path.cwd().parent / "piecewise_potential.pickle"
+    filepath = Path.cwd().parent / config.filename.piecewise_potential
     if config.read.simulated_trajectories:
         log.debug("Configuration 'read.simulated_trajectories' is set to True.")
         try:

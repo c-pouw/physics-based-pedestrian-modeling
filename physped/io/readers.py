@@ -69,8 +69,10 @@ def read_parallel_paths(config) -> pd.DataFrame:
     df = pd.read_hdf(file_path)
     df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
     df["Pid"] = df.groupby(["Pid", "day_id"]).ngroup()
+    df.reset_index(inplace=True)
     df = df.query("Umean>0.5").loc[abs(df.X0 - df.X1) > 2]
     df = df.groupby("Pid").filter(lambda x: max(x.uf) < 3.5)
+    # df["time"] = df["frame"]
     return df
 
 

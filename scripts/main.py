@@ -45,7 +45,11 @@ def main(cfg):
     log.info("---- Learn piecewise potential from trajectories ----")
     piecewise_potential = learn_potential_from_trajectories(preprocessed_trajectories, cfg)
     if cfg.save.piecewise_potential:
-        save_piecewise_potential(piecewise_potential, Path.cwd().parent)
+        save_piecewise_potential(
+            piecewise_potential,
+            Path.cwd().parent,
+            cfg.filename.piecewise_potential,
+        )
 
     print("\n")
     simulated_trajectories = simulate_trajectories(piecewise_potential, cfg)

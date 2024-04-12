@@ -1,18 +1,19 @@
 defaults:
-  - bins: station_paths_bins.yaml
-name: 'station_paths_grid'
+  - bins: default_bins_with_r_from_list
+name: station_paths_grid
 x:
   min: 47
   max: 73
-  step: 0.3
+  step: 0.2
 y:
   min: -10
   max: 4
-  step: 0.3
+  step: 0.2
 r:
   min: 0
   max: 2
   step: 0.4
+  list: [0,0.4,1.1,1.8]
 theta:
   min: ${parse_pi:-1}
   segments: 6

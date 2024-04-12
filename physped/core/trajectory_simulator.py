@@ -31,7 +31,7 @@ def sample_trajectory_origins_from_trajectories(piecewise_potential, parameters:
 
 def simulate_trajectories(piecewise_potential, config: dict) -> pd.DataFrame:
     parameters = config.params
-    filepath = Path.cwd().parent / "simulated_trajectories.csv"
+    filepath = Path.cwd().parent / config.filename.simulated_trajectories
 
     # TODO : Move to separate function
     if config.read.simulated_trajectories:
@@ -72,5 +72,5 @@ def simulate_trajectories(piecewise_potential, config: dict) -> pd.DataFrame:
     trajectories["rs"], trajectories["thetas"] = cart2pol(trajectories.us, trajectories.vs)
     if config.save.simulated_trajectories:
         log.debug("Configuration 'save.simulated_trajectories' is set to True.")
-        save_trajectories(trajectories, Path.cwd().parent, "simulated_trajectories.csv")
+        save_trajectories(trajectories, Path.cwd().parent, config.filename.simulated_trajectories)
     return trajectories

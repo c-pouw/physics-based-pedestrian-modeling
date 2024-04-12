@@ -10,11 +10,13 @@ defaults:
   - _self_
 env_name: station_paths
 taux: 2
-tauu: 2
+tauu: ${params.taux}
 fps: 10
 dt: 0.1
 sigma: 0.2
 minimum_trajectory_length: 10
+simulation:
+  end: 50
 colnames:
   xf: xf
   yf: yf
@@ -44,7 +46,6 @@ background:
   ymax: 10909
 trajectory_plot:
   title: "Station paths"
-  y_title: 1
   show_background: true
 force_field_plot:
   figsize: [3.54, 2]

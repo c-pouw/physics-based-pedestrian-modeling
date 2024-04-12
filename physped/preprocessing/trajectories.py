@@ -207,7 +207,7 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     :rtype: pd.DataFrame
     """
     parameters = config.params
-    filepath = Path.cwd().parent / "preprocessed_trajectories.csv"
+    filepath = Path.cwd().parent / config.filename.preprocessed_trajectories
 
     # TODO : Move to separate function
     if config.read.preprocessed_trajectories:
@@ -223,7 +223,7 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     log.info("---- Preprocess recorded trajectories ----")
     # TODO : Use columnnames from parameters instead of renaming
     df = rename_columns(df, parameters)
-    log.info("Columns renamed.")
+    log.info("Columns renamed to %s", list(df.columns))
     df = prune_short_trajectories(df, parameters)
     log.info("Short trajectories pruned.")
     df = add_velocity(df, parameters)
@@ -244,7 +244,7 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     # if parameters.intermediate_save.preprocessed_trajectories:
     if config.save.preprocessed_trajectories:
         log.debug("Configuration 'save.preprocessed_trajectories' is set to True.")
-        save_trajectories(df, Path.cwd().parent, "preprocessed_trajectories.csv")
+        save_trajectories(df, Path.cwd().parent, config.filename.preprocessed_trajectories)
     return df
 
 
