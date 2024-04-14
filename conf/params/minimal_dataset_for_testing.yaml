@@ -1,5 +1,5 @@
 defaults:
-  - grid: single_paths
+  - grid: default_grid
   - simulation: default_simulation_params
   - selection: default_selection
   - trajectory_plot: default_trajectory_plot_params
@@ -20,6 +20,13 @@ colnames:
   yf: Y_SG
   Pid: Pid
   time: Rstep
+grid:
+  x:
+    min: -1.4
+    max: 1.4
+  y:
+    min: -0.8
+    max: 0.8
 plot_style: conf/science_no_latex.mplstyle
 default_xlims: [-1.1,1.1]
 default_ylims:  [-0.7,0.7]

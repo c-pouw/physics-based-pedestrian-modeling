@@ -1,14 +1,10 @@
 defaults:
   - bins: default_bins_with_r_from_list
-name: single_paths_grid
+name: dxy${params.grid.spatial_cell_size}_r${params.grid.r.list}_ntheta${params.grid.theta.segments}
 spatial_cell_size: 0.2
 x:
-  min: -1.4
-  max: 1.4
   step: ${params.grid.spatial_cell_size}
 y:
-  min: -0.6
-  max: 0.6
   step: ${params.grid.spatial_cell_size}
 r:
   min: 0
@@ -16,6 +12,6 @@ r:
   step: 0.6
   list: [0,0.4,1.6,2.8]
 theta:
-  min_x_pi: -0.25
-  min: ${parse_pi:${params.grid.theta.min_x_pi}}
+  min_multiple_pi: -0.25
+  min: ${parse_pi:${params.grid.theta.min_multiple_pi}}
   segments: 4

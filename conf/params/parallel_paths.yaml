@@ -1,5 +1,5 @@
 defaults:
-  - grid: parallel_paths
+  - grid: default_grid
   - simulation: default_simulation_params
   - selection: default_selection
   - trajectory_plot: default_trajectory_plot_params
@@ -20,6 +20,13 @@ colnames:
   y: y_pos
   Pid: Pid
   time: frame
+grid:
+  x:
+    min: -2.5
+    max: 2.5
+  y:
+    min: -4.5
+    max: 4.5
 selection:
   range:
     x: [-0.45, -0.45]
@@ -32,8 +39,12 @@ default_xlims: [-2, 2.5]
 default_ylims: [-4, 4]
 trajectory_plot:
   title: "Wide corridor"
+  figsize: [3.54, 5]
   width_ratios: [2, 1]
   yps: [2.3, 0.8, -1.7]
   ywalls: [3.6, -3.6]
+  text_box:
+    x: 0.8
+    y: 0.7
 force_field_plot:
   figsize: [3.54, 2]

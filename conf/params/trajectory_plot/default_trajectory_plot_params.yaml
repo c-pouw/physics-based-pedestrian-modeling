@@ -1,9 +1,10 @@
 save_figure: true
+figsize: [3.54, 2.36]
 y_title: 0.9
 width_ratios: [2, 1]
 xlims: ${params.default_xlims}
 ylims: ${params.default_ylims}
-N_trajs: 30
+N_trajs: 20
 plot_selection: false
 plot_potential_cross_section: false
 plot_walls: false
@@ -12,6 +13,10 @@ show_background: false
 velocity_grid: polar
 plot_polar_grid: True
 grid_type: potential
+text_box:
+  show: True
+  x: 0.6
+  y: 0.85
 axis_labels:
   polar:
     x: "$u\\, [\\mathrm{m/s}]$"

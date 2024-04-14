@@ -34,3 +34,4 @@ def register_new_resolvers():
     OmegaConf.register_new_resolver(
         "apply_periodic_conditions_to_the_angle_theta", apply_periodic_conditions_to_the_angle_theta
     )
+    OmegaConf.register_new_resolver("inv_prop", lambda x: 1 / x)

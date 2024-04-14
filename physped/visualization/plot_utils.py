@@ -244,7 +244,7 @@ def plot_polar_velocity_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
 
 def plot_polar_labels(ax: plt.Axes, grid_params: dict) -> plt.Axes:
     rbins = grid_params.bins.r
-    thetabins = grid_params.bins.theta
+    # thetabins = grid_params.bins.theta
     for r in rbins[1:]:
         ax.text(
             np.pi / 2 + 0.4,
@@ -255,14 +255,24 @@ def plot_polar_labels(ax: plt.Axes, grid_params: dict) -> plt.Axes:
             fontsize=5,
             bbox=dict(facecolor="white", alpha=1, edgecolor="none", boxstyle="round", pad=0.1),
         )
-    for theta in thetabins[:-1]:
+    # for theta in thetabins[:-1]:
+    #     ax.text(
+    #         theta,
+    #         rbins[-1] + 0.3 + np.abs(np.cos(theta)) / 4,
+    #         f"{theta/np.pi:.1f}$\\pi$",
+    #         ha="center",
+    #         va="center",
+    #         fontsize=7,
+    #     )
+    for theta, winddirection in zip([np.pi / 2, 0, -np.pi / 2, np.pi], ["N", "E", "S", "W"]):
         ax.text(
             theta,
-            rbins[-1] + 0.3 + np.abs(np.cos(theta)) / 4,
-            f"{theta/np.pi:.1f}$\\pi$",
+            rbins[-1],
+            winddirection,
             ha="center",
             va="center",
-            fontsize=7,
+            fontsize=5,
+            bbox=dict(facecolor="white", alpha=1, edgecolor="k", boxstyle="circle,pad=0.2", pad=0.1, lw=0.4),
         )
         # ax.text(theta, rbins[-1] * 1.35, f"{convert_rad_to_deg(theta):.1f}$^\\circ$", ha="center", va="center")
     return ax
