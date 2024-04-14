@@ -1,5 +1,5 @@
 defaults:
-  - params: default_params
+  - params: minimal_dataset_for_testing
   - override hydra/job_logging: colorlog
   - override hydra/hydra_logging: colorlog
   - _self_
@@ -32,4 +32,4 @@ hydra:
     dir: ${root_dir}/outputs/${params.env_name}_tau${params.taux}/${params.grid.name}/${now:%Y-%m-%d_%H-%M-%S}
   sweep:
     dir: ${root_dir}/outputs/${params.env_name}_tau${params.taux}/${params.grid.name}
-    subdir: multirun-${hydra.job.num}-${now:%Y-%m-%d_%H-%M-%S}
+    subdir: job${hydra.job.num}-sigma${params.sigma}-tau${params.taux}-${params.grid.name}-${now:%Y-%m-%d_%H-%M-%S}

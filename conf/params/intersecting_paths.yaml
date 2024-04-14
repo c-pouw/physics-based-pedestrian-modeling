@@ -1,5 +1,5 @@
 defaults:
-  - grid: intersecting_paths
+  - grid: default_grid
   - simulation: default_simulation_params
   - selection: default_selection
   - trajectory_plot: default_trajectory_plot_params
@@ -20,6 +20,13 @@ colnames:
   y: y_pos
   Pid: Pid
   time: time
+grid:
+  x:
+    min: -3.5
+    max: 3.5
+  y:
+    min: -2
+    max: 2
 selection:
   range:
     x: [-0.45, -0.45]
