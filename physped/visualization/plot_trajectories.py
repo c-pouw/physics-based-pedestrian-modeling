@@ -6,7 +6,6 @@ from pathlib import Path
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
 
 from physped.core.functions_to_discretize_grid import (
     get_boundary_coordinates_of_selection,
@@ -194,7 +193,12 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
         ax = highlight_grid_box(ax, plot_limits)
 
     if traj_plot_params.text_box.show:
-        textstr = f"{trajectory_type.capitalize()} paths\n$N=\\,${traj_plot_params.N_trajs} paths\n$\\sigma=\\,${config.params.sigma} ms$^{{-3/2}}$\n$\\tau=\\,${config.params.taux} s"
+        textstr = (
+            f"{trajectory_type.capitalize()} paths\n"
+            f"$N=\\,${traj_plot_params.N_trajs} paths\n"
+            f"$\\sigma=\\,${config.params.sigma} ms$^{{-3/2}}$\n"
+            f"$\\tau=\\,${config.params.taux} s"
+        )
         props = {"boxstyle": "round", "facecolor": "white", "alpha": 0.5, "edgecolor": "black"}
         plt.figtext(
             traj_plot_params.text_box.x,
