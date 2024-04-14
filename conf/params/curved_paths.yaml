@@ -15,6 +15,7 @@ fps: 10
 dt: 0.1
 sigma: 1
 minimum_trajectory_length: 10
+input_ntrajs: ???
 colnames:
   xf: xf
   yf: yf

@@ -3,6 +3,8 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
+from tqdm.contrib.logging import logging_redirect_tqdm
 
 from physped.core.functions_to_discretize_grid import convert_grid_indices_to_coordinates, sample_from_ndarray
 from physped.core.langevin_model import LangevinModel
@@ -23,7 +25,9 @@ def sample_trajectory_origins_from_heatmap(piecewise_potential, parameters: dict
 
 
 def sample_trajectory_origins_from_trajectories(piecewise_potential, parameters: dict) -> np.ndarray:
-    sampled_origins = piecewise_potential.trajectory_origins.sample(n=parameters.simulation.ntrajs)
+    ntrajs = np.min([parameters.simulation.ntrajs, parameters.input_ntrajs])
+    log.info("Sampling %d origins from the input trajectories.", ntrajs)
+    sampled_origins = piecewise_potential.trajectory_origins.sample(n=ntrajs)
     # Stacking to go from [x,y,u,v] to [x,y,u,v,xs,ys,us,vs]
     sampled_origins = np.hstack((sampled_origins, sampled_origins))
     return sampled_origins
@@ -59,13 +63,18 @@ def simulate_trajectories(piecewise_potential, config: dict) -> pd.DataFrame:
     # simulation_time = params.get("simulation_time", [0, 10, 0.1])
     # t_eval = np.arange(*simulation_time)
     trajectories = []
-    for Pid, X_0 in enumerate(origins[:, :8]):
-        solution = lm.simulate(X_0, t_eval)
-        traj = pd.DataFrame(solution, columns=["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs"]).dropna()
-        traj["Pid"] = Pid
-        traj["t"] = t_eval[: len(traj)]
-        traj["k"] = range(len(traj))
-        trajectories.append(traj)
+    Pid = 0
+    with logging_redirect_tqdm():
+        for X_0 in tqdm(
+            origins[:, :8], desc="Simulating trajectories", unit="trajs", total=origins.shape[0], miniters=10
+        ):
+            solution = lm.simulate(X_0, t_eval)
+            traj = pd.DataFrame(solution, columns=["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs"]).dropna()
+            traj["Pid"] = Pid
+            traj["t"] = t_eval[: len(traj)]
+            traj["k"] = range(len(traj))
+            trajectories.append(traj)
+            Pid += 1
 
     trajectories = pd.concat(trajectories)
     trajectories["rf"], trajectories["thetaf"] = cart2pol(trajectories.uf, trajectories.vf)

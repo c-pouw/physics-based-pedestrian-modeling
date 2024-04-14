@@ -15,6 +15,7 @@ fps: 15
 dt: ${inv_prop:${params.fps}}
 sigma: 0.2
 minimum_trajectory_length: 10
+input_ntrajs: ???
 grid:
   x:
     min: -1.4
@@ -31,7 +32,7 @@ plot_style: conf/science.mplstyle
 default_xlims: [-1.1,1.1]
 default_ylims:  [-0.7,0.7]
 trajectory_plot:
-  title: "Straight paths"
+  title: "paths in a narrow corridor"
   yps: [0]
   ywalls: [0.6, -0.6]
   plot_walls: true

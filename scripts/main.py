@@ -32,6 +32,7 @@ def main(config):
 
     trajectories = trajectory_reader[env_name](config)
     preprocessed_trajectories = preprocess_trajectories(trajectories, config=config)
+    config.params.input_ntrajs = len(preprocessed_trajectories.Pid.unique())
 
     # * Optional plotting of preprocessed trajectories
     if config.plot.preprocessed_trajectories:
@@ -70,7 +71,7 @@ def main(config):
         log.info("---- Plot probability distribution comparison ----")
         log.debug("Configuration 'plot.histograms' is set to True.")
         observables = ["xf", "yf", "uf", "vf"]
-        histograms = create_all_histograms(preprocessed_trajectories, simulated_trajectories, observables)
+        histograms = create_all_histograms(preprocessed_trajectories, simulated_trajectories, config)
         plot_multiple_histograms(observables, histograms, "PDF", config)
     else:
         log.warning("Configuration 'plot.simulated_trajectories' is set to False.")

@@ -18,6 +18,7 @@ from physped.visualization.plot_utils import (
     apply_polar_plot_style,
     apply_xy_plot_style,
     highlight_grid_box,
+    plot_cartesian_spatial_grid,
     plot_station_background,
 )
 
@@ -145,6 +146,8 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
     )
 
     ax = fig.add_subplot(spec[0])
+    ax.grid(False)
+    ax = plot_cartesian_spatial_grid(ax, params.grid, alpha=0.4)
     ax = apply_xy_plot_style(ax, params)
     ax = plot_position_trajectories_in_cartesian_coordinates(ax, plot_trajs)
     ax.set_title("Positions $\\vec{x}$ [m]", y=1)
@@ -192,12 +195,11 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
         plot_limits = [grid_selection[obs]["periodic_bounds"] for obs in ["r", "theta"]]
         ax = highlight_grid_box(ax, plot_limits)
 
-    if traj_plot_params.text_box.show:
+    if (traj_plot_params.text_box.show) and (trajectory_type == "simulated"):
         textstr = (
-            f"{trajectory_type.capitalize()} paths\n"
-            f"$N=\\,${traj_plot_params.N_trajs} paths\n"
-            f"$\\sigma=\\,${config.params.sigma} ms$^{{-3/2}}$\n"
-            f"$\\tau=\\,${config.params.taux} s"
+            f"Model parameters\n"
+            f"$\\sigma=\\,${config.params.sigma} ms$^{{\\mathdefault{{-3/2}}}}$\n"
+            f"$\\tau_x=\\tau_u=\\,${config.params.taux} s"
         )
         props = {"boxstyle": "round", "facecolor": "white", "alpha": 0.5, "edgecolor": "black"}
         plt.figtext(
@@ -210,9 +212,8 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
             bbox=props,
         )
 
-    if trajectory_type:
-        trajectory_type = f"{trajectory_type}_"
-    fig.suptitle(traj_plot_params.title, x=0.3, y=traj_plot_params.y_title)
-    filepath = Path.cwd() / f"{trajectory_type}trajectories_{params.get('env_name', '')}.pdf"
+    title = f"{traj_plot_params.N_trajs} {trajectory_type} {traj_plot_params.title}"
+    fig.suptitle(title, x=0.5, y=traj_plot_params.y_title, ha="center", va="center")
+    filepath = Path.cwd() / f"{trajectory_type}_trajectories_{params.get('env_name', '')}.pdf"
     log.info("Saving trajectory plot to %s.", filepath.relative_to(config.root_dir))
     plt.savefig(filepath)

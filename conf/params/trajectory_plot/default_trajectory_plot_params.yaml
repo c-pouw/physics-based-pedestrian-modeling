@@ -1,6 +1,6 @@
 save_figure: true
 figsize: [3.54, 2.36]
-y_title: 0.9
+y_title: 0.85
 width_ratios: [2, 1]
 xlims: ${params.default_xlims}
 ylims: ${params.default_ylims}
@@ -15,8 +15,8 @@ plot_polar_grid: True
 grid_type: potential
 text_box:
   show: True
-  x: 0.6
-  y: 0.85
+  x: 0.86
+  y: 0.23
 axis_labels:
   polar:
     x: "$u\\, [\\mathrm{m/s}]$"

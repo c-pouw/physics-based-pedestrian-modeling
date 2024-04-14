@@ -188,11 +188,10 @@ def plot_station_background(ax: plt.Axes, config: dict) -> plt.Axes:
     return ax
 
 
-def plot_cartesian_spatial_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
+def plot_cartesian_spatial_grid(ax: plt.Axes, grid_params: dict, alpha: float = 0.8) -> plt.Axes:
     xbins = grid_params.bins.x
     ybins = grid_params.bins.y
     linestyle = "dashed"
-    alpha = 0.8
     color = "k"
     linewidth = 0.6
     for x in xbins:
@@ -247,7 +246,7 @@ def plot_polar_labels(ax: plt.Axes, grid_params: dict) -> plt.Axes:
     # thetabins = grid_params.bins.theta
     for r in rbins[1:]:
         ax.text(
-            np.pi / 2 + 0.4,
+            3 * np.pi / 4,
             r,
             f"{r:.1f}",
             ha="center",
@@ -272,7 +271,7 @@ def plot_polar_labels(ax: plt.Axes, grid_params: dict) -> plt.Axes:
             ha="center",
             va="center",
             fontsize=5,
-            bbox=dict(facecolor="white", alpha=1, edgecolor="k", boxstyle="circle,pad=0.2", pad=0.1, lw=0.4),
+            bbox=dict(facecolor="white", alpha=1, edgecolor="k", boxstyle="circle,pad=0.4", lw=0.4),
         )
         # ax.text(theta, rbins[-1] * 1.35, f"{convert_rad_to_deg(theta):.1f}$^\\circ$", ha="center", va="center")
     return ax
