@@ -5,6 +5,7 @@ width_ratios: [2, 1]
 xlims: ${params.default_xlims}
 ylims: ${params.default_ylims}
 N_trajs: 20
+plot_cartesian_grid: True
 plot_selection: false
 plot_potential_cross_section: false
 plot_walls: false
@@ -13,11 +14,13 @@ show_background: false
 velocity_grid: polar
 plot_polar_grid: True
 grid_type: potential
+yticks:
+  custom: false
 text_box:
   show: True
   x: 0.86
   y: 0.23
 axis_labels:
   polar:
-    x: "$u\\, [\\mathrm{m/s}]$"
-    y: "$v\\, [\\mathrm{m/s}]$"
+    x: "$u\\, [\\mathrm{m\\,s}^{-1}]$"
+    y: "$v\\, [\\mathrm{m\\,s}^{-1}]$"

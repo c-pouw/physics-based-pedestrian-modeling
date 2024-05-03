@@ -39,22 +39,25 @@ def plot_discrete_grid(config: dict):
     ax1.set_ylim(params.grid.bins.y[0], params.grid.bins.y[-1])
     ax1.set_aspect("equal")
     ax1.grid(False)
-    ax1.set_title(plot_params.title.position, y=1.1)
+    ax1.set_title(plot_params.title.position, y=1)
+
+    if plot_params.get("customyticklabels", False):
+        ax1.set_yticks(plot_params.customyticklabels)
 
     # * Subplot right: velocity grid
     ax2 = fig.add_subplot(spec[1], polar=True)
     ax2 = apply_polar_plot_style(ax2, params)
     ax2 = plot_polar_velocity_grid(ax2, params.grid)
     ax2 = plot_polar_labels(ax2, params.grid)
-    ax2.set_ylim(params.grid.bins.r[0], params.grid.bins.r[-1])
+    ax2.set_ylim(params.grid.bins.r[0], params.grid.bins.r[-2])
     ax2.grid(False)
-    ax2.set_title(plot_params.title.velocity, y=1.1)
+    ax2.set_title(plot_params.title.velocity, y=1)
 
     if plot_params.highlight_selection:
         ax1 = highlight_position_selection(ax1, params)
         ax2 = highlight_velocity_selection(ax2, params)
 
-    fig.suptitle(plot_params.title.figure, y=0.85)
+    fig.suptitle(plot_params.title.figure, y=0.9)
     filepath = Path.cwd() / (params.grid.name + ".pdf")
     plt.savefig(filepath, bbox_inches="tight")
     log.info("Saving plot of the grid to %s.", filepath.relative_to(config.root_dir))

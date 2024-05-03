@@ -62,9 +62,9 @@ def is_selected_point_within_grid(selected_point: OmegaConf, grid_bins: dict) ->
         log.info("The selectied point is located within the grid.")
 
 
-def get_boundaries_that_enclose_the_selected_point(selected_point: OmegaConf, bins: dict) -> dict:
-    left_bound = bins[selected_point]
-    right_bound = bins[selected_point + 1]
+def get_boundaries_that_enclose_the_selected_bin(bin_index: OmegaConf, bins: dict) -> dict:
+    left_bound = bins[bin_index]
+    right_bound = bins[bin_index + 1]
     return [left_bound, right_bound]
 
 
@@ -79,9 +79,17 @@ def get_index_of_the_enclosing_bin(selected_value: float, bins: np.ndarray) -> i
     Returns:
         int: The index of the bin that encloses the value.
     """
+    # ! Note that the value can be outside the range of the bins.
+    # ! In this case it returns the extrema i.e. 0 or len(bins).
+    if selected_value < bins[0]:
+        return np.nan
+    if selected_value > bins[-1]:
+        return np.nan
     shifted_bins = np.copy(bins) - bins[0]
+    # print(shifted_bins)
     selected_value = selected_value - bins[0]
-    return int(np.digitize(selected_value, shifted_bins) - 1)
+    # print(selected_value)
+    return int(np.digitize(selected_value, shifted_bins, right=False) - 1)
 
 
 def evaluate_selection_point(config):

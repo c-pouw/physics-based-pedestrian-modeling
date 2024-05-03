@@ -4,7 +4,7 @@ defaults:
   - override hydra/hydra_logging: colorlog
   - _self_
 read:
-  preprocessed_trajectories: True
+  preprocessed_trajectories: False
   piecewise_potential: False
   simulated_trajectories: False
 save:

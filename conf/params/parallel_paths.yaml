@@ -23,11 +23,11 @@ colnames:
   time: frame
 grid:
   x:
-    min: -2.5
-    max: 2.5
+    min: -2
+    max: 2
   y:
-    min: -4.5
-    max: 4.5
+    min: -3.8
+    max: 3.8
 selection:
   range:
     x: [-0.45, -0.45]
@@ -36,18 +36,19 @@ selection:
     theta: [0.15, 0.15]
     k: [1.2, 1.2]
 plot_style: conf/science.mplstyle
-default_xlims: [-2, 2.5]
+default_xlims: [-2, 2]
 default_ylims: [-4, 4]
 trajectory_plot:
   title: "paths in a wide corridor"
+  y_title: 0.9
   figsize: [3.54, 5]
   width_ratios: [2, 1]
   yps: [2.3, 0.8, -1.7]
-  ywalls: [3.6, -3.6]
+  ywalls: [3.8, -3.8]
   plot_walls: true
   plot_intended_path: true
   text_box:
-    x: 0.8
-    y: 0.7
+    x: 0.86
+    y: 0.3
 force_field_plot:
   figsize: [3.54, 2]

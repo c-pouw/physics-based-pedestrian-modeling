@@ -1,3 +1,4 @@
+import copy
 import logging
 from pathlib import Path
 
@@ -20,6 +21,28 @@ def compute_slow_modes_geert(xf: pd.Series, tau: float, dt: float) -> pd.Series:
     xs = xf.copy()
     xs.loc[:] = xslow
     return xs
+
+
+def low_pass_filter(x: pd.Series, tau: float, dt: float) -> pd.Series:
+    """
+    Simple first-order low-pass filter.
+
+    Args:
+        x: Input signal (list or numpy array).
+        tau: Time constant.
+        dt: Time step.
+
+    Returns:
+        y: Filtered signal.
+    """
+    # y = [0] * len(x)  # Initialize output array
+    y = copy.deepcopy(x)
+    alpha = dt / (tau + dt)
+
+    for i in range(1, len(x)):
+        y[i] = alpha * x[i] + (1 - alpha) * y[i - 1]
+
+    return y
 
 
 def compute_slow_modes_numpy(xf: pd.Series, tau: float, dt: float) -> np.ndarray:
@@ -67,12 +90,17 @@ def compute_slow_modes_convolve(xf: np.ndarray, tau: float, dt: float) -> np.nda
     return np.convolve(xf, weights, mode="same")
 
 
+def savgolfilter(xf: pd.Series, tau: float, dt: float) -> np.ndarray:
+    window_length = min(len(xf) - 1, 40)
+    return savgol_filter(xf, window_length, polyorder=1, deriv=0, mode="interp")
+
+
 def compute_all_slow_modes(
     trajectories: pd.DataFrame,
     observables: list,
     tau: float,
     dt: float,
-    slow_mode_algo=compute_slow_modes_numpy,
+    slow_mode_algo=None,
 ) -> pd.DataFrame:
     """
     Compute the slow mode for all the observables.
@@ -142,7 +170,6 @@ def rename_columns(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     colnames = parameters.get("colnames", {})
     inverted_colnames = {v: k for k, v in colnames.items()}
     df.rename(columns=inverted_colnames, inplace=True)
-    # df.rename(columns={"Rstep": "time", "Pid": "Pid", "t": "time"}, inplace=True)
     return df
 
 
@@ -197,15 +224,6 @@ def add_velocity(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
 
 
 def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
-    """_summary_
-
-    :param df: _description_
-    :type df: pd.DataFrame
-    :param parameters: _description_
-    :type parameters: dict
-    :return: _description_
-    :rtype: pd.DataFrame
-    """
     parameters = config.params
     filepath = Path.cwd().parent / config.filename.preprocessed_trajectories
 
@@ -214,20 +232,25 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         log.debug("Configuration 'read.preprocessed_trajectories' is set to True.")
         try:
             preprocessed_trajectories = read_trajectories_from_path(filepath)
-            log.info("---- Preprocessed trajectories succesfully read from file ----")
+            log.warning("Preprocessed trajectories read from file.")
             log.debug("Filepath %s", filepath.relative_to(config.root_dir))
             return preprocessed_trajectories
         except FileNotFoundError as e:
-            log.warning("Preprocessed trajectories not found: %s", e)
+            log.error("Preprocessed trajectories not found: %s", e)
 
-    log.info("---- Preprocess recorded trajectories ----")
+    log.info("Start preprocessing of the recorded trajectories.")
     # TODO : Use columnnames from parameters instead of renaming
     df = rename_columns(df, parameters)
     log.info("Columns renamed to %s", list(df.columns))
     df = prune_short_trajectories(df, parameters)
     log.info("Short trajectories pruned.")
-    df = add_velocity(df, parameters)
-    log.info("Velocity added.")
+
+    uf = parameters.colnames.get("uf", None)
+    vf = parameters.colnames.get("vf", None)
+    if uf is None or vf is None:
+        log.warning("Columns for velocity not found in parameters. Calculating velocity.")
+        df = add_velocity(df, parameters)
+        log.info("Velocity added.")
     df = add_trajectory_step(df, parameters)
     log.info("Trajectory step added.")
     df = add_velocity_in_polar_coordinates(df, mode="f")
@@ -237,7 +260,7 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         ["x", "y", "u", "v"],  # , "r", "theta"],
         tau=parameters["taux"],
         dt=parameters["dt"],
-        slow_mode_algo=compute_slow_modes_geert,
+        slow_mode_algo=savgolfilter,
     )
     df = add_velocity_in_polar_coordinates(df, mode="s")
     log.info("Slow modes computed.")
@@ -249,7 +272,7 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
 
 
 def filter_trajectories_by_velocity(df: pd.DataFrame) -> pd.DataFrame:
-    """Filter trajectories by mean velocity."""
+    """Filter trajectories by their average velocity."""
     log.info("Start filtering trajectories by velocity.")
     umin = 0.2
     df = df[df.groupby("Pid")["uf"].transform("mean") > umin]

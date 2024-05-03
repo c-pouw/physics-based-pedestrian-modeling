@@ -94,17 +94,16 @@ def plot_histogram(
         "simulated": config.params.simulation.ntrajs,
     }
     histogram_plot_params = config.params.histogram_plot
-    for traj_type in ["recorded", "simulated"]:
-        label = f"{traj_type.capitalize()} ($N =$ {ntrajs[traj_type]})"
+    for trajectory_type in ["recorded", "simulated"]:
+        label = f"{trajectory_type.capitalize()} ($N =$ {ntrajs[trajectory_type]})"
         ax.scatter(
-            histograms[traj_type][observable]["bin_centers"],
-            histograms[traj_type][observable][hist_type],
-            ec=histogram_plot_params[traj_type]["edgecolor"],
-            fc=histogram_plot_params[traj_type]["facecolor"],
+            histograms[trajectory_type][observable]["bin_centers"],
+            histograms[trajectory_type][observable][hist_type],
+            ec=histogram_plot_params[trajectory_type]["edgecolor"],
+            fc=histogram_plot_params[trajectory_type]["facecolor"],
             label=label,
-            s=histogram_plot_params[traj_type]["markersize"],
+            s=histogram_plot_params[trajectory_type]["markersize"],
         )
-    # ax.set_title(f"$D_{{KL}}={kl_div:.2f}$")
     ax.set_xlabel(histogram_plot_params[observable]["xlabel"])
     ax.set_ylabel(histogram_plot_params[observable]["ylabel"][hist_type])
     return ax
@@ -131,7 +130,6 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
 
     for plotid, observable in enumerate(observables):
         ax = fig.add_subplot(2, 2, plotid + 1)
-        # ax = fig.add_subplot(1, len(observables), plotid + 1)
 
         kldiv = sum(
             compute_KL_divergence(
@@ -148,20 +146,26 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
             hist_type=histogram_type,
             config=config,
         )
-        lims = hist_plot_params.get(f"{observable}lims", None)
-        ax.set_xlim(lims)
-
+        xlims = hist_plot_params.get(f"{observable}lims", None)
+        ax.set_xlim(xlims)
+        ymin, ymax = ax.get_ylim()
+        ax.set_ylim(ymin * 2, ymax * 2)
+        props = {"facecolor": "white", "alpha": 1, "edgecolor": "black", "lw": 0.5, "pad": 1.6}
+        ax.text(
+            0.215,
+            0.92,
+            f"$D_{{\\! K\\! L}}={kldiv:.3f}$",
+            transform=ax.transAxes,
+            ha="center",
+            va="center",
+            fontsize=6,
+            bbox=props,
+        )
         sum_kl_div += kldiv
 
     handles, labels = ax.get_legend_handles_labels()
 
     fig.legend(handles, labels, bbox_to_anchor=(0.5, -0.05), ncol=2, fontsize=7, loc="center")
-    # plt.suptitle(
-    #     f"Parameters: $\qquad \\tau_x = {params['taux']} \qquad \\tau_u = {params['tauu']} \qquad "
-    #     f"dt = {params['dt']} \qquad \sigma = {params['sigma']} \qquad \\sum{{D_{{KL}}}} = {sum_kl_div:.2f}$",
-    #     fontsize=16,
-    # )
-    # fig.text(-0.02, 0.5, "PDF", rotation=90)
     filepath = Path.cwd() / f"histograms_{params.env_name}.pdf"
     log.info("Saving histograms figure to %s.", filepath.relative_to(config.root_dir))
     plt.savefig(filepath)

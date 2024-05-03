@@ -6,8 +6,8 @@ xlimits:
 xlabel:
   x: "$(x \\, |\\, \\vec{x}_p, \\vec{u}_p)$ [m]"
   y: "$(y \\, |\\, \\vec{x}_p, \\vec{u}_p)$ [m]"
-  u: "$(u \\, |\\, \\vec{x}_p, \\vec{u}_p)$ [m/s]"
-  v: "$(v \\, |\\, \\vec{x}_p, \\vec{u}_p)$ [m/s]"
+  u: "$(u \\, |\\, \\vec{x}_p, \\vec{u}_p) [\\mathrm{m\\,s}^{-1}]$"
+  v: "$(v \\, |\\, \\vec{x}_p, \\vec{u}_p) [\\mathrm{m\\,s}^{-1}]$"
 ylabel:
   x: "$\\mathbb{P}(x \\, |\\, \\vec{x}_p, \\vec{u}_p)$"
   y: "$\\mathbb{P}(y \\, |\\, \\vec{x}_p, \\vec{u}_p)$"

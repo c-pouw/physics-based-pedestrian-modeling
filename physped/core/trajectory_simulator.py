@@ -26,10 +26,10 @@ def sample_trajectory_origins_from_heatmap(piecewise_potential, parameters: dict
 
 def sample_trajectory_origins_from_trajectories(piecewise_potential, parameters: dict) -> np.ndarray:
     ntrajs = np.min([parameters.simulation.ntrajs, parameters.input_ntrajs])
-    log.info("Sampling %d origins from the input trajectories.", ntrajs)
     sampled_origins = piecewise_potential.trajectory_origins.sample(n=ntrajs)
     # Stacking to go from [x,y,u,v] to [x,y,u,v,xs,ys,us,vs]
     sampled_origins = np.hstack((sampled_origins, sampled_origins))
+    log.info("Sampled %d origins from the input trajectories.", ntrajs)
     return sampled_origins
 
 
@@ -42,26 +42,23 @@ def simulate_trajectories(piecewise_potential, config: dict) -> pd.DataFrame:
         log.debug("Configuration 'read.simulated_trajectories' is set to True.")
         try:
             simulated_trajectories = read_trajectories_from_path(filepath)
-            log.info("---- Simulated trajectories succesfully read from file ----")
+            log.warning("Simulated trajectories read from file")
             log.debug("Filepath %s", filepath.relative_to(config.root_dir))
             return simulated_trajectories
         except FileNotFoundError as e:
-            log.warning("Preprocessed trajectories not found: %s", e)
+            log.error("Preprocessed trajectories not found: %s", e)
 
-    log.info("---- Simulate trajectories with piecewise potential ----")
+    log.info("Simulate trajectories using the piecewise potential")
     match config.params.simulation.sample_origins_from:
         case "heatmap":
-            log.warning("Trajectory origins are sampled from a heatmap.")
+            log.warning("Trajectory origins will be sampled from a heatmap.")
             origins = sample_trajectory_origins_from_heatmap(piecewise_potential, parameters)
         case "trajectories":
-            log.warning("Trajectory origins are sampled from the input trajectories.")
+            log.warning("Trajectory origins will be sampled from the input trajectories.")
             origins = sample_trajectory_origins_from_trajectories(piecewise_potential, parameters)
 
-    # Simulate trajectories
     lm = LangevinModel(piecewise_potential, parameters)
     t_eval = np.arange(parameters.simulation.start, parameters.simulation.end, parameters.simulation.step)
-    # simulation_time = params.get("simulation_time", [0, 10, 0.1])
-    # t_eval = np.arange(*simulation_time)
     trajectories = []
     Pid = 0
     with logging_redirect_tqdm():

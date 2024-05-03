@@ -8,63 +8,39 @@ defaults:
   - grid_plot: default_grid_plot
   - learn_piece_of_potential_plot: default_learn_piece_of_potential_plot
   - _self_
-env_name: station_paths
+env_name: intersecting_paths_synthetic
 taux: 2
 tauu: ${params.taux}
-fps: 10
+fps: 15
 dt: 0.1
 sigma: 0.5
 minimum_trajectory_length: 10
 input_ntrajs: ???
+colnames:
+  xf: x_pos
+  yf: y_pos
+  Pid: Pid
+  time: time
 grid:
   x:
-    min: 47
-    max: 73
+    min: -3
+    max: 3
   y:
-    min: -10
-    max: 4
-  # theta:
-    # min_multiple_pi: -0.125
-    # segments: 8
-simulation:
-  end: 50
-colnames:
-  xf: xf
-  yf: yf
-  Pid: Pid
-  time: date_time_utc
+    min: -3
+    max: 3
 selection:
-  point:
-    x: 50
-    y: 0.15
-    r: 0.75
-    theta: 0.15
-    k: 1.2
   range:
-    x: [50, 50]
+    x: [-0.45, -0.45]
     y: [0.15, 0.15]
     r: [0.75, 0.75]
     theta: [0.15, 0.15]
     k: [1.2, 1.2]
 plot_style: conf/science.mplstyle
-default_xlims: [45, 74]
-default_ylims: [-10, 5]
-background:
-  imgpath: 'data/backgrounds/EHV.Perron2.1_multisensor_1.png'
-  alpha: 1
-  xmin: -6039
-  xmax: 75091
-  ymin: -16539
-  ymax: 10909
+default_xlims: [-2.5, 2.5]
+default_ylims: [-2.5, 2.5]
 trajectory_plot:
-  title: "paths on a train platform"
-  figsize: [3.54, 3]
-  y_title: 0.8
-  show_background: true
-  plot_cartesian_grid: False
-  text_box:
-    x: 0.86
-    y: 0.25
+  title: "intersecting paths"
+  y_title: 1.05
 force_field_plot:
   figsize: [3.54, 2]
 learn_piece_of_potential_plot:

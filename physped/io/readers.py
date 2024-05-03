@@ -1,13 +1,15 @@
 """Trajectory readers for the pathintegral code."""
 
+import io
 import logging
 import pickle
 import zipfile
-from io import StringIO
 from pathlib import Path
 from zipfile import ZipFile
 
+import numpy as np
 import pandas as pd
+import requests
 from tqdm import tqdm
 
 from physped.core.piecewise_potential import PiecewisePotential
@@ -42,21 +44,35 @@ def read_minimal_dataset_for_testing(config) -> pd.DataFrame:
 
 def read_single_paths(config) -> pd.DataFrame:
     """Read the single paths data set."""
-    trajectory_data_dir = Path(config.trajectory_data_dir)
-    log.info("Start reading single paths data set.")
-    archive = zipfile.ZipFile(trajectory_data_dir / "data.zip")
+    # trajectory_data_dir = Path(config.trajectory_data_dir)
+    # log.info("Start reading single paths data set.")
+    # archive = zipfile.ZipFile(trajectory_data_dir / "data.zip")
 
-    with archive.open("left-to-right.ssv") as f:
-        data_str = f.read().decode("utf-8")
+    # with archive.open("left-to-right.ssv") as f:
+    #     data_str = f.read().decode("utf-8")
 
-    df1 = pd.read_csv(StringIO(data_str), sep=" ")
+    # df1 = pd.read_csv(StringIO(data_str), sep=" ")
 
-    with archive.open("right-to-left.ssv") as f:
-        data_str = f.read().decode("utf-8")
+    # with archive.open("right-to-left.ssv") as f:
+    #     data_str = f.read().decode("utf-8")
 
-    df2 = pd.read_csv(StringIO(data_str), sep=" ")
+    link = "https://data.4tu.nl/ndownloader/items/b8e30f8c-3931-4604-842a-77c7fb8ac3fc/versions/1"
+    bytestring = requests.get(link, timeout=10)
+    with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as outerzip:
+        with zipfile.ZipFile(outerzip.open("data.zip")) as innerzip:
+            with innerzip.open("left-to-right.ssv") as paths_ltr:
+                paths_ltr = paths_ltr.read().decode("utf-8")
+            with innerzip.open("right-to-left.ssv") as paths_rtl:
+                paths_rtl = paths_rtl.read().decode("utf-8")
+
+    df1 = pd.read_csv(io.StringIO(paths_ltr), sep=" ")
+    df2 = pd.read_csv(io.StringIO(paths_rtl), sep=" ")
     df = pd.concat([df1, df2], ignore_index=True)
+
+    # df2 = pd.read_csv(io.StringIO(data_str), sep=" ")
+    # df = pd.concat([df1, df2], ignore_index=True)
     df["X_SG"] = df["X_SG"] + 0.1
+    df["Y_SG"] = df["Y_SG"] - 0.05
     df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
     log.info("Finished reading single paths data set.")
     return df
@@ -68,6 +84,8 @@ def read_parallel_paths(config) -> pd.DataFrame:
     file_path = trajectory_data_dir / "df_single_pedestrians_small.h5"
     df = pd.read_hdf(file_path)
     df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
+    df["xf"] = df["xf"] - 0.4
+    df["yf"] = df["yf"] + 0.3
     df["Pid"] = df.groupby(["Pid", "day_id"]).ngroup()
     df.reset_index(inplace=True)
     df = df.query("Umean>0.5").loc[abs(df.X0 - df.X1) > 2]
@@ -76,7 +94,7 @@ def read_parallel_paths(config) -> pd.DataFrame:
     return df
 
 
-def read_intersecting_paths(config) -> pd.DataFrame:
+def read_intersecting_paths_synthetic(config) -> pd.DataFrame:
     """Read the intersecting paths data set."""
     trajectory_data_dir = Path(config.trajectory_data_dir)
     file_path = trajectory_data_dir / "simulations_crossing.parquet"
@@ -87,13 +105,73 @@ def read_intersecting_paths(config) -> pd.DataFrame:
     return df
 
 
-def read_curved_paths(config) -> pd.DataFrame:
+def read_intersecting_paths(config) -> pd.DataFrame:
+    link = "https://data.4tu.nl/ndownloader/items/b8e30f8c-3931-4604-842a-77c7fb8ac3fc/versions/1"
+    bytestring = requests.get(link, timeout=10)
+    with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as outerzip:
+        with zipfile.ZipFile(outerzip.open("data.zip")) as innerzip:
+            with innerzip.open("left-to-right.ssv") as paths_ltr:
+                paths_ltr = paths_ltr.read().decode("utf-8")
+            with innerzip.open("right-to-left.ssv") as paths_rtl:
+                paths_rtl = paths_rtl.read().decode("utf-8")
+
+    df1 = pd.read_csv(io.StringIO(paths_ltr), sep=" ")
+    df1["X_SG"] = df1["X_SG"] + 0.1
+    df1["Y_SG"] = df1["Y_SG"] - 0.05
+
+    df2 = pd.read_csv(io.StringIO(paths_rtl), sep=" ")
+    df2["X_SG"] = df2["X_SG"] + 0.1
+    df2["Y_SG"] = df2["Y_SG"] - 0.05
+    df2.rename(  # swap x and y coordinates
+        columns={"X": "Y", "Y": "X", "X_SG": "Y_SG", "Y_SG": "X_SG", "U_SG": "V_SG", "V_SG": "U_SG"}, inplace=True
+    )
+
+    df = pd.concat([df1, df2], ignore_index=True)
+
+    # df2 = pd.read_csv(io.StringIO(data_str), sep=" ")
+    # df = pd.concat([df1, df2], ignore_index=True)
+    # df["X_SG"] = df["X_SG"] + 0.1
+    # df["Y_SG"] = df["Y_SG"] - 0.05
+    # df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
+    log.info("Finished reading single paths data set.")
+    return df
+
+
+def read_curved_paths_synthetic(config) -> pd.DataFrame:
     """Read the curved paths data set."""
     trajectory_data_dir = Path(config.trajectory_data_dir)
     file_path = trajectory_data_dir / "artificial_measurements_ellipse.parquet"
     df = pd.read_parquet(file_path)
     df = df.rename(columns={"x": "xf", "y": "yf", "xdot": "uf", "ydot": "vf"})
     return df
+
+
+def read_curved_paths(config) -> pd.DataFrame:
+    trajectory_data_dir = Path(config.trajectory_data_dir)
+    trajs = pd.read_csv(trajectory_data_dir / "linecross-1.csv")
+    pid_column = "particle"
+    # x_column = 'x'
+    # y_column = 'y'
+    time_column = "time"
+    conversion_X = 2.30405921919033
+    conversion_Y = 2.35579871138595
+    trajs = trajs[trajs.frame > 380].copy()
+    trajs["x"] = trajs["x"] - np.mean(trajs["x"])
+    trajs["y"] = trajs["y"] - np.mean(trajs["y"])
+    trajs["x"] = trajs["x"] * conversion_X / 100
+    trajs["y"] = trajs["y"] * conversion_Y / 100
+
+    trajs["v_x_m"] = trajs["v_x_m"].replace(-99, np.nan).interpolate()
+    trajs["v_y_m"] = trajs["v_y_m"].replace(-99, np.nan).interpolate()
+
+    trajs["traj_len"] = trajs.groupby([pid_column])[pid_column].transform("size")
+    trajs = trajs[trajs.traj_len > 10].copy()
+    trajs.sort_values(by=[pid_column, time_column], inplace=True)
+    trajs["k"] = trajs.groupby(pid_column)[pid_column].transform(lambda x: np.arange(x.size))
+    trajs["kp"] = trajs["k"] // 320
+    trajs["new_pid"] = trajs.apply(lambda x: int(f"{x[pid_column]:06}{x['kp']:04}"), axis=1)
+    # trajs["new_pid"] = trajs[pid_column] * 100000 + trajs["kp"] + 100
+    return trajs
 
 
 def read_station_paths(config) -> pd.DataFrame:
@@ -196,7 +274,9 @@ trajectory_reader = {
     "single_paths": read_single_paths,
     "parallel_paths": read_parallel_paths,
     "intersecting_paths": read_intersecting_paths,
+    "intersecting_paths_synthetic": read_intersecting_paths_synthetic,
     "curved_paths": read_curved_paths,
+    "curved_paths_synthetic": read_curved_paths_synthetic,
     "station_paths": read_station_paths,
     "minimal_dataset_for_testing": read_minimal_dataset_for_testing,
     # "ehv_azure": read_ehv_station_paths_from_azure,

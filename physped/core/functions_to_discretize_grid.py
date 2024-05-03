@@ -48,12 +48,13 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: dict) 
         log.debug("Configuration 'read.simulated_trajectories' is set to True.")
         try:
             piecewise_potential = read_piecewise_potential_from_file(filepath)
-            log.info("---- Piecewise potential succesfully read from file ----")
+            log.warning("Piecewise potential read from file")
             log.debug("Filepath %s", filepath.relative_to(config.root_dir))
             return piecewise_potential
         except FileNotFoundError as e:
-            log.warning("Piecewise potential not found: %s", e)
+            log.error("Piecewise potential not found: %s", e)
 
+    log.info("Start learning the piecewise potential")
     piecewise_potential = PiecewisePotential(grid_bins)
     trajectories = digitize_trajectories_to_grid(piecewise_potential.bins, trajectories)
     piecewise_potential.histogram = add_trajectories_to_histogram(

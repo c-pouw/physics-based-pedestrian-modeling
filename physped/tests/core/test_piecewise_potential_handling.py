@@ -37,14 +37,23 @@ bins2 = np.arange(-1, 3, 0.5)
 test_data = [
     (bins1, 0, 0),
     (bins1, 1.0, 2),
+    (bins1, -100, np.nan),
+    (bins1, 100, np.nan),
     (bins2, 0, 2),
     (bins2, 1.0, 4),
+    (bins2, -1, 0),
+    (bins2, -100, np.nan),
+    (bins2, 100, np.nan),
 ]
 
 
 @pytest.mark.parametrize("bins,selected_value,expected_index", test_data)
 def test_point_selection(bins, selected_value, expected_index):
-    assert get_index_of_the_enclosing_bin(selected_value, bins) == expected_index
+    assert np.allclose(
+        get_index_of_the_enclosing_bin(selected_value, bins),
+        expected_index,
+        equal_nan=True,
+    )
 
 
 test_data = [
