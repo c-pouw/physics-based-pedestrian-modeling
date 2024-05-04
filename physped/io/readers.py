@@ -221,10 +221,21 @@ def read_station_paths(config) -> pd.DataFrame:
 
 
 def read_asdz_pf34(config) -> pd.DataFrame:
-    trajectory_data_dir = Path(config.trajectory_data_dir)
-    file_path = trajectory_data_dir / "Amsterdam Zuid - platform 3-4 - set1.csv"
-    df = pd.read_csv(file_path)
-    # df.rename({"xf": "yf", "yf": "xf", "uf": "vf", "vf": "uf"}, axis=1, inplace=True)
+    source = "4tu"
+    if source == "local":
+        trajectory_data_dir = Path(config.trajectory_data_dir)
+        file_path = trajectory_data_dir / "Amsterdam Zuid - platform 3-4 - set1.csv"
+        df = pd.read_csv(file_path)
+    elif source == "4tu":
+        link = "https://data.4tu.nl/file/7d78a5e3-6142-49fe-be03-e4c707322863/40ea5cd9-95dc-4e3c-8760-7f4dd543eae7"
+        bytestring = requests.get(link, timeout=10)
+
+        with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as zipped_file:
+            with zipped_file.open("Amsterdam Zuid - platform 3-4 - set1.csv") as paths:
+                paths = paths.read().decode("utf-8")
+
+        df = pd.read_csv(io.StringIO(paths), sep=",")
+
     df["x_pos"] /= 1000
     df["y_pos"] /= 1000
     return df
