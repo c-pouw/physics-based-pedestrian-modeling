@@ -5,7 +5,6 @@ import logging
 import pickle
 import zipfile
 from pathlib import Path
-from zipfile import ZipFile
 
 import numpy as np
 import pandas as pd
@@ -31,47 +30,46 @@ def read_piecewise_potential_from_file(filepath: Path) -> PiecewisePotential:
     return val
 
 
-def read_minimal_dataset_for_testing(config) -> pd.DataFrame:
-    """Read the single paths data set."""
-    log.info("Start reading single paths data set.")
-    trajectory_data_dir = Path(config.trajectory_data_dir)
-    with ZipFile(trajectory_data_dir / "minimal_test_dataset.zip", "r") as archive:
-        with archive.open("single_paths_rtl.csv") as f:
-            paths = pd.read_csv(f)
+# def read_minimal_dataset_for_testing(config) -> pd.DataFrame:
+#     """Read the single paths data set."""
+#     log.info("Start reading single paths data set.")
+#     trajectory_data_dir = Path(config.trajectory_data_dir)
+#     with ZipFile(trajectory_data_dir / "minimal_test_dataset.zip", "r") as archive:
+#         with archive.open("single_paths_rtl.csv") as f:
+#             paths = pd.read_csv(f)
 
-    log.info("Finished reading single paths data set.")
-    return paths
+#     log.info("Finished reading single paths data set.")
+#     return paths
 
 
 def read_single_paths(config) -> pd.DataFrame:
     """Read the single paths data set."""
-    # trajectory_data_dir = Path(config.trajectory_data_dir)
-    # log.info("Start reading single paths data set.")
-    # archive = zipfile.ZipFile(trajectory_data_dir / "data.zip")
+    source = "4tu"
+    if source == "local":
+        trajectory_data_dir = Path(config.trajectory_data_dir)
+        log.info("Start reading single paths data set.")
+        archive = zipfile.ZipFile(trajectory_data_dir / "data.zip")
 
-    # with archive.open("left-to-right.ssv") as f:
-    #     data_str = f.read().decode("utf-8")
+        with archive.open("left-to-right.ssv") as f:
+            paths_ltr = f.read().decode("utf-8")
 
-    # df1 = pd.read_csv(StringIO(data_str), sep=" ")
+        with archive.open("right-to-left.ssv") as f:
+            paths_rtl = f.read().decode("utf-8")
 
-    # with archive.open("right-to-left.ssv") as f:
-    #     data_str = f.read().decode("utf-8")
-
-    link = "https://data.4tu.nl/ndownloader/items/b8e30f8c-3931-4604-842a-77c7fb8ac3fc/versions/1"
-    bytestring = requests.get(link, timeout=10)
-    with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as outerzip:
-        with zipfile.ZipFile(outerzip.open("data.zip")) as innerzip:
-            with innerzip.open("left-to-right.ssv") as paths_ltr:
-                paths_ltr = paths_ltr.read().decode("utf-8")
-            with innerzip.open("right-to-left.ssv") as paths_rtl:
-                paths_rtl = paths_rtl.read().decode("utf-8")
+    elif source == "4tu":
+        link = "https://data.4tu.nl/ndownloader/items/b8e30f8c-3931-4604-842a-77c7fb8ac3fc/versions/1"
+        bytestring = requests.get(link, timeout=10)
+        with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as outerzip:
+            with zipfile.ZipFile(outerzip.open("data.zip")) as innerzip:
+                with innerzip.open("left-to-right.ssv") as paths_ltr:
+                    paths_ltr = paths_ltr.read().decode("utf-8")
+                with innerzip.open("right-to-left.ssv") as paths_rtl:
+                    paths_rtl = paths_rtl.read().decode("utf-8")
 
     df1 = pd.read_csv(io.StringIO(paths_ltr), sep=" ")
     df2 = pd.read_csv(io.StringIO(paths_rtl), sep=" ")
     df = pd.concat([df1, df2], ignore_index=True)
 
-    # df2 = pd.read_csv(io.StringIO(data_str), sep=" ")
-    # df = pd.concat([df1, df2], ignore_index=True)
     df["X_SG"] = df["X_SG"] + 0.1
     df["Y_SG"] = df["Y_SG"] - 0.05
     df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
@@ -337,6 +335,6 @@ trajectory_reader = {
     "curved_paths_synthetic": read_curved_paths_synthetic,
     "station_paths": read_station_paths,
     "asdz_pf34": read_asdz_pf34,
-    "minimal_dataset_for_testing": read_minimal_dataset_for_testing,
+    # "minimal_dataset_for_testing": read_minimal_dataset_for_testing,
     # "ehv_azure": read_ehv_station_paths_from_azure,
 }

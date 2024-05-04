@@ -1,5 +1,5 @@
 defaults:
-  - params: minimal_dataset_for_testing
+  - params: single_paths
   - override hydra/job_logging: colorlog
   - override hydra/hydra_logging: colorlog
   - _self_
