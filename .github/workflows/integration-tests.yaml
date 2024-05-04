@@ -55,7 +55,7 @@ jobs:
       - name: Test Integration
         run: |
           set -vxeuo pipefail
-          python scripts/main.py params=single_paths root_dir=$GITHUB_WORKSPACE
+          python scripts/main.py params=single_paths root_dir=$GITHUB_WORKSPACE plot_style="${GITHUB_WORKSPACE}/conf/science_no_latex.mplstyle"
 
       - uses: actions/upload-artifact@v3
         with:
