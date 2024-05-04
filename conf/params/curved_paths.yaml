@@ -11,25 +11,25 @@ defaults:
 env_name: curved_paths
 taux: 2
 tauu: ${params.taux}
-fps: 10
-dt: 0.1
-sigma: 0.5
+fps: 30
+dt: 0.0333
+sigma: 1
 minimum_trajectory_length: 10
 input_ntrajs: ???
 colnames:
   xf: x
   yf: 'y'
-  uf: v_x_m
-  vf: v_y_m
+  # uf: v_x_m
+  # vf: v_y_m
   Pid: new_pid
   time: time
 grid:
   x:
-    min: -2.7
-    max: 2.8
+    min: -4
+    max: 4
   y:
-    min: -1.8
-    max: 1.9
+    min: -2.5
+    max: 2.5
 simulation:
   end: 20
   step: 0.1
@@ -42,8 +42,8 @@ selection:
     theta: [0.15, 0.15]
     k: [1.2, 1.2]
 plot_style: conf/science.mplstyle
-default_xlims: [-3,3]
-default_ylims:  [-2,2]
+default_xlims: [-4.5,4.5]
+default_ylims:  [-3,3]
 trajectory_plot:
   title: "curved paths"
   y_title: 0.9

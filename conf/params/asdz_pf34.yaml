@@ -1,0 +1,75 @@
+defaults:
+  - grid: default_grid
+  - simulation: default_simulation_params
+  - selection: default_selection
+  - trajectory_plot: default_trajectory_plot_params
+  - histogram_plot: default_histogram_plot_params
+  - force_field_plot: default_force_field_plot_params
+  - grid_plot: default_grid_plot
+  - learn_piece_of_potential_plot: default_learn_piece_of_potential_plot
+  - _self_
+env_name: asdz_pf34
+taux: 2
+tauu: ${params.taux}
+fps: 10
+dt: 0.1
+sigma: 0.5
+minimum_trajectory_length: 10
+input_ntrajs: ???
+grid:
+  x:
+    min: -21
+    max: 7
+  y:
+    min: -8
+    max: 3
+  # theta:
+    # min_multiple_pi: -0.125
+    # segments: 8
+simulation:
+  end: 50
+colnames:
+  xf: x_pos
+  yf: y_pos
+  Pid: tracked_object
+  time: timestampms
+# selection:
+#   point:
+#     x: 50
+#     y: 0.15
+#     r: 0.75
+#     theta: 0.15
+#     k: 1.2
+#   range:
+#     x: [50, 50]
+#     y: [0.15, 0.15]
+#     r: [0.75, 0.75]
+#     theta: [0.15, 0.15]
+#     k: [1.2, 1.2]
+plot_style: conf/science.mplstyle
+default_xlims: [-22, 8]
+default_ylims: [-9, 4]
+# background:
+#   imgpath: 'data/backgrounds/EHV.Perron2.1_multisensor_1.png'
+#   alpha: 1
+#   xmin: -6039
+#   xmax: 75091
+#   ymin: -16539
+#   ymax: 10909
+trajectory_plot:
+  title: "paths on a train platform"
+  figsize: [3.54, 3]
+  y_title: 0.8
+  show_background: false
+  plot_cartesian_grid: False
+  text_box:
+    x: 0.86
+    y: 0.25
+force_field_plot:
+  figsize: [3.54, 2]
+learn_piece_of_potential_plot:
+  xlimits:
+    x: [0, 1]
+    y: [-0.5, 0.5]
+    u: [0.5, 1.5]
+    v: [-0.5, 0.5]

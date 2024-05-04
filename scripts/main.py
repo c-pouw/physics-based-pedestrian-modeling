@@ -70,6 +70,7 @@ def main(config):
         log.info("Plot probability distribution comparison.")
         log.debug("Configuration 'plot.histograms' is set to True.")
         observables = ["xf", "yf", "uf", "vf"]
+        config.params.simulation.ntrajs = len(simulated_trajectories.Pid.unique())
         histograms = create_all_histograms(preprocessed_trajectories, simulated_trajectories, config)
         plot_multiple_histograms(observables, histograms, "PDF", config)
     else:

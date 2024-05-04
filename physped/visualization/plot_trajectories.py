@@ -25,75 +25,7 @@ from physped.visualization.plot_utils import (
 
 log = logging.getLogger(__name__)
 
-# trajectory_colorset = [
-#     "#4477AA",
-#     "#EE6677",
-#     "#228833",
-#     "#CCBB44",
-#     "#66CCEE",
-#     "#AA3377",
-#     "#BBBBBB",
-#     "#000000",
-#     "#004488",
-#     "#DDAA33",
-#     "#BB5566",
-#     "#000000",
-#     "#EE7733",
-#     "#0077BB",
-#     "#33BBEE",
-#     "#EE3377",
-#     "#CC3311",
-#     "#009988",
-#     "#BBBBBB",
-#     "#000000",
-#     "#CC6677",
-#     "#332288",
-#     "#DDCC77",
-#     "#117733",
-#     "#88CCEE",
-#     "#882255",
-#     "#44AA99",
-#     "#999933",
-#     "#AA4499",
-#     "#DDDDDD",
-#     "#000000",
-#     "#6699CC",
-#     "#004488",
-#     "#EECC66",
-#     "#994455",
-#     "#997700",
-#     "#EE99AA",
-#     "#000000",
-#     "#BBCCEE",
-#     "#FFCCCC",
-#     "#CCDDAA",
-#     "#EEEEBB",
-#     "#CCEEFF",
-#     "#DDDDDD",
-#     "#000000",
-#     "#222255",
-#     "#663333",
-#     "#225522",
-#     "#666633",
-#     "#225555",
-#     "#555555",
-#     "#000000",
-#     "#77AADD",
-#     "#EE8866",
-#     "#EEDD88",
-#     "#FFAABB",
-#     "#99DDFF",
-#     "#44BB99",
-#     "#BBCC33",
-#     "#AAAA00",
-#     "#DDDDDD",
-#     "#000000",
-# ]
 trajectory_colorset = list(palettes.TolRainbow23)
-# trajectory_colorset = list(set(trajectory_colorset))
-# random.shuffle(trajectory_colorset)
-# Set the default color cycle
-# mpl.rcParams["axes.prop_cycle"] = mpl.cycler(color=trajectory_colorset)
 
 
 def plot_position_trajectories_in_cartesian_coordinates(ax: plt.Axes, df: pd.DataFrame) -> plt.Axes:
@@ -109,9 +41,7 @@ def plot_position_trajectories_in_cartesian_coordinates(ax: plt.Axes, df: pd.Dat
     """
     for i, ped_id in enumerate(df.Pid.unique()):
         path = df[df["Pid"] == ped_id]
-        # color = f"C{int(ped_id%len(plt.rcParams['axes.prop_cycle'].by_key()['color']))}"
         color = trajectory_colorset[i % len(trajectory_colorset)]
-        # color = trajectory_colorset
 
         # * Plot the starting point of the trajectory
         ax.plot(
@@ -138,7 +68,6 @@ def plot_velocity_trajectories_in_polar_coordinates(ax: plt.Axes, df: pd.DataFra
             lw=0.9,
             alpha=0.8,
             zorder=0,
-            # c=f"C{int(ped_id%len(plt.rcParams['axes.prop_cycle'].by_key()['color']))}",
             color=trajectory_colorset[i % len(trajectory_colorset)],
         )
 

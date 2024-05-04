@@ -93,9 +93,13 @@ def plot_histogram(
         "recorded": config.params.input_ntrajs,
         "simulated": config.params.simulation.ntrajs,
     }
+    labels = {
+        "recorded": f"Measurements ($N =$ {ntrajs['recorded']})",
+        "simulated": f"Simulations ($N =$ {ntrajs['simulated']})",
+    }
     histogram_plot_params = config.params.histogram_plot
     for trajectory_type in ["recorded", "simulated"]:
-        label = f"{trajectory_type.capitalize()} ($N =$ {ntrajs[trajectory_type]})"
+        label = labels[trajectory_type]
         ax.scatter(
             histograms[trajectory_type][observable]["bin_centers"],
             histograms[trajectory_type][observable][hist_type],

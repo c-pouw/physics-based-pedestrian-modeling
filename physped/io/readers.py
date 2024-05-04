@@ -10,6 +10,7 @@ from zipfile import ZipFile
 import numpy as np
 import pandas as pd
 import requests
+from scipy import signal
 from tqdm import tqdm
 
 from physped.core.piecewise_potential import PiecewisePotential
@@ -146,18 +147,54 @@ def read_curved_paths_synthetic(config) -> pd.DataFrame:
     return df
 
 
+def filter_trajectory(df, cutoff=0.16, order=4):
+    b, a = signal.butter(order, cutoff, "low")
+    df = df.sort_values(["particle", "time"])
+    df = df.groupby("particle").filter(lambda x: len(x) > 52)
+
+    f_df = df.groupby(df["particle"]).apply(
+        lambda x: pd.DataFrame(signal.filtfilt(b, a, x[["x", "y"]].values, axis=0))
+    )
+    df[["x", "y"]] = f_df.set_index(df.index)
+    return df
+
+
 def read_curved_paths(config) -> pd.DataFrame:
+    # trajectory_data_dir = Path(config.trajectory_data_dir)
+    # trajs = pd.read_csv(trajectory_data_dir / "linecross-2.csv")
+    # pid_column = "particle"
+    # # x_column = 'x'
+    # # y_column = 'y'
+    # time_column = "time"
+    # conversion_X = 2.30405921919033
+    # conversion_Y = 2.35579871138595
+    # trajs = trajs[trajs.frame > 380].copy()
+    # trajs["x"] = trajs["x"] - np.mean(trajs["x"]) - 30
+    # trajs["y"] = trajs["y"] - np.mean(trajs["y"]) + 35
+    # trajs["x"] = trajs["x"] * conversion_X / 100
+    # trajs["y"] = trajs["y"] * conversion_Y / 100
+
     trajectory_data_dir = Path(config.trajectory_data_dir)
     trajs = pd.read_csv(trajectory_data_dir / "linecross-1.csv")
+    trajs = filter_trajectory(trajs)
     pid_column = "particle"
-    # x_column = 'x'
-    # y_column = 'y'
     time_column = "time"
     conversion_X = 2.30405921919033
     conversion_Y = 2.35579871138595
     trajs = trajs[trajs.frame > 380].copy()
-    trajs["x"] = trajs["x"] - np.mean(trajs["x"])
-    trajs["y"] = trajs["y"] - np.mean(trajs["y"])
+    trajs["x"] = trajs["x"] - np.mean(trajs["x"]) - 30
+    trajs["y"] = trajs["y"] - np.mean(trajs["y"]) + 35
+    trajs1 = trajs.copy()
+
+    trajs = pd.read_csv(trajectory_data_dir / "linecross-2.csv")
+    trajs = filter_trajectory(trajs)
+    trajs = trajs[trajs.frame > 380].copy()
+    trajs["x"] = trajs["x"] - np.mean(trajs["x"]) + 17
+    trajs["y"] = trajs["y"] - np.mean(trajs["y"]) + 33
+    trajs[pid_column] += np.max(trajs1[pid_column])
+    trajs2 = trajs.copy()
+
+    trajs = pd.concat([trajs1, trajs2])
     trajs["x"] = trajs["x"] * conversion_X / 100
     trajs["y"] = trajs["y"] * conversion_Y / 100
 
@@ -180,6 +217,16 @@ def read_station_paths(config) -> pd.DataFrame:
     file_path = trajectory_data_dir / "trajectories_EHV_platform_2_1_refined.parquet"
     df = pd.read_parquet(file_path)
     df.rename({"xf": "yf", "yf": "xf", "uf": "vf", "vf": "uf"}, axis=1, inplace=True)
+    return df
+
+
+def read_asdz_pf34(config) -> pd.DataFrame:
+    trajectory_data_dir = Path(config.trajectory_data_dir)
+    file_path = trajectory_data_dir / "Amsterdam Zuid - platform 3-4 - set1.csv"
+    df = pd.read_csv(file_path)
+    # df.rename({"xf": "yf", "yf": "xf", "uf": "vf", "vf": "uf"}, axis=1, inplace=True)
+    df["x_pos"] /= 1000
+    df["y_pos"] /= 1000
     return df
 
 
@@ -278,6 +325,7 @@ trajectory_reader = {
     "curved_paths": read_curved_paths,
     "curved_paths_synthetic": read_curved_paths_synthetic,
     "station_paths": read_station_paths,
+    "asdz_pf34": read_asdz_pf34,
     "minimal_dataset_for_testing": read_minimal_dataset_for_testing,
     # "ehv_azure": read_ehv_station_paths_from_azure,
 }

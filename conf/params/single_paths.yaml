@@ -13,7 +13,7 @@ taux: 2
 tauu: ${params.taux}
 fps: 15
 dt: ${inv_prop:${params.fps}}
-sigma: 0.4
+sigma: 0.5
 minimum_trajectory_length: 5
 input_ntrajs: ???
 grid:

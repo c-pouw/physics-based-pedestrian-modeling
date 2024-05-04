@@ -13,7 +13,7 @@ taux: 2
 tauu: ${params.taux}
 fps: 15
 dt: 0.1
-sigma: 0.4
+sigma: 0.5
 minimum_trajectory_length: 10
 input_ntrajs: ???
 colnames:
