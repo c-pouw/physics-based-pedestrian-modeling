@@ -260,7 +260,7 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         ["x", "y", "u", "v"],  # , "r", "theta"],
         tau=parameters["taux"],
         dt=parameters["dt"],
-        slow_mode_algo=savgolfilter,
+        slow_mode_algo=compute_slow_modes_geert,
     )
     df = add_velocity_in_polar_coordinates(df, mode="s")
     log.info("Slow modes computed.")

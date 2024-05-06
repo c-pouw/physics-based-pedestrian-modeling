@@ -49,7 +49,7 @@ class LangevinModel:
         - dz/dt: Derivatives of the state vector (uf, vf, ufdot, vfdot, xsdot, ysdot, usdot, vsdot).
 
         """
-        # Can we precompute certain quantities to make the processing faster?
+        # ? Can we precompute certain quantities to make the processing faster?
         xf, yf, uf, vf, xs, ys, us, vs = X_0
         # check stopping condition
         # Either position out of domain or position in unexplored grid cell
@@ -82,7 +82,7 @@ class LangevinModel:
         ysdot = -1 / self.params["taux"] * (ys - yf)
         usdot = -1 / self.params["tauu"] * (us - uf)
         vsdot = -1 / self.params["tauu"] * (vs - vf)
-        # k += 1
+
         # return derivatives
         return np.array([uf, vf, ufdot, vfdot, xsdot, ysdot, usdot, vsdot])
 

@@ -44,8 +44,7 @@ def read_piecewise_potential_from_file(filepath: Path) -> PiecewisePotential:
 
 def read_single_paths(config) -> pd.DataFrame:
     """Read the single paths data set."""
-    source = "4tu"
-    if source == "local":
+    if config.params.data_source == "local":
         trajectory_data_dir = Path(config.trajectory_data_dir)
         log.info("Start reading single paths data set.")
         archive = zipfile.ZipFile(trajectory_data_dir / "data.zip")
@@ -56,7 +55,7 @@ def read_single_paths(config) -> pd.DataFrame:
         with archive.open("right-to-left.ssv") as f:
             paths_rtl = f.read().decode("utf-8")
 
-    elif source == "4tu":
+    elif config.params.data_source == "4tu":
         link = "https://data.4tu.nl/ndownloader/items/b8e30f8c-3931-4604-842a-77c7fb8ac3fc/versions/1"
         bytestring = requests.get(link, timeout=10)
         with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as outerzip:
@@ -219,12 +218,11 @@ def read_station_paths(config) -> pd.DataFrame:
 
 
 def read_asdz_pf34(config) -> pd.DataFrame:
-    source = "4tu"
-    if source == "local":
+    if config.params.data_source == "local":
         trajectory_data_dir = Path(config.trajectory_data_dir)
         file_path = trajectory_data_dir / "Amsterdam Zuid - platform 3-4 - set1.csv"
         df = pd.read_csv(file_path)
-    elif source == "4tu":
+    elif config.params.data_source == "4tu":
         link = "https://data.4tu.nl/file/7d78a5e3-6142-49fe-be03-e4c707322863/40ea5cd9-95dc-4e3c-8760-7f4dd543eae7"
         bytestring = requests.get(link, timeout=10)
 

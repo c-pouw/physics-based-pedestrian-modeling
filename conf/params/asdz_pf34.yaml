@@ -9,6 +9,7 @@ defaults:
   - learn_piece_of_potential_plot: default_learn_piece_of_potential_plot
   - _self_
 env_name: asdz_pf34
+data_source: 4tu
 taux: 2
 tauu: ${params.taux}
 fps: 10
