@@ -38,6 +38,22 @@ class LangevinModel:
         self.grid_counts = np.sum(potential.histogram, axis=(2, 3, 4))
         self.heatmap = np.sum(potential.histogram, axis=(2, 3, 4)) / np.sum(potential.histogram)
 
+    def simulate(self, X_0: np.ndarray, t_eval: np.ndarray = np.arange(0, 10, 0.1)) -> np.ndarray:
+        """
+        Simulates the Langevin model.
+
+        Parameters:
+        - X_0: np.ndarray
+            The initial state of the system.
+        - t_eval: np.ndarray, optional
+            The time points at which to evaluate the solution. Default is np.arange(0, 10, 0.1).
+
+        Returns:
+        - np.ndarray
+            The simulated trajectory of the system.
+        """
+        return sdeint.itoSRI2(self.modelxy, self.Noise, y0=X_0, tspan=t_eval)
+
     def modelxy(self, X_0: np.ndarray, t) -> np.ndarray:
         """
         Given state z=(xf, yf, ..., us, vs), returns the derivatives dz/dt (excluding random noise).
@@ -67,27 +83,29 @@ class LangevinModel:
         ]
 
         # determine potential energy contributions
-        var = self.params["sigma"] ** 2
-        V_x = uvar / xvar * (xf - xmean) if xvar != 0 else 0
-        V_y = vvar / yvar * (yf - ymean) if yvar != 0 else 0
-        V_u = var / (2 * uvar) * (uf - umean) if uvar != 0 else 0
-        V_v = var / (2 * vvar) * (vf - vmean) if vvar != 0 else 0
+        # var = self.params.sigma**2
+        # V_x = uvar / xvar * (xf - xmean) if xvar != 0 else 0
+        # V_y = vvar / yvar * (yf - ymean) if yvar != 0 else 0
+        # V_u = var / (2 * uvar) * (uf - umean) if uvar != 0 else 0
+        # V_v = var / (2 * vvar) * (vf - vmean) if vvar != 0 else 0
+
+        V_x = self.potential.curvature_x[*X_indx] * (xf - xmean)
+        V_y = self.potential.curvature_y[*X_indx] * (yf - ymean)
+        V_u = self.potential.curvature_u[*X_indx] * (uf - umean)
+        V_v = self.potential.curvature_v[*X_indx] * (vf - vmean)
 
         # acceleration fast modes (-grad V, random noise excluded)
         ufdot = -V_x - V_u
         vfdot = -V_y - V_v
 
         # relaxation of slow modes toward fast modes
-        xsdot = -1 / self.params["taux"] * (xs - xf)
-        ysdot = -1 / self.params["taux"] * (ys - yf)
-        usdot = -1 / self.params["tauu"] * (us - uf)
-        vsdot = -1 / self.params["tauu"] * (vs - vf)
+        xsdot = -1 / self.params.taux * (xs - xf)
+        ysdot = -1 / self.params.taux * (ys - yf)
+        usdot = -1 / self.params.tauu * (us - uf)
+        vsdot = -1 / self.params.tauu * (vs - vf)
 
         # return derivatives
         return np.array([uf, vf, ufdot, vfdot, xsdot, ysdot, usdot, vsdot])
-
-    def simulate(self, X_0: np.ndarray, t_eval: np.ndarray = np.arange(0, 10, 0.1)) -> np.ndarray:
-        return sdeint.itoSRI2(self.modelxy, self.Noise, y0=X_0, tspan=t_eval)
 
     def Noise(self, X_0, t) -> np.ndarray:
         """Return noise matrix.
@@ -97,11 +115,11 @@ class LangevinModel:
             correspond to the independent driving Wiener processes.
 
         """
-        return np.diag([0.0, 0.0, self.params["sigma"], self.params["sigma"], 0.0, 0.0, 0.0, 0.0])
+        return np.diag([0.0, 0.0, self.params.sigma, self.params.sigma, 0.0, 0.0, 0.0, 0.0])
 
     def stop_condition(self, xf: float, yf: float, stop_condition: float) -> bool:
         """
-        Customize stopping condition.
+        Custom stopping condition.
 
         Parameters:
         - xf (float): The x-coordinate of the pedestrian's final position.

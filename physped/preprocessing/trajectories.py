@@ -243,7 +243,7 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     df = rename_columns(df, parameters)
     log.info("Columns renamed to %s", list(df.columns))
     df = prune_short_trajectories(df, parameters)
-    log.info("Short trajectories pruned.")
+    log.info("Short trajectories with less than %s observations removed.", parameters.minimum_trajectory_length)
 
     uf = parameters.colnames.get("uf", None)
     vf = parameters.colnames.get("vf", None)
@@ -254,16 +254,18 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     df = add_trajectory_step(df, parameters)
     log.info("Trajectory step added.")
     df = add_velocity_in_polar_coordinates(df, mode="f")
-    log.info("Polar coordinates added.")
+    log.info("Velocity transformed to polar coordinates.")
+    slow_mode_algorithm = compute_slow_modes_geert
     df = compute_all_slow_modes(
         df,
         ["x", "y", "u", "v"],  # , "r", "theta"],
         tau=parameters["taux"],
         dt=parameters["dt"],
-        slow_mode_algo=compute_slow_modes_geert,
+        slow_mode_algo=slow_mode_algorithm,
     )
     df = add_velocity_in_polar_coordinates(df, mode="s")
-    log.info("Slow modes computed.")
+    log.info("Slow mode velocity transformed to polar coordinates.")
+    log.info("Slow modes computed with %s.", slow_mode_algorithm.__name__)
     # if parameters.intermediate_save.preprocessed_trajectories:
     if config.save.preprocessed_trajectories:
         log.debug("Configuration 'save.preprocessed_trajectories' is set to True.")

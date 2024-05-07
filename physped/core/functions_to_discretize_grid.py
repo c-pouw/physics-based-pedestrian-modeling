@@ -67,6 +67,44 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: dict) 
         piecewise_potential.trajectory_origins = trajectories.groupby("Pid").first()[["xf", "yf", "uf", "vf"]]
     piecewise_potential.fit_params = fit_trajectories_on_grid(piecewise_potential.fit_params, trajectories)
     log.info("Finished learning piecewise potential from trajectories.")
+    piecewise_potential = calculate_curvature_of_the_potential(piecewise_potential, config)
+    piecewise_potential = derive_potential_center(piecewise_potential, config)
+    piecewise_potential = calculate_position_based_offset(piecewise_potential, config)
+    return piecewise_potential
+
+
+def calculate_curvature_of_the_potential(
+    piecewise_potential: PiecewisePotential, config: dict
+) -> PiecewisePotential:
+    var = config.params.sigma**2
+    var_indices = [1, 3, 5, 7]
+    variances = [piecewise_potential.fit_params[..., i] for i in var_indices]
+
+    # Replace 0 with np.nan
+    xvar, yvar, uvar, vvar = [np.where(v == 0, np.nan, v) for v in variances]
+
+    piecewise_potential.curvature_x = uvar / xvar
+    piecewise_potential.curvature_y = vvar / yvar
+    piecewise_potential.curvature_u = var / (2 * uvar)
+    piecewise_potential.curvature_v = var / (2 * vvar)
+    return piecewise_potential
+
+
+def derive_potential_center(piecewise_potential: PiecewisePotential, config: dict) -> PiecewisePotential:
+    piecewise_potential.center_x = piecewise_potential.fit_params[..., 0]
+    piecewise_potential.center_y = piecewise_potential.fit_params[..., 2]
+    piecewise_potential.center_u = piecewise_potential.fit_params[..., 4]
+    piecewise_potential.center_v = piecewise_potential.fit_params[..., 6]
+    return piecewise_potential
+
+
+def calculate_position_based_offset(piecewise_potential: PiecewisePotential, config: dict) -> PiecewisePotential:
+    position_counts = np.nansum(piecewise_potential.histogram_slow, axis=(2, 3, 4))
+    position_counts = np.where(position_counts == 0, np.nan, position_counts)
+    A = 0.01  # TODO: Move to config
+    piecewise_potential.position_based_offset = A * (
+        -np.log(position_counts) + np.log(np.nansum(piecewise_potential.histogram_slow))
+    )
     return piecewise_potential
 
 
