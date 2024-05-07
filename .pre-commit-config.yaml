@@ -29,8 +29,9 @@ repos:
     hooks:
     -   id: poetry-check
     -   id: poetry-lock
-    # -   id: poetry-export
-    #     args: ["-f", "requirements.txt", "-o", "requirements.txt"]
-    # -   id: poetry-export
-    #     args: ["--with", "dev", "-f", "requirements.txt", "-o", "requirements-dev.txt"]
-    # -   id: poetry-install
+        args: ["--no-update", "--no-cache"]
+    -   id: poetry-export
+        args: ["-f", "requirements.txt", "-o", "requirements.txt"]
+    -   id: poetry-export
+        args: ["--with", "dev", "-f", "requirements.txt", "-o", "requirements-dev.txt"]
+    -   id: poetry-install
