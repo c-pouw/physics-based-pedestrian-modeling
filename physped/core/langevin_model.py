@@ -39,19 +39,6 @@ class LangevinModel:
         self.heatmap = np.sum(potential.histogram, axis=(2, 3, 4)) / np.sum(potential.histogram)
 
     def simulate(self, X_0: np.ndarray, t_eval: np.ndarray = np.arange(0, 10, 0.1)) -> np.ndarray:
-        """
-        Simulates the Langevin model.
-
-        Parameters:
-        - X_0: np.ndarray
-            The initial state of the system.
-        - t_eval: np.ndarray, optional
-            The time points at which to evaluate the solution. Default is np.arange(0, 10, 0.1).
-
-        Returns:
-        - np.ndarray
-            The simulated trajectory of the system.
-        """
         return sdeint.itoSRI2(self.modelxy, self.Noise, y0=X_0, tspan=t_eval)
 
     def modelxy(self, X_0: np.ndarray, t) -> np.ndarray:
