@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Pouw
+    given-names: Caspar
+    orcid: https://orcid.org/0000-0002-3041-4533
+  - family-names: van der Vleuten
+    given-names: Geert
+title: "Data-driven physics-based modeling o fpedestrian dynamics"
+version: 0.1.1
+identifiers:
+  - type: doi
+    value: xx
+date-released: 2024-05-23
