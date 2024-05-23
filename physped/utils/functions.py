@@ -204,7 +204,15 @@ def weighted_mean_of_matrix(field: np.ndarray, histogram: np.ndarray, axes: Tupl
         np.ndarray: The weighted mean of the matrix.
 
     """
-    weighted_field = np.nansum(field * histogram, axis=axes)
-    position_histogram = np.nansum(histogram, axis=axes)
-    weighted_field /= np.where(position_histogram != 0, position_histogram, np.inf)
-    return weighted_field
+    weights = histogram / np.sum(histogram)
+    values = field
+
+    weighted_sum = np.sum(values * weights, axis=axes)
+    sum_of_weights = np.sum(weights, axis=axes)
+
+    weighted_average = weighted_sum / sum_of_weights
+
+    # weighted_field = np.nansum(field * histogram, axis=axes)
+    # position_histogram = np.nansum(histogram, axis=axes)
+    # weighted_field /= np.where(position_histogram != 0, position_histogram, np.inf)
+    return weighted_average
