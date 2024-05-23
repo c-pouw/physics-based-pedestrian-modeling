@@ -69,7 +69,10 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: dict) 
     log.info("Finished learning piecewise potential from trajectories.")
     piecewise_potential = calculate_curvature_of_the_potential(piecewise_potential, config)
     piecewise_potential = derive_potential_center(piecewise_potential, config)
-    piecewise_potential = calculate_position_based_offset(piecewise_potential, config)
+    piecewise_potential.position_based_offset = calculate_position_based_emperic_potential(
+        piecewise_potential.histogram_slow
+    )
+    # piecewise_potential = calculate_position_based_offset(piecewise_potential, config)
     return piecewise_potential
 
 
@@ -98,14 +101,22 @@ def derive_potential_center(piecewise_potential: PiecewisePotential, config: dic
     return piecewise_potential
 
 
-def calculate_position_based_offset(piecewise_potential: PiecewisePotential, config: dict) -> PiecewisePotential:
-    position_counts = np.nansum(piecewise_potential.histogram_slow, axis=(2, 3, 4))
+# def calculate_position_based_offset(piecewise_potential: PiecewisePotential, config: dict) -> PiecewisePotential:
+#     position_counts = np.nansum(piecewise_potential.histogram_slow, axis=(2, 3, 4))
+#     position_counts = np.where(position_counts == 0, np.nan, position_counts)
+#     A = 0.01  # TODO: Move to config
+#     piecewise_potential.position_based_offset = A * (
+#         -np.log(position_counts) + np.log(np.nansum(piecewise_potential.histogram_slow))
+#     )
+#     return piecewise_potential
+
+
+def calculate_position_based_emperic_potential(histogram_slow):
+    position_counts = np.nansum(histogram_slow, axis=(2, 3, 4))
     position_counts = np.where(position_counts == 0, np.nan, position_counts)
-    A = 0.01  # TODO: Move to config
-    piecewise_potential.position_based_offset = A * (
-        -np.log(position_counts) + np.log(np.nansum(piecewise_potential.histogram_slow))
-    )
-    return piecewise_potential
+    A = 0.02  # TODO: Move to config
+    position_based_emperic_potential = A * (-np.log(position_counts) + np.log(np.nansum(histogram_slow)))
+    return position_based_emperic_potential
 
 
 def accumulate_grids(

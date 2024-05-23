@@ -70,12 +70,6 @@ class LangevinModel:
         ]
 
         # determine potential energy contributions
-        # var = self.params.sigma**2
-        # V_x = uvar / xvar * (xf - xmean) if xvar != 0 else 0
-        # V_y = vvar / yvar * (yf - ymean) if yvar != 0 else 0
-        # V_u = var / (2 * uvar) * (uf - umean) if uvar != 0 else 0
-        # V_v = var / (2 * vvar) * (vf - vmean) if vvar != 0 else 0
-
         V_x = self.potential.curvature_x[*X_indx] * (xf - xmean)
         V_y = self.potential.curvature_y[*X_indx] * (yf - ymean)
         V_u = self.potential.curvature_u[*X_indx] * (uf - umean)

@@ -97,7 +97,7 @@ def evaluate_selection_point(config):
     selected_point = selection.point
     grid_bins = config.params.grid.bins
 
-    # selected_point.theta_periodic = apply_periodic_conditions_to_the_angle_theta(selected_point.theta)
+    selected_point.theta_periodic = apply_periodic_conditions_to_the_angle_theta(selected_point.theta)
     is_selected_point_within_grid(selected_point, grid_bins)
     selected_point.x_index = get_index_of_the_enclosing_bin(selected_point.x, grid_bins["x"])
     selected_point.y_index = get_index_of_the_enclosing_bin(selected_point.y, grid_bins["y"])
