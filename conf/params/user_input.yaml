@@ -1,0 +1,39 @@
+defaults:
+  - grid: default_grid
+  - simulation: default_simulation_params
+  - selection: default_selection
+  - trajectory_plot: default_trajectory_plot_params
+  - histogram_plot: default_histogram_plot_params
+  - force_field_plot: default_force_field_plot_params
+  - grid_plot: default_grid_plot
+  - learn_piece_of_potential_plot: default_learn_piece_of_potential_plot
+  - _self_
+env_name: single_paths
+data_source: 4tu
+taux: 2
+tauu: ${params.taux}
+fps: ???
+dt: ${inv_prop:${params.fps}}
+sigma: 0.5
+minimum_trajectory_length: 5
+input_ntrajs: ???
+grid:
+  x:
+    min: ???
+    max: ???
+  y:
+    min: ???
+    max: ???
+colnames:
+  xf: ???
+  yf: ???
+  Pid: ???
+  time: ???
+plot_style: conf/science.mplstyle
+default_xlims: ???
+default_ylims: ???
+trajectory_plot:
+  plot_title: false
+  title: "User input paths"
+  text_box:
+    show: false

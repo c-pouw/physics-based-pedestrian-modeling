@@ -1,15 +1,15 @@
 xlimits:
-  x: [0, 1]
+  x: [-1.0, 1.0]
   y: [-0.5, 0.5]
-  u: [0.5, 1.5]
-  v: [-0.5, 0.5]
+  u: [-1.5, 1.5]
+  v: [-1.0, 1.0]
 xlabel:
-  x: "$(x \\, |\\, \\vec{x}_p, \\vec{u}_p)$ [m]"
-  y: "$(y \\, |\\, \\vec{x}_p, \\vec{u}_p)$ [m]"
-  u: "$(u \\, |\\, \\vec{x}_p, \\vec{u}_p) [\\mathrm{m\\,s}^{-1}]$"
-  v: "$(v \\, |\\, \\vec{x}_p, \\vec{u}_p) [\\mathrm{m\\,s}^{-1}]$"
+  x: "$(x \\, |\\, \\vec{x}_s, \\vec{u}_s)$ [m]"
+  y: "$(y \\, |\\, \\vec{x}_s, \\vec{u}_s)$ [m]"
+  u: "$(u \\, |\\, \\vec{x}_s, \\vec{u}_s) [\\mathrm{m\\,s}^{-1}]$"
+  v: "$(v \\, |\\, \\vec{x}_s, \\vec{u}_s) [\\mathrm{m\\,s}^{-1}]$"
 ylabel:
-  x: "$\\mathbb{P}(x \\, |\\, \\vec{x}_p, \\vec{u}_p)$"
-  y: "$\\mathbb{P}(y \\, |\\, \\vec{x}_p, \\vec{u}_p)$"
-  u: "$\\mathbb{P}(u \\, |\\, \\vec{x}_p, \\vec{u}_p)$"
-  v: "$\\mathbb{P}(v \\, |\\, \\vec{x}_p, \\vec{u}_p)$"
+  x: "$\\mathbb{P}(x \\, |\\, \\vec{x}_s, \\vec{u}_s)$"
+  y: "$\\mathbb{P}(y \\, |\\, \\vec{x}_s, \\vec{u}_s)$"
+  u: "$\\mathbb{P}(u \\, |\\, \\vec{x}_s, \\vec{u}_s)$"
+  v: "$\\mathbb{P}(v \\, |\\, \\vec{x}_s, \\vec{u}_s)$"

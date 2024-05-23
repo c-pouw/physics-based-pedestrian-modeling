@@ -1,0 +1,5 @@
+x: ${cast_numpy_array:[${params.grid.x.min},${params.grid.x.max}]}
+y: ${cast_numpy_array:[${params.grid.y.min},${params.grid.y.max}]}
+r: ${cast_numpy_array:[0,2.5,3]}
+theta: ${cast_numpy_array:[0,6.283]}
+k: ${cast_numpy_array:[0,1,100000000000]}

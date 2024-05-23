@@ -41,10 +41,10 @@ selection:
     theta: 0.15
     k: 1.2
   range:
-    x: [50, 50]
-    y: [0.15, 0.15]
-    r: [0.75, 0.75]
-    theta: [0.15, 0.15]
+    x: [48, 72]
+    y: [-9, 3]
+    r: [1, 1]
+    theta: [0, 0]
     k: [1.2, 1.2]
 plot_style: conf/science.mplstyle
 default_xlims: [45, 74]
