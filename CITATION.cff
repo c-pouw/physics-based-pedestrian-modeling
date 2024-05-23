@@ -19,3 +19,5 @@ identifiers:
     type: doi
     value: 10.4121/UUID:25289586-4FDA-4931-8904-D63EFE4AA0B8
 date-released: 2024-05-23
+license: BSD 3-Clause License
+repository-code: "https://github.com/c-pouw/physics-based-pedestrian-modeling"
