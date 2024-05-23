@@ -149,9 +149,7 @@ def filter_trajectory(df, cutoff=0.16, order=4):
     df = df.sort_values(["particle", "time"])
     df = df.groupby("particle").filter(lambda x: len(x) > 52)
 
-    f_df = df.groupby(df["particle"]).apply(
-        lambda x: pd.DataFrame(signal.filtfilt(b, a, x[["x", "y"]].values, axis=0))
-    )
+    f_df = df.groupby(df["particle"]).apply(lambda x: pd.DataFrame(signal.filtfilt(b, a, x[["x", "y"]].values, axis=0)))
     df[["x", "y"]] = f_df.set_index(df.index)
     return df
 

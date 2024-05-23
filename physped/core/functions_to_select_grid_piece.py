@@ -183,34 +183,20 @@ def get_boundaries_that_enclose_the_selected_range(selected_range: OmegaConf, bi
 def evaluate_selection_range(config):
     selected_range = config.params.selection.range
     grid_bins = config.params.grid.bins
-    selected_range.theta_periodic = [
-        apply_periodic_conditions_to_the_angle_theta(theta) for theta in selected_range.theta
-    ]
+    selected_range.theta_periodic = [apply_periodic_conditions_to_the_angle_theta(theta) for theta in selected_range.theta]
     is_selected_range_valid(selected_range)
     is_selected_range_within_grid(selected_range, grid_bins)
     selected_range.x_indices = get_indices_of_the_enclosing_range(selected_range.x, grid_bins["x"])
     selected_range.y_indices = get_indices_of_the_enclosing_range(selected_range.y, grid_bins["y"])
     selected_range.r_indices = get_indices_of_the_enclosing_range(selected_range.r, grid_bins["r"])
-    selected_range.theta_indices = get_indices_of_the_enclosing_range(
-        selected_range.theta_periodic, grid_bins["theta"]
-    )
+    selected_range.theta_indices = get_indices_of_the_enclosing_range(selected_range.theta_periodic, grid_bins["theta"])
     selected_range.k_indices = get_indices_of_the_enclosing_range(selected_range.k, grid_bins["k"])
 
-    selected_range.x_bounds = get_boundaries_that_enclose_the_selected_range(
-        selected_range.x_indices, grid_bins["x"]
-    )
-    selected_range.y_bounds = get_boundaries_that_enclose_the_selected_range(
-        selected_range.y_indices, grid_bins["y"]
-    )
-    selected_range.r_bounds = get_boundaries_that_enclose_the_selected_range(
-        selected_range.r_indices, grid_bins["r"]
-    )
-    selected_range.theta_bounds = get_boundaries_that_enclose_the_selected_range(
-        selected_range.theta_indices, grid_bins["theta"]
-    )
-    selected_range.k_bounds = get_boundaries_that_enclose_the_selected_range(
-        selected_range.k_indices, grid_bins["k"]
-    )
+    selected_range.x_bounds = get_boundaries_that_enclose_the_selected_range(selected_range.x_indices, grid_bins["x"])
+    selected_range.y_bounds = get_boundaries_that_enclose_the_selected_range(selected_range.y_indices, grid_bins["y"])
+    selected_range.r_bounds = get_boundaries_that_enclose_the_selected_range(selected_range.r_indices, grid_bins["r"])
+    selected_range.theta_bounds = get_boundaries_that_enclose_the_selected_range(selected_range.theta_indices, grid_bins["theta"])
+    selected_range.k_bounds = get_boundaries_that_enclose_the_selected_range(selected_range.k_indices, grid_bins["k"])
 
     # log.info(f"Selection : {OmegaConf.to_yaml(selected_range)}")
     log.info("x bins: %s", [np.round(x, 2) for x in grid_bins["x"]])

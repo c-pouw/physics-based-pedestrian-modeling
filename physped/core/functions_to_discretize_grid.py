@@ -69,16 +69,12 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: dict) 
     log.info("Finished learning piecewise potential from trajectories.")
     piecewise_potential = calculate_curvature_of_the_potential(piecewise_potential, config)
     piecewise_potential = derive_potential_center(piecewise_potential, config)
-    piecewise_potential.position_based_offset = calculate_position_based_emperic_potential(
-        piecewise_potential.histogram_slow
-    )
+    piecewise_potential.position_based_offset = calculate_position_based_emperic_potential(piecewise_potential.histogram_slow)
     # piecewise_potential = calculate_position_based_offset(piecewise_potential, config)
     return piecewise_potential
 
 
-def calculate_curvature_of_the_potential(
-    piecewise_potential: PiecewisePotential, config: dict
-) -> PiecewisePotential:
+def calculate_curvature_of_the_potential(piecewise_potential: PiecewisePotential, config: dict) -> PiecewisePotential:
     var = config.params.sigma**2
     var_indices = [1, 3, 5, 7]
     variances = [piecewise_potential.fit_params[..., i] for i in var_indices]
@@ -119,9 +115,7 @@ def calculate_position_based_emperic_potential(histogram_slow):
     return position_based_emperic_potential
 
 
-def accumulate_grids(
-    cummulative_grids: PiecewisePotential, grids_to_add: PiecewisePotential
-) -> PiecewisePotential:
+def accumulate_grids(cummulative_grids: PiecewisePotential, grids_to_add: PiecewisePotential) -> PiecewisePotential:
     """
     Accumulate grids by taking a weighted mean of the fit parameters.
 
@@ -161,9 +155,7 @@ def get_slice_of_multidimensional_matrix(a: np.ndarray, slices: List[tuple]) -> 
     if any(slice[0] > slice[1] for slice in slices):
         print("Slice values must be ascending.")
     reshape_dimension = (-1,) + (1,) * (len(slices) - 1)
-    slices = [
-        np.arange(*slice).reshape(np.roll(reshape_dimension, i)) % a.shape[i] for i, slice in enumerate(slices)
-    ]
+    slices = [np.arange(*slice).reshape(np.roll(reshape_dimension, i)) % a.shape[i] for i, slice in enumerate(slices)]
     return a[tuple(slices)]
 
 
@@ -190,12 +182,8 @@ def digitize_trajectories_to_grid(grid_bins: dict, trajectories: pd.DataFrame) -
     indices["thetaf"] = np.where(indices["rf"] == 0, 0, indices["thetaf"])
     indices["thetas"] = np.where(indices["rs"] == 0, 0, indices["thetas"])
 
-    trajectories["fast_grid_indices"] = list(
-        zip(indices["xf"], indices["yf"], indices["rf"], indices["thetaf"], indices["k"])
-    )
-    trajectories["slow_grid_indices"] = list(
-        zip(indices["xs"], indices["ys"], indices["rs"], indices["thetas"], indices["k"])
-    )
+    trajectories["fast_grid_indices"] = list(zip(indices["xf"], indices["yf"], indices["rf"], indices["thetaf"], indices["k"]))
+    trajectories["slow_grid_indices"] = list(zip(indices["xs"], indices["ys"], indices["rs"], indices["thetas"], indices["k"]))
     return trajectories
 
 
@@ -236,9 +224,7 @@ def fit_trajectories_on_grid(param_grid, trajectories: pd.DataFrame):
     return param_grid
 
 
-def add_trajectories_to_histogram(
-    histogram: np.ndarray, trajectories: pd.DataFrame, groupbyindex: str
-) -> np.ndarray:
+def add_trajectories_to_histogram(histogram: np.ndarray, trajectories: pd.DataFrame, groupbyindex: str) -> np.ndarray:
     """
     Add trajectories to a histogram.
 

@@ -62,9 +62,7 @@ def simulate_trajectories(piecewise_potential, config: dict) -> pd.DataFrame:
     trajectories = []
     Pid = 0
     with logging_redirect_tqdm():
-        for X_0 in tqdm(
-            origins[:, :8], desc="Simulating trajectories", unit="trajs", total=origins.shape[0], miniters=10
-        ):
+        for X_0 in tqdm(origins[:, :8], desc="Simulating trajectories", unit="trajs", total=origins.shape[0], miniters=10):
             solution = lm.simulate(X_0, t_eval)
             traj = pd.DataFrame(solution, columns=["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs"]).dropna()
             traj["Pid"] = Pid
