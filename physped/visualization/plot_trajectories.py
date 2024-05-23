@@ -8,11 +8,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from bokeh import palettes
 
-from physped.core.functions_to_discretize_grid import (
-    get_boundary_coordinates_of_selection,
-    make_grid_selection,
-    return_grid_ids,
-)
+from physped.core.functions_to_discretize_grid import get_boundary_coordinates_of_selection, make_grid_selection, return_grid_ids
 from physped.io.readers import read_piecewise_potential_from_file
 from physped.visualization.plot_utils import (
     apply_cartesian_velocity_plot_style,
@@ -28,7 +24,9 @@ log = logging.getLogger(__name__)
 trajectory_colorset = list(palettes.TolRainbow23)
 
 
-def plot_position_trajectories_in_cartesian_coordinates(ax: plt.Axes, df: pd.DataFrame) -> plt.Axes:
+def plot_position_trajectories_in_cartesian_coordinates(
+    ax: plt.Axes, df: pd.DataFrame, alpha: float = 1.0, traj_type: str = "f"
+) -> plt.Axes:
     """
     Plot the trajectories of pedestrians in cartesian coordinates.
 
@@ -39,34 +37,39 @@ def plot_position_trajectories_in_cartesian_coordinates(ax: plt.Axes, df: pd.Dat
     Returns:
     - ax (plt.Axes): The modified matplotlib Axes object.
     """
+    xcol, ycol = f"x{traj_type}", f"y{traj_type}"
     for i, ped_id in enumerate(df.Pid.unique()):
         path = df[df["Pid"] == ped_id]
         color = trajectory_colorset[i % len(trajectory_colorset)]
 
         # * Plot the starting point of the trajectory
         ax.plot(
-            path["xf"].iloc[0],
-            path["yf"].iloc[0],
+            path[xcol].iloc[0],
+            path[ycol].iloc[0],
             marker="h",
             markersize=4,
             markeredgecolor=color,
             markerfacecolor="none",
             zorder=10,
+            alpha=alpha,
         )
 
-        ax.plot(path["xf"], path["yf"], color=color, lw=0.9, alpha=0.8, zorder=10)
+        ax.plot(path[xcol], path[ycol], color=color, lw=0.9, alpha=alpha, zorder=10)
     return ax
 
 
-def plot_velocity_trajectories_in_polar_coordinates(ax: plt.Axes, df: pd.DataFrame) -> plt.Axes:
+def plot_velocity_trajectories_in_polar_coordinates(
+    ax: plt.Axes, df: pd.DataFrame, alpha: float = 1.0, traj_type: str = "f"
+) -> plt.Axes:
     """Plot the trajectories of particles in the metaforum dataset."""
+    thetacol, rcol = f"theta{traj_type}", f"r{traj_type}"
     for i, ped_id in enumerate(df.Pid.unique()):
         dfp = df[df["Pid"] == ped_id]
         ax.plot(
-            dfp["thetaf"],
-            dfp["rf"],
+            dfp[thetacol],
+            dfp[rcol],
             lw=0.9,
-            alpha=0.8,
+            alpha=alpha,
             zorder=0,
             color=trajectory_colorset[i % len(trajectory_colorset)],
         )
@@ -145,9 +148,7 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
 
     fig = plt.figure(layout="constrained")
     fig.set_size_inches(traj_plot_params.figsize)
-    spec = mpl.gridspec.GridSpec(
-        ncols=2, nrows=1, width_ratios=traj_plot_params.width_ratios, wspace=0.1, hspace=0.1, figure=fig
-    )
+    spec = mpl.gridspec.GridSpec(ncols=2, nrows=1, width_ratios=traj_plot_params.width_ratios, wspace=0.1, hspace=0.1, figure=fig)
 
     ax = fig.add_subplot(spec[0])
     if traj_plot_params.plot_cartesian_grid:
@@ -172,9 +173,7 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
     plot_potential_cross_section = traj_plot_params.plot_potential_cross_section
     if plot_potential_cross_section and "potential_convolution" in params:
         for axis in ["x", "y"]:
-            piecewise_potential = read_piecewise_potential_from_file(
-                Path.cwd().parent / "piecewise_potential.pickle"
-            )
+            piecewise_potential = read_piecewise_potential_from_file(Path.cwd().parent / "piecewise_potential.pickle")
             potential_convolution_params = params.get("potential_convolution", {})
             value = potential_convolution_params[axis]
             bins = piecewise_potential.bins.get(axis)
@@ -220,9 +219,13 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
             fontsize=5,
             bbox=props,
         )
-
-    title = f"{traj_plot_params.N_trajs} {trajectory_type} {traj_plot_params.title}"
-    fig.suptitle(title, x=0.5, y=traj_plot_params.y_title, ha="center", va="center")
+    traj_type_description = {
+        "recorded": "measured",
+        "simulated": "simulated",
+    }
+    if traj_plot_params.plot_title:
+        title = f"Sample of {traj_plot_params.N_trajs} {traj_type_description[trajectory_type]}" f" {traj_plot_params.title}"
+        fig.suptitle(title, x=0.5, y=traj_plot_params.y_title, ha="center", va="center")
     filepath = Path.cwd() / f"{trajectory_type}_trajectories_{params.get('env_name', '')}.pdf"
     log.info("Saving trajectory plot to %s.", filepath.relative_to(config.root_dir))
     plt.savefig(filepath)

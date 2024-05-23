@@ -1,3 +1,4 @@
+fail_fast: true
 default_language_version:
     python: python3
 repos:
@@ -15,6 +16,8 @@ repos:
     rev: 7.0.0
     hooks:
       - id: flake8
+        entry: pflake8
+        additional_dependencies: [pyproject-flake8]
   - repo: https://github.com/pycqa/isort
     rev: 5.13.2
     hooks:
