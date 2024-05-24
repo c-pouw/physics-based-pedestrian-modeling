@@ -8,26 +8,30 @@ defaults:
   - grid_plot: default_grid_plot
   - learn_piece_of_potential_plot: default_learn_piece_of_potential_plot
   - _self_
-env_name: parallel_paths
+env_name: curved_paths_synthetic
 taux: 2
 tauu: ${params.taux}
-fps: 15
+fps: 10
 dt: 0.1
 sigma: 0.5
 minimum_trajectory_length: 10
 input_ntrajs: ???
 colnames:
-  x: x_pos
-  y: y_pos
+  xf: xf
+  yf: yf
   Pid: Pid
-  time: frame
+  time: t
 grid:
   x:
-    min: -2
-    max: 2
+    min: -2.7
+    max: 2.8
   y:
-    min: -3.8
-    max: 3.8
+    min: -1.8
+    max: 1.9
+simulation:
+  end: 20
+  step: 0.1
+  stop_condition: 1
 selection:
   range:
     x: [-0.45, -0.45]
@@ -36,19 +40,13 @@ selection:
     theta: [0.15, 0.15]
     k: [1.2, 1.2]
 plot_style: conf/science.mplstyle
-default_xlims: [-2, 2]
-default_ylims: [-4, 4]
+default_xlims: [-3,3]
+default_ylims:  [-2,2]
 trajectory_plot:
-  title: "paths in a wide corridor"
+  title: "curved paths"
   y_title: 0.9
-  figsize: [3.54, 5]
-  width_ratios: [2, 1]
-  yps: [2.3, 0.8, -1.7]
-  ywalls: [3.8, -3.8]
-  plot_walls: true
-  plot_intended_path: true
   text_box:
-    x: 0.86
-    y: 0.3
+    x: 0.84
+    y: 0.18
 force_field_plot:
   figsize: [3.54, 2]

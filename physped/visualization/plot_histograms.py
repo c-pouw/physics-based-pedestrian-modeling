@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,21 +10,6 @@ from matplotlib.axes import Axes
 from scipy.special import kl_div
 
 log = logging.getLogger(__name__)
-
-
-def create_automatic_bins(values: pd.Series) -> np.ndarray:
-    """
-    Create bins for the trajectories.
-
-    Parameters:
-    - values (pd.Series): A Pandas Series containing the values to bin.
-
-    Returns:
-    - np.ndarray: An array of bin edges.
-    """
-    # Nbins = int(np.sqrt(len(values)))
-    Nbins = 50
-    return np.linspace(values.min(), values.max(), Nbins)
 
 
 def create_histogram(values: pd.Series, bins: np.ndarray) -> dict:
@@ -52,27 +37,18 @@ def create_histogram(values: pd.Series, bins: np.ndarray) -> dict:
 
 
 def create_all_histograms(
-    trajs: pd.DataFrame,
-    simtrajs: pd.DataFrame,
-    observables: Optional[List[str]] = None,
+    recorded_paths: pd.DataFrame,
+    simulated_paths: pd.DataFrame,
+    config: dict,
 ):
-    if observables is None:
-        observables = ["xf", "yf", "uf", "vf", "rf", "thetaf"]
+    observables = config.params.histogram_plot.observables
     histograms = {}
-    bin_generator = create_automatic_bins
-    for traj_type, trajectories in zip(["recorded", "simulated"], [trajs, simtrajs]):
+    for traj_type, trajectories in zip(["recorded", "simulated"], [recorded_paths, simulated_paths]):
         histograms[traj_type] = {}
         for observable in observables:
+            lims = config.params.histogram_plot[f"{observable}lims"]
+            bins = np.linspace(lims[0], lims[1], 50)
             values = trajectories[observable]
-            if traj_type == "recorded":
-                if observable == "rf":
-                    bins = np.linspace(0, 3, 50)
-                # elif observable == "thetaf":
-                #     bins = np.linspace(0, 2 * np.pi, 100)
-                else:
-                    bins = bin_generator(values)
-            else:
-                bins = histograms["recorded"][observable]["bin_edges"]
             histograms[traj_type][observable] = create_histogram(values, bins)
     return histograms
 
@@ -113,17 +89,25 @@ def plot_histogram(
     Returns:
     - The axes object.
     """
+    ntrajs = {
+        "recorded": config.params.input_ntrajs,
+        "simulated": config.params.simulation.ntrajs,
+    }
+    labels = {
+        "recorded": f"Measurements ($N =$ {ntrajs['recorded']})",
+        "simulated": f"Simulations ($N =$ {ntrajs['simulated']})",
+    }
     histogram_plot_params = config.params.histogram_plot
-    for traj_type in ["recorded", "simulated"]:
+    for trajectory_type in ["recorded", "simulated"]:
+        label = labels[trajectory_type]
         ax.scatter(
-            histograms[traj_type][observable]["bin_centers"],
-            histograms[traj_type][observable][hist_type],
-            ec=histogram_plot_params[traj_type]["edgecolor"],
-            fc=histogram_plot_params[traj_type]["facecolor"],
-            label=histogram_plot_params[traj_type]["label"],
-            s=histogram_plot_params[traj_type]["markersize"],
+            histograms[trajectory_type][observable]["bin_centers"],
+            histograms[trajectory_type][observable][hist_type],
+            ec=histogram_plot_params[trajectory_type]["edgecolor"],
+            fc=histogram_plot_params[trajectory_type]["facecolor"],
+            label=label,
+            s=histogram_plot_params[trajectory_type]["markersize"],
         )
-    # ax.set_title(f"$D_{{KL}}={kl_div:.2f}$")
     ax.set_xlabel(histogram_plot_params[observable]["xlabel"])
     ax.set_ylabel(histogram_plot_params[observable]["ylabel"][hist_type])
     return ax
@@ -146,11 +130,10 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
     params = config.params
     fig = plt.figure(figsize=(3.54, 2.36), layout="constrained")
     sum_kl_div = 0
-    hist_plot_params = params.get("histogram_plot", {})
+    hist_plot_params = params.histogram_plot
 
     for plotid, observable in enumerate(observables):
         ax = fig.add_subplot(2, 2, plotid + 1)
-        # ax = fig.add_subplot(1, len(observables), plotid + 1)
 
         kldiv = sum(
             compute_KL_divergence(
@@ -167,20 +150,26 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
             hist_type=histogram_type,
             config=config,
         )
-        lims = hist_plot_params.get(f"{observable}lims", None)
-        ax.set_xlim(lims)
-
+        xlims = hist_plot_params.get(f"{observable}lims", None)
+        ax.set_xlim(xlims)
+        ymin, ymax = ax.get_ylim()
+        ax.set_ylim(ymin * 2, ymax * 2)
+        props = {"facecolor": "white", "alpha": 1, "edgecolor": "black", "lw": 0.5, "pad": 1.6}
+        ax.text(
+            0.215,
+            0.92,
+            f"$D_{{\\! K\\! L}}={kldiv:.3f}$",
+            transform=ax.transAxes,
+            ha="center",
+            va="center",
+            fontsize=6,
+            bbox=props,
+        )
         sum_kl_div += kldiv
 
     handles, labels = ax.get_legend_handles_labels()
 
-    fig.legend(handles, labels, bbox_to_anchor=(0.5, 1.05), ncol=2, fontsize=7, loc="center")
-    # plt.suptitle(
-    #     f"Parameters: $\qquad \\tau_x = {params['taux']} \qquad \\tau_u = {params['tauu']} \qquad "
-    #     f"dt = {params['dt']} \qquad \sigma = {params['sigma']} \qquad \\sum{{D_{{KL}}}} = {sum_kl_div:.2f}$",
-    #     fontsize=16,
-    # )
-    # fig.text(-0.02, 0.5, "PDF", rotation=90)
-    filepath = Path.cwd() / f"histograms_{params.get('env_name', '')}.pdf"
+    fig.legend(handles, labels, bbox_to_anchor=(0.5, -0.05), ncol=2, fontsize=7, loc="center")
+    filepath = Path.cwd() / f"histograms_{params.env_name}.pdf"
     log.info("Saving histograms figure to %s.", filepath.relative_to(config.root_dir))
     plt.savefig(filepath)

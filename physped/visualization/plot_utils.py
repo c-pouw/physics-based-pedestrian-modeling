@@ -48,7 +48,7 @@ def apply_polar_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
     ax.set_xticks([])
     ax = plot_polar_velocity_grid(ax, params.grid)
     ax = plot_polar_labels(ax, params.grid)
-    ax.set_ylim(0, params.grid.bins.r[-1])
+    ax.set_ylim(0, params.grid.bins.r[-2])
     return ax
 
 
@@ -183,34 +183,35 @@ def plot_station_background(ax: plt.Axes, config: dict) -> plt.Axes:
             config.params.background["ymin"] / 1000,
             config.params.background["ymax"] / 1000,
         ),
-        alpha=1,
+        alpha=config.params.background.alpha,
     )
     return ax
 
 
-def plot_cartesian_spatial_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
+def plot_cartesian_spatial_grid(ax: plt.Axes, grid_params: dict, alpha: float = 0.8) -> plt.Axes:
     xbins = grid_params.bins.x
     ybins = grid_params.bins.y
     linestyle = "dashed"
-    alpha = 0.8
     color = "k"
     linewidth = 0.6
-    for x in xbins:
-        ax.axvline(
-            x,
-            color=color,
-            linestyle=linestyle,
-            lw=linewidth,
-            alpha=alpha,
-        )
-    for y in ybins:
-        ax.axhline(
-            y,
-            color=color,
-            linestyle=linestyle,
-            lw=linewidth,
-            alpha=alpha,
-        )
+    ax.vlines(
+        xbins,
+        ymin=ybins[0],
+        ymax=ybins[-1],
+        color=color,
+        linestyle=linestyle,
+        lw=linewidth,
+        alpha=alpha,
+    )
+    ax.hlines(
+        ybins,
+        xmin=xbins[0],
+        xmax=xbins[-1],
+        color=color,
+        linestyle=linestyle,
+        lw=linewidth,
+        alpha=alpha,
+    )
     return ax
 
 
@@ -221,7 +222,7 @@ def plot_polar_velocity_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
     alpha = 0.8
     color = "k"
     linewidth = 0.6
-    for r in rbins:
+    for r in rbins[:-1]:
         ax.plot(
             np.linspace(0, 2 * np.pi, 100),
             np.ones(100) * r,
@@ -233,7 +234,7 @@ def plot_polar_velocity_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
     for theta in thetabins:
         ax.plot(
             [theta, theta],
-            [rbins[1], rbins[-1]],
+            [rbins[1], rbins[-2]],
             color=color,
             alpha=alpha,
             linestyle=linestyle,
@@ -244,27 +245,47 @@ def plot_polar_velocity_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
 
 def plot_polar_labels(ax: plt.Axes, grid_params: dict) -> plt.Axes:
     rbins = grid_params.bins.r
-    thetabins = grid_params.bins.theta
-    for r in rbins[1:]:
+
+    for r in rbins[1:-1]:
         ax.text(
-            np.pi / 2 + 0.4,
+            5 * np.pi / 8,
             r,
             f"{r:.1f}",
             ha="center",
             va="center",
             fontsize=5,
+            rotation=12.5,
             bbox=dict(facecolor="white", alpha=1, edgecolor="none", boxstyle="round", pad=0.1),
         )
-    for theta in thetabins[:-1]:
-        ax.text(
-            theta,
-            rbins[-1] + 0.3 + np.abs(np.cos(theta)) / 4,
-            f"{theta/np.pi:.1f}$\\pi$",
-            ha="center",
-            va="center",
-            fontsize=7,
-        )
-        # ax.text(theta, rbins[-1] * 1.35, f"{convert_rad_to_deg(theta):.1f}$^\\circ$", ha="center", va="center")
+    winddirections = {
+        4: zip([np.pi / 2, 0, -np.pi / 2, np.pi], ["N", "E", "S", "W"], [5, 5, 5, 5]),
+        8: zip(
+            [np.pi / 2, np.pi / 4, 0, -np.pi / 4, -np.pi / 2, -3 * np.pi / 4, np.pi, 3 * np.pi / 4],
+            ["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
+            [5, 3, 5, 3, 5, 3, 5, 3],
+        ),
+    }
+    if grid_params.theta.segments in winddirections:
+        for theta, winddirection, fontsize in winddirections[grid_params.theta.segments]:
+            ax.text(
+                theta,
+                rbins[-2],
+                winddirection,
+                ha="center",
+                va="center",
+                fontsize=fontsize,
+                bbox=dict(facecolor="white", alpha=1, edgecolor="k", boxstyle="circle,pad=0.4", lw=0.4),
+            )
+    # for theta in thetabins[:-1]:
+    #     ax.text(
+    #         theta,
+    #         rbins[-1] + 0.3 + np.abs(np.cos(theta)) / 4,
+    #         f"{theta/np.pi:.1f}$\\pi$",
+    #         ha="center",
+    #         va="center",
+    #         fontsize=7,
+    #     )
+    # ax.text(theta, rbins[-1] * 1.35, f"{convert_rad_to_deg(theta):.1f}$^\\circ$", ha="center", va="center")
     return ax
 
 

@@ -27,7 +27,7 @@ class PiecewisePotential:
 
     def __init__(self, bins: Dict[str, np.ndarray]):
         """
-        Initialize a new CreateDiscreteGrid object.
+        Initialize a piecewise potential object.
 
         Parameters:
         - bins (Dict[str, np.ndarray]): A dictionary of bin edges for each dimension of the grid.
@@ -35,7 +35,7 @@ class PiecewisePotential:
         self.bins = bins
         self.bin_centers = {key: get_bin_middle(bins[key]) for key in bins}
         self.grid_shape = tuple(len(self.bin_centers[key]) for key in self.bin_centers)
-        self.dimensions = tuple(self.bin_centers.keys())
+        self.dimensions = tuple(self.bins.keys())
         self.histogram = np.zeros(self.grid_shape)
         self.histogram_slow = np.zeros(self.grid_shape)
         self.fit_dimensions = ("x", "y", "u", "v")

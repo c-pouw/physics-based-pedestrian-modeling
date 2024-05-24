@@ -62,9 +62,9 @@ def is_selected_point_within_grid(selected_point: OmegaConf, grid_bins: dict) ->
         log.info("The selectied point is located within the grid.")
 
 
-def get_boundaries_that_enclose_the_selected_point(selected_point: OmegaConf, bins: dict) -> dict:
-    left_bound = bins[selected_point]
-    right_bound = bins[selected_point + 1]
+def get_boundaries_that_enclose_the_selected_bin(bin_index: OmegaConf, bins: dict) -> dict:
+    left_bound = bins[bin_index]
+    right_bound = bins[bin_index + 1]
     return [left_bound, right_bound]
 
 
@@ -79,9 +79,17 @@ def get_index_of_the_enclosing_bin(selected_value: float, bins: np.ndarray) -> i
     Returns:
         int: The index of the bin that encloses the value.
     """
+    # ! Note that the value can be outside the range of the bins.
+    # ! In this case it returns the extrema i.e. 0 or len(bins).
+    if selected_value < bins[0]:
+        return np.nan
+    if selected_value > bins[-1]:
+        return np.nan
     shifted_bins = np.copy(bins) - bins[0]
+    # print(shifted_bins)
     selected_value = selected_value - bins[0]
-    return int(np.digitize(selected_value, shifted_bins) - 1)
+    # print(selected_value)
+    return int(np.digitize(selected_value, shifted_bins, right=False) - 1)
 
 
 def evaluate_selection_point(config):
@@ -89,7 +97,7 @@ def evaluate_selection_point(config):
     selected_point = selection.point
     grid_bins = config.params.grid.bins
 
-    # selected_point.theta_periodic = apply_periodic_conditions_to_the_angle_theta(selected_point.theta)
+    selected_point.theta_periodic = apply_periodic_conditions_to_the_angle_theta(selected_point.theta)
     is_selected_point_within_grid(selected_point, grid_bins)
     selected_point.x_index = get_index_of_the_enclosing_bin(selected_point.x, grid_bins["x"])
     selected_point.y_index = get_index_of_the_enclosing_bin(selected_point.y, grid_bins["y"])
@@ -175,34 +183,20 @@ def get_boundaries_that_enclose_the_selected_range(selected_range: OmegaConf, bi
 def evaluate_selection_range(config):
     selected_range = config.params.selection.range
     grid_bins = config.params.grid.bins
-    selected_range.theta_periodic = [
-        apply_periodic_conditions_to_the_angle_theta(theta) for theta in selected_range.theta
-    ]
+    selected_range.theta_periodic = [apply_periodic_conditions_to_the_angle_theta(theta) for theta in selected_range.theta]
     is_selected_range_valid(selected_range)
     is_selected_range_within_grid(selected_range, grid_bins)
     selected_range.x_indices = get_indices_of_the_enclosing_range(selected_range.x, grid_bins["x"])
     selected_range.y_indices = get_indices_of_the_enclosing_range(selected_range.y, grid_bins["y"])
     selected_range.r_indices = get_indices_of_the_enclosing_range(selected_range.r, grid_bins["r"])
-    selected_range.theta_indices = get_indices_of_the_enclosing_range(
-        selected_range.theta_periodic, grid_bins["theta"]
-    )
+    selected_range.theta_indices = get_indices_of_the_enclosing_range(selected_range.theta_periodic, grid_bins["theta"])
     selected_range.k_indices = get_indices_of_the_enclosing_range(selected_range.k, grid_bins["k"])
 
-    selected_range.x_bounds = get_boundaries_that_enclose_the_selected_range(
-        selected_range.x_indices, grid_bins["x"]
-    )
-    selected_range.y_bounds = get_boundaries_that_enclose_the_selected_range(
-        selected_range.y_indices, grid_bins["y"]
-    )
-    selected_range.r_bounds = get_boundaries_that_enclose_the_selected_range(
-        selected_range.r_indices, grid_bins["r"]
-    )
-    selected_range.theta_bounds = get_boundaries_that_enclose_the_selected_range(
-        selected_range.theta_indices, grid_bins["theta"]
-    )
-    selected_range.k_bounds = get_boundaries_that_enclose_the_selected_range(
-        selected_range.k_indices, grid_bins["k"]
-    )
+    selected_range.x_bounds = get_boundaries_that_enclose_the_selected_range(selected_range.x_indices, grid_bins["x"])
+    selected_range.y_bounds = get_boundaries_that_enclose_the_selected_range(selected_range.y_indices, grid_bins["y"])
+    selected_range.r_bounds = get_boundaries_that_enclose_the_selected_range(selected_range.r_indices, grid_bins["r"])
+    selected_range.theta_bounds = get_boundaries_that_enclose_the_selected_range(selected_range.theta_indices, grid_bins["theta"])
+    selected_range.k_bounds = get_boundaries_that_enclose_the_selected_range(selected_range.k_indices, grid_bins["k"])
 
     # log.info(f"Selection : {OmegaConf.to_yaml(selected_range)}")
     log.info("x bins: %s", [np.round(x, 2) for x in grid_bins["x"]])

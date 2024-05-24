@@ -1,0 +1,20 @@
+defaults:
+  - bins: default_bins_with_r_from_list
+  # - bins: only_spatial_grid
+  # - bins: no_grid
+name: dxy${params.grid.spatial_cell_size}_r${create_grid_name:${params.grid.r.list}}_ntheta${params.grid.theta.segments}
+dimensions: ['x','y','r','theta','k']
+spatial_cell_size: 0.2
+x:
+  step: ${params.grid.spatial_cell_size}
+y:
+  step: ${params.grid.spatial_cell_size}
+r:
+  min: 0
+  max: 1.8
+  step: 0.6
+  list: [0,0.5,1,1.5,2,2.5]
+theta:
+  min_multiple_pi: -1.125
+  min: ${parse_pi:${params.grid.theta.min_multiple_pi}}
+  segments: 8

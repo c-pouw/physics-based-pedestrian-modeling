@@ -21,16 +21,21 @@ def apply_periodic_conditions_to_the_angle_theta(theta: float):
     return theta % (2 * np.pi) - np.pi
 
 
+def create_grid_name(grid_list: list):
+    grid_list = [f"-{int(i*10)}" for i in grid_list]
+    grid_name = "".join(grid_list)
+    return grid_name
+
+
 def register_new_resolvers():
     OmegaConf.register_new_resolver("get_root_dir", lambda: ROOT_DIR)
     OmegaConf.register_new_resolver("parse_pi", lambda a: a * np.pi)
+    OmegaConf.register_new_resolver("generate_linear_bins", lambda min, max, step: np.arange(min, max + 0.01, step))
     OmegaConf.register_new_resolver(
-        "generate_linear_bins", lambda min, max, step: np.arange(min, max + 0.01, step)
-    )
-    OmegaConf.register_new_resolver(
-        "generate_angular_bins", lambda min, segments: np.linspace(min, min + 2 * np.pi + 0.01, segments + 1)
+        "generate_angular_bins",
+        lambda min, segments: np.linspace(min, min + 2 * np.pi, segments + 1),
     )
     OmegaConf.register_new_resolver("cast_numpy_array", np.array)
-    OmegaConf.register_new_resolver(
-        "apply_periodic_conditions_to_the_angle_theta", apply_periodic_conditions_to_the_angle_theta
-    )
+    OmegaConf.register_new_resolver("apply_periodic_conditions_to_the_angle_theta", apply_periodic_conditions_to_the_angle_theta)
+    OmegaConf.register_new_resolver("inv_prop", lambda x: 1 / x)
+    OmegaConf.register_new_resolver("create_grid_name", create_grid_name)

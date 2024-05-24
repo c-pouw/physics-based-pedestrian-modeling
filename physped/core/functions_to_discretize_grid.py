@@ -43,17 +43,18 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: dict) 
     - A dictionary of DiscreteGrid objects for storing histograms and parameters.
     """
     grid_bins = dict(config.params.grid.bins)
-    filepath = Path.cwd().parent / "piecewise_potential.pickle"
+    filepath = Path.cwd().parent / config.filename.piecewise_potential
     if config.read.simulated_trajectories:
         log.debug("Configuration 'read.simulated_trajectories' is set to True.")
         try:
             piecewise_potential = read_piecewise_potential_from_file(filepath)
-            log.info("---- Piecewise potential succesfully read from file ----")
+            log.warning("Piecewise potential read from file")
             log.debug("Filepath %s", filepath.relative_to(config.root_dir))
             return piecewise_potential
         except FileNotFoundError as e:
-            log.warning("Piecewise potential not found: %s", e)
+            log.error("Piecewise potential not found: %s", e)
 
+    log.info("Start learning the piecewise potential")
     piecewise_potential = PiecewisePotential(grid_bins)
     trajectories = digitize_trajectories_to_grid(piecewise_potential.bins, trajectories)
     piecewise_potential.histogram = add_trajectories_to_histogram(
@@ -66,12 +67,55 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: dict) 
         piecewise_potential.trajectory_origins = trajectories.groupby("Pid").first()[["xf", "yf", "uf", "vf"]]
     piecewise_potential.fit_params = fit_trajectories_on_grid(piecewise_potential.fit_params, trajectories)
     log.info("Finished learning piecewise potential from trajectories.")
+    piecewise_potential = calculate_curvature_of_the_potential(piecewise_potential, config)
+    piecewise_potential = derive_potential_center(piecewise_potential, config)
+    piecewise_potential.position_based_offset = calculate_position_based_emperic_potential(piecewise_potential.histogram_slow)
+    # piecewise_potential = calculate_position_based_offset(piecewise_potential, config)
     return piecewise_potential
 
 
-def accumulate_grids(
-    cummulative_grids: PiecewisePotential, grids_to_add: PiecewisePotential
-) -> PiecewisePotential:
+def calculate_curvature_of_the_potential(piecewise_potential: PiecewisePotential, config: dict) -> PiecewisePotential:
+    var = config.params.sigma**2
+    var_indices = [1, 3, 5, 7]
+    variances = [piecewise_potential.fit_params[..., i] for i in var_indices]
+
+    # Replace 0 with np.nan
+    xvar, yvar, uvar, vvar = [np.where(v == 0, np.nan, v) for v in variances]
+
+    piecewise_potential.curvature_x = uvar / xvar
+    piecewise_potential.curvature_y = vvar / yvar
+    piecewise_potential.curvature_u = var / (2 * uvar)
+    piecewise_potential.curvature_v = var / (2 * vvar)
+    return piecewise_potential
+
+
+def derive_potential_center(piecewise_potential: PiecewisePotential, config: dict) -> PiecewisePotential:
+    piecewise_potential.center_x = piecewise_potential.fit_params[..., 0]
+    piecewise_potential.center_y = piecewise_potential.fit_params[..., 2]
+    piecewise_potential.center_u = piecewise_potential.fit_params[..., 4]
+    piecewise_potential.center_v = piecewise_potential.fit_params[..., 6]
+    return piecewise_potential
+
+
+# def calculate_position_based_offset(piecewise_potential: PiecewisePotential, config: dict) -> PiecewisePotential:
+#     position_counts = np.nansum(piecewise_potential.histogram_slow, axis=(2, 3, 4))
+#     position_counts = np.where(position_counts == 0, np.nan, position_counts)
+#     A = 0.01  # TODO: Move to config
+#     piecewise_potential.position_based_offset = A * (
+#         -np.log(position_counts) + np.log(np.nansum(piecewise_potential.histogram_slow))
+#     )
+#     return piecewise_potential
+
+
+def calculate_position_based_emperic_potential(histogram_slow):
+    position_counts = np.nansum(histogram_slow, axis=(2, 3, 4))
+    position_counts = np.where(position_counts == 0, np.nan, position_counts)
+    A = 0.02  # TODO: Move to config
+    position_based_emperic_potential = A * (-np.log(position_counts) + np.log(np.nansum(histogram_slow)))
+    return position_based_emperic_potential
+
+
+def accumulate_grids(cummulative_grids: PiecewisePotential, grids_to_add: PiecewisePotential) -> PiecewisePotential:
     """
     Accumulate grids by taking a weighted mean of the fit parameters.
 
@@ -111,9 +155,7 @@ def get_slice_of_multidimensional_matrix(a: np.ndarray, slices: List[tuple]) -> 
     if any(slice[0] > slice[1] for slice in slices):
         print("Slice values must be ascending.")
     reshape_dimension = (-1,) + (1,) * (len(slices) - 1)
-    slices = [
-        np.arange(*slice).reshape(np.roll(reshape_dimension, i)) % a.shape[i] for i, slice in enumerate(slices)
-    ]
+    slices = [np.arange(*slice).reshape(np.roll(reshape_dimension, i)) % a.shape[i] for i, slice in enumerate(slices)]
     return a[tuple(slices)]
 
 
@@ -140,12 +182,8 @@ def digitize_trajectories_to_grid(grid_bins: dict, trajectories: pd.DataFrame) -
     indices["thetaf"] = np.where(indices["rf"] == 0, 0, indices["thetaf"])
     indices["thetas"] = np.where(indices["rs"] == 0, 0, indices["thetas"])
 
-    trajectories["fast_grid_indices"] = list(
-        zip(indices["xf"], indices["yf"], indices["rf"], indices["thetaf"], indices["k"])
-    )
-    trajectories["slow_grid_indices"] = list(
-        zip(indices["xs"], indices["ys"], indices["rs"], indices["thetas"], indices["k"])
-    )
+    trajectories["fast_grid_indices"] = list(zip(indices["xf"], indices["yf"], indices["rf"], indices["thetaf"], indices["k"]))
+    trajectories["slow_grid_indices"] = list(zip(indices["xs"], indices["ys"], indices["rs"], indices["thetas"], indices["k"]))
     return trajectories
 
 
@@ -186,9 +224,7 @@ def fit_trajectories_on_grid(param_grid, trajectories: pd.DataFrame):
     return param_grid
 
 
-def add_trajectories_to_histogram(
-    histogram: np.ndarray, trajectories: pd.DataFrame, groupbyindex: str
-) -> np.ndarray:
+def add_trajectories_to_histogram(histogram: np.ndarray, trajectories: pd.DataFrame, groupbyindex: str) -> np.ndarray:
     """
     Add trajectories to a histogram.
 

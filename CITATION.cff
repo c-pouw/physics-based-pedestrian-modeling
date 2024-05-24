@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Pouw
+    given-names: Caspar Anton Simon
+    orcid: https://orcid.org/0000-0002-3041-4533
+  - family-names: van der Vleuten
+    given-names: Geert
+  - family-names: Corbetta
+    given-names: Alessandro
+    orcid: https://orcid.org/0000-0001-6979-3414
+  - family-names: Toschi
+    given-names: Federico
+    orcid: https://orcid.org/0000-0001-5935-2332
+title: "Data-driven physics-based modeling of pedestrian dynamics"
+version: 0.1.1
+identifiers:
+  - description: Crowdflow - diluted pedestrian dynamics in the Metaforum building of Eindhoven University of Technology
+    type: doi
+    value: 10.4121/UUID:25289586-4FDA-4931-8904-D63EFE4AA0B8
+date-released: 2024-05-23
+license: BSD 3-Clause License
+repository-code: "https://github.com/c-pouw/physics-based-pedestrian-modeling"

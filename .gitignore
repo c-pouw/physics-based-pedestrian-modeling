@@ -6,6 +6,7 @@ figures/*
 data/models/
 data/trajectories/
 develop/*
+thrash/*
 
 # -*- mode: gitignore; -*-
 *~

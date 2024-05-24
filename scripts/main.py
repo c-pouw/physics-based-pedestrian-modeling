@@ -21,65 +21,71 @@ log = logging.getLogger(__name__)
 
 
 @hydra.main(version_base=None, config_path="../conf", config_name="config")
-def main(cfg):
-    env_name = cfg.params.env_name
-    log.debug("Configuration: \n%s", pprint.pformat(dict(cfg)))
+def main(config):
+    env_name = config.params.env_name
+    log.debug("Configuration: \n%s", pprint.pformat(dict(config)))
+    log.critical("Environment name: %s", env_name)
     log.info("Working directory %s", Path.cwd())
-    log.info("Project root %s", cfg.root_dir)
+    log.info("Project root %s", config.root_dir)
 
-    plt.style.use(cfg.root_dir / cfg.params.plot_style)
+    plt.style.use(Path(config.root_dir) / config.params.plot_style)
 
-    trajectories = trajectory_reader[env_name](cfg)
-    preprocessed_trajectories = preprocess_trajectories(trajectories, config=cfg)
+    log.info("READING TRAJECTORIES")
+    trajectories = trajectory_reader[env_name](config)
+    log.info("PREPROCESSING TRAJECTORIES")
+    preprocessed_trajectories = preprocess_trajectories(trajectories, config=config)
+    config.params.input_ntrajs = len(preprocessed_trajectories.Pid.unique())
 
+    log.info("LEARNING POTENTIAL")
+    piecewise_potential = learn_potential_from_trajectories(preprocessed_trajectories, config)
+    if config.save.piecewise_potential and not config.read.piecewise_potential:
+        save_piecewise_potential(
+            piecewise_potential,
+            Path.cwd().parent,
+            config.filename.piecewise_potential,
+        )
+
+    log.info("SIMULATING TRAJECTORIES")
+    simulated_trajectories = simulate_trajectories(piecewise_potential, config)
+
+    log.info("PLOTTING FIGURES")
     # * Optional plotting of preprocessed trajectories
-    if cfg.plot.preprocessed_trajectories:
-        print("\n")
-        log.info("---- Plot preprocessed trajectories ----")
+    if config.plot.preprocessed_trajectories:
+        log.info("Plot preprocessed trajectories.")
         log.debug("Configuration 'plot.preprocessed_trajectories' is set to True.")
-        plot_trajectories(preprocessed_trajectories, cfg, "recorded")
+        plot_trajectories(preprocessed_trajectories, config, "recorded")
     else:
         log.warning("Configuration 'plot.preprocessed_trajectories' is set to False.")
 
-    print("\n")
-    log.info("---- Learn piecewise potential from trajectories ----")
-    piecewise_potential = learn_potential_from_trajectories(preprocessed_trajectories, cfg)
-    if cfg.save.piecewise_potential:
-        save_piecewise_potential(piecewise_potential, Path.cwd().parent)
-
-    print("\n")
-    simulated_trajectories = simulate_trajectories(piecewise_potential, cfg)
-
     # * Optional plotting of simulated trajectories
-    if cfg.plot.simulated_trajectories:
-        print("\n")
-        log.info("---- Plot simulated trajectories ----")
+    if config.plot.simulated_trajectories:
+        log.info("Plot simulated trajectories")
         log.debug("Configuration 'plot.simulated_trajectories' is set to True.")
-        plot_trajectories(simulated_trajectories, cfg, "simulated")
+        plot_trajectories(simulated_trajectories, config, "simulated")
     else:
         log.warning("Configuration 'plot.simulated_trajectories' is set to False.")
 
     # * Optional plotting of probability distributions
-    if cfg.plot.histograms:
-        print("\n")
-        log.info("---- Plot probability distribution comparison ----")
+    if config.plot.histograms:
+        log.info("Plot probability distribution comparison.")
         log.debug("Configuration 'plot.histograms' is set to True.")
         observables = ["xf", "yf", "uf", "vf"]
-        histograms = create_all_histograms(preprocessed_trajectories, simulated_trajectories, observables)
-        plot_multiple_histograms(observables, histograms, "PDF", cfg)
+        config.params.simulation.ntrajs = len(simulated_trajectories.Pid.unique())
+        histograms = create_all_histograms(preprocessed_trajectories, simulated_trajectories, config)
+        plot_multiple_histograms(observables, histograms, "PDF", config)
     else:
         log.warning("Configuration 'plot.simulated_trajectories' is set to False.")
 
     # * Optional plotting of the grid
-    if cfg.plot.grid:
-        print("\n")
-        log.info("---- Plot grid ----")
+    if config.plot.grid:
+        log.info("Plot the configuration of the grid.")
         log.debug("Configuration 'plot.grid' is set to True.")
-        plot_discrete_grid(cfg)
+        plot_discrete_grid(config)
     else:
-        log.info("Configuration 'plot.grid' is set to False.")
+        log.warning("Configuration 'plot.grid' is set to False.")
 
     output_figures = glob.glob("*.pdf")
+    log.info("Pulling output figures to the parent directory for easy access.")
     for figure in output_figures:
         shutil.copyfile(figure, Path.cwd().parent / figure)
 

@@ -1,0 +1,2 @@
+fit_dimensions: ['x','y','u','v']
+fit_param_names: ["xmu","xvar","ymu","yvar","umu","uvar","vmu","vvar"]

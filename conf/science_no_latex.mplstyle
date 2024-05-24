@@ -10,11 +10,11 @@ figure.figsize : 3.54, 2.36
 figure.dpi : 600
 
 font.size : 8
-#axes.labelsize : 300
-#axes.titlesize : 22
-#legend.fontsize : 18
-#xtick.labelsize : 22
-#ytick.labelsize : 22
+# axes.labelsize : 300
+# axes.titlesize : 22
+# legend.fontsize : 18
+# xtick.labelsize : 22
+# ytick.labelsize : 22
 
 # Set x axis
 xtick.direction : in
@@ -36,7 +36,7 @@ ytick.right : True
 
 # Set line widths
 axes.linewidth : 0.5
-#grid.linewidth : 0.5
+# grid.linewidth : 0.5
 lines.linewidth : 1.
 
 # Always save as 'tight'
@@ -44,12 +44,12 @@ savefig.bbox : tight
 savefig.pad_inches : 0.01
 
 # Use serif fonts
-font.family : serif
-mathtext.fontset : dejavuserif
+# font.family : serif
+# mathtext.fontset : dejavuserif
 
 # Use LaTeX for math formatting
-text.usetex : False
-text.latex.preamble : \usepackage{amsmath} \usepackage{amssymb} \usepackage{bm}
+# text.usetex : False
+# text.latex.preamble : \usepackage{amsmath} \usepackage{amssymb} \usepackage{bm}
 
 # Add grid lines and turn the legend frame on
 

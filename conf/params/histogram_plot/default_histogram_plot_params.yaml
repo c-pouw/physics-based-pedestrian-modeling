@@ -3,10 +3,11 @@ yflims: ${params.default_ylims}
 uflims: [-2, 2]
 vflims: [-2, 2]
 rflims: [0, 2]
+observables: ['xf', 'yf', 'uf', 'vf']
 thetaflims: [-3.1415, 3.1415]
 recorded:
-  edgecolor: "C3"
-  facecolor: "C3"
+  edgecolor: "#77AADD"
+  facecolor: "#77AADD"
   marker: "o"
   markersize: 8
   label: "Recordings"

@@ -14,10 +14,7 @@ from physped.visualization.plot_fields import (
     plot_pcolormesh_offset_field,
     plot_quiver_force_vectors,
 )
-from physped.visualization.plot_trajectories import (  # highlight_grid_box,
-    apply_polar_plot_style,
-    plot_station_background,
-)
+from physped.visualization.plot_trajectories import apply_polar_plot_style, plot_station_background  # highlight_grid_box,
 
 log = logging.getLogger(__name__)
 
