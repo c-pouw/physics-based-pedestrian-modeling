@@ -1,27 +1,10 @@
 import logging
-from pathlib import Path
 from typing import Tuple
 
 import numpy as np
 import pandas as pd
 
 log = logging.getLogger(__name__)
-
-
-def _ensure_folder_exists(folderpath: Path) -> None:
-    # ! Should be obsolete due to the use of hydra
-    """
-    Create a folder at the specified path if it does not exist.
-
-    params:
-    - folderpath (str): The path to the folder to create.
-
-    Returns:
-    - None
-    """
-    if not folderpath.exists():
-        folderpath.mkdir()
-        log.info("Folder created at %s", folderpath)
 
 
 def cart2pol(x: float, y: float) -> tuple:
