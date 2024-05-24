@@ -61,9 +61,9 @@ jobs:
         with:
           name: artifacts-minimal-test-dataset
           path: |
-            preprocessed_trajectories.csv
-            simulated_trajectories.csv
-            piecewise_potential.pickle
+            outputs/preprocessed_trajectories.csv
+            outputs/simulated_trajectories.csv
+            outputs/piecewise_potential.pickle
             outputs/recorded_trajectories_single_paths.pdf
             outputs/simulated_trajectories_single_paths.pdf
             outputs/histograms_single_paths.pdf
