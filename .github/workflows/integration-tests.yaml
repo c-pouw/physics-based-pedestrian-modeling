@@ -61,6 +61,7 @@ jobs:
         with:
           name: artifacts-minimal-test-dataset
           path: |
+            outputs/single_paths_tau2/dxy0.2_r-0-5-10-15-20-25_ntheta8/2024-05-24_05-52-06/histograms_single_paths.pdf
             single_paths/taux2_tauu2_dt0.1_sigma0.2_single_paths_grid/preprocessed_trajectories.csv
             single_paths/taux2_tauu2_dt0.1_sigma0.2_single_paths_grid/simulated_trajectories.csv
             single_paths/taux2_tauu2_dt0.1_sigma0.2_single_paths_grid/piecewise_potential.pickle
