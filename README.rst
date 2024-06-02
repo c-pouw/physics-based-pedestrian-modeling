@@ -8,7 +8,9 @@ Data-driven physics-based modeling of pedestrian dynamics
 .. image:: https://img.shields.io/pypi/v/physics-based-pedestrian-modeling.svg
         :target: https://pypi.python.org/pypi/physics-based-pedestrian-modeling
 
-## Project overview
+Project overview
+----------
+
 Python package to create physics-based pedestrian models from pedestrian trajectory measurements.
 
 ## Installation and Setup
