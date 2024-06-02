@@ -63,7 +63,7 @@ jobs:
           path: |
             outputs/preprocessed_trajectories.csv
             outputs/simulated_trajectories.csv
-            outputs/piecewise_potential.pickle
+            outputs/p iecewise_potential.pickle
             outputs/recorded_trajectories_single_paths.pdf
             outputs/simulated_trajectories_single_paths.pdf
             outputs/histograms_single_paths.pdf
