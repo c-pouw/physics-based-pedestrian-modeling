@@ -13,32 +13,42 @@ Project Overview
 
 Python package to create physics-based pedestrian models from pedestrian trajectory measurements.
 
-##Installation and Setup
+
+Installation and Setup
+-----------------------------------------------------------------------
 
 
-###Codes and Resources used
+Codes and Resources used
+-----------------------------------------------------------------------
 - Python Version: 3.12
 
-###Python packages used
+
+Python packages used
+-----------------------------------------------------------------------
 
 
-##Getting started
+Getting started
+-----------------------------------------------------------------------
 
 
-##Features
+Features
+-----------------------------------------------------------------------
 - Read trajectory data set
 - Calculate slow dynamics
 - Learn the potential from the trajectories
 - Simulate new trajectories
 
-###Featured Notebooks
+Featured Notebooks
+-----------------------------------------------------------------------
 - Usage notebook for corridor paths
 - Usage notebook for station paths
 - Usage notebook for custom paths
 
-##License
+License
+-----------------------------------------------------------------------
 * Free software: 3-clause BSD license
 
-##Documentation
 
+Documentation
+-----------------------------------------------------------------------
 * Documentation: (COMING SOON!) https://c-pouw.github.io/physics-based-pedestrian-modeling.
