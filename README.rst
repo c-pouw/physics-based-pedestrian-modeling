@@ -19,16 +19,18 @@ Installation and Setup
 
 
 Codes and Resources used
------------------------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 - Python Version: 3.12
 
 
 Python packages used
------------------------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 Getting started
 -----------------------------------------------------------------------
+.. code-block:: bash
+   pip install physped
 
 
 Features
@@ -39,7 +41,7 @@ Features
 - Simulate new trajectories
 
 Featured Notebooks
------------------------------------------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 - Usage notebook for corridor paths
 - Usage notebook for station paths
 - Usage notebook for custom paths
