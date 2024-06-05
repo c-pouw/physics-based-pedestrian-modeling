@@ -6,6 +6,8 @@ from omegaconf import OmegaConf
 
 ROOT_DIR = Path(os.path.dirname(os.path.abspath(__file__))).parent
 
+# ! Todo this file move to utils
+
 
 def apply_periodic_conditions_to_the_angle_theta(theta: float):
     """
