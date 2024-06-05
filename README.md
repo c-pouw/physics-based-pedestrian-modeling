@@ -16,7 +16,7 @@
 
 # Project Overview
 
-Python package to create physics-based pedestrian models from pedestrian trajectory measurements. This package is an implementation of the data-driven generalized pedestrian model as presented in:
+Python package to create physics-based pedestrian models from pedestrian trajectory measurements. This package is an implementation of the data-driven generalized pedestrian model presented in:
 
 Pouw, C. A. S., van der Vleuten, G., Corbetta, A., & Toschi, F. (2024). Data-driven physics-based modeling of pedestrian dynamics. To appear xx.
 
@@ -26,7 +26,7 @@ Pouw, C. A. S., van der Vleuten, G., Corbetta, A., & Toschi, F. (2024). Data-dri
 Install the package from PyPI
 
 ```bash
-pip install physped
+pip install physics-based-pedestrian-modeling
 ```
 
 Run the main script for one of the available parameter files (listed below)
@@ -59,8 +59,8 @@ A couple of usage notebooks are available for the following cases:
 * Station paths
 * User input paths
 
+# Documentation
+* Documentation: https://c-pouw.github.io/physics-based-pedestrian-modeling.
+
 # License
 * Free software: 3-clause BSD license
-
-# Documentation
-* Documentation: (COMING SOON!) https://c-pouw.github.io/physics-based-pedestrian-modeling.
