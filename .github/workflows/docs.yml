@@ -1,64 +1,64 @@
-# name: Build Documentation
+name: Build Documentation
 
-# on:
-#   push:
-#   pull_request:
-#   workflow_dispatch:
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
 
-# jobs:
-#   build_docs:
-#     # pull requests are a duplicate of a branch push if within the same repo.
-#     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+jobs:
+  build_docs:
+    # pull requests are a duplicate of a branch push if within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
 
-#     runs-on: ubuntu-latest
-#     strategy:
-#       matrix:
-#         python-version: ["3.11"]
-#       fail-fast: false
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+      fail-fast: false
 
-#     defaults:
-#       run:
-#         shell: bash -l {0}
+    defaults:
+      run:
+        shell: bash -l {0}
 
-#     steps:
-#       - name: Set env vars
-#         run: |
-#           export REPOSITORY_NAME=${GITHUB_REPOSITORY#*/}  # just the repo, as opposed to org/repo
-#           echo "REPOSITORY_NAME=${REPOSITORY_NAME}" >> $GITHUB_ENV
+    steps:
+      - name: Set env vars
+        run: |
+          export REPOSITORY_NAME=${GITHUB_REPOSITORY#*/}  # just the repo, as opposed to org/repo
+          echo "REPOSITORY_NAME=${REPOSITORY_NAME}" >> $GITHUB_ENV
 
-#       - name: Checkout the code
-#         uses: actions/checkout@v4
-#         with:
-#           fetch-depth: 1000  # should be enough to reach the most recent tag
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1000  # should be enough to reach the most recent tag
 
-#       - name: Set up Python ${{ matrix.python-version }}
-#         uses: actions/setup-python@v5
-#         with:
-#           python-version: ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
-#       - name: Install documentation-building requirements
-#         run: |
-#           # For reference: https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html.
-#           set -vxeuo pipefail
+      - name: Install documentation-building requirements
+        run: |
+          # For reference: https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html.
+          set -vxeuo pipefail
 
-#           # These packages are installed in the base environment but may be older
-#           # versions. Explicitly upgrade them because they often create
-#           # installation problems if out of date.
-#           python -m pip install --upgrade pip setuptools numpy
+          # These packages are installed in the base environment but may be older
+          # versions. Explicitly upgrade them because they often create
+          # installation problems if out of date.
+          python -m pip install --upgrade pip setuptools numpy
 
-#           pip install .
-#           pip install -r requirements-dev.txt
-#           pip list
+          pip install .
+          pip install -r requirements-dev.txt
+          pip list
 
-#       - name: Build Docs
-#         run: |
-#           sphinx-apidoc -f -o docs/source physped
-#           make -C docs/ html
+      - name: Build Docs
+        run: |
+          sphinx-apidoc -f -o docs/source physped
+          make -C docs/ html
 
-#       - uses: actions/upload-artifact@v4
-#         with:
-#           name: ${{ env.REPOSITORY_NAME }}-docs
-#           path: docs/build/html/
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: ${{ env.REPOSITORY_NAME }}-docs
+      #     path: docs/build/html/
 
       # - name: Init new repo in dist folder and commit generated files
       #   run: |
@@ -71,10 +71,10 @@
       #     git config --global --add safe.directory /github/workspace/docs/build/html
       #     git commit -m 'deploy'
 
-      # - name: Force push to destination branch
-      #   uses: ad-m/github-push-action@v0.8.0
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     branch: gh-pages
-      #     force: true
-      #     directory: ./docs/build/html
+      - name: Force push to destination branch
+        uses: ad-m/github-push-action@v0.8.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+          force: true
+          directory: ./docs/build/html
