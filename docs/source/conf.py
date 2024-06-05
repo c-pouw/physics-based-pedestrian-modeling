@@ -61,8 +61,8 @@ templates_path = ["_templates"]
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-# source_suffix = ['.rst', '.md']
-source_suffix = ".rst"
+source_suffix = [".rst", ".md"]
+# source_suffix = ".rst"
 
 # The master toctree document.
 master_doc = "index"
@@ -70,7 +70,7 @@ master_doc = "index"
 # General information about the project.
 project = "Data-driven physics-based modeling of pedestrian dynamics"
 copyright = "2024, Eindhoven University of Technology"
-author = "Eindhoven University of Technology"
+author = "C.A.S. Pouw"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
