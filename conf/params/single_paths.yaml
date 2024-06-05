@@ -1,6 +1,5 @@
 defaults:
   - grid: default_grid
-  - model: default_model_parameters
   - simulation: default_simulation_params
   - selection: default_selection
   - trajectory_plot: default_trajectory_plot_params
