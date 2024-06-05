@@ -16,6 +16,7 @@ fps: 15
 dt: ${inv_prop:${params.fps}}
 sigma: 0.5
 minimum_trajectory_length: 5
+velocity_window_length: 5
 input_ntrajs: ???
 grid:
   x:

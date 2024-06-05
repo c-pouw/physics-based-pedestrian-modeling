@@ -15,6 +15,7 @@ fps: 10
 dt: 0.1
 sigma: 0.5
 minimum_trajectory_length: 10
+velocity_window_length: 10
 input_ntrajs: ???
 colnames:
   xf: xf
@@ -44,9 +45,10 @@ default_xlims: [-3,3]
 default_ylims:  [-2,2]
 trajectory_plot:
   title: "curved paths"
+  truncate_trajectories: true
   y_title: 0.9
   text_box:
-    x: 0.84
+    x: 0.845
     y: 0.18
 force_field_plot:
   figsize: [3.54, 2]

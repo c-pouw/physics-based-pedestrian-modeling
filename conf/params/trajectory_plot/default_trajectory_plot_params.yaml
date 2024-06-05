@@ -15,6 +15,9 @@ show_background: false
 velocity_grid: polar
 plot_polar_grid: true
 grid_type: potential
+truncate_trajectories: false
+truncated_trajectory_length: 300
+trajectory_alpha: 1
 yticks:
   custom: false
 text_box:

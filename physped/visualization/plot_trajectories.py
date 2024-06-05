@@ -21,7 +21,7 @@ from physped.visualization.plot_utils import (
 
 log = logging.getLogger(__name__)
 
-trajectory_colorset = list(palettes.TolRainbow23)
+trajectory_colorset = list(palettes.TolRainbow20)[::-1]
 
 
 def plot_position_trajectories_in_cartesian_coordinates(
@@ -143,8 +143,12 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
     traj_plot_params = params.trajectory_plot
 
     num_trajectories_to_plot = traj_plot_params.get("N_trajs", 10)
+    num_trajectories_to_plot = min(num_trajectories_to_plot, trajs.Pid.nunique())
     sampled_pids = trajs.Pid.drop_duplicates().sample(num_trajectories_to_plot)
     plot_trajs = trajs[trajs["Pid"].isin(sampled_pids)]
+
+    if traj_plot_params.truncate_trajectories:
+        plot_trajs = plot_trajs[plot_trajs["k"] < traj_plot_params.truncated_trajectory_length]
 
     fig = plt.figure(layout="constrained")
     fig.set_size_inches(traj_plot_params.figsize)
@@ -153,7 +157,7 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
     ax = fig.add_subplot(spec[0])
     if traj_plot_params.plot_cartesian_grid:
         ax.grid(False)
-        ax = plot_cartesian_spatial_grid(ax, params.grid, alpha=0.4)
+        ax = plot_cartesian_spatial_grid(ax, params.grid, alpha=traj_plot_params.trajectory_alpha)
     ax = apply_xy_plot_style(ax, params)
     ax = plot_position_trajectories_in_cartesian_coordinates(ax, plot_trajs)
     ax.set_title("Positions $\\vec{x}$ [m]", y=1)
@@ -224,7 +228,7 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
         "simulated": "simulated",
     }
     if traj_plot_params.plot_title:
-        title = f"Sample of {traj_plot_params.N_trajs} {traj_type_description[trajectory_type]}" f" {traj_plot_params.title}"
+        title = f"Sample of {num_trajectories_to_plot} {traj_type_description[trajectory_type]}" f" {traj_plot_params.title}"
         fig.suptitle(title, x=0.5, y=traj_plot_params.y_title, ha="center", va="center")
     filepath = Path.cwd() / f"{trajectory_type}_trajectories_{params.get('env_name', '')}.pdf"
     log.info("Saving trajectory plot to %s.", filepath.relative_to(config.root_dir))

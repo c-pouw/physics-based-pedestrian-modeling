@@ -85,14 +85,15 @@ def infer_bounds_from_data(data: np.ndarray) -> tuple:
     return (np.nanmin(data), np.nanmax(data))
 
 
-def plot_colorbar(ax: plt.Axes, cs: mpl.contour.QuadContourSet) -> plt.Axes:
+def plot_colorbar(ax: plt.Axes, cs: mpl.contour.QuadContourSet, label: str) -> plt.Axes:
     """Plot the colorbar."""
     cbar = plt.colorbar(
         cs,
         ax=ax,
         shrink=0.5,
     )
-    cbar.set_label("$\\Delta V = 0.023\\log{\\left[\\mathbb{P}" "(y_s\\mid x_s,\\vec u_s)\\right]}$")
+    # label = "$\\Delta V = 0.023\\log{\\left[\\mathbb{P}" "(y_s\\mid x_s,\\vec u_s)\\right]}$"
+    cbar.set_label(label)
     return ax
 
 

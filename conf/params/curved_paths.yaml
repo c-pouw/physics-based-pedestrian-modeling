@@ -15,13 +15,14 @@ fps: 30
 dt: 0.0333
 sigma: 1
 minimum_trajectory_length: 10
+velocity_window_length: 10
 input_ntrajs: ???
 colnames:
   xf: x
   yf: 'y'
   # uf: v_x_m
   # vf: v_y_m
-  Pid: new_pid
+  Pid: particle
   time: time
 grid:
   x:
@@ -47,5 +48,9 @@ default_ylims:  [-3,3]
 trajectory_plot:
   title: "curved paths"
   y_title: 0.9
+  truncate_trajectories: false
+  text_box:
+    x: 0.84
+    y: 0.18
 force_field_plot:
   figsize: [3.54, 2]

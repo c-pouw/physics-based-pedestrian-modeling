@@ -19,9 +19,8 @@ class LangevinModel:
     It contains methods for initializing the model, simulating trajectories, and defining stopping conditions.
 
     Attributes:
-        grids (DiscreteGrid): The discrete grid object used for modeling.
+        potential (PiecewisePotential): The piecewise potential object used for modeling.
         params (dict): A dictionary containing the model parameters.
-        grid_counts (ndarray): The counts of grid cells visited during simulation.
 
     """
 
@@ -29,7 +28,7 @@ class LangevinModel:
         """Initialize Langevin model with parameters.
 
         Args:
-            grids (DiscreteGrid): The discrete grid object used for modeling.
+            potential (PiecewisePotential): The piecewise potential object used for modeling.
             params (dict): A dictionary containing the model parameters.
 
         """
@@ -39,24 +38,31 @@ class LangevinModel:
         self.heatmap = np.sum(potential.histogram, axis=(2, 3, 4)) / np.sum(potential.histogram)
 
     def simulate(self, X_0: np.ndarray, t_eval: np.ndarray = np.arange(0, 10, 0.1)) -> np.ndarray:
+        """
+        Simulates the Langevin model.
+
+        Parameters:
+        - X_0: Initial state of the system as a numpy array.
+        - t_eval: Time points at which to evaluate the solution. Defaults to np.arange(0, 10, 0.1).
+
+        Returns:
+        - The simulated trajectory of the system as a numpy array.
+        """
         return sdeint.itoSRI2(self.modelxy, self.Noise, y0=X_0, tspan=t_eval)
 
     def modelxy(self, X_0: np.ndarray, t) -> np.ndarray:
         """
-        Given state z=(xf, yf, ..., us, vs), returns the derivatives dz/dt (excluding random noise).
+        Calculate the derivatives of the Langevin model for the given state variables.
 
-        Parameters:
-        - X_0: Initial state vector containing the values of xf, yf, uf, vf, xs, ys, us, vs.
+        Args:
+            X_0 (np.ndarray): Array of initial state variables [xf, yf, uf, vf, xs, ys, us, vs].
+            t: Time parameter (not used in this method).
 
         Returns:
-        - dz/dt: Derivatives of the state vector (uf, vf, ufdot, vfdot, xsdot, ysdot, usdot, vsdot).
-
+            np.ndarray: Array of derivatives [uf, vf, ufdot, vfdot, xsdot, ysdot, usdot, vsdot].
         """
-        # ? Can we precompute certain quantities to make the processing faster?
         xf, yf, uf, vf, xs, ys, us, vs = X_0
         # check stopping condition
-        # Either position out of domain or position in unexplored grid cell
-        # stop_condition = self.params.get("stop_condition", 0.000001)
         stop_condition = self.params.simulation.stop_condition
         if self.stop_condition(xf, yf, stop_condition) or np.isnan(xs):
             return np.zeros(len(X_0)) * np.nan  # terminate simulation
@@ -100,11 +106,11 @@ class LangevinModel:
 
     def stop_condition(self, xf: float, yf: float, stop_condition: float) -> bool:
         """
-        Custom stopping condition.
+        Custom stopping condition to terminate a trajectory when the potential goes to infinity.
 
         Parameters:
-        - xf (float): The x-coordinate of the pedestrian's final position.
-        - yf (float): The y-coordinate of the pedestrian's final position.
+        - xf (float): The x-coordinate of the pedestrian.
+        - yf (float): The y-coordinate of the pedestrian.
         - stop_condition (float): The threshold value for the stopping condition.
 
         Returns:
