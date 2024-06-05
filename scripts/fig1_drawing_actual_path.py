@@ -70,7 +70,9 @@ def plot_frame(traj_to_plot):
     path2_color = "C1"
     path3_color = "C2"
 
-    fig, ax = plt.subplots()
+    fig = plt.figure(layout="constrained")
+    ax = fig.add_subplot()
+    # fig, ax = plt.subplots()
 
     intended_path_x = traj_to_plot["xs"].tolist() + [direct_path_x[-1]]
     intended_path_y = traj_to_plot["ys"].tolist() + [direct_path_y[-1]]
@@ -79,8 +81,8 @@ def plot_frame(traj_to_plot):
     (path3,) = ax.plot(direct_path_x, direct_path_y, "-", c=path3_color, zorder=1)
     (path3,) = ax.plot(direct_path_x, direct_path_y, "--", c=path3_color, alpha=0.8, lw=1)
 
-    ax.set_xlabel("$x\\; (\\mathrm{m})$")
-    ax.set_ylabel("$y\\; (\\mathrm{m})$")
+    ax.set_xlabel("$x\\; [\\mathrm{m}]$")
+    ax.set_ylabel("$y\\; [\\mathrm{m}]$")
     ax.set_aspect("equal")
     if cfg.params.env_name == "station_paths":
         ax = plot_station_background(ax, cfg)
@@ -106,16 +108,16 @@ def plot_frame(traj_to_plot):
     center1 = traj_to_plot.iloc[0][["xf", "yf"]].to_list()
     # ax.text(center1[0], center1[1], 'Origin', ha = 'center', )
     ax.text(
-        center1[0] - 1.5,
-        center1[1] + 2,
+        center1[0] - 1.2,
+        center1[1] + 1.5,
         "Origin",
         ha="center",
         bbox=dict(facecolor="white", edgecolor=None, boxstyle="round,pad=0.5"),
     )
     center2 = traj_to_plot.iloc[-1][["xf", "yf"]].to_list()
     ax.text(
-        center2[0] + 2.5,
-        center2[1] - 2.5,
+        center2[0] + 1.2,
+        center2[1] - 2,
         "Destination",
         ha="center",
         bbox=dict(facecolor="white", edgecolor=None, boxstyle="round,pad=0.5"),
@@ -149,7 +151,7 @@ def plot_frame(traj_to_plot):
         y1 = -6.5
         y2 = y1 + 3
         # axin = ax.inset_axes([0.5, 0.05, 0.3, 0.35], xlim=(x1, x2), ylim=(y1, y2), xticklabels=[], yticklabels=[])
-        axin = ax.inset_axes([0.05, 0.5, 0.3, 0.45], xlim=(x1, x2), ylim=(y1, y2), xticklabels=[], yticklabels=[])
+        axin = ax.inset_axes([0.05, 0.57, 0.3, 0.4], xlim=(x1, x2), ylim=(y1, y2), xticklabels=[], yticklabels=[])
 
         (path1,) = axin.plot(traj_to_plot["xf"], traj_to_plot["yf"], ".", c=path1_color, alpha=1, ms=1)
         (path2,) = axin.plot(traj_to_plot["xs"], traj_to_plot["ys"], c=path2_color, ls="--", alpha=1, lw=1)
@@ -188,11 +190,14 @@ def plot_frame(traj_to_plot):
         ax.add_patch(cp2)
 
     ax.set_xlim(cfg.params.trajectory_plot.xlims)
-    ax.set_ylim(cfg.params.trajectory_plot.ylims)
+    ax.set_ylim(-12, 5)
+    # ax.set_ylim(cfg.params.trajectory_plot.ylims)
 
     lines = [path3, path2, path1]
-    labels = ["Direct path to destination", "Intended path perturbed by obstacles", "Actual path including noise"]
-    plt.figlegend(lines, labels, loc="upper left", bbox_to_anchor=(0.11, 1.07), ncol=1)
+    # labels = ["Direct path to destination", "Intended path perturbed by obstacles", "Actual path including noise"]
+    # plt.figlegend(lines, labels, loc="upper left", bbox_to_anchor=(0.11, 1.07), ncol=1)
+    labels = ["Direct path to destination", "Intended path around obstacles", "Actual path with fluctuations"]
+    plt.figlegend(lines, labels, loc="upper left", bbox_to_anchor=(0.4, 0.39), ncol=1, fontsize=7.5)
     plt.savefig("../figures/fig1_drawing_intended_path.pdf", bbox_inches="tight")
 
 

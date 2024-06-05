@@ -212,7 +212,8 @@ def add_velocity(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     xpos = "xf"
     ypos = "yf"
     pos_to_vel = {"xf": "uf", "yf": "vf"}
-    window_length = parameters.minimum_trajectory_length - 1
+    window_length = parameters.velocity_window_length
+    # window_length = parameters.minimum_trajectory_length - 1
     for direction in [xpos, ypos]:
         df.loc[:, pos_to_vel[direction]] = df.groupby([groupby])[direction].transform(
             lambda x: savgol_filter(x, window_length=window_length, polyorder=2, deriv=1, mode="interp") * framerate
@@ -241,6 +242,8 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     log.info("Columns renamed to %s", list(df.columns))
     df = prune_short_trajectories(df, parameters)
     log.info("Short trajectories with less than %s observations removed.", parameters.minimum_trajectory_length)
+    df = add_trajectory_step(df, parameters)
+    log.info("Trajectory step added.")
 
     uf = parameters.colnames.get("uf", None)
     vf = parameters.colnames.get("vf", None)
@@ -248,11 +251,11 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         log.warning("Columns for velocity not found in parameters. Calculating velocity.")
         df = add_velocity(df, parameters)
         log.info("Velocity added.")
-    df = add_trajectory_step(df, parameters)
-    log.info("Trajectory step added.")
     df = add_velocity_in_polar_coordinates(df, mode="f")
     log.info("Velocity transformed to polar coordinates.")
+    # TODO: Separate slow modes from preprocessing.
     slow_mode_algorithm = compute_slow_modes_geert
+    log.info("Compute slow modes with %s.", slow_mode_algorithm.__name__)
     df = compute_all_slow_modes(
         df,
         ["x", "y", "u", "v"],  # , "r", "theta"],
@@ -262,7 +265,6 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     )
     df = add_velocity_in_polar_coordinates(df, mode="s")
     log.info("Slow mode velocity transformed to polar coordinates.")
-    log.info("Slow modes computed with %s.", slow_mode_algorithm.__name__)
     # if parameters.intermediate_save.preprocessed_trajectories:
     if config.save.preprocessed_trajectories:
         log.debug("Configuration 'save.preprocessed_trajectories' is set to True.")

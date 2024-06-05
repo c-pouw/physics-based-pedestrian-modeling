@@ -169,6 +169,7 @@ def read_curved_paths(config) -> pd.DataFrame:
     # trajs["x"] = trajs["x"] * conversion_X / 100
     # trajs["y"] = trajs["y"] * conversion_Y / 100
 
+    # Trajectories recorded during experiment 1
     trajectory_data_dir = Path(config.trajectory_data_dir)
     trajs = pd.read_csv(trajectory_data_dir / "linecross-1.csv")
     trajs = filter_trajectory(trajs)
@@ -181,6 +182,7 @@ def read_curved_paths(config) -> pd.DataFrame:
     trajs["y"] = trajs["y"] - np.mean(trajs["y"]) + 35
     trajs1 = trajs.copy()
 
+    # Trajectories recorded during experiment 2
     trajs = pd.read_csv(trajectory_data_dir / "linecross-2.csv")
     trajs = filter_trajectory(trajs)
     trajs = trajs[trajs.frame > 380].copy()
@@ -217,6 +219,7 @@ def read_station_paths(config) -> pd.DataFrame:
 
 
 def read_asdz_pf34(config) -> pd.DataFrame:
+    # TODO: Make separate readers for local and 4tu data sources
     if config.params.data_source == "local":
         trajectory_data_dir = Path(config.trajectory_data_dir)
         file_path = trajectory_data_dir / "Amsterdam Zuid - platform 3-4 - set1.csv"

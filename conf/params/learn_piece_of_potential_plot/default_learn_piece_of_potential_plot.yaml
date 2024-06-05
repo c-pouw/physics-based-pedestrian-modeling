@@ -4,10 +4,10 @@ xlimits:
   u: [-1.5, 1.5]
   v: [-1.0, 1.0]
 xlabel:
-  x: "$(x \\, |\\, \\vec{x}_s, \\vec{u}_s)$ [m]"
-  y: "$(y \\, |\\, \\vec{x}_s, \\vec{u}_s)$ [m]"
-  u: "$(u \\, |\\, \\vec{x}_s, \\vec{u}_s) [\\mathrm{m\\,s}^{-1}]$"
-  v: "$(v \\, |\\, \\vec{x}_s, \\vec{u}_s) [\\mathrm{m\\,s}^{-1}]$"
+  x: "$(x \\, |\\, \\vec{x}_s, \\vec{u}_s)\\, [\\mathrm{m}]$"
+  y: "$(y \\, |\\, \\vec{x}_s, \\vec{u}_s)\\, [\\mathrm{m}]$"
+  u: "$(u \\, |\\, \\vec{x}_s, \\vec{u}_s) \\, [\\mathrm{m\\,s}^{-1}]$"
+  v: "$(v \\, |\\, \\vec{x}_s, \\vec{u}_s) \\, [\\mathrm{m\\,s}^{-1}]$"
 ylabel:
   x: "$\\mathbb{P}(x \\, |\\, \\vec{x}_s, \\vec{u}_s)$"
   y: "$\\mathbb{P}(y \\, |\\, \\vec{x}_s, \\vec{u}_s)$"

@@ -49,6 +49,7 @@ ax.xaxis.labelpad = -7
 ax.set_ylabel("x [m]")
 ax.set_ylim(-1, 1)
 ax.set_yticks([-1, 0, 1])
+ax.set_yticklabels([-1, 0, 1], rotation=0, verticalalignment="baseline", horizontalalignment="center")
 
 # z
 ax.set_zlim(0, 0.5)
@@ -65,8 +66,8 @@ ax.set_box_aspect(aspect=(3, 6, 1))
 X = np.arange(-2, 2, 0.01)
 Y = np.arange(-2, 2, 0.05)
 X, Y = np.meshgrid(X, Y)
-Z1 = 0.5 * (X) ** 2 + 0.5 * (Y**2 - 1**2) ** 2
-Z1 = np.where(Z1 > 0.9, np.nan, Z1)
+Z1 = 1.5 * (X) ** 2 + 0.3 * (Y**2 - 1.3**2) ** 2
+Z1 = np.where(Z1 > 1, np.nan, Z1)
 
 steps = 20
 yy = np.linspace(-1, 1, steps)
@@ -76,23 +77,25 @@ for y0 in y0s:
     ax.plot_surface(X + y0, Y, Z1, cmap="Blues", linewidth=0, antialiased=False)
 
 # x
-ax.set_xlim(-1.5, 1.5)
+ax.set_xlim(-1.1, 1.1)
 ax.set_xlabel("v [$\\mathrm{m\\,s}^{-1}$]")
 ax.set_xticks([-1, 0, 1])
 ax.xaxis.labelpad = 20
-ax.tick_params(axis="x", which="major", pad=-3)
-ax.xaxis.labelpad = -3
+ax.tick_params(axis="x", which="major", pad=-5)
+ax.xaxis.labelpad = -6
 
 # y
 ax.set_ylabel("u [$\\mathrm{m\\,s}^{-1}$]")
-ax.set_ylim(-2, 2)
-ax.set_yticks([-2, 0, 2])
-# ax.tick_params(axis='y', which='major', pad=-1)
+ax.set_ylim(-2.5, 2.5)
+ax.set_yticks([-2.5, -1.3, 0, 1.3, 2.5])
+# ax.set_yticklabels()
+# ax.tick_params(axis='y', which='major', pad=-2)
+ax.set_yticklabels([-2.5, "$-u_s$", 0, "$u_s$", 2.5], rotation=0, verticalalignment="baseline", horizontalalignment="center")
 # ax.yaxis.labelpad=-2
 
 # z
 ax.set_zlim(0, 0.8)
-ax.set_zticks([0.8])
+ax.set_zticks([1.1])
 ax.set_zticklabels(["$\\phi$(u,v)"])
 # ax.tick_params(axis='z', which='major', pad=0)
 
