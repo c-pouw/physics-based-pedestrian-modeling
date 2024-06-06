@@ -29,6 +29,8 @@ Install the package from PyPI
 pip install physics-based-pedestrian-modeling
 ```
 
+Download the configuration files into your working directory.
+
 Run the main script for one of the available parameter files (listed below)
 
 ```bash
