@@ -51,12 +51,14 @@ setup(
     packages=find_packages(exclude=["docs", "tests"]),
     entry_points={
         "console_scripts": [
+            "physped = scripts:main.py"
             # 'command = some.module:some_function',
         ],
     },
     include_package_data=True,
     package_data={
         "physped": [
+            "conf/*.yaml"
             # When adding files here, remember to update MANIFEST.in as well,
             # or else they will not be included in the distribution on PyPI!
             # 'path/to/data_file',
