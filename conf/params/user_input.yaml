@@ -16,6 +16,7 @@ fps: ???
 dt: ${inv_prop:${params.fps}}
 sigma: 0.5
 minimum_trajectory_length: 5
+velocity_window_length: 10
 input_ntrajs: ???
 grid:
   x:
@@ -29,6 +30,8 @@ colnames:
   yf: ???
   Pid: ???
   time: ???
+  uf: ???
+  vf: ???
 plot_style: conf/science.mplstyle
 default_xlims: ???
 default_ylims: ???
