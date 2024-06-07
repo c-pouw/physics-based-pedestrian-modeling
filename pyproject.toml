@@ -1,12 +1,15 @@
 [tool.poetry]
 name = "physics-based-pedestrian-modeling"
-version = "0.1.1"
+version = "0.1.2"
 description = "Python package to create physics-based pedestrian models from crowd measurements"
 authors = ["Cas Pouw <c.a.s.pouw@tue.nl>"]
 license = "BSD-3-Clause"
 readme = "README.md"
 repository = "https://github.com/c-pouw/physics-based-pedestrian-modeling/"
 packages = [{include = "physped"}]
+
+[project.scripts]
+physped_main = "physped.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.11"
