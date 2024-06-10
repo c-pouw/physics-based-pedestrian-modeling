@@ -12,7 +12,7 @@ packages = [{include = "physped"}]
 physped_main = "physped.main:main"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.10"
 pandas = "^2.2.2"
 numpy = "^1.26.4"
 scipy = "^1.13.0"

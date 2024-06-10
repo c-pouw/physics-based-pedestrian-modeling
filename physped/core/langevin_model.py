@@ -76,10 +76,10 @@ class LangevinModel:
         ]
 
         # determine potential energy contributions
-        V_x = self.potential.curvature_x[*X_indx] * (xf - xmean)
-        V_y = self.potential.curvature_y[*X_indx] * (yf - ymean)
-        V_u = self.potential.curvature_u[*X_indx] * (uf - umean)
-        V_v = self.potential.curvature_v[*X_indx] * (vf - vmean)
+        V_x = self.potential.curvature_x[X_indx[0], X_indx[1], X_indx[2], X_indx[3], X_indx[4]] * (xf - xmean)
+        V_y = self.potential.curvature_y[X_indx[0], X_indx[1], X_indx[2], X_indx[3], X_indx[4]] * (yf - ymean)
+        V_u = self.potential.curvature_u[X_indx[0], X_indx[1], X_indx[2], X_indx[3], X_indx[4]] * (uf - umean)
+        V_v = self.potential.curvature_v[X_indx[0], X_indx[1], X_indx[2], X_indx[3], X_indx[4]] * (vf - vmean)
 
         # acceleration fast modes (-grad V, random noise excluded)
         ufdot = -V_x - V_u
