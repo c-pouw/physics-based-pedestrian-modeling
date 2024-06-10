@@ -23,29 +23,19 @@ Pouw, C. A. S., van der Vleuten, G., Corbetta, A., & Toschi, F. (2024). Data-dri
 
 # Getting started
 
-Install the package from PyPI
+Install the package from source
 
 ```bash
-pip install physics-based-pedestrian-modeling
+git clone https://github.com/c-pouw/physics-based-pedestrian-modeling.git
+cd physics-based-pedestrian-modeling
+pip install -e .
 ```
 
-Download the configuration files into your working directory.
-
-Run the main script for one of the available parameter files (listed below)
+Run the main prcessing script for one of the available parameter files (listed below)
 
 ```bash
-python main.py params=single_paths
+python physped/main.py params=PARAM_NAME
 ```
-
-# Features
-### Preprocessing of trajectories
-Calculate slow dynamics
-
-### Learn potential from the preprocessed trajectories
-Learn the potential
-
-### Simulate new trajectories using the learned potential
-Simulate new trajectories
 
 ## Parameter Files
 Configuration of parameter files is handled by ![Hydra](https://github.com/facebookresearch/hydra). Default parameter files are provided for the following cases:
@@ -58,8 +48,20 @@ Configuration of parameter files is handled by ![Hydra](https://github.com/faceb
 ## Featured Notebooks
 A couple of usage notebooks are available for the following cases:
 * Narrow corridor paths [![Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_narrow_corridor_colab.ipynb)
-* Station paths
+* Train station paths
 * User input paths
+
+
+# Features
+### Preprocessing of trajectories
+Calculate slow dynamics
+
+### Learn potential from the preprocessed trajectories
+Learn the potential
+
+### Simulate new trajectories using the learned potential
+Simulate new trajectories
+
 
 # Documentation
 * Documentation: https://c-pouw.github.io/physics-based-pedestrian-modeling.
