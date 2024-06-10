@@ -13,7 +13,7 @@ repository = "https://github.com/c-pouw/physics-based-pedestrian-modeling/"
 packages = [{include = "physped"}]
 
 [project.scripts]
-physped_main = "physped.main:main"
+physped-main = "physped.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -63,7 +63,7 @@ exclude = '''
   | build
   | dist
 
-  # The following are specific to Black, you probably don't want those.
+  # The following are specific to Black, you probably dont want those.
   | blib2to3
   | tests/data
 )/

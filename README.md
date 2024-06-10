@@ -57,7 +57,7 @@ Configuration of parameter files is handled by ![Hydra](https://github.com/faceb
 
 ## Featured Notebooks
 A couple of usage notebooks are available for the following cases:
-* Narrow corridor paths
+* Narrow corridor paths [![Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_narrow_corridor_colab.ipynb)
 * Station paths
 * User input paths
 
