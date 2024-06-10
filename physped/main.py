@@ -20,7 +20,7 @@ from physped.visualization.plot_trajectories import plot_trajectories
 log = logging.getLogger(__name__)
 
 
-@hydra.main(version_base=None, config_path="../conf", config_name="config")
+@hydra.main(version_base=None, config_path="conf", config_name="config")
 def main(config):
     env_name = config.params.env_name
     log.debug("Configuration: \n%s", pprint.pformat(dict(config)))
