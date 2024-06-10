@@ -9,7 +9,7 @@ defaults:
   - learn_piece_of_potential_plot: default_learn_piece_of_potential_plot
   - _self_
 env_name: single_paths
-data_source: 4tu
+data_source: local
 taux: 2
 tauu: ${params.taux}
 fps: 15
