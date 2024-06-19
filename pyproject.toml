@@ -28,6 +28,7 @@ hydra-colorlog = "^1.2.0"
 tables = "^3.9.2"
 bokeh = "~3.3"
 poetry-plugin-export = "^1.7.1"
+urllib3 = "^2.2.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.3.0"
