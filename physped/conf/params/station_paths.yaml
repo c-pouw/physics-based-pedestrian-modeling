@@ -1,5 +1,6 @@
 defaults:
   - grid: default_grid
+  - model: default_model_params
   - simulation: default_simulation_params
   - selection: default_selection
   - trajectory_plot: default_trajectory_plot_params
@@ -9,12 +10,8 @@ defaults:
   - learn_piece_of_potential_plot: default_learn_piece_of_potential_plot
   - _self_
 env_name: station_paths
-taux: 2
-tauu: ${params.taux}
 fps: 10
-dt: 0.1
-sigma: 0.5
-minimum_trajectory_length: 10
+minimum_trajectory_length: 30
 velocity_window_length: 10
 input_ntrajs: ???
 grid:
@@ -42,12 +39,12 @@ selection:
     theta: 0.15
     k: 1.2
   range:
-    x: [48, 72]
-    y: [-9, 3]
+    x: [55, 55]
+    y: [-5, -5]
     r: [1, 1]
-    theta: [0, 0]
+    theta: [3.7, 3.7]
     k: [1.2, 1.2]
-plot_style: conf/science.mplstyle
+plot_style: physped/conf/science.mplstyle
 default_xlims: [45, 74]
 default_ylims: [-12, 6]
 background:
@@ -68,9 +65,10 @@ trajectory_plot:
     y: 0.26
 force_field_plot:
   figsize: [3.54, 2]
+  sparseness: 3
 learn_piece_of_potential_plot:
   xlimits:
-    x: [0, 1]
-    y: [-0.5, 0.5]
-    u: [0.5, 1.5]
-    v: [-0.5, 0.5]
+    x: [53, 57]
+    y: [-7, -3]
+    u: [-2, 2]
+    v: [-2, 2]

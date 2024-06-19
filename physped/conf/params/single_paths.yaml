@@ -1,5 +1,6 @@
 defaults:
   - grid: default_grid
+  - model: default_model_params
   - simulation: default_simulation_params
   - selection: default_selection
   - trajectory_plot: default_trajectory_plot_params
@@ -10,11 +11,7 @@ defaults:
   - _self_
 env_name: single_paths
 data_source: local
-taux: 2
-tauu: ${params.taux}
 fps: 15
-dt: ${inv_prop:${params.fps}}
-sigma: 0.5
 minimum_trajectory_length: 5
 velocity_window_length: 5
 input_ntrajs: ???

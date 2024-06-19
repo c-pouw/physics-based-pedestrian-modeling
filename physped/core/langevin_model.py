@@ -62,6 +62,14 @@ class LangevinModel:
             np.ndarray: Array of derivatives [uf, vf, ufdot, vfdot, xsdot, ysdot, usdot, vsdot].
         """
         xf, yf, uf, vf, xs, ys, us, vs = X_0
+        # dt = self.params.model.dt
+        # xs = xs + us * self.params.model.dt
+        # ys = ys + vs * self.params.model.dt
+
+        # ufdot, vfdot = 0, 0
+        # uf = uf + ufdot * self.params.dt
+        # vf = vf + vfdot * self.params.dt
+
         # check stopping condition
         stop_condition = self.params.simulation.stop_condition
         if self.stop_condition(xf, yf, stop_condition) or np.isnan(xs):
@@ -86,10 +94,10 @@ class LangevinModel:
         vfdot = -V_y - V_v
 
         # relaxation of slow modes toward fast modes
-        xsdot = -1 / self.params.taux * (xs - xf)
-        ysdot = -1 / self.params.taux * (ys - yf)
-        usdot = -1 / self.params.tauu * (us - uf)
-        vsdot = -1 / self.params.tauu * (vs - vf)
+        xsdot = us - 1 / self.params.model.taux * (xs - xf)
+        ysdot = vs - 1 / self.params.model.taux * (ys - yf)
+        usdot = -1 / self.params.model.tauu * (us - uf)
+        vsdot = -1 / self.params.model.tauu * (vs - vf)
 
         # return derivatives
         return np.array([uf, vf, ufdot, vfdot, xsdot, ysdot, usdot, vsdot])
@@ -102,7 +110,7 @@ class LangevinModel:
             correspond to the independent driving Wiener processes.
 
         """
-        return np.diag([0.0, 0.0, self.params.sigma, self.params.sigma, 0.0, 0.0, 0.0, 0.0])
+        return np.diag([0.0, 0.0, self.params.model.sigma, self.params.model.sigma, 0.0, 0.0, 0.0, 0.0])
 
     def stop_condition(self, xf: float, yf: float, stop_condition: float) -> bool:
         """

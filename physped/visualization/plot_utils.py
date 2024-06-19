@@ -305,7 +305,7 @@ def highlight_position_selection(ax: plt.Axes, params: dict) -> plt.Axes:
         "b": (0, 0, 1, 1),
     }
     args = {
-        "fc": (1, 1, 1, 0.6),
+        "fc": (1, 1, 1, 0),
         "ec": colors[c],
         "zorder": 10,
         "lw": 1.5,
@@ -327,7 +327,7 @@ def highlight_velocity_selection(ax: plt.Axes, params: dict) -> plt.Axes:
         "b": (0, 0, 1, 1),
     }
     args = {
-        "fc": (1, 1, 1, 0.6),
+        "fc": (1, 1, 1, 0),
         "ec": colors[c],
         "zorder": 10,
         "lw": 1.5,

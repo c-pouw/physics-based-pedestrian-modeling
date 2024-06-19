@@ -1,10 +1,11 @@
-import copy
 import logging
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from scipy.signal import savgol_filter
+from tqdm import tqdm
+from tqdm.contrib.logging import logging_redirect_tqdm
 
 from physped.io.readers import read_trajectories_from_path
 from physped.io.writers import save_trajectories
@@ -23,71 +24,60 @@ def compute_slow_modes_geert(xf: pd.Series, tau: float, dt: float) -> pd.Series:
     return xs
 
 
-def low_pass_filter(x: pd.Series, tau: float, dt: float) -> pd.Series:
-    """
-    Simple first-order low-pass filter.
+# def compute_slow_modes_with_shift(x: pd.Series, tau: float, dt: float) -> list:
+#     x = list(x)
+#     alpha = dt / tau
+#     k = int(tau / dt)
+#     # k = int(tau_x / (2 * delta_t))
+#     x = x + [x[-1]] * (k-1)
+#     x = x[k:]
+#     xs = [x[0]]  # Initialize xs(0) to x(0)
+#     for i in range(0, len(x)):
+#         xs.append((1 - alpha) * xs[-1] + alpha * x[i])
+#     return xs
 
-    Args:
-        x: Input signal (list or numpy array).
-        tau: Time constant.
-        dt: Time step.
-
-    Returns:
-        y: Filtered signal.
-    """
-    # y = [0] * len(x)  # Initialize output array
-    y = copy.deepcopy(x)
-    alpha = dt / (tau + dt)
-
-    for i in range(1, len(x)):
-        y[i] = alpha * x[i] + (1 - alpha) * y[i - 1]
-
-    return y
-
-
-def compute_slow_modes_numpy(xf: pd.Series, tau: float, dt: float) -> np.ndarray:
-    """Compute slow modes."""
-    # xf = list(xf)
-    # xfast = xf.copy()
-    xslow = list(xf)  # .copy()
-    for i in range(len(xf) - 1):
-        xslow[i + 1] = (1 - dt / tau) * xslow[i] + dt / tau * xslow[i]
-    return xslow
+# def compute_slow_modes_with_shift(x: pd.Series, tau: float, dt: float) -> list:
+#     x = list(x)
+#     alpha = dt / tau
+#     k = int(tau / dt)
+#     # k = int(tau_x / (2 * delta_t))
+#     x = x + [x[-1]] * (k-1)
+#     x = x[k:]
+#     xs = [x[0]]  # Initialize xs(0) to x(0)
+#     for i in range(0, len(x)):
+#         xs.append((1 - alpha) * xs[-1] + alpha * x[i])
+#     return xs
 
 
-def compute_slow_modes_ewm(xf: pd.Series, tau: float, dt: float) -> pd.Series:
-    """
-    Compute the slow modes of a time series using an exponential moving average filter.
-
-    Parameters:
-    - xf (pd.Series): The time series to compute the slow modes of.
-    - tau (float): The time constant of the filter.
-    - dt (float): The time step of the filter.
-
-    Returns:
-    - A new pandas Series object containing the slow modes of the input time series.
-    """
-    return xf.ewm(alpha=dt / tau, adjust=False).mean()
+def compute_slow_dynamics(x, xsdot, xs0, tau_x, delta_t):
+    alpha = delta_t / tau_x
+    xs = np.zeros_like(x)
+    xs[0] = xs0
+    for i in range(0, len(x) - 1):
+        xs[i + 1] = (1 - alpha) * xs[i] + alpha * x[i] + delta_t * xsdot[i]
+    return xs
 
 
-def compute_slow_modes_convolve(xf: np.ndarray, tau: float, dt: float) -> np.ndarray:
-    """
-    Compute the slow modes of a time series using an exponential moving average filter.
+# def compute_slow_position(x, us, tau_x, delta_t):
+#     x = list(x)
+#     us = list(us)
+#     alpha = delta_t / tau_x
+#     xs = np.zeros_like(x)
+#     xs[0] = x[0]  # Initialize xs(0) to x(0)
+#     for i in range(0, len(x)-1):
+#         xs[i+1] = (1 - alpha) * xs[i] + alpha * x[i] + delta_t * us[i]
+#     return xs
 
-    Parameters:
-    - xf (np.ndarray): The time series to compute the slow modes of.
-    - tau (float): The time constant of the filter.
-    - dt (float): The time step of the filter.
-
-    Returns:
-    - A new NumPy array containing the slow modes of the input time series.
-    """
-    # print(xf)
-    # xf = list(xf)
-    alpha = dt / tau
-    weights = np.exp(-np.arange(len(xf)) * alpha)
-    weights /= weights.sum()
-    return np.convolve(xf, weights, mode="same")
+# def compute_slow_velocity(u, accs, tau_x, delta_t):
+#     u = list(u)
+#     accs = list(accs)
+#     alpha = delta_t / tau_x
+#     us = np.zeros_like(u)
+#     # us[0] = u[0]  # Initialize xs(0) to x(0)
+#     us[0] = np.mean(u[:20])
+#     for i in range(0, len(u)-1):
+#         us[i+1] = (1 - alpha) * us[i] + alpha * u[i] #+ delta_t * accs[i]
+#     return us
 
 
 def savgolfilter(xf: pd.Series, tau: float, dt: float) -> np.ndarray:
@@ -95,7 +85,7 @@ def savgolfilter(xf: pd.Series, tau: float, dt: float) -> np.ndarray:
     return savgol_filter(xf, window_length, polyorder=1, deriv=0, mode="interp")
 
 
-def compute_all_slow_modes(
+def compute_all_slow_modes_without_time_recentering(
     trajectories: pd.DataFrame,
     observables: list,
     tau: float,
@@ -119,6 +109,64 @@ def compute_all_slow_modes(
         trajectories[obs + "s"] = trajectories.groupby("Pid")[obs + "f"].transform(lambda x: slow_mode_algo(x, tau, dt))
     # log.info(f'Slow modes computed.')
     return trajectories
+
+
+# def compute_all_slow_modes(trajectories, tau, dt):
+#     # TODO: Improve this function
+#     test_trajs_with_slow_modes = []
+#     with logging_redirect_tqdm():
+#         # for X_0 in tqdm(origins[:, :8], desc="Simulating trajectories", unit="trajs", total=origins.shape[0], miniters=10):
+#         for _, traj_i in tqdm(trajectories.groupby('Pid'), desc = 'Computing slow modes', unit = 'trajs',
+# total = len(trajectories.Pid.unique()), miniters = 100):
+#             traj_i['us'] = compute_slow_velocity(traj_i['uf'], traj_i['axf'], tau, dt)
+#             traj_i['vs'] = compute_slow_velocity(traj_i['vf'], traj_i['ayf'], tau, dt)
+#             traj_i['xs'] = compute_slow_position(traj_i['xf'], traj_i['us'], tau, dt)
+#             traj_i['ys'] = compute_slow_position(traj_i['yf'], traj_i['vs'], tau, dt)
+#             test_trajs_with_slow_modes.append(traj_i)
+
+#     test_trajs_with_slow_modes = pd.concat(test_trajs_with_slow_modes)
+#     test_trajs_with_slow_modes.sort_values(by='time', inplace=True)
+#     return test_trajs_with_slow_modes
+
+
+def compute_all_slow_modes(trajectories, tau, dt):
+    # TODO: Improve this function
+    test_trajs_with_slow_modes = []
+    with logging_redirect_tqdm():
+        # for X_0 in tqdm(origins[:, :8], desc="Simulating trajectories", unit="trajs", total=origins.shape[0], miniters=10):
+        for _, traj_i in tqdm(
+            trajectories.groupby("Pid"),
+            desc="Computing slow modes",
+            unit="trajs",
+            total=len(trajectories.Pid.unique()),
+            miniters=100,
+        ):
+
+            xf = list(traj_i["xf"])
+            yf = list(traj_i["yf"])
+            uf = list(traj_i["uf"])
+            vf = list(traj_i["vf"])
+
+            usdot = np.zeros(len(traj_i))
+            vsdot = np.zeros(len(traj_i))
+            us0 = uf[0]
+            vs0 = vf[0]
+
+            traj_i["us"] = compute_slow_dynamics(uf, usdot, us0, tau, dt)
+            traj_i["vs"] = compute_slow_dynamics(vf, vsdot, vs0, tau, dt)
+
+            xsdot = list(traj_i["us"])
+            ysdot = list(traj_i["vs"])
+            xs0 = xf[0]
+            ys0 = yf[0]
+
+            traj_i["xs"] = compute_slow_dynamics(xf, xsdot, xs0, tau, dt)
+            traj_i["ys"] = compute_slow_dynamics(yf, ysdot, ys0, tau, dt)
+            test_trajs_with_slow_modes.append(traj_i)
+
+    test_trajs_with_slow_modes = pd.concat(test_trajs_with_slow_modes)
+    test_trajs_with_slow_modes.sort_values(by="time", inplace=True)
+    return test_trajs_with_slow_modes
 
 
 def add_velocity_in_polar_coordinates(df: pd.DataFrame, mode: str = "f") -> pd.DataFrame:
@@ -221,6 +269,21 @@ def add_velocity(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     return df
 
 
+def add_acceleration(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
+    framerate = parameters.fps
+    groupby = "Pid"
+    xcol = "uf"
+    ycol = "vf"
+    new_col = {"uf": "axf", "vf": "ayf"}
+    window_length = parameters.velocity_window_length
+    # window_length = parameters.minimum_trajectory_length - 1
+    for direction in [xcol, ycol]:
+        df.loc[:, new_col[direction]] = df.groupby([groupby])[direction].transform(
+            lambda x: savgol_filter(x, window_length=window_length, polyorder=2, deriv=2, mode="interp") * framerate
+        )
+    return df
+
+
 def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     parameters = config.params
     filepath = Path.cwd().parent / config.filename.preprocessed_trajectories
@@ -251,24 +314,38 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         log.warning("Columns for velocity not found in parameters. Calculating velocity.")
         df = add_velocity(df, parameters)
         log.info("Velocity added.")
+
+    axf = parameters.colnames.get("axf", None)
+    ayf = parameters.colnames.get("ayf", None)
+    if axf is None or ayf is None:
+        log.warning("Columns for acceleration not found in parameters. Calculating acceleration.")
+        df = add_acceleration(df, parameters)
+        log.info("Acceleration added.")
+
     df = add_velocity_in_polar_coordinates(df, mode="f")
     log.info("Velocity transformed to polar coordinates.")
-    # TODO: Separate slow modes from preprocessing.
-    slow_mode_algorithm = compute_slow_modes_geert
-    log.info("Compute slow modes with %s.", slow_mode_algorithm.__name__)
-    df = compute_all_slow_modes(
-        df,
-        ["x", "y", "u", "v"],  # , "r", "theta"],
-        tau=parameters["taux"],
-        dt=parameters["dt"],
-        slow_mode_algo=slow_mode_algorithm,
-    )
-    df = add_velocity_in_polar_coordinates(df, mode="s")
-    log.info("Slow mode velocity transformed to polar coordinates.")
+
     # if parameters.intermediate_save.preprocessed_trajectories:
     if config.save.preprocessed_trajectories:
         log.debug("Configuration 'save.preprocessed_trajectories' is set to True.")
         save_trajectories(df, Path.cwd().parent, config.filename.preprocessed_trajectories)
+    return df
+
+
+def process_slow_modes(df: pd.DataFrame, config: dict) -> pd.DataFrame:
+    parameters = config.params
+    log.warning(df.columns)
+    # slow_mode_algorithm = compute_slow_modes_geert
+    # log.info("Compute slow modes with %s.", slow_mode_algorithm.__name__)
+    df = compute_all_slow_modes(
+        df,
+        # ["x", "y", "u", "v"],  # , "r", "theta"],
+        tau=parameters.model["taux"],
+        dt=parameters.model["dt"],
+        # slow_mode_algo=slow_mode_algorithm,
+    )
+    df = add_velocity_in_polar_coordinates(df, mode="s")
+    log.info("Slow mode velocity transformed to polar coordinates.")
     return df
 
 

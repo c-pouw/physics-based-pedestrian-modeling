@@ -127,7 +127,7 @@ def plot_intended_path(ax: plt.Axes, traj_plot_params: dict) -> plt.Axes:
     return ax
 
 
-def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = None):
+def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = None, traj_type="f"):
     """
     Plot trajectories of pedestrians.
 
@@ -159,7 +159,7 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
         ax.grid(False)
         ax = plot_cartesian_spatial_grid(ax, params.grid, alpha=traj_plot_params.trajectory_alpha)
     ax = apply_xy_plot_style(ax, params)
-    ax = plot_position_trajectories_in_cartesian_coordinates(ax, plot_trajs)
+    ax = plot_position_trajectories_in_cartesian_coordinates(ax, plot_trajs, 1, traj_type)
     ax.set_title("Positions $\\vec{x}$ [m]", y=1)
     if traj_plot_params.plot_walls:
         ax = plot_walls_in_environment(ax, traj_plot_params)
@@ -209,9 +209,9 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
     if (traj_plot_params.text_box.show) and (trajectory_type == "simulated"):
         textstr = (
             f"Model parameters\n"
-            f"$\\sigma=\\,${config.params.sigma} ms$^{{\\mathdefault{{-3/2}}}}$\n"
-            f"$\\tau_x=\\tau_u=\\,${config.params.taux} s\n"
-            f"$\\Delta t=\\,${config.params.dt:.3f} s"
+            f"$\\sigma=\\,${config.params.model.sigma} ms$^{{\\mathdefault{{-3/2}}}}$\n"
+            f"$\\tau_x=\\tau_u=\\,${config.params.model.taux} s\n"
+            f"$\\Delta t=\\,${config.params.model.dt:.3f} s"
         )
         props = {"boxstyle": "round", "facecolor": "white", "alpha": 1, "edgecolor": "black", "lw": 0.5}
         plt.figtext(
@@ -230,6 +230,6 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
     if traj_plot_params.plot_title:
         title = f"Sample of {num_trajectories_to_plot} {traj_type_description[trajectory_type]}" f" {traj_plot_params.title}"
         fig.suptitle(title, x=0.5, y=traj_plot_params.y_title, ha="center", va="center")
-    filepath = Path.cwd() / f"{trajectory_type}_trajectories_{params.get('env_name', '')}.pdf"
+    filepath = Path.cwd() / f"{trajectory_type}_trajectories_{traj_type}_{params.env_name}.pdf"
     log.info("Saving trajectory plot to %s.", filepath.relative_to(config.root_dir))
     plt.savefig(filepath)

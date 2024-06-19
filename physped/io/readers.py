@@ -42,28 +42,41 @@ def read_piecewise_potential_from_file(filepath: Path) -> PiecewisePotential:
 #     return paths
 
 
+def read_narrow_corridor_paths_local(config) -> pd.DataFrame:
+    trajectory_data_dir = Path(config.trajectory_data_dir)
+    log.info("Start reading single paths data set.")
+    archive = zipfile.ZipFile(trajectory_data_dir / "data.zip")
+
+    with archive.open("left-to-right.ssv") as f:
+        paths_ltr = f.read().decode("utf-8")
+
+    with archive.open("right-to-left.ssv") as f:
+        paths_rtl = f.read().decode("utf-8")
+    return paths_ltr, paths_rtl
+
+
+def read_narrow_corridor_paths_4tu(config) -> pd.DataFrame:
+    link = "https://data.4tu.nl/ndownloader/items/b8e30f8c-3931-4604-842a-77c7fb8ac3fc/versions/1"
+    bytestring = requests.get(link, timeout=10)
+    with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as outerzip:
+        with zipfile.ZipFile(outerzip.open("data.zip")) as innerzip:
+            with innerzip.open("left-to-right.ssv") as paths_ltr:
+                paths_ltr = paths_ltr.read().decode("utf-8")
+            with innerzip.open("right-to-left.ssv") as paths_rtl:
+                paths_rtl = paths_rtl.read().decode("utf-8")
+    return paths_ltr, paths_rtl
+
+
+narrow_corridor_path_reader = {
+    "local": read_narrow_corridor_paths_local,
+    "4tu": read_narrow_corridor_paths_4tu,
+}
+
+
 def read_single_paths(config) -> pd.DataFrame:
     """Read the single paths data set."""
-    if config.params.data_source == "local":
-        trajectory_data_dir = Path(config.trajectory_data_dir)
-        log.info("Start reading single paths data set.")
-        archive = zipfile.ZipFile(trajectory_data_dir / "data.zip")
-
-        with archive.open("left-to-right.ssv") as f:
-            paths_ltr = f.read().decode("utf-8")
-
-        with archive.open("right-to-left.ssv") as f:
-            paths_rtl = f.read().decode("utf-8")
-
-    elif config.params.data_source == "4tu":
-        link = "https://data.4tu.nl/ndownloader/items/b8e30f8c-3931-4604-842a-77c7fb8ac3fc/versions/1"
-        bytestring = requests.get(link, timeout=10)
-        with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as outerzip:
-            with zipfile.ZipFile(outerzip.open("data.zip")) as innerzip:
-                with innerzip.open("left-to-right.ssv") as paths_ltr:
-                    paths_ltr = paths_ltr.read().decode("utf-8")
-                with innerzip.open("right-to-left.ssv") as paths_rtl:
-                    paths_rtl = paths_rtl.read().decode("utf-8")
+    data_source = config.params.data_source
+    paths_ltr, paths_rtl = narrow_corridor_path_reader[data_source](config)
 
     df1 = pd.read_csv(io.StringIO(paths_ltr), sep=" ")
     df2 = pd.read_csv(io.StringIO(paths_rtl), sep=" ")
@@ -104,14 +117,8 @@ def read_intersecting_paths_synthetic(config) -> pd.DataFrame:
 
 
 def read_intersecting_paths(config) -> pd.DataFrame:
-    link = "https://data.4tu.nl/ndownloader/items/b8e30f8c-3931-4604-842a-77c7fb8ac3fc/versions/1"
-    bytestring = requests.get(link, timeout=10)
-    with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as outerzip:
-        with zipfile.ZipFile(outerzip.open("data.zip")) as innerzip:
-            with innerzip.open("left-to-right.ssv") as paths_ltr:
-                paths_ltr = paths_ltr.read().decode("utf-8")
-            with innerzip.open("right-to-left.ssv") as paths_rtl:
-                paths_rtl = paths_rtl.read().decode("utf-8")
+    data_source = config.params.data_source
+    paths_ltr, paths_rtl = narrow_corridor_path_reader[data_source](config)
 
     df1 = pd.read_csv(io.StringIO(paths_ltr), sep=" ")
     df1["X_SG"] = df1["X_SG"] + 0.1

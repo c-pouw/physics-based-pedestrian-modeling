@@ -1,20 +1,23 @@
 import glob
 import logging
-import pprint
 import shutil
 from pathlib import Path
+from pprint import pformat
 
 import hydra
 import matplotlib.pyplot as plt
+from omegaconf import OmegaConf
 
 from physped.core.functions_to_discretize_grid import learn_potential_from_trajectories
+from physped.core.functions_to_select_grid_piece import evaluate_selection_range
 from physped.core.trajectory_simulator import simulate_trajectories
 from physped.io.readers import trajectory_reader
 from physped.io.writers import save_piecewise_potential
 from physped.omegaconf_resolvers import register_new_resolvers
-from physped.preprocessing.trajectories import preprocess_trajectories
+from physped.preprocessing.trajectories import preprocess_trajectories, process_slow_modes
 from physped.visualization.plot_discrete_grid import plot_discrete_grid
 from physped.visualization.plot_histograms import create_all_histograms, plot_multiple_histograms
+from physped.visualization.plot_potential_at_slow_index import plot_potential_at_slow_index
 from physped.visualization.plot_trajectories import plot_trajectories
 
 log = logging.getLogger(__name__)
@@ -23,7 +26,7 @@ log = logging.getLogger(__name__)
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def main(config):
     env_name = config.params.env_name
-    log.debug("Configuration: \n%s", pprint.pformat(dict(config)))
+    log.debug("Configuration: \n%s", pformat(dict(config)))
     log.critical("Environment name: %s", env_name)
     log.info("Working directory %s", Path.cwd())
     log.info("Project root %s", config.root_dir)
@@ -35,6 +38,11 @@ def main(config):
     log.info("PREPROCESSING TRAJECTORIES")
     preprocessed_trajectories = preprocess_trajectories(trajectories, config=config)
     config.params.input_ntrajs = len(preprocessed_trajectories.Pid.unique())
+
+    logging.info("MODELING PARAMETERS: " + pformat(OmegaConf.to_container(config.params.model, resolve=True), depth=1))
+
+    log.info("PROCESSING SLOW MODES")
+    preprocessed_trajectories = process_slow_modes(preprocessed_trajectories, config)
 
     log.info("LEARNING POTENTIAL")
     piecewise_potential = learn_potential_from_trajectories(preprocessed_trajectories, config)
@@ -54,6 +62,7 @@ def main(config):
         log.info("Plot preprocessed trajectories.")
         log.debug("Configuration 'plot.preprocessed_trajectories' is set to True.")
         plot_trajectories(preprocessed_trajectories, config, "recorded")
+        plot_trajectories(preprocessed_trajectories, config, "recorded", traj_type="s")
     else:
         log.warning("Configuration 'plot.preprocessed_trajectories' is set to False.")
 
@@ -62,6 +71,7 @@ def main(config):
         log.info("Plot simulated trajectories")
         log.debug("Configuration 'plot.simulated_trajectories' is set to True.")
         plot_trajectories(simulated_trajectories, config, "simulated")
+        plot_trajectories(simulated_trajectories, config, "simulated", traj_type="s")
     else:
         log.warning("Configuration 'plot.simulated_trajectories' is set to False.")
 
@@ -76,13 +86,31 @@ def main(config):
     else:
         log.warning("Configuration 'plot.simulated_trajectories' is set to False.")
 
+    config = evaluate_selection_range(config)
+    selection = config.params.selection.range
+    slow_indices = (
+        selection.x_indices[0],
+        selection.y_indices[0],
+        selection.r_indices[0],
+        selection.theta_indices[0],
+        selection.k_indices[0],
+    )
+
     # * Optional plotting of the grid
     if config.plot.grid:
         log.info("Plot the configuration of the grid.")
         log.debug("Configuration 'plot.grid' is set to True.")
-        plot_discrete_grid(config)
+        plot_discrete_grid(config, slow_indices, preprocessed_trajectories)
     else:
         log.warning("Configuration 'plot.grid' is set to False.")
+
+    # * Optional plotting of the potential
+    if config.plot.potential_at_selection:
+        log.info("Plot potential at selection.")
+        log.debug("Configuration 'plot.potential_at_selection' is set to True.")
+        plot_potential_at_slow_index(config, slow_indices, piecewise_potential)
+    else:
+        log.warning("Configuration 'plot.potential_at_selection' is set to False.")
 
     output_figures = glob.glob("*.pdf")
     log.info("Pulling output figures to the parent directory for easy access.")

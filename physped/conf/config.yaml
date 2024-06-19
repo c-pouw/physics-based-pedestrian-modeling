@@ -8,28 +8,29 @@ read:
   piecewise_potential: False
   simulated_trajectories: False
 save:
-  preprocessed_trajectories: True
-  piecewise_potential: True
-  simulated_trajectories: True
+  preprocessed_trajectories: False
+  piecewise_potential: False
+  simulated_trajectories: False
 filename:
-  preprocessed_trajectories: preprocessed_trajectories_with_tau${params.taux}.csv
+  preprocessed_trajectories: preprocessed_trajectories_with_tau${params.model.taux}.csv
   piecewise_potential: piecewise_potential_with_${params.grid.name}.pickle
-  simulated_trajectories: simulated_trajectories_with_sigma${params.sigma}.csv
+  simulated_trajectories: simulated_trajectories_with_sigma${params.model.sigma}.csv
 plot:
   preprocessed_trajectories: True
   simulated_trajectories: True
   histograms: True
   grid: True
+  potential_at_selection: True
 root_dir: ${get_root_dir:}
 trajectory_data_dir: ${root_dir}/data/trajectories
-parameter_combinations: sigma${params.sigma}_${params.grid.name}
+parameter_combinations: sigma${params.model.sigma}_${params.grid.name}
 hydra:
   verbose: False
   job:
     name: ${params.env_name}_${parameter_combinations}
     chdir: True
   run:
-    dir: ${root_dir}/outputs/${params.env_name}_tau${params.taux}/${params.grid.name}/${now:%Y-%m-%d_%H-%M-%S}
+    dir: ${root_dir}/outputs/${params.env_name}_tau${params.model.taux}/${params.grid.name}/${now:%Y-%m-%d_%H-%M-%S}
   sweep:
-    dir: ${root_dir}/outputs/${params.env_name}_tau${params.taux}/${params.grid.name}
-    subdir: job${hydra.job.num}-sigma${params.sigma}-tau${params.taux}-${params.grid.name}-${now:%Y-%m-%d_%H-%M-%S}
+    dir: ${root_dir}/outputs/${params.env_name}_tau${params.model.taux}/${params.grid.name}
+    subdir: job${hydra.job.num}-sigma${params.model.sigma}-tau${params.model.taux}-${params.grid.name}-${now:%Y-%m-%d_%H-%M-%S}

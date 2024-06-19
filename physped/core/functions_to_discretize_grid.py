@@ -13,6 +13,8 @@ from physped.core.piecewise_potential import PiecewisePotential
 from physped.io.readers import read_piecewise_potential_from_file
 from physped.utils.functions import digitize_values_to_grid, pol2cart, weighted_mean_of_two_matrices
 
+# from physped.core.functions_to_discretize_grid import digitize_trajectories_to_grid
+
 log = logging.getLogger(__name__)
 
 
@@ -64,7 +66,7 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: dict) 
         piecewise_potential.histogram_slow, trajectories, "slow_grid_indices"
     )
     if config.params.simulation.sample_origins_from == "trajectories":
-        piecewise_potential.trajectory_origins = trajectories.groupby("Pid").first()[["xf", "yf", "uf", "vf"]]
+        piecewise_potential.trajectory_origins = trajectories.groupby("Pid").apply(lambda g: g.iloc[0][["xf", "yf", "uf", "vf"]])
     piecewise_potential.fit_params = fit_trajectories_on_grid(piecewise_potential.fit_params, trajectories)
     log.info("Finished learning piecewise potential from trajectories.")
     piecewise_potential = calculate_curvature_of_the_potential(piecewise_potential, config)
@@ -75,7 +77,8 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: dict) 
 
 
 def calculate_curvature_of_the_potential(piecewise_potential: PiecewisePotential, config: dict) -> PiecewisePotential:
-    var = config.params.sigma**2
+    var = config.params.model.sigma**2
+    # var = 0.5
     var_indices = [1, 3, 5, 7]
     variances = [piecewise_potential.fit_params[..., i] for i in var_indices]
 

@@ -2,11 +2,11 @@ xlims: ${params.default_xlims}
 ylims: ${params.default_ylims}
 title:
   figure: 'Discretization of the slow variables'
-  position: 'Positions $\vec{x}_s$'
-  velocity: 'Velocities $\vec{u}_s$'
+  position: 'Positions $(\vec{x} \mid \vec{x}_s,\, \vec{u}_s)$'
+  velocity: 'Velocities $(\vec{u} \mid \vec{x}_s,\, \vec{u}_s)$'
 position:
-  xlabel: "$x_s$ [m]"
-  ylabel: "$y_s$ [m]"
+  xlabel: "$x$ [m]"
+  ylabel: "$y$ [m]"
 highlight_selection: True
 plot_trajs: True
 N_trajs: 20
