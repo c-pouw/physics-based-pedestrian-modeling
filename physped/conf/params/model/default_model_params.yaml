@@ -1,0 +1,4 @@
+taux: 2
+tauu: ${params.model.taux}
+dt: ${inv_prop:${params.fps}}
+sigma: 0.25
