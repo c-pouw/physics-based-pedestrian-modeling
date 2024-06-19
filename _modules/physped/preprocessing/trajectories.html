@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.preprocessing.trajectories &mdash; Data-driven physics-based modeling of pedestrian dynamics 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/documentation_options.js?v=27db1736"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0+unknown
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">physped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release-history.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../min_versions.html">Minimum Version of Python and NumPy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">physped.preprocessing.trajectories</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for physped.preprocessing.trajectories</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">savgol_filter</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">tqdm.contrib.logging</span> <span class="kn">import</span> <span class="n">logging_redirect_tqdm</span>
+
+<span class="kn">from</span> <span class="nn">physped.io.readers</span> <span class="kn">import</span> <span class="n">read_trajectories_from_path</span>
+<span class="kn">from</span> <span class="nn">physped.io.writers</span> <span class="kn">import</span> <span class="n">save_trajectories</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="compute_slow_modes_geert">
+<a class="viewcode-back" href="../../../physped.preprocessing.html#physped.preprocessing.trajectories.compute_slow_modes_geert">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_slow_modes_geert</span><span class="p">(</span><span class="n">xf</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">tau</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute slow modes.&quot;&quot;&quot;</span>
+    <span class="n">xfast</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">xf</span><span class="p">)</span>
+    <span class="n">xslow</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">xf</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xf</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">xslow</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">/</span> <span class="n">tau</span><span class="p">)</span> <span class="o">*</span> <span class="n">xslow</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">/</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">xfast</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="n">xf</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">xs</span><span class="o">.</span><span class="n">loc</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">xslow</span>
+    <span class="k">return</span> <span class="n">xs</span></div>
+
+
+
+<span class="c1"># def compute_slow_modes_with_shift(x: pd.Series, tau: float, dt: float) -&gt; list:</span>
+<span class="c1">#     x = list(x)</span>
+<span class="c1">#     alpha = dt / tau</span>
+<span class="c1">#     k = int(tau / dt)</span>
+<span class="c1">#     # k = int(tau_x / (2 * delta_t))</span>
+<span class="c1">#     x = x + [x[-1]] * (k-1)</span>
+<span class="c1">#     x = x[k:]</span>
+<span class="c1">#     xs = [x[0]]  # Initialize xs(0) to x(0)</span>
+<span class="c1">#     for i in range(0, len(x)):</span>
+<span class="c1">#         xs.append((1 - alpha) * xs[-1] + alpha * x[i])</span>
+<span class="c1">#     return xs</span>
+
+<span class="c1"># def compute_slow_modes_with_shift(x: pd.Series, tau: float, dt: float) -&gt; list:</span>
+<span class="c1">#     x = list(x)</span>
+<span class="c1">#     alpha = dt / tau</span>
+<span class="c1">#     k = int(tau / dt)</span>
+<span class="c1">#     # k = int(tau_x / (2 * delta_t))</span>
+<span class="c1">#     x = x + [x[-1]] * (k-1)</span>
+<span class="c1">#     x = x[k:]</span>
+<span class="c1">#     xs = [x[0]]  # Initialize xs(0) to x(0)</span>
+<span class="c1">#     for i in range(0, len(x)):</span>
+<span class="c1">#         xs.append((1 - alpha) * xs[-1] + alpha * x[i])</span>
+<span class="c1">#     return xs</span>
+
+
+<div class="viewcode-block" id="compute_slow_dynamics">
+<a class="viewcode-back" href="../../../physped.preprocessing.html#physped.preprocessing.trajectories.compute_slow_dynamics">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_slow_dynamics</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">xsdot</span><span class="p">,</span> <span class="n">xs0</span><span class="p">,</span> <span class="n">tau_x</span><span class="p">,</span> <span class="n">delta_t</span><span class="p">):</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">delta_t</span> <span class="o">/</span> <span class="n">tau_x</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">xs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">xs0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">xs</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="n">xs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">delta_t</span> <span class="o">*</span> <span class="n">xsdot</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">xs</span></div>
+
+
+
+<span class="c1"># def compute_slow_position(x, us, tau_x, delta_t):</span>
+<span class="c1">#     x = list(x)</span>
+<span class="c1">#     us = list(us)</span>
+<span class="c1">#     alpha = delta_t / tau_x</span>
+<span class="c1">#     xs = np.zeros_like(x)</span>
+<span class="c1">#     xs[0] = x[0]  # Initialize xs(0) to x(0)</span>
+<span class="c1">#     for i in range(0, len(x)-1):</span>
+<span class="c1">#         xs[i+1] = (1 - alpha) * xs[i] + alpha * x[i] + delta_t * us[i]</span>
+<span class="c1">#     return xs</span>
+
+<span class="c1"># def compute_slow_velocity(u, accs, tau_x, delta_t):</span>
+<span class="c1">#     u = list(u)</span>
+<span class="c1">#     accs = list(accs)</span>
+<span class="c1">#     alpha = delta_t / tau_x</span>
+<span class="c1">#     us = np.zeros_like(u)</span>
+<span class="c1">#     # us[0] = u[0]  # Initialize xs(0) to x(0)</span>
+<span class="c1">#     us[0] = np.mean(u[:20])</span>
+<span class="c1">#     for i in range(0, len(u)-1):</span>
+<span class="c1">#         us[i+1] = (1 - alpha) * us[i] + alpha * u[i] #+ delta_t * accs[i]</span>
+<span class="c1">#     return us</span>
+
+
+<div class="viewcode-block" id="savgolfilter">
+<a class="viewcode-back" href="../../../physped.preprocessing.html#physped.preprocessing.trajectories.savgolfilter">[docs]</a>
+<span class="k">def</span> <span class="nf">savgolfilter</span><span class="p">(</span><span class="n">xf</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">tau</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="n">window_length</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xf</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">40</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">savgol_filter</span><span class="p">(</span><span class="n">xf</span><span class="p">,</span> <span class="n">window_length</span><span class="p">,</span> <span class="n">polyorder</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">deriv</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;interp&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_all_slow_modes_without_time_recentering">
+<a class="viewcode-back" href="../../../physped.preprocessing.html#physped.preprocessing.trajectories.compute_all_slow_modes_without_time_recentering">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_all_slow_modes_without_time_recentering</span><span class="p">(</span>
+    <span class="n">trajectories</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">observables</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+    <span class="n">tau</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">slow_mode_algo</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the slow mode for all the observables.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - trajectories (pd.DataFrame): The DataFrame of trajectories.</span>
+<span class="sd">    - observables (list): A list of observable names.</span>
+<span class="sd">    - tau (float): The slow mode time constant.</span>
+<span class="sd">    - dt (float): The time step.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - The DataFrame with the slow modes added.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># compute_slow_modes = compute_slow_modes_new</span>
+    <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="n">observables</span><span class="p">:</span>
+        <span class="n">trajectories</span><span class="p">[</span><span class="n">obs</span> <span class="o">+</span> <span class="s2">&quot;s&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trajectories</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;Pid&quot;</span><span class="p">)[</span><span class="n">obs</span> <span class="o">+</span> <span class="s2">&quot;f&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">slow_mode_algo</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">dt</span><span class="p">))</span>
+    <span class="c1"># log.info(f&#39;Slow modes computed.&#39;)</span>
+    <span class="k">return</span> <span class="n">trajectories</span></div>
+
+
+
+<span class="c1"># def compute_all_slow_modes(trajectories, tau, dt):</span>
+<span class="c1">#     # TODO: Improve this function</span>
+<span class="c1">#     test_trajs_with_slow_modes = []</span>
+<span class="c1">#     with logging_redirect_tqdm():</span>
+<span class="c1">#         # for X_0 in tqdm(origins[:, :8], desc=&quot;Simulating trajectories&quot;, unit=&quot;trajs&quot;, total=origins.shape[0], miniters=10):</span>
+<span class="c1">#         for _, traj_i in tqdm(trajectories.groupby(&#39;Pid&#39;), desc = &#39;Computing slow modes&#39;, unit = &#39;trajs&#39;,</span>
+<span class="c1"># total = len(trajectories.Pid.unique()), miniters = 100):</span>
+<span class="c1">#             traj_i[&#39;us&#39;] = compute_slow_velocity(traj_i[&#39;uf&#39;], traj_i[&#39;axf&#39;], tau, dt)</span>
+<span class="c1">#             traj_i[&#39;vs&#39;] = compute_slow_velocity(traj_i[&#39;vf&#39;], traj_i[&#39;ayf&#39;], tau, dt)</span>
+<span class="c1">#             traj_i[&#39;xs&#39;] = compute_slow_position(traj_i[&#39;xf&#39;], traj_i[&#39;us&#39;], tau, dt)</span>
+<span class="c1">#             traj_i[&#39;ys&#39;] = compute_slow_position(traj_i[&#39;yf&#39;], traj_i[&#39;vs&#39;], tau, dt)</span>
+<span class="c1">#             test_trajs_with_slow_modes.append(traj_i)</span>
+
+<span class="c1">#     test_trajs_with_slow_modes = pd.concat(test_trajs_with_slow_modes)</span>
+<span class="c1">#     test_trajs_with_slow_modes.sort_values(by=&#39;time&#39;, inplace=True)</span>
+<span class="c1">#     return test_trajs_with_slow_modes</span>
+
+
+<div class="viewcode-block" id="compute_all_slow_modes">
+<a class="viewcode-back" href="../../../physped.preprocessing.html#physped.preprocessing.trajectories.compute_all_slow_modes">[docs]</a>
+<span class="k">def</span> <span class="nf">compute_all_slow_modes</span><span class="p">(</span><span class="n">trajectories</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+    <span class="c1"># TODO: Improve this function</span>
+    <span class="n">test_trajs_with_slow_modes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="n">logging_redirect_tqdm</span><span class="p">():</span>
+        <span class="c1"># for X_0 in tqdm(origins[:, :8], desc=&quot;Simulating trajectories&quot;, unit=&quot;trajs&quot;, total=origins.shape[0], miniters=10):</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">traj_i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+            <span class="n">trajectories</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;Pid&quot;</span><span class="p">),</span>
+            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Computing slow modes&quot;</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;trajs&quot;</span><span class="p">,</span>
+            <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">trajectories</span><span class="o">.</span><span class="n">Pid</span><span class="o">.</span><span class="n">unique</span><span class="p">()),</span>
+            <span class="n">miniters</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="p">):</span>
+
+            <span class="n">xf</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">traj_i</span><span class="p">[</span><span class="s2">&quot;xf&quot;</span><span class="p">])</span>
+            <span class="n">yf</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">traj_i</span><span class="p">[</span><span class="s2">&quot;yf&quot;</span><span class="p">])</span>
+            <span class="n">uf</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">traj_i</span><span class="p">[</span><span class="s2">&quot;uf&quot;</span><span class="p">])</span>
+            <span class="n">vf</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">traj_i</span><span class="p">[</span><span class="s2">&quot;vf&quot;</span><span class="p">])</span>
+
+            <span class="n">usdot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">traj_i</span><span class="p">))</span>
+            <span class="n">vsdot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">traj_i</span><span class="p">))</span>
+            <span class="n">us0</span> <span class="o">=</span> <span class="n">uf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">vs0</span> <span class="o">=</span> <span class="n">vf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">traj_i</span><span class="p">[</span><span class="s2">&quot;us&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">compute_slow_dynamics</span><span class="p">(</span><span class="n">uf</span><span class="p">,</span> <span class="n">usdot</span><span class="p">,</span> <span class="n">us0</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+            <span class="n">traj_i</span><span class="p">[</span><span class="s2">&quot;vs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">compute_slow_dynamics</span><span class="p">(</span><span class="n">vf</span><span class="p">,</span> <span class="n">vsdot</span><span class="p">,</span> <span class="n">vs0</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+
+            <span class="n">xsdot</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">traj_i</span><span class="p">[</span><span class="s2">&quot;us&quot;</span><span class="p">])</span>
+            <span class="n">ysdot</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">traj_i</span><span class="p">[</span><span class="s2">&quot;vs&quot;</span><span class="p">])</span>
+            <span class="n">xs0</span> <span class="o">=</span> <span class="n">xf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">ys0</span> <span class="o">=</span> <span class="n">yf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">traj_i</span><span class="p">[</span><span class="s2">&quot;xs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">compute_slow_dynamics</span><span class="p">(</span><span class="n">xf</span><span class="p">,</span> <span class="n">xsdot</span><span class="p">,</span> <span class="n">xs0</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+            <span class="n">traj_i</span><span class="p">[</span><span class="s2">&quot;ys&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">compute_slow_dynamics</span><span class="p">(</span><span class="n">yf</span><span class="p">,</span> <span class="n">ysdot</span><span class="p">,</span> <span class="n">ys0</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span>
+            <span class="n">test_trajs_with_slow_modes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">traj_i</span><span class="p">)</span>
+
+    <span class="n">test_trajs_with_slow_modes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">test_trajs_with_slow_modes</span><span class="p">)</span>
+    <span class="n">test_trajs_with_slow_modes</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">test_trajs_with_slow_modes</span></div>
+
+
+
+<div class="viewcode-block" id="add_velocity_in_polar_coordinates">
+<a class="viewcode-back" href="../../../physped.preprocessing.html#physped.preprocessing.trajectories.add_velocity_in_polar_coordinates">[docs]</a>
+<span class="k">def</span> <span class="nf">add_velocity_in_polar_coordinates</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;f&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add columns with velocity in polar coordinates to the DataFrame.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - df (pd.DataFrame): The DataFrame to add polar coordinates to.</span>
+<span class="sd">    - mode (str): The mode to add polar coordinates for (&#39;f&#39; or &#39;s&#39;).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - The DataFrame with the &#39;r&#39; and &#39;theta&#39; columns added.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;r&quot;</span> <span class="o">+</span> <span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;u&quot;</span> <span class="o">+</span> <span class="n">mode</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;v&quot;</span> <span class="o">+</span> <span class="n">mode</span><span class="p">])</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;theta&quot;</span> <span class="o">+</span> <span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;v&quot;</span> <span class="o">+</span> <span class="n">mode</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;u&quot;</span> <span class="o">+</span> <span class="n">mode</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="add_trajectory_step">
+<a class="viewcode-back" href="../../../physped.preprocessing.html#physped.preprocessing.trajectories.add_trajectory_step">[docs]</a>
+<span class="k">def</span> <span class="nf">add_trajectory_step</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add a column with the observation/step numbers of each trajectory.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - df (pd.DataFrame): The DataFrame to add the trajectory step/observation to.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - The DataFrame with the trajectory step/observation added.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pid_col, time_col = params.colnames.Pid, params.colnames.time</span>
+    <span class="n">pid_col</span><span class="p">,</span> <span class="n">time_col</span> <span class="o">=</span> <span class="s2">&quot;Pid&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="n">pid_col</span><span class="p">,</span> <span class="n">time_col</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">pid_col</span><span class="p">)[</span><span class="n">pid_col</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="rename_columns">
+<a class="viewcode-back" href="../../../physped.preprocessing.html#physped.preprocessing.trajectories.rename_columns">[docs]</a>
+<span class="k">def</span> <span class="nf">rename_columns</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rename columns of a DataFrame.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - df (pd.DataFrame): The DataFrame to rename the columns of.</span>
+<span class="sd">    - colnames (dict): A dictionary with the old column names as keys and the new column names as values.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - The DataFrame with the columns renamed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">colnames</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;colnames&quot;</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="n">inverted_colnames</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">colnames</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">inverted_colnames</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="prune_short_trajectories">
+<a class="viewcode-back" href="../../../physped.preprocessing.html#physped.preprocessing.trajectories.prune_short_trajectories">[docs]</a>
+<span class="k">def</span> <span class="nf">prune_short_trajectories</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="c1"># df.reset_index(inplace=True, drop=True)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;traj_len&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">&quot;Pid&quot;</span><span class="p">])[</span><span class="s2">&quot;Pid&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="s2">&quot;size&quot;</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">traj_len</span> <span class="o">&gt;</span> <span class="n">parameters</span><span class="o">.</span><span class="n">minimum_trajectory_length</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="add_velocity">
+<a class="viewcode-back" href="../../../physped.preprocessing.html#physped.preprocessing.trajectories.add_velocity">[docs]</a>
+<span class="k">def</span> <span class="nf">add_velocity</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add velocity to dataframe.</span>
+
+<span class="sd">    This function calculates the velocity of each pedestrian in the input DataFrame</span>
+<span class="sd">    based on their position data. The velocity is calculated using the Savitzky-Golay</span>
+<span class="sd">    filter with a window size of 49 and a polynomial order of 1.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        df (pd.DataFrame): The input DataFrame containing the position data.</span>
+<span class="sd">        groupby (str, optional): The column name to group the data by. Default is &quot;Pid&quot;.</span>
+<span class="sd">        xpos (str, optional): The column name for the x-position data. Default is &quot;xf&quot;.</span>
+<span class="sd">        ypos (str, optional): The column name for the y-position data. Default is &quot;yf&quot;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pd.DataFrame: The input DataFrame with velocity columns added.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the input DataFrame is empty or does not contain the specified columns.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; df = pd.DataFrame({&#39;Pid&#39;: [1, 1, 2, 2], &#39;xf&#39;: [0, 1, 0, 1], &#39;yf&#39;: [0, 1, 0, 1]})</span>
+<span class="sd">        &gt;&gt;&gt; add_velocity(df)</span>
+<span class="sd">           Pid  xf  yf   uf   vf</span>
+<span class="sd">        0    1   0   0  0.0  0.0</span>
+<span class="sd">        1    1   1   1  0.0  0.0</span>
+<span class="sd">        2    2   0   0  0.0  0.0</span>
+<span class="sd">        3    2   1   1  0.0  0.0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">framerate</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">fps</span>
+    <span class="n">groupby</span> <span class="o">=</span> <span class="s2">&quot;Pid&quot;</span>
+    <span class="n">xpos</span> <span class="o">=</span> <span class="s2">&quot;xf&quot;</span>
+    <span class="n">ypos</span> <span class="o">=</span> <span class="s2">&quot;yf&quot;</span>
+    <span class="n">pos_to_vel</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;xf&quot;</span><span class="p">:</span> <span class="s2">&quot;uf&quot;</span><span class="p">,</span> <span class="s2">&quot;yf&quot;</span><span class="p">:</span> <span class="s2">&quot;vf&quot;</span><span class="p">}</span>
+    <span class="n">window_length</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">velocity_window_length</span>
+    <span class="c1"># window_length = parameters.minimum_trajectory_length - 1</span>
+    <span class="k">for</span> <span class="n">direction</span> <span class="ow">in</span> <span class="p">[</span><span class="n">xpos</span><span class="p">,</span> <span class="n">ypos</span><span class="p">]:</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">pos_to_vel</span><span class="p">[</span><span class="n">direction</span><span class="p">]]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="n">groupby</span><span class="p">])[</span><span class="n">direction</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">savgol_filter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">window_length</span><span class="o">=</span><span class="n">window_length</span><span class="p">,</span> <span class="n">polyorder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">deriv</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;interp&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">framerate</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="add_acceleration">
+<a class="viewcode-back" href="../../../physped.preprocessing.html#physped.preprocessing.trajectories.add_acceleration">[docs]</a>
+<span class="k">def</span> <span class="nf">add_acceleration</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">framerate</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">fps</span>
+    <span class="n">groupby</span> <span class="o">=</span> <span class="s2">&quot;Pid&quot;</span>
+    <span class="n">xcol</span> <span class="o">=</span> <span class="s2">&quot;uf&quot;</span>
+    <span class="n">ycol</span> <span class="o">=</span> <span class="s2">&quot;vf&quot;</span>
+    <span class="n">new_col</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;uf&quot;</span><span class="p">:</span> <span class="s2">&quot;axf&quot;</span><span class="p">,</span> <span class="s2">&quot;vf&quot;</span><span class="p">:</span> <span class="s2">&quot;ayf&quot;</span><span class="p">}</span>
+    <span class="n">window_length</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">velocity_window_length</span>
+    <span class="c1"># window_length = parameters.minimum_trajectory_length - 1</span>
+    <span class="k">for</span> <span class="n">direction</span> <span class="ow">in</span> <span class="p">[</span><span class="n">xcol</span><span class="p">,</span> <span class="n">ycol</span><span class="p">]:</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">new_col</span><span class="p">[</span><span class="n">direction</span><span class="p">]]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="n">groupby</span><span class="p">])[</span><span class="n">direction</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">savgol_filter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">window_length</span><span class="o">=</span><span class="n">window_length</span><span class="p">,</span> <span class="n">polyorder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">deriv</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;interp&quot;</span><span class="p">)</span> <span class="o">*</span> <span class="n">framerate</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="preprocess_trajectories">
+<a class="viewcode-back" href="../../../physped.preprocessing.html#physped.preprocessing.trajectories.preprocess_trajectories">[docs]</a>
+<span class="k">def</span> <span class="nf">preprocess_trajectories</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span>
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">preprocessed_trajectories</span>
+
+    <span class="c1"># TODO : Move to separate function</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">preprocessed_trajectories</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Configuration &#39;read.preprocessed_trajectories&#39; is set to True.&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">preprocessed_trajectories</span> <span class="o">=</span> <span class="n">read_trajectories_from_path</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Preprocessed trajectories read from file.&quot;</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Filepath </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">filepath</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">root_dir</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">preprocessed_trajectories</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Preprocessed trajectories not found: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Start preprocessing of the recorded trajectories.&quot;</span><span class="p">)</span>
+    <span class="c1"># TODO : Use columnnames from parameters instead of renaming</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">rename_columns</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Columns renamed to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">prune_short_trajectories</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Short trajectories with less than </span><span class="si">%s</span><span class="s2"> observations removed.&quot;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">minimum_trajectory_length</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">add_trajectory_step</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Trajectory step added.&quot;</span><span class="p">)</span>
+
+    <span class="n">uf</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">colnames</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;uf&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">vf</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">colnames</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;vf&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">uf</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">vf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Columns for velocity not found in parameters. Calculating velocity.&quot;</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">add_velocity</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Velocity added.&quot;</span><span class="p">)</span>
+
+    <span class="n">axf</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">colnames</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;axf&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">ayf</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">colnames</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ayf&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">axf</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">ayf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Columns for acceleration not found in parameters. Calculating acceleration.&quot;</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">add_acceleration</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Acceleration added.&quot;</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">add_velocity_in_polar_coordinates</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;f&quot;</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Velocity transformed to polar coordinates.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># if parameters.intermediate_save.preprocessed_trajectories:</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">save</span><span class="o">.</span><span class="n">preprocessed_trajectories</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Configuration &#39;save.preprocessed_trajectories&#39; is set to True.&quot;</span><span class="p">)</span>
+        <span class="n">save_trajectories</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">preprocessed_trajectories</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="process_slow_modes">
+<a class="viewcode-back" href="../../../physped.preprocessing.html#physped.preprocessing.trajectories.process_slow_modes">[docs]</a>
+<span class="k">def</span> <span class="nf">process_slow_modes</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+    <span class="c1"># slow_mode_algorithm = compute_slow_modes_geert</span>
+    <span class="c1"># log.info(&quot;Compute slow modes with %s.&quot;, slow_mode_algorithm.__name__)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">compute_all_slow_modes</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">,</span>
+        <span class="c1"># [&quot;x&quot;, &quot;y&quot;, &quot;u&quot;, &quot;v&quot;],  # , &quot;r&quot;, &quot;theta&quot;],</span>
+        <span class="n">tau</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;taux&quot;</span><span class="p">],</span>
+        <span class="n">dt</span><span class="o">=</span><span class="n">parameters</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;dt&quot;</span><span class="p">],</span>
+        <span class="c1"># slow_mode_algo=slow_mode_algorithm,</span>
+    <span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">add_velocity_in_polar_coordinates</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Slow mode velocity transformed to polar coordinates.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="filter_trajectories_by_velocity">
+<a class="viewcode-back" href="../../../physped.preprocessing.html#physped.preprocessing.trajectories.filter_trajectories_by_velocity">[docs]</a>
+<span class="k">def</span> <span class="nf">filter_trajectories_by_velocity</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter trajectories by their average velocity.&quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Start filtering trajectories by velocity.&quot;</span><span class="p">)</span>
+    <span class="n">umin</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;Pid&quot;</span><span class="p">)[</span><span class="s2">&quot;uf&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">umin</span><span class="p">]</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Trajectories filtered by velocity.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

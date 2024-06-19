@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.core package &mdash; Data-driven physics-based modeling of pedestrian dynamics 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/documentation_options.js?v=27db1736"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="physped.io package" href="physped.io.html" />
+    <link rel="prev" title="physped package" href="physped.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0+unknown
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">physped</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="physped.html">physped package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="physped.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">physped.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.io.html">physped.io package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.preprocessing.html">physped.preprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.tests.html">physped.tests package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.utils.html">physped.utils package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.visualization.html">physped.visualization package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="physped.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.html#module-physped.main">physped.main module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.html#module-physped.omegaconf_resolvers">physped.omegaconf_resolvers module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.html#module-physped">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release-history.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="min_versions.html">Minimum Version of Python and NumPy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">physped</a></li>
+          <li class="breadcrumb-item"><a href="physped.html">physped package</a></li>
+      <li class="breadcrumb-item active">physped.core package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/physped.core.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="physped-core-package">
+<h1>physped.core package<a class="headerlink" href="#physped-core-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-physped.core.functions_to_discretize_grid">
+<span id="physped-core-functions-to-discretize-grid-module"></span><h2>physped.core.functions_to_discretize_grid module<a class="headerlink" href="#module-physped.core.functions_to_discretize_grid" title="Link to this heading">¶</a></h2>
+<p>Infer force fields from trajectories.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.accumulate_grids">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">accumulate_grids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cummulative_grids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">grids_to_add</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#accumulate_grids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.accumulate_grids" title="Link to this definition">¶</a></dt>
+<dd><p>Accumulate grids by taking a weighted mean of the fit parameters.</p>
+<p>Parameters:
+- cummulative_grids (DiscreteGrid): The cumulative grids to add to.
+- grids_to_add (DiscreteGrid): The grids to add to the cumulative grids.</p>
+<p>Returns:
+- The updated cumulative grids.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.add_trajectories_to_histogram">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">add_trajectories_to_histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">histogram</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupbyindex</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#add_trajectories_to_histogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.add_trajectories_to_histogram" title="Link to this definition">¶</a></dt>
+<dd><p>Add trajectories to a histogram.</p>
+<p>Parameters:
+- histogram (): The histogram to add the trajectories to.
+- trajectories (pd.DataFrame): The trajectories to add to the histogram.</p>
+<p>Returns:
+- The updated histogram.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.calculate_curvature_of_the_potential">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">calculate_curvature_of_the_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">piecewise_potential</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#calculate_curvature_of_the_potential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.calculate_curvature_of_the_potential" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.calculate_position_based_emperic_potential">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">calculate_position_based_emperic_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">histogram_slow</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#calculate_position_based_emperic_potential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.calculate_position_based_emperic_potential" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.convert_grid_indices_to_coordinates">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">convert_grid_indices_to_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">potential_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#convert_grid_indices_to_coordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.convert_grid_indices_to_coordinates" title="Link to this definition">¶</a></dt>
+<dd><p>Convert grid indices to Cartesian coordinates.</p>
+<p>Parameters:
+- grids (Grids): The Grids object containing the grid definitions.
+- X_0 (List[int]): A list of grid indices.</p>
+<p>Returns:
+- A list of Cartesian coordinates.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.derive_potential_center">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">derive_potential_center</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">piecewise_potential</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#derive_potential_center"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.derive_potential_center" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.digitize_trajectories_to_grid">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">digitize_trajectories_to_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid_bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#digitize_trajectories_to_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.digitize_trajectories_to_grid" title="Link to this definition">¶</a></dt>
+<dd><p>Digitize trajectories to a grid.</p>
+<p>Parameters:
+- grid_bins (dict): The grid bins to digitize the trajectories to.
+- trajectories (pd.DataFrame): The trajectories to digitize.</p>
+<p>Returns:
+- pd.DataFrame: The trajectories with the digitized grid indices.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.fit_probability_distributions">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">fit_probability_distributions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#fit_probability_distributions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.fit_probability_distributions" title="Link to this definition">¶</a></dt>
+<dd><p>Fits normal distribution to a group of data points and returns fitting parameters.</p>
+<p>Parameters:
+- group (pd.DataFrame): The group of data points to fit the normal distribution to.</p>
+<p>Returns:
+- A list of fitting parameters.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.fit_trajectories_on_grid">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">fit_trajectories_on_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#fit_trajectories_on_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.fit_trajectories_on_grid" title="Link to this definition">¶</a></dt>
+<dd><p>Fit trajectories to the parameter grid.</p>
+<p>Parameters:
+- param_grid (): The parameter grid to fit the trajectories on.
+- trajectories (pd.DataFrame): The trajectories to fit.</p>
+<p>Returns:
+- The grid with fit parameters.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.get_boundary_coordinates_of_selection">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">get_boundary_coordinates_of_selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#get_boundary_coordinates_of_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.get_boundary_coordinates_of_selection" title="Link to this definition">¶</a></dt>
+<dd><p>Return the grid bounds of a given observable and value.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.get_grid_index_single_value">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">get_grid_index_single_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#get_grid_index_single_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.get_grid_index_single_value" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the index of the grid cell that corresponds to the given value.
+If a value is outside the grid, it is wrapped around to the other side.
+Following a periodic boundary condition.</p>
+<p>Parameters:
+value (float): The value to be discretized.
+bins (np.array): An array of bin edges defining the grid cells.</p>
+<p>Returns:
+int: The index of the grid cell that corresponds to the given value.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.get_grid_indices">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">get_grid_indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">potential_grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.12)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#get_grid_indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.get_grid_indices" title="Link to this definition">¶</a></dt>
+<dd><p>Given a point (xs, ys, thetas, rs), returns the grid index of the point.</p>
+<p>Parameters:
+- grid (Grids): The Grids object containing the grid definitions.
+- X (List[float]): A list of Cartesian and polar coordinates.</p>
+<p>Returns:
+- A tuple of grid indices.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.get_slice_of_multidimensional_matrix">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">get_slice_of_multidimensional_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">slices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.12)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#get_slice_of_multidimensional_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.get_slice_of_multidimensional_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Get a slice of a multidimensional NumPy array with periodic boundary conditions.</p>
+<p>Parameters:
+- a (np.ndarray): The input array to slice.
+- slices (List[Tuple[int, int]]): A list of slice ranges for each dimension of the array.</p>
+<p>Returns:
+- The sliced array.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.learn_potential_from_trajectories">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">learn_potential_from_trajectories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#learn_potential_from_trajectories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.learn_potential_from_trajectories" title="Link to this definition">¶</a></dt>
+<dd><p>Convert trajectories to a grid of histograms and parameters.</p>
+<p>Parameters:
+- trajectories (pd.DataFrame): A DataFrame of trajectories.
+- grid_bins (dict): A dictionary of grid values for each dimension.</p>
+<p>Returns:
+- A dictionary of DiscreteGrid objects for storing histograms and parameters.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.make_grid_selection">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">make_grid_selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">piecewise_potential</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#make_grid_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.make_grid_selection" title="Link to this definition">¶</a></dt>
+<dd><p>Make selection.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.random_uniform_value_in_bin">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">random_uniform_value_in_bin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#random_uniform_value_in_bin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.random_uniform_value_in_bin" title="Link to this definition">¶</a></dt>
+<dd><p>Generate random uniform values within each bin.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>values (np.ndarray): Array of bin indices.
+bins (np.ndarray): Array of bin edges.</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: Array of random uniform values within each bin.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.return_grid_ids">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">return_grid_ids</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#return_grid_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.return_grid_ids" title="Link to this definition">¶</a></dt>
+<dd><p>Return the grid indices of a given observable and value.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.sample_from_ndarray">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">sample_from_ndarray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origin_histogram</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">N_samples</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#sample_from_ndarray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.sample_from_ndarray" title="Link to this definition">¶</a></dt>
+<dd><p>Sample origin positions from a heatmap with initial positions.</p>
+<p>Parameters:
+- origin_histogram (np.ndarray): The initial position heatmap.
+- N_samples (int): The number of samples to generate. Default is 1.</p>
+<p>Returns:
+- A tuple of NumPy arrays representing the sampled origin positions.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_discretize_grid.selection_to_bounds">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_discretize_grid.</span></span><span class="sig-name descname"><span class="pre">selection_to_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection_coordinates</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimension</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/core/functions_to_discretize_grid.html#selection_to_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_discretize_grid.selection_to_bounds" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-physped.core.functions_to_select_grid_piece">
+<span id="physped-core-functions-to-select-grid-piece-module"></span><h2>physped.core.functions_to_select_grid_piece module<a class="headerlink" href="#module-physped.core.functions_to_select_grid_piece" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_select_grid_piece.apply_periodic_conditions_to_the_angle_theta">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_select_grid_piece.</span></span><span class="sig-name descname"><span class="pre">apply_periodic_conditions_to_the_angle_theta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/core/functions_to_select_grid_piece.html#apply_periodic_conditions_to_the_angle_theta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_select_grid_piece.apply_periodic_conditions_to_the_angle_theta" title="Link to this definition">¶</a></dt>
+<dd><p>Apply periodic conditions to the angle theta.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>theta (float): The angle theta.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The angle theta after applying the periodic conditions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_select_grid_piece.evaluate_selection_point">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_select_grid_piece.</span></span><span class="sig-name descname"><span class="pre">evaluate_selection_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/core/functions_to_select_grid_piece.html#evaluate_selection_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_select_grid_piece.evaluate_selection_point" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_select_grid_piece.evaluate_selection_range">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_select_grid_piece.</span></span><span class="sig-name descname"><span class="pre">evaluate_selection_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/core/functions_to_select_grid_piece.html#evaluate_selection_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_select_grid_piece.evaluate_selection_range" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_select_grid_piece.get_boundaries_that_enclose_the_selected_bin">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_select_grid_piece.</span></span><span class="sig-name descname"><span class="pre">get_boundaries_that_enclose_the_selected_bin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bin_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">OmegaConf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_select_grid_piece.html#get_boundaries_that_enclose_the_selected_bin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_select_grid_piece.get_boundaries_that_enclose_the_selected_bin" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_select_grid_piece.get_boundaries_that_enclose_the_selected_range">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_select_grid_piece.</span></span><span class="sig-name descname"><span class="pre">get_boundaries_that_enclose_the_selected_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selected_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">OmegaConf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_select_grid_piece.html#get_boundaries_that_enclose_the_selected_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_select_grid_piece.get_boundaries_that_enclose_the_selected_range" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_select_grid_piece.get_index_of_the_enclosing_bin">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_select_grid_piece.</span></span><span class="sig-name descname"><span class="pre">get_index_of_the_enclosing_bin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selected_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_select_grid_piece.html#get_index_of_the_enclosing_bin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_select_grid_piece.get_index_of_the_enclosing_bin" title="Link to this definition">¶</a></dt>
+<dd><p>Get the index of the bin that encloses the value.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>selected_value (float): A single integer or float value.
+bins (np.ndarray): An array of bin boundaries.</p>
+</dd>
+<dt>Returns:</dt><dd><p>int: The index of the bin that encloses the value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_select_grid_piece.get_indices_of_the_enclosing_range">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_select_grid_piece.</span></span><span class="sig-name descname"><span class="pre">get_indices_of_the_enclosing_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selected_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.12)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.12)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/physped/core/functions_to_select_grid_piece.html#get_indices_of_the_enclosing_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_select_grid_piece.get_indices_of_the_enclosing_range" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_select_grid_piece.is_range_decreasing">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_select_grid_piece.</span></span><span class="sig-name descname"><span class="pre">is_range_decreasing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selected_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">OmegaConf</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_select_grid_piece.html#is_range_decreasing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_select_grid_piece.is_range_decreasing" title="Link to this definition">¶</a></dt>
+<dd><p>Check if the range is increasing.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>selected_range (OmegaConf): The selection.</p>
+</dd>
+<dt>Returns:</dt><dd><p>bool: True if the range is increasing, False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_select_grid_piece.is_selected_point_within_grid">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_select_grid_piece.</span></span><span class="sig-name descname"><span class="pre">is_selected_point_within_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selected_point</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">OmegaConf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_select_grid_piece.html#is_selected_point_within_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_select_grid_piece.is_selected_point_within_grid" title="Link to this definition">¶</a></dt>
+<dd><p>Validate the selection.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>selection (OmegaConf): The selection.</p>
+</dd>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_select_grid_piece.is_selected_range_valid">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_select_grid_piece.</span></span><span class="sig-name descname"><span class="pre">is_selected_range_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selected_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">OmegaConf</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_select_grid_piece.html#is_selected_range_valid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_select_grid_piece.is_selected_range_valid" title="Link to this definition">¶</a></dt>
+<dd><p>Validate the selection.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>selection (OmegaConf): The selection.</p>
+</dd>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_select_grid_piece.is_selected_range_within_grid">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_select_grid_piece.</span></span><span class="sig-name descname"><span class="pre">is_selected_range_within_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selected_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">OmegaConf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_select_grid_piece.html#is_selected_range_within_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_select_grid_piece.is_selected_range_within_grid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.functions_to_select_grid_piece.is_selected_value_outside_bins">
+<span class="sig-prename descclassname"><span class="pre">physped.core.functions_to_select_grid_piece.</span></span><span class="sig-name descname"><span class="pre">is_selected_value_outside_bins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selected_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_dimension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="_modules/physped/core/functions_to_select_grid_piece.html#is_selected_value_outside_bins"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.functions_to_select_grid_piece.is_selected_value_outside_bins" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-physped.core.langevin_model">
+<span id="physped-core-langevin-model-module"></span><h2>physped.core.langevin_model module<a class="headerlink" href="#module-physped.core.langevin_model" title="Link to this heading">¶</a></h2>
+<p>Langevin model class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="physped.core.langevin_model.LangevinModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">physped.core.langevin_model.</span></span><span class="sig-name descname"><span class="pre">LangevinModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">potential</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/core/langevin_model.html#LangevinModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.langevin_model.LangevinModel" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Langevin model class.</p>
+<p>This class represents a Langevin model used for simulating pedestrian trajectories.
+It contains methods for initializing the model, simulating trajectories, and defining stopping conditions.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>potential (PiecewisePotential): The piecewise potential object used for modeling.
+params (dict): A dictionary containing the model parameters.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="physped.core.langevin_model.LangevinModel.Noise">
+<span class="sig-name descname"><span class="pre">Noise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="_modules/physped/core/langevin_model.html#LangevinModel.Noise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.langevin_model.LangevinModel.Noise" title="Link to this definition">¶</a></dt>
+<dd><p>Return noise matrix.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>numpy.ndarray: A diagonal matrix representing the noise matrix. The diagonal elements
+correspond to the independent driving Wiener processes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="physped.core.langevin_model.LangevinModel.modelxy">
+<span class="sig-name descname"><span class="pre">modelxy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="_modules/physped/core/langevin_model.html#LangevinModel.modelxy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.langevin_model.LangevinModel.modelxy" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the derivatives of the Langevin model for the given state variables.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>X_0 (np.ndarray): Array of initial state variables [xf, yf, uf, vf, xs, ys, us, vs].
+t: Time parameter (not used in this method).</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: Array of derivatives [uf, vf, ufdot, vfdot, xsdot, ysdot, usdot, vsdot].</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="physped.core.langevin_model.LangevinModel.simulate">
+<span class="sig-name descname"><span class="pre">simulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_eval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">array([0.,</span> <span class="pre">0.1,</span> <span class="pre">0.2,</span> <span class="pre">0.3,</span> <span class="pre">0.4,</span> <span class="pre">0.5,</span> <span class="pre">0.6,</span> <span class="pre">0.7,</span> <span class="pre">0.8,</span> <span class="pre">0.9,</span> <span class="pre">1.,</span> <span class="pre">1.1,</span> <span class="pre">1.2,</span> <span class="pre">1.3,</span> <span class="pre">1.4,</span> <span class="pre">1.5,</span> <span class="pre">1.6,</span> <span class="pre">1.7,</span> <span class="pre">1.8,</span> <span class="pre">1.9,</span> <span class="pre">2.,</span> <span class="pre">2.1,</span> <span class="pre">2.2,</span> <span class="pre">2.3,</span> <span class="pre">2.4,</span> <span class="pre">2.5,</span> <span class="pre">2.6,</span> <span class="pre">2.7,</span> <span class="pre">2.8,</span> <span class="pre">2.9,</span> <span class="pre">3.,</span> <span class="pre">3.1,</span> <span class="pre">3.2,</span> <span class="pre">3.3,</span> <span class="pre">3.4,</span> <span class="pre">3.5,</span> <span class="pre">3.6,</span> <span class="pre">3.7,</span> <span class="pre">3.8,</span> <span class="pre">3.9,</span> <span class="pre">4.,</span> <span class="pre">4.1,</span> <span class="pre">4.2,</span> <span class="pre">4.3,</span> <span class="pre">4.4,</span> <span class="pre">4.5,</span> <span class="pre">4.6,</span> <span class="pre">4.7,</span> <span class="pre">4.8,</span> <span class="pre">4.9,</span> <span class="pre">5.,</span> <span class="pre">5.1,</span> <span class="pre">5.2,</span> <span class="pre">5.3,</span> <span class="pre">5.4,</span> <span class="pre">5.5,</span> <span class="pre">5.6,</span> <span class="pre">5.7,</span> <span class="pre">5.8,</span> <span class="pre">5.9,</span> <span class="pre">6.,</span> <span class="pre">6.1,</span> <span class="pre">6.2,</span> <span class="pre">6.3,</span> <span class="pre">6.4,</span> <span class="pre">6.5,</span> <span class="pre">6.6,</span> <span class="pre">6.7,</span> <span class="pre">6.8,</span> <span class="pre">6.9,</span> <span class="pre">7.,</span> <span class="pre">7.1,</span> <span class="pre">7.2,</span> <span class="pre">7.3,</span> <span class="pre">7.4,</span> <span class="pre">7.5,</span> <span class="pre">7.6,</span> <span class="pre">7.7,</span> <span class="pre">7.8,</span> <span class="pre">7.9,</span> <span class="pre">8.,</span> <span class="pre">8.1,</span> <span class="pre">8.2,</span> <span class="pre">8.3,</span> <span class="pre">8.4,</span> <span class="pre">8.5,</span> <span class="pre">8.6,</span> <span class="pre">8.7,</span> <span class="pre">8.8,</span> <span class="pre">8.9,</span> <span class="pre">9.,</span> <span class="pre">9.1,</span> <span class="pre">9.2,</span> <span class="pre">9.3,</span> <span class="pre">9.4,</span> <span class="pre">9.5,</span> <span class="pre">9.6,</span> <span class="pre">9.7,</span> <span class="pre">9.8,</span> <span class="pre">9.9])</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="_modules/physped/core/langevin_model.html#LangevinModel.simulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.langevin_model.LangevinModel.simulate" title="Link to this definition">¶</a></dt>
+<dd><p>Simulates the Langevin model.</p>
+<p>Parameters:
+- X_0: Initial state of the system as a numpy array.
+- t_eval: Time points at which to evaluate the solution. Defaults to np.arange(0, 10, 0.1).</p>
+<p>Returns:
+- The simulated trajectory of the system as a numpy array.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="physped.core.langevin_model.LangevinModel.stop_condition">
+<span class="sig-name descname"><span class="pre">stop_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">yf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_condition</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="_modules/physped/core/langevin_model.html#LangevinModel.stop_condition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.langevin_model.LangevinModel.stop_condition" title="Link to this definition">¶</a></dt>
+<dd><p>Custom stopping condition to terminate a trajectory when the potential goes to infinity.</p>
+<p>Parameters:
+- xf (float): The x-coordinate of the pedestrian.
+- yf (float): The y-coordinate of the pedestrian.
+- stop_condition (float): The threshold value for the stopping condition.</p>
+<p>Returns:
+- bool: A boolean indicating whether the stopping condition has been met.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-physped.core.piecewise_potential">
+<span id="physped-core-piecewise-potential-module"></span><h2>physped.core.piecewise_potential module<a class="headerlink" href="#module-physped.core.piecewise_potential" title="Link to this heading">¶</a></h2>
+<p>Discrete grid class</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="physped.core.piecewise_potential.PiecewisePotential">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">physped.core.piecewise_potential.</span></span><span class="sig-name descname"><span class="pre">PiecewisePotential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/core/piecewise_potential.html#PiecewisePotential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.piecewise_potential.PiecewisePotential" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A class for creating a discrete grid based on a set of bin edges.</p>
+<p>Attributes:
+- bins (Dict[str, np.ndarray]): A dictionary of bin edges for each dimension of the grid.
+- bin_centers (Dict[str, np.ndarray]): A dictionary of bin centers for each dimension of the grid.
+- grid_shape (tuple): The shape of the grid.
+- grid (np.ndarray): The grid of discrete values.</p>
+</dd></dl>
+
+</section>
+<section id="module-physped.core.trajectory_simulator">
+<span id="physped-core-trajectory-simulator-module"></span><h2>physped.core.trajectory_simulator module<a class="headerlink" href="#module-physped.core.trajectory_simulator" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.trajectory_simulator.sample_trajectory_origins_from_heatmap">
+<span class="sig-prename descclassname"><span class="pre">physped.core.trajectory_simulator.</span></span><span class="sig-name descname"><span class="pre">sample_trajectory_origins_from_heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">piecewise_potential</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="_modules/physped/core/trajectory_simulator.html#sample_trajectory_origins_from_heatmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.trajectory_simulator.sample_trajectory_origins_from_heatmap" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.trajectory_simulator.sample_trajectory_origins_from_trajectories">
+<span class="sig-prename descclassname"><span class="pre">physped.core.trajectory_simulator.</span></span><span class="sig-name descname"><span class="pre">sample_trajectory_origins_from_trajectories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">piecewise_potential</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><span class="pre">ndarray</span></a></span></span><a class="reference internal" href="_modules/physped/core/trajectory_simulator.html#sample_trajectory_origins_from_trajectories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.trajectory_simulator.sample_trajectory_origins_from_trajectories" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.core.trajectory_simulator.simulate_trajectories">
+<span class="sig-prename descclassname"><span class="pre">physped.core.trajectory_simulator.</span></span><span class="sig-name descname"><span class="pre">simulate_trajectories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">piecewise_potential</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/core/trajectory_simulator.html#simulate_trajectories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.core.trajectory_simulator.simulate_trajectories" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-physped.core">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-physped.core" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="physped.html" class="btn btn-neutral float-left" title="physped package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="physped.io.html" class="btn btn-neutral float-right" title="physped.io package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

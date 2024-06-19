@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.core.langevin_model &mdash; Data-driven physics-based modeling of pedestrian dynamics 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/documentation_options.js?v=27db1736"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0+unknown
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">physped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release-history.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../min_versions.html">Minimum Version of Python and NumPy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">physped.core.langevin_model</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for physped.core.langevin_model</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Langevin model class.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sdeint</span>
+
+<span class="kn">from</span> <span class="nn">physped.core.functions_to_discretize_grid</span> <span class="kn">import</span> <span class="n">get_grid_indices</span>
+<span class="kn">from</span> <span class="nn">physped.core.piecewise_potential</span> <span class="kn">import</span> <span class="n">PiecewisePotential</span>
+<span class="kn">from</span> <span class="nn">physped.utils.functions</span> <span class="kn">import</span> <span class="n">cart2pol</span><span class="p">,</span> <span class="n">digitize_values_to_grid</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="LangevinModel">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.langevin_model.LangevinModel">[docs]</a>
+<span class="k">class</span> <span class="nc">LangevinModel</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Langevin model class.</span>
+
+<span class="sd">    This class represents a Langevin model used for simulating pedestrian trajectories.</span>
+<span class="sd">    It contains methods for initializing the model, simulating trajectories, and defining stopping conditions.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        potential (PiecewisePotential): The piecewise potential object used for modeling.</span>
+<span class="sd">        params (dict): A dictionary containing the model parameters.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">potential</span><span class="p">:</span> <span class="n">PiecewisePotential</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize Langevin model with parameters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            potential (PiecewisePotential): The piecewise potential object used for modeling.</span>
+<span class="sd">            params (dict): A dictionary containing the model parameters.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">potential</span> <span class="o">=</span> <span class="n">potential</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">grid_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">potential</span><span class="o">.</span><span class="n">histogram</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heatmap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">potential</span><span class="o">.</span><span class="n">histogram</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">potential</span><span class="o">.</span><span class="n">histogram</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LangevinModel.simulate">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.langevin_model.LangevinModel.simulate">[docs]</a>
+    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_0</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">t_eval</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simulates the Langevin model.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        - X_0: Initial state of the system as a numpy array.</span>
+<span class="sd">        - t_eval: Time points at which to evaluate the solution. Defaults to np.arange(0, 10, 0.1).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        - The simulated trajectory of the system as a numpy array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">sdeint</span><span class="o">.</span><span class="n">itoSRI2</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modelxy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Noise</span><span class="p">,</span> <span class="n">y0</span><span class="o">=</span><span class="n">X_0</span><span class="p">,</span> <span class="n">tspan</span><span class="o">=</span><span class="n">t_eval</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LangevinModel.modelxy">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.langevin_model.LangevinModel.modelxy">[docs]</a>
+    <span class="k">def</span> <span class="nf">modelxy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_0</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the derivatives of the Langevin model for the given state variables.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            X_0 (np.ndarray): Array of initial state variables [xf, yf, uf, vf, xs, ys, us, vs].</span>
+<span class="sd">            t: Time parameter (not used in this method).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            np.ndarray: Array of derivatives [uf, vf, ufdot, vfdot, xsdot, ysdot, usdot, vsdot].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">xf</span><span class="p">,</span> <span class="n">yf</span><span class="p">,</span> <span class="n">uf</span><span class="p">,</span> <span class="n">vf</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">us</span><span class="p">,</span> <span class="n">vs</span> <span class="o">=</span> <span class="n">X_0</span>
+        <span class="c1"># dt = self.params.model.dt</span>
+        <span class="c1"># xs = xs + us * self.params.model.dt</span>
+        <span class="c1"># ys = ys + vs * self.params.model.dt</span>
+
+        <span class="c1"># ufdot, vfdot = 0, 0</span>
+        <span class="c1"># uf = uf + ufdot * self.params.dt</span>
+        <span class="c1"># vf = vf + vfdot * self.params.dt</span>
+
+        <span class="c1"># check stopping condition</span>
+        <span class="n">stop_condition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">stop_condition</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_condition</span><span class="p">(</span><span class="n">xf</span><span class="p">,</span> <span class="n">yf</span><span class="p">,</span> <span class="n">stop_condition</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">xs</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X_0</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># terminate simulation</span>
+
+        <span class="n">rs</span><span class="p">,</span> <span class="n">thetas</span> <span class="o">=</span> <span class="n">cart2pol</span><span class="p">(</span><span class="n">us</span><span class="p">,</span> <span class="n">vs</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="n">X_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">rs</span><span class="p">,</span> <span class="n">thetas</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+        <span class="n">X_indx</span> <span class="o">=</span> <span class="n">get_grid_indices</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">potential</span><span class="p">,</span> <span class="n">X_vals</span><span class="p">)</span>
+        <span class="n">xmean</span><span class="p">,</span> <span class="n">xvar</span><span class="p">,</span> <span class="n">ymean</span><span class="p">,</span> <span class="n">yvar</span><span class="p">,</span> <span class="n">umean</span><span class="p">,</span> <span class="n">uvar</span><span class="p">,</span> <span class="n">vmean</span><span class="p">,</span> <span class="n">vvar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">potential</span><span class="o">.</span><span class="n">fit_params</span><span class="p">[</span>
+            <span class="n">X_indx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="p">:</span>
+        <span class="p">]</span>
+
+        <span class="c1"># determine potential energy contributions</span>
+        <span class="n">V_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">potential</span><span class="o">.</span><span class="n">curvature_x</span><span class="p">[</span><span class="n">X_indx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">4</span><span class="p">]]</span> <span class="o">*</span> <span class="p">(</span><span class="n">xf</span> <span class="o">-</span> <span class="n">xmean</span><span class="p">)</span>
+        <span class="n">V_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">potential</span><span class="o">.</span><span class="n">curvature_y</span><span class="p">[</span><span class="n">X_indx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">4</span><span class="p">]]</span> <span class="o">*</span> <span class="p">(</span><span class="n">yf</span> <span class="o">-</span> <span class="n">ymean</span><span class="p">)</span>
+        <span class="n">V_u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">potential</span><span class="o">.</span><span class="n">curvature_u</span><span class="p">[</span><span class="n">X_indx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">4</span><span class="p">]]</span> <span class="o">*</span> <span class="p">(</span><span class="n">uf</span> <span class="o">-</span> <span class="n">umean</span><span class="p">)</span>
+        <span class="n">V_v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">potential</span><span class="o">.</span><span class="n">curvature_v</span><span class="p">[</span><span class="n">X_indx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">X_indx</span><span class="p">[</span><span class="mi">4</span><span class="p">]]</span> <span class="o">*</span> <span class="p">(</span><span class="n">vf</span> <span class="o">-</span> <span class="n">vmean</span><span class="p">)</span>
+
+        <span class="c1"># acceleration fast modes (-grad V, random noise excluded)</span>
+        <span class="n">ufdot</span> <span class="o">=</span> <span class="o">-</span><span class="n">V_x</span> <span class="o">-</span> <span class="n">V_u</span>
+        <span class="n">vfdot</span> <span class="o">=</span> <span class="o">-</span><span class="n">V_y</span> <span class="o">-</span> <span class="n">V_v</span>
+
+        <span class="c1"># relaxation of slow modes toward fast modes</span>
+        <span class="n">xsdot</span> <span class="o">=</span> <span class="n">us</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">taux</span> <span class="o">*</span> <span class="p">(</span><span class="n">xs</span> <span class="o">-</span> <span class="n">xf</span><span class="p">)</span>
+        <span class="n">ysdot</span> <span class="o">=</span> <span class="n">vs</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">taux</span> <span class="o">*</span> <span class="p">(</span><span class="n">ys</span> <span class="o">-</span> <span class="n">yf</span><span class="p">)</span>
+        <span class="n">usdot</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">tauu</span> <span class="o">*</span> <span class="p">(</span><span class="n">us</span> <span class="o">-</span> <span class="n">uf</span><span class="p">)</span>
+        <span class="n">vsdot</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">tauu</span> <span class="o">*</span> <span class="p">(</span><span class="n">vs</span> <span class="o">-</span> <span class="n">vf</span><span class="p">)</span>
+
+        <span class="c1"># return derivatives</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">uf</span><span class="p">,</span> <span class="n">vf</span><span class="p">,</span> <span class="n">ufdot</span><span class="p">,</span> <span class="n">vfdot</span><span class="p">,</span> <span class="n">xsdot</span><span class="p">,</span> <span class="n">ysdot</span><span class="p">,</span> <span class="n">usdot</span><span class="p">,</span> <span class="n">vsdot</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="LangevinModel.Noise">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.langevin_model.LangevinModel.Noise">[docs]</a>
+    <span class="k">def</span> <span class="nf">Noise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_0</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return noise matrix.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: A diagonal matrix representing the noise matrix. The diagonal elements</span>
+<span class="sd">            correspond to the independent driving Wiener processes.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="LangevinModel.stop_condition">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.langevin_model.LangevinModel.stop_condition">[docs]</a>
+    <span class="k">def</span> <span class="nf">stop_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xf</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">yf</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">stop_condition</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Custom stopping condition to terminate a trajectory when the potential goes to infinity.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        - xf (float): The x-coordinate of the pedestrian.</span>
+<span class="sd">        - yf (float): The y-coordinate of the pedestrian.</span>
+<span class="sd">        - stop_condition (float): The threshold value for the stopping condition.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        - bool: A boolean indicating whether the stopping condition has been met.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">c0</span> <span class="o">=</span> <span class="n">xf</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">min</span>
+        <span class="n">c1</span> <span class="o">=</span> <span class="n">xf</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">max</span>
+        <span class="n">c2</span> <span class="o">=</span> <span class="n">yf</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">min</span>
+        <span class="n">c3</span> <span class="o">=</span> <span class="n">yf</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">max</span>
+        <span class="n">grid_index_x</span> <span class="o">=</span> <span class="n">digitize_values_to_grid</span><span class="p">(</span><span class="n">xf</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">potential</span><span class="o">.</span><span class="n">bins</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span>
+        <span class="n">grid_index_y</span> <span class="o">=</span> <span class="n">digitize_values_to_grid</span><span class="p">(</span><span class="n">yf</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">potential</span><span class="o">.</span><span class="n">bins</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span>
+        <span class="n">c4</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid_counts</span><span class="p">[</span><span class="n">grid_index_x</span><span class="p">,</span> <span class="n">grid_index_y</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">stop_condition</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">([</span><span class="n">c0</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">c3</span><span class="p">,</span> <span class="n">c4</span><span class="p">])</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

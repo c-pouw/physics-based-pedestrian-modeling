@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.io.readers &mdash; Data-driven physics-based modeling of pedestrian dynamics 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/documentation_options.js?v=27db1736"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0+unknown
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">physped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release-history.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../min_versions.html">Minimum Version of Python and NumPy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">physped.io.readers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for physped.io.readers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Trajectory readers for the pathintegral code.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">physped.core.piecewise_potential</span> <span class="kn">import</span> <span class="n">PiecewisePotential</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="read_piecewise_potential_from_file">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_piecewise_potential_from_file">[docs]</a>
+<span class="k">def</span> <span class="nf">read_piecewise_potential_from_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PiecewisePotential</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reads a piecewise potential from a file using pickle.</span>
+
+<span class="sd">    :param filename: The path to the file containing the piecewise potential.</span>
+<span class="sd">    :type filename: str</span>
+<span class="sd">    :return: The piecewise potential.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">val</span></div>
+
+
+
+<span class="c1"># def read_minimal_dataset_for_testing(config) -&gt; pd.DataFrame:</span>
+<span class="c1">#     &quot;&quot;&quot;Read the single paths data set.&quot;&quot;&quot;</span>
+<span class="c1">#     log.info(&quot;Start reading single paths data set.&quot;)</span>
+<span class="c1">#     trajectory_data_dir = Path(config.trajectory_data_dir)</span>
+<span class="c1">#     with ZipFile(trajectory_data_dir / &quot;minimal_test_dataset.zip&quot;, &quot;r&quot;) as archive:</span>
+<span class="c1">#         with archive.open(&quot;single_paths_rtl.csv&quot;) as f:</span>
+<span class="c1">#             paths = pd.read_csv(f)</span>
+
+<span class="c1">#     log.info(&quot;Finished reading single paths data set.&quot;)</span>
+<span class="c1">#     return paths</span>
+
+
+<div class="viewcode-block" id="read_narrow_corridor_paths_local">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_narrow_corridor_paths_local">[docs]</a>
+<span class="k">def</span> <span class="nf">read_narrow_corridor_paths_local</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">trajectory_data_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">trajectory_data_dir</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Start reading single paths data set.&quot;</span><span class="p">)</span>
+    <span class="n">archive</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">trajectory_data_dir</span> <span class="o">/</span> <span class="s2">&quot;data.zip&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">archive</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;left-to-right.ssv&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">paths_ltr</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">archive</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;right-to-left.ssv&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">paths_rtl</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">paths_ltr</span><span class="p">,</span> <span class="n">paths_rtl</span></div>
+
+
+
+<div class="viewcode-block" id="read_narrow_corridor_paths_4tu">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_narrow_corridor_paths_4tu">[docs]</a>
+<span class="k">def</span> <span class="nf">read_narrow_corridor_paths_4tu</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="s2">&quot;https://data.4tu.nl/ndownloader/items/b8e30f8c-3931-4604-842a-77c7fb8ac3fc/versions/1&quot;</span>
+    <span class="n">bytestring</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">link</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">bytestring</span><span class="o">.</span><span class="n">content</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outerzip</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">outerzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;data.zip&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">innerzip</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">innerzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;left-to-right.ssv&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">paths_ltr</span><span class="p">:</span>
+                <span class="n">paths_ltr</span> <span class="o">=</span> <span class="n">paths_ltr</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">innerzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;right-to-left.ssv&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">paths_rtl</span><span class="p">:</span>
+                <span class="n">paths_rtl</span> <span class="o">=</span> <span class="n">paths_rtl</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">paths_ltr</span><span class="p">,</span> <span class="n">paths_rtl</span></div>
+
+
+
+<span class="n">narrow_corridor_path_reader</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;local&quot;</span><span class="p">:</span> <span class="n">read_narrow_corridor_paths_local</span><span class="p">,</span>
+    <span class="s2">&quot;4tu&quot;</span><span class="p">:</span> <span class="n">read_narrow_corridor_paths_4tu</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="read_single_paths">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_single_paths">[docs]</a>
+<span class="k">def</span> <span class="nf">read_single_paths</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the single paths data set.&quot;&quot;&quot;</span>
+    <span class="n">data_source</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">data_source</span>
+    <span class="n">paths_ltr</span><span class="p">,</span> <span class="n">paths_rtl</span> <span class="o">=</span> <span class="n">narrow_corridor_path_reader</span><span class="p">[</span><span class="n">data_source</span><span class="p">](</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="n">df1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">paths_ltr</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="n">df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">paths_rtl</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;X_SG&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;X_SG&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.1</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Y_SG&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Y_SG&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.05</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;X_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;xf&quot;</span><span class="p">,</span> <span class="s2">&quot;Y_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;yf&quot;</span><span class="p">,</span> <span class="s2">&quot;U_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;uf&quot;</span><span class="p">,</span> <span class="s2">&quot;V_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;vf&quot;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished reading single paths data set.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="read_parallel_paths">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_parallel_paths">[docs]</a>
+<span class="k">def</span> <span class="nf">read_parallel_paths</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the parallel paths data set.&quot;&quot;&quot;</span>
+    <span class="n">trajectory_data_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">trajectory_data_dir</span><span class="p">)</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="n">trajectory_data_dir</span> <span class="o">/</span> <span class="s2">&quot;df_single_pedestrians_small.h5&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;X_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;xf&quot;</span><span class="p">,</span> <span class="s2">&quot;Y_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;yf&quot;</span><span class="p">,</span> <span class="s2">&quot;U_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;uf&quot;</span><span class="p">,</span> <span class="s2">&quot;V_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;vf&quot;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;xf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;xf&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.4</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;yf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;yf&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.3</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Pid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">&quot;Pid&quot;</span><span class="p">,</span> <span class="s2">&quot;day_id&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">ngroup</span><span class="p">()</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;Umean&gt;0.5&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">X0</span> <span class="o">-</span> <span class="n">df</span><span class="o">.</span><span class="n">X1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;Pid&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">uf</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">3.5</span><span class="p">)</span>
+    <span class="c1"># df[&quot;time&quot;] = df[&quot;frame&quot;]</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="read_intersecting_paths_synthetic">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_intersecting_paths_synthetic">[docs]</a>
+<span class="k">def</span> <span class="nf">read_intersecting_paths_synthetic</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the intersecting paths data set.&quot;&quot;&quot;</span>
+    <span class="n">trajectory_data_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">trajectory_data_dir</span><span class="p">)</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="n">trajectory_data_dir</span> <span class="o">/</span> <span class="s2">&quot;simulations_crossing.parquet&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;X_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;xf&quot;</span><span class="p">,</span> <span class="s2">&quot;Y_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;yf&quot;</span><span class="p">,</span> <span class="s2">&quot;U_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;uf&quot;</span><span class="p">,</span> <span class="s2">&quot;V_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;vf&quot;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;Pid&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">cumcount</span><span class="p">()</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="read_intersecting_paths">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_intersecting_paths">[docs]</a>
+<span class="k">def</span> <span class="nf">read_intersecting_paths</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">data_source</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">data_source</span>
+    <span class="n">paths_ltr</span><span class="p">,</span> <span class="n">paths_rtl</span> <span class="o">=</span> <span class="n">narrow_corridor_path_reader</span><span class="p">[</span><span class="n">data_source</span><span class="p">](</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="n">df1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">paths_ltr</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="n">df1</span><span class="p">[</span><span class="s2">&quot;X_SG&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df1</span><span class="p">[</span><span class="s2">&quot;X_SG&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.1</span>
+    <span class="n">df1</span><span class="p">[</span><span class="s2">&quot;Y_SG&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df1</span><span class="p">[</span><span class="s2">&quot;Y_SG&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.05</span>
+
+    <span class="n">df2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">paths_rtl</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="n">df2</span><span class="p">[</span><span class="s2">&quot;X_SG&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df2</span><span class="p">[</span><span class="s2">&quot;X_SG&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.1</span>
+    <span class="n">df2</span><span class="p">[</span><span class="s2">&quot;Y_SG&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df2</span><span class="p">[</span><span class="s2">&quot;Y_SG&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.05</span>
+    <span class="n">df2</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>  <span class="c1"># swap x and y coordinates</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="s2">&quot;X_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;Y_SG&quot;</span><span class="p">,</span> <span class="s2">&quot;Y_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;X_SG&quot;</span><span class="p">,</span> <span class="s2">&quot;U_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;V_SG&quot;</span><span class="p">,</span> <span class="s2">&quot;V_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;U_SG&quot;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df1</span><span class="p">,</span> <span class="n">df2</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># df2 = pd.read_csv(io.StringIO(data_str), sep=&quot; &quot;)</span>
+    <span class="c1"># df = pd.concat([df1, df2], ignore_index=True)</span>
+    <span class="c1"># df[&quot;X_SG&quot;] = df[&quot;X_SG&quot;] + 0.1</span>
+    <span class="c1"># df[&quot;Y_SG&quot;] = df[&quot;Y_SG&quot;] - 0.05</span>
+    <span class="c1"># df.rename(columns={&quot;X_SG&quot;: &quot;xf&quot;, &quot;Y_SG&quot;: &quot;yf&quot;, &quot;U_SG&quot;: &quot;uf&quot;, &quot;V_SG&quot;: &quot;vf&quot;}, inplace=True)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished reading single paths data set.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="read_curved_paths_synthetic">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_curved_paths_synthetic">[docs]</a>
+<span class="k">def</span> <span class="nf">read_curved_paths_synthetic</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the curved paths data set.&quot;&quot;&quot;</span>
+    <span class="n">trajectory_data_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">trajectory_data_dir</span><span class="p">)</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="n">trajectory_data_dir</span> <span class="o">/</span> <span class="s2">&quot;artificial_measurements_ellipse.parquet&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="s2">&quot;xf&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="s2">&quot;yf&quot;</span><span class="p">,</span> <span class="s2">&quot;xdot&quot;</span><span class="p">:</span> <span class="s2">&quot;uf&quot;</span><span class="p">,</span> <span class="s2">&quot;ydot&quot;</span><span class="p">:</span> <span class="s2">&quot;vf&quot;</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="filter_trajectory">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.filter_trajectory">[docs]</a>
+<span class="k">def</span> <span class="nf">filter_trajectory</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">0.16</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="n">b</span><span class="p">,</span> <span class="n">a</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">butter</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="s2">&quot;low&quot;</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;particle&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">])</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;particle&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">52</span><span class="p">)</span>
+
+    <span class="n">f_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;particle&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">filtfilt</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">x</span><span class="p">[[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)))</span>
+    <span class="n">df</span><span class="p">[[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">f_df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="read_curved_paths">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_curved_paths">[docs]</a>
+<span class="k">def</span> <span class="nf">read_curved_paths</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="c1"># trajectory_data_dir = Path(config.trajectory_data_dir)</span>
+    <span class="c1"># trajs = pd.read_csv(trajectory_data_dir / &quot;linecross-2.csv&quot;)</span>
+    <span class="c1"># pid_column = &quot;particle&quot;</span>
+    <span class="c1"># # x_column = &#39;x&#39;</span>
+    <span class="c1"># # y_column = &#39;y&#39;</span>
+    <span class="c1"># time_column = &quot;time&quot;</span>
+    <span class="c1"># conversion_X = 2.30405921919033</span>
+    <span class="c1"># conversion_Y = 2.35579871138595</span>
+    <span class="c1"># trajs = trajs[trajs.frame &gt; 380].copy()</span>
+    <span class="c1"># trajs[&quot;x&quot;] = trajs[&quot;x&quot;] - np.mean(trajs[&quot;x&quot;]) - 30</span>
+    <span class="c1"># trajs[&quot;y&quot;] = trajs[&quot;y&quot;] - np.mean(trajs[&quot;y&quot;]) + 35</span>
+    <span class="c1"># trajs[&quot;x&quot;] = trajs[&quot;x&quot;] * conversion_X / 100</span>
+    <span class="c1"># trajs[&quot;y&quot;] = trajs[&quot;y&quot;] * conversion_Y / 100</span>
+
+    <span class="c1"># Trajectories recorded during experiment 1</span>
+    <span class="n">trajectory_data_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">trajectory_data_dir</span><span class="p">)</span>
+    <span class="n">trajs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">trajectory_data_dir</span> <span class="o">/</span> <span class="s2">&quot;linecross-1.csv&quot;</span><span class="p">)</span>
+    <span class="n">trajs</span> <span class="o">=</span> <span class="n">filter_trajectory</span><span class="p">(</span><span class="n">trajs</span><span class="p">)</span>
+    <span class="n">pid_column</span> <span class="o">=</span> <span class="s2">&quot;particle&quot;</span>
+    <span class="n">time_column</span> <span class="o">=</span> <span class="s2">&quot;time&quot;</span>
+    <span class="n">conversion_X</span> <span class="o">=</span> <span class="mf">2.30405921919033</span>
+    <span class="n">conversion_Y</span> <span class="o">=</span> <span class="mf">2.35579871138595</span>
+    <span class="n">trajs</span> <span class="o">=</span> <span class="n">trajs</span><span class="p">[</span><span class="n">trajs</span><span class="o">.</span><span class="n">frame</span> <span class="o">&gt;</span> <span class="mi">380</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span> <span class="o">-</span> <span class="mi">30</span>
+    <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span> <span class="o">+</span> <span class="mi">35</span>
+    <span class="n">trajs1</span> <span class="o">=</span> <span class="n">trajs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># Trajectories recorded during experiment 2</span>
+    <span class="n">trajs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">trajectory_data_dir</span> <span class="o">/</span> <span class="s2">&quot;linecross-2.csv&quot;</span><span class="p">)</span>
+    <span class="n">trajs</span> <span class="o">=</span> <span class="n">filter_trajectory</span><span class="p">(</span><span class="n">trajs</span><span class="p">)</span>
+    <span class="n">trajs</span> <span class="o">=</span> <span class="n">trajs</span><span class="p">[</span><span class="n">trajs</span><span class="o">.</span><span class="n">frame</span> <span class="o">&gt;</span> <span class="mi">380</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span> <span class="o">+</span> <span class="mi">17</span>
+    <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span> <span class="o">+</span> <span class="mi">33</span>
+    <span class="n">trajs</span><span class="p">[</span><span class="n">pid_column</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">trajs1</span><span class="p">[</span><span class="n">pid_column</span><span class="p">])</span>
+    <span class="n">trajs2</span> <span class="o">=</span> <span class="n">trajs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">trajs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">trajs1</span><span class="p">,</span> <span class="n">trajs2</span><span class="p">])</span>
+    <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">conversion_X</span> <span class="o">/</span> <span class="mi">100</span>
+    <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">conversion_Y</span> <span class="o">/</span> <span class="mi">100</span>
+
+    <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;v_x_m&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;v_x_m&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="o">-</span><span class="mi">99</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">()</span>
+    <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;v_y_m&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;v_y_m&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="o">-</span><span class="mi">99</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span><span class="o">.</span><span class="n">interpolate</span><span class="p">()</span>
+
+    <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;traj_len&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trajs</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="n">pid_column</span><span class="p">])[</span><span class="n">pid_column</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="s2">&quot;size&quot;</span><span class="p">)</span>
+    <span class="n">trajs</span> <span class="o">=</span> <span class="n">trajs</span><span class="p">[</span><span class="n">trajs</span><span class="o">.</span><span class="n">traj_len</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">trajs</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="n">pid_column</span><span class="p">,</span> <span class="n">time_column</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trajs</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">pid_column</span><span class="p">)[</span><span class="n">pid_column</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+    <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;kp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">]</span> <span class="o">//</span> <span class="mi">320</span>
+    <span class="n">trajs</span><span class="p">[</span><span class="s2">&quot;new_pid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">trajs</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="p">[</span><span class="n">pid_column</span><span class="p">]</span><span class="si">:</span><span class="s2">06</span><span class="si">}{</span><span class="n">x</span><span class="p">[</span><span class="s1">&#39;kp&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">04</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># trajs[&quot;new_pid&quot;] = trajs[pid_column] * 100000 + trajs[&quot;kp&quot;] + 100</span>
+    <span class="k">return</span> <span class="n">trajs</span></div>
+
+
+
+<div class="viewcode-block" id="read_station_paths">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_station_paths">[docs]</a>
+<span class="k">def</span> <span class="nf">read_station_paths</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the station paths data set.&quot;&quot;&quot;</span>
+    <span class="n">trajectory_data_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">trajectory_data_dir</span><span class="p">)</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="n">trajectory_data_dir</span> <span class="o">/</span> <span class="s2">&quot;trajectories_EHV_platform_2_1_refined.parquet&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s2">&quot;date_time_utc&quot;</span><span class="p">,</span> <span class="s2">&quot;Pid&quot;</span><span class="p">,</span> <span class="s2">&quot;xf&quot;</span><span class="p">,</span> <span class="s2">&quot;yf&quot;</span><span class="p">]]</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s2">&quot;xf&quot;</span><span class="p">:</span> <span class="s2">&quot;yf&quot;</span><span class="p">,</span> <span class="s2">&quot;yf&quot;</span><span class="p">:</span> <span class="s2">&quot;xf&quot;</span><span class="p">,</span> <span class="s2">&quot;uf&quot;</span><span class="p">:</span> <span class="s2">&quot;vf&quot;</span><span class="p">,</span> <span class="s2">&quot;vf&quot;</span><span class="p">:</span> <span class="s2">&quot;uf&quot;</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="read_asdz_pf34">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_asdz_pf34">[docs]</a>
+<span class="k">def</span> <span class="nf">read_asdz_pf34</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="c1"># TODO: Make separate readers for local and 4tu data sources</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">data_source</span> <span class="o">==</span> <span class="s2">&quot;local&quot;</span><span class="p">:</span>
+        <span class="n">trajectory_data_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">trajectory_data_dir</span><span class="p">)</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">trajectory_data_dir</span> <span class="o">/</span> <span class="s2">&quot;Amsterdam Zuid - platform 3-4 - set1.csv&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">data_source</span> <span class="o">==</span> <span class="s2">&quot;4tu&quot;</span><span class="p">:</span>
+        <span class="n">link</span> <span class="o">=</span> <span class="s2">&quot;https://data.4tu.nl/file/7d78a5e3-6142-49fe-be03-e4c707322863/40ea5cd9-95dc-4e3c-8760-7f4dd543eae7&quot;</span>
+        <span class="n">bytestring</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">link</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">bytestring</span><span class="o">.</span><span class="n">content</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zipped_file</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">zipped_file</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;Amsterdam Zuid - platform 3-4 - set1.csv&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">paths</span><span class="p">:</span>
+                <span class="n">paths</span> <span class="o">=</span> <span class="n">paths</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">paths</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x_pos&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y_pos&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="read_ehv_train_station_multifile">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_ehv_train_station_multifile">[docs]</a>
+<span class="k">def</span> <span class="nf">read_ehv_train_station_multifile</span><span class="p">(</span><span class="n">filelist</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">df_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">filelist</span><span class="p">,</span> <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="n">df_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">df_list</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">preprocess_ehv</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="preprocess_ehv">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.preprocess_ehv">[docs]</a>
+<span class="k">def</span> <span class="nf">preprocess_ehv</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;x_pos&quot;</span><span class="p">,</span> <span class="s2">&quot;y_pos&quot;</span><span class="p">]:</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;traj_len&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">&quot;tracked_object&quot;</span><span class="p">])[</span><span class="s2">&quot;tracked_object&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="s2">&quot;size&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Remove short trajectories</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">traj_len</span> <span class="o">&gt;</span> <span class="mi">150</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># Rename position column names. Input the column names of the object identifier and the position coordinates.</span>
+    <span class="n">column_names</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;object_identifier&quot;</span><span class="p">:</span> <span class="s2">&quot;tracked_object&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;x_position&quot;</span><span class="p">:</span> <span class="s2">&quot;y_pos&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;y_position&quot;</span><span class="p">:</span> <span class="s2">&quot;x_pos&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">inv_column_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;Pid&quot;</span><span class="p">:</span> <span class="n">column_names</span><span class="p">[</span><span class="s2">&quot;object_identifier&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;xf&quot;</span><span class="p">:</span> <span class="n">column_names</span><span class="p">[</span><span class="s2">&quot;x_position&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;yf&quot;</span><span class="p">:</span> <span class="n">column_names</span><span class="p">[</span><span class="s2">&quot;y_position&quot;</span><span class="p">],</span>
+    <span class="p">}</span>
+    <span class="n">column_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">inv_column_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">column_mapping</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Convert position units to meters</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;xf&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;yf&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+
+    <span class="c1"># df = add_velocity(df, groupby=&quot;Pid&quot;, xpos=&quot;xf&quot;, ypos=&quot;yf&quot;)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<span class="c1"># def read_ehv_station_paths_from_azure(datehour: datetime.datetime, freq: str) -&gt; pd.DataFrame:</span>
+<span class="c1">#     import crowdflow as cf</span>
+<span class="c1">#     from crowdflow.preprocessing.aggregators import KinematicsAggregator</span>
+<span class="c1">#     from crowdflow.preprocessing.pipelines import siemens_trajectory_cleaner as cleaner</span>
+
+<span class="c1">#     filename = &quot;ehv_Perron2.1_siemens.json&quot;</span>
+<span class="c1">#     log.info(&quot;Reading %s&quot;, datehour)</span>
+<span class="c1">#     area = cf.get_area(filename, **{&quot;validate&quot;: False})</span>
+<span class="c1">#     days = 1</span>
+<span class="c1">#     if freq[1] == &quot;d&quot;:</span>
+<span class="c1">#         starttime = datetime.time(0)</span>
+<span class="c1">#         endtime = datetime.time(23, 59)</span>
+<span class="c1">#         days = int(freq[0])</span>
+<span class="c1">#     elif freq[1] == &quot;h&quot;:</span>
+<span class="c1">#         starttime = datetime.time(datehour.hour)</span>
+<span class="c1">#         endtime = datetime.time(datehour.hour + (int(freq[0]) - 1), 59)</span>
+<span class="c1">#     df = pl.concat(</span>
+<span class="c1">#         cf.read(</span>
+<span class="c1">#             area,</span>
+<span class="c1">#             &quot;trajectorie&quot;,</span>
+<span class="c1">#             &quot;Siemens_Scan&quot;,</span>
+<span class="c1">#             &quot;azurescanpolars&quot;,</span>
+<span class="c1">#             datehour.date(),</span>
+<span class="c1">#             datehour.date() + datetime.timedelta(days=days),</span>
+<span class="c1">#             starttime,</span>
+<span class="c1">#             endtime,</span>
+<span class="c1">#             **{&quot;errors&quot;: &quot;ignore&quot;, &quot;show_progress&quot;: True},</span>
+<span class="c1">#         )</span>
+<span class="c1">#     )</span>
+<span class="c1">#     df = cleaner(df, **{&quot;NormalizeCoordinates.area&quot;: area})</span>
+<span class="c1">#     df = df.collect()</span>
+<span class="c1">#     ka = KinematicsAggregator(derivative=&quot;velocity&quot;)</span>
+<span class="c1">#     df = ka.aggregate(df)</span>
+<span class="c1">#     df = df.with_columns(pl.col(&quot;x_pos&quot;) / 1000)</span>
+<span class="c1">#     df = df.with_columns(pl.col(&quot;y_pos&quot;) / 1000)</span>
+<span class="c1">#     # df = df[df.traj_len &gt; 150].copy()</span>
+<span class="c1">#     return df.to_pandas()</span>
+
+
+<div class="viewcode-block" id="read_trajectories_from_path">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_trajectories_from_path">[docs]</a>
+<span class="k">def</span> <span class="nf">read_trajectories_from_path</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read trajectories from file.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span></div>
+
+
+
+<span class="n">trajectory_reader</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;single_paths&quot;</span><span class="p">:</span> <span class="n">read_single_paths</span><span class="p">,</span>
+    <span class="s2">&quot;parallel_paths&quot;</span><span class="p">:</span> <span class="n">read_parallel_paths</span><span class="p">,</span>
+    <span class="s2">&quot;intersecting_paths&quot;</span><span class="p">:</span> <span class="n">read_intersecting_paths</span><span class="p">,</span>
+    <span class="s2">&quot;intersecting_paths_synthetic&quot;</span><span class="p">:</span> <span class="n">read_intersecting_paths_synthetic</span><span class="p">,</span>
+    <span class="s2">&quot;curved_paths&quot;</span><span class="p">:</span> <span class="n">read_curved_paths</span><span class="p">,</span>
+    <span class="s2">&quot;curved_paths_synthetic&quot;</span><span class="p">:</span> <span class="n">read_curved_paths_synthetic</span><span class="p">,</span>
+    <span class="s2">&quot;station_paths&quot;</span><span class="p">:</span> <span class="n">read_station_paths</span><span class="p">,</span>
+    <span class="s2">&quot;asdz_pf34&quot;</span><span class="p">:</span> <span class="n">read_asdz_pf34</span><span class="p">,</span>
+    <span class="c1"># &quot;minimal_dataset_for_testing&quot;: read_minimal_dataset_for_testing,</span>
+    <span class="c1"># &quot;ehv_azure&quot;: read_ehv_station_paths_from_azure,</span>
+<span class="p">}</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

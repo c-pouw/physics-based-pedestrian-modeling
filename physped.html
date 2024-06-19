@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped package &mdash; Data-driven physics-based modeling of pedestrian dynamics 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/documentation_options.js?v=27db1736"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="physped.core package" href="physped.core.html" />
+    <link rel="prev" title="physped" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0+unknown
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">physped</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">physped package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="physped.core.html">physped.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.io.html">physped.io package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.preprocessing.html">physped.preprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.tests.html">physped.tests package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.utils.html">physped.utils package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.visualization.html">physped.visualization package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-physped.main">physped.main module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#physped.main.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-physped.omegaconf_resolvers">physped.omegaconf_resolvers module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#physped.omegaconf_resolvers.apply_periodic_conditions_to_the_angle_theta"><code class="docutils literal notranslate"><span class="pre">apply_periodic_conditions_to_the_angle_theta()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#physped.omegaconf_resolvers.create_grid_name"><code class="docutils literal notranslate"><span class="pre">create_grid_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#physped.omegaconf_resolvers.register_new_resolvers"><code class="docutils literal notranslate"><span class="pre">register_new_resolvers()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-physped">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release-history.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="min_versions.html">Minimum Version of Python and NumPy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">physped</a></li>
+      <li class="breadcrumb-item active">physped package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/physped.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="physped-package">
+<h1>physped package<a class="headerlink" href="#physped-package" title="Link to this heading">¶</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="physped.core.html">physped.core package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="physped.core.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="physped.core.html#module-physped.core.functions_to_discretize_grid">physped.core.functions_to_discretize_grid module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.accumulate_grids"><code class="docutils literal notranslate"><span class="pre">accumulate_grids()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.add_trajectories_to_histogram"><code class="docutils literal notranslate"><span class="pre">add_trajectories_to_histogram()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.calculate_curvature_of_the_potential"><code class="docutils literal notranslate"><span class="pre">calculate_curvature_of_the_potential()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.calculate_position_based_emperic_potential"><code class="docutils literal notranslate"><span class="pre">calculate_position_based_emperic_potential()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.convert_grid_indices_to_coordinates"><code class="docutils literal notranslate"><span class="pre">convert_grid_indices_to_coordinates()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.derive_potential_center"><code class="docutils literal notranslate"><span class="pre">derive_potential_center()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.digitize_trajectories_to_grid"><code class="docutils literal notranslate"><span class="pre">digitize_trajectories_to_grid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.fit_probability_distributions"><code class="docutils literal notranslate"><span class="pre">fit_probability_distributions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.fit_trajectories_on_grid"><code class="docutils literal notranslate"><span class="pre">fit_trajectories_on_grid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.get_boundary_coordinates_of_selection"><code class="docutils literal notranslate"><span class="pre">get_boundary_coordinates_of_selection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.get_grid_index_single_value"><code class="docutils literal notranslate"><span class="pre">get_grid_index_single_value()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.get_grid_indices"><code class="docutils literal notranslate"><span class="pre">get_grid_indices()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.get_slice_of_multidimensional_matrix"><code class="docutils literal notranslate"><span class="pre">get_slice_of_multidimensional_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.learn_potential_from_trajectories"><code class="docutils literal notranslate"><span class="pre">learn_potential_from_trajectories()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.make_grid_selection"><code class="docutils literal notranslate"><span class="pre">make_grid_selection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.random_uniform_value_in_bin"><code class="docutils literal notranslate"><span class="pre">random_uniform_value_in_bin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.return_grid_ids"><code class="docutils literal notranslate"><span class="pre">return_grid_ids()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.sample_from_ndarray"><code class="docutils literal notranslate"><span class="pre">sample_from_ndarray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_discretize_grid.selection_to_bounds"><code class="docutils literal notranslate"><span class="pre">selection_to_bounds()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physped.core.html#module-physped.core.functions_to_select_grid_piece">physped.core.functions_to_select_grid_piece module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_select_grid_piece.apply_periodic_conditions_to_the_angle_theta"><code class="docutils literal notranslate"><span class="pre">apply_periodic_conditions_to_the_angle_theta()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_select_grid_piece.evaluate_selection_point"><code class="docutils literal notranslate"><span class="pre">evaluate_selection_point()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_select_grid_piece.evaluate_selection_range"><code class="docutils literal notranslate"><span class="pre">evaluate_selection_range()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_select_grid_piece.get_boundaries_that_enclose_the_selected_bin"><code class="docutils literal notranslate"><span class="pre">get_boundaries_that_enclose_the_selected_bin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_select_grid_piece.get_boundaries_that_enclose_the_selected_range"><code class="docutils literal notranslate"><span class="pre">get_boundaries_that_enclose_the_selected_range()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_select_grid_piece.get_index_of_the_enclosing_bin"><code class="docutils literal notranslate"><span class="pre">get_index_of_the_enclosing_bin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_select_grid_piece.get_indices_of_the_enclosing_range"><code class="docutils literal notranslate"><span class="pre">get_indices_of_the_enclosing_range()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_select_grid_piece.is_range_decreasing"><code class="docutils literal notranslate"><span class="pre">is_range_decreasing()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_select_grid_piece.is_selected_point_within_grid"><code class="docutils literal notranslate"><span class="pre">is_selected_point_within_grid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_select_grid_piece.is_selected_range_valid"><code class="docutils literal notranslate"><span class="pre">is_selected_range_valid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_select_grid_piece.is_selected_range_within_grid"><code class="docutils literal notranslate"><span class="pre">is_selected_range_within_grid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.functions_to_select_grid_piece.is_selected_value_outside_bins"><code class="docutils literal notranslate"><span class="pre">is_selected_value_outside_bins()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physped.core.html#module-physped.core.langevin_model">physped.core.langevin_model module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.langevin_model.LangevinModel"><code class="docutils literal notranslate"><span class="pre">LangevinModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="physped.core.html#physped.core.langevin_model.LangevinModel.Noise"><code class="docutils literal notranslate"><span class="pre">LangevinModel.Noise()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.core.html#physped.core.langevin_model.LangevinModel.modelxy"><code class="docutils literal notranslate"><span class="pre">LangevinModel.modelxy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.core.html#physped.core.langevin_model.LangevinModel.simulate"><code class="docutils literal notranslate"><span class="pre">LangevinModel.simulate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.core.html#physped.core.langevin_model.LangevinModel.stop_condition"><code class="docutils literal notranslate"><span class="pre">LangevinModel.stop_condition()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physped.core.html#module-physped.core.piecewise_potential">physped.core.piecewise_potential module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.piecewise_potential.PiecewisePotential"><code class="docutils literal notranslate"><span class="pre">PiecewisePotential</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physped.core.html#module-physped.core.trajectory_simulator">physped.core.trajectory_simulator module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.trajectory_simulator.sample_trajectory_origins_from_heatmap"><code class="docutils literal notranslate"><span class="pre">sample_trajectory_origins_from_heatmap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.trajectory_simulator.sample_trajectory_origins_from_trajectories"><code class="docutils literal notranslate"><span class="pre">sample_trajectory_origins_from_trajectories()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.core.html#physped.core.trajectory_simulator.simulate_trajectories"><code class="docutils literal notranslate"><span class="pre">simulate_trajectories()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physped.core.html#module-physped.core">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="physped.io.html">physped.io package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="physped.io.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="physped.io.html#module-physped.io.readers">physped.io.readers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physped.io.html#physped.io.readers.filter_trajectory"><code class="docutils literal notranslate"><span class="pre">filter_trajectory()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.io.html#physped.io.readers.preprocess_ehv"><code class="docutils literal notranslate"><span class="pre">preprocess_ehv()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.io.html#physped.io.readers.read_asdz_pf34"><code class="docutils literal notranslate"><span class="pre">read_asdz_pf34()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.io.html#physped.io.readers.read_curved_paths"><code class="docutils literal notranslate"><span class="pre">read_curved_paths()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.io.html#physped.io.readers.read_curved_paths_synthetic"><code class="docutils literal notranslate"><span class="pre">read_curved_paths_synthetic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.io.html#physped.io.readers.read_ehv_train_station_multifile"><code class="docutils literal notranslate"><span class="pre">read_ehv_train_station_multifile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.io.html#physped.io.readers.read_intersecting_paths"><code class="docutils literal notranslate"><span class="pre">read_intersecting_paths()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.io.html#physped.io.readers.read_intersecting_paths_synthetic"><code class="docutils literal notranslate"><span class="pre">read_intersecting_paths_synthetic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.io.html#physped.io.readers.read_narrow_corridor_paths_4tu"><code class="docutils literal notranslate"><span class="pre">read_narrow_corridor_paths_4tu()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.io.html#physped.io.readers.read_narrow_corridor_paths_local"><code class="docutils literal notranslate"><span class="pre">read_narrow_corridor_paths_local()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.io.html#physped.io.readers.read_parallel_paths"><code class="docutils literal notranslate"><span class="pre">read_parallel_paths()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.io.html#physped.io.readers.read_piecewise_potential_from_file"><code class="docutils literal notranslate"><span class="pre">read_piecewise_potential_from_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.io.html#physped.io.readers.read_single_paths"><code class="docutils literal notranslate"><span class="pre">read_single_paths()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.io.html#physped.io.readers.read_station_paths"><code class="docutils literal notranslate"><span class="pre">read_station_paths()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.io.html#physped.io.readers.read_trajectories_from_path"><code class="docutils literal notranslate"><span class="pre">read_trajectories_from_path()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physped.io.html#module-physped.io.writers">physped.io.writers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physped.io.html#physped.io.writers.save_grid_bins"><code class="docutils literal notranslate"><span class="pre">save_grid_bins()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.io.html#physped.io.writers.save_piecewise_potential"><code class="docutils literal notranslate"><span class="pre">save_piecewise_potential()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.io.html#physped.io.writers.save_trajectories"><code class="docutils literal notranslate"><span class="pre">save_trajectories()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physped.io.html#module-physped.io">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="physped.preprocessing.html">physped.preprocessing package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="physped.preprocessing.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="physped.preprocessing.html#module-physped.preprocessing.trajectories">physped.preprocessing.trajectories module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physped.preprocessing.html#physped.preprocessing.trajectories.add_acceleration"><code class="docutils literal notranslate"><span class="pre">add_acceleration()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.preprocessing.html#physped.preprocessing.trajectories.add_trajectory_step"><code class="docutils literal notranslate"><span class="pre">add_trajectory_step()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.preprocessing.html#physped.preprocessing.trajectories.add_velocity"><code class="docutils literal notranslate"><span class="pre">add_velocity()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.preprocessing.html#physped.preprocessing.trajectories.add_velocity_in_polar_coordinates"><code class="docutils literal notranslate"><span class="pre">add_velocity_in_polar_coordinates()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.preprocessing.html#physped.preprocessing.trajectories.compute_all_slow_modes"><code class="docutils literal notranslate"><span class="pre">compute_all_slow_modes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.preprocessing.html#physped.preprocessing.trajectories.compute_all_slow_modes_without_time_recentering"><code class="docutils literal notranslate"><span class="pre">compute_all_slow_modes_without_time_recentering()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.preprocessing.html#physped.preprocessing.trajectories.compute_slow_dynamics"><code class="docutils literal notranslate"><span class="pre">compute_slow_dynamics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.preprocessing.html#physped.preprocessing.trajectories.compute_slow_modes_geert"><code class="docutils literal notranslate"><span class="pre">compute_slow_modes_geert()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.preprocessing.html#physped.preprocessing.trajectories.filter_trajectories_by_velocity"><code class="docutils literal notranslate"><span class="pre">filter_trajectories_by_velocity()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.preprocessing.html#physped.preprocessing.trajectories.preprocess_trajectories"><code class="docutils literal notranslate"><span class="pre">preprocess_trajectories()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.preprocessing.html#physped.preprocessing.trajectories.process_slow_modes"><code class="docutils literal notranslate"><span class="pre">process_slow_modes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.preprocessing.html#physped.preprocessing.trajectories.prune_short_trajectories"><code class="docutils literal notranslate"><span class="pre">prune_short_trajectories()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.preprocessing.html#physped.preprocessing.trajectories.rename_columns"><code class="docutils literal notranslate"><span class="pre">rename_columns()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.preprocessing.html#physped.preprocessing.trajectories.savgolfilter"><code class="docutils literal notranslate"><span class="pre">savgolfilter()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physped.preprocessing.html#module-physped.preprocessing">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="physped.tests.html">physped.tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="physped.tests.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physped.tests.core.html">physped.tests.core package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="physped.tests.core.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.tests.core.html#module-physped.tests.core.test_piecewise_potential_handling">physped.tests.core.test_piecewise_potential_handling module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.tests.core.html#module-physped.tests.core">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physped.tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="physped.tests.html#module-physped.tests.conftest">physped.tests.conftest module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="physped.tests.html#module-physped.tests">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="physped.utils.html">physped.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="physped.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="physped.utils.html#module-physped.utils.functions">physped.utils.functions module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physped.utils.html#physped.utils.functions.cart2pol"><code class="docutils literal notranslate"><span class="pre">cart2pol()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.utils.html#physped.utils.functions.digitize_values_to_grid"><code class="docutils literal notranslate"><span class="pre">digitize_values_to_grid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.utils.html#physped.utils.functions.get_bin_middle"><code class="docutils literal notranslate"><span class="pre">get_bin_middle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.utils.html#physped.utils.functions.get_slice_of_multidimensional_matrix"><code class="docutils literal notranslate"><span class="pre">get_slice_of_multidimensional_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.utils.html#physped.utils.functions.pol2cart"><code class="docutils literal notranslate"><span class="pre">pol2cart()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.utils.html#physped.utils.functions.test_weighted_mean_of_two_matrices"><code class="docutils literal notranslate"><span class="pre">test_weighted_mean_of_two_matrices()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.utils.html#physped.utils.functions.weighted_mean_of_matrix"><code class="docutils literal notranslate"><span class="pre">weighted_mean_of_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.utils.html#physped.utils.functions.weighted_mean_of_two_matrices"><code class="docutils literal notranslate"><span class="pre">weighted_mean_of_two_matrices()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physped.utils.html#module-physped.utils">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="physped.visualization.html">physped.visualization package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="physped.visualization.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="physped.visualization.html#module-physped.visualization.force_field">physped.visualization.force_field module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.force_field.clip_fields"><code class="docutils literal notranslate"><span class="pre">clip_fields()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.force_field.plot_quiver"><code class="docutils literal notranslate"><span class="pre">plot_quiver()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physped.visualization.html#module-physped.visualization.plot_discrete_grid">physped.visualization.plot_discrete_grid module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_discrete_grid.plot_discrete_grid"><code class="docutils literal notranslate"><span class="pre">plot_discrete_grid()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physped.visualization.html#module-physped.visualization.plot_fields">physped.visualization.plot_fields module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_fields.calculate_offsets"><code class="docutils literal notranslate"><span class="pre">calculate_offsets()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_fields.clip_fields"><code class="docutils literal notranslate"><span class="pre">clip_fields()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_fields.create_force_fields"><code class="docutils literal notranslate"><span class="pre">create_force_fields()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_fields.infer_bounds_from_data"><code class="docutils literal notranslate"><span class="pre">infer_bounds_from_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_fields.plot_colorbar"><code class="docutils literal notranslate"><span class="pre">plot_colorbar()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_fields.plot_contourf_offset_field"><code class="docutils literal notranslate"><span class="pre">plot_contourf_offset_field()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_fields.plot_force_field_of_selection"><code class="docutils literal notranslate"><span class="pre">plot_force_field_of_selection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_fields.plot_pcolormesh_offset_field"><code class="docutils literal notranslate"><span class="pre">plot_pcolormesh_offset_field()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_fields.plot_quiver_force_vectors"><code class="docutils literal notranslate"><span class="pre">plot_quiver_force_vectors()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_fields.plot_quiverkey"><code class="docutils literal notranslate"><span class="pre">plot_quiverkey()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physped.visualization.html#module-physped.visualization.plot_histograms">physped.visualization.plot_histograms module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_histograms.compute_KL_divergence"><code class="docutils literal notranslate"><span class="pre">compute_KL_divergence()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_histograms.create_all_histograms"><code class="docutils literal notranslate"><span class="pre">create_all_histograms()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_histograms.create_histogram"><code class="docutils literal notranslate"><span class="pre">create_histogram()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_histograms.plot_histogram"><code class="docutils literal notranslate"><span class="pre">plot_histogram()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_histograms.plot_multiple_histograms"><code class="docutils literal notranslate"><span class="pre">plot_multiple_histograms()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physped.visualization.html#module-physped.visualization.plot_learn_piece_of_potential">physped.visualization.plot_learn_piece_of_potential module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_learn_piece_of_potential.learn_piece_of_potential_plot"><code class="docutils literal notranslate"><span class="pre">learn_piece_of_potential_plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_learn_piece_of_potential.plot_piecewise_potential_fit"><code class="docutils literal notranslate"><span class="pre">plot_piecewise_potential_fit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physped.visualization.html#module-physped.visualization.plot_potential_at_slow_index">physped.visualization.plot_potential_at_slow_index module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_potential_at_slow_index.get_position_based_emperic_potential_from_state"><code class="docutils literal notranslate"><span class="pre">get_position_based_emperic_potential_from_state()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_potential_at_slow_index.plot_potential_at_slow_index"><code class="docutils literal notranslate"><span class="pre">plot_potential_at_slow_index()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physped.visualization.html#module-physped.visualization.plot_trajectories">physped.visualization.plot_trajectories module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_trajectories.plot_intended_path"><code class="docutils literal notranslate"><span class="pre">plot_intended_path()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_trajectories.plot_position_trajectories_in_cartesian_coordinates"><code class="docutils literal notranslate"><span class="pre">plot_position_trajectories_in_cartesian_coordinates()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_trajectories.plot_trajectories"><code class="docutils literal notranslate"><span class="pre">plot_trajectories()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_trajectories.plot_velocity_trajectories_in_cartesian_coordinates"><code class="docutils literal notranslate"><span class="pre">plot_velocity_trajectories_in_cartesian_coordinates()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_trajectories.plot_velocity_trajectories_in_polar_coordinates"><code class="docutils literal notranslate"><span class="pre">plot_velocity_trajectories_in_polar_coordinates()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_trajectories.plot_walls_in_environment"><code class="docutils literal notranslate"><span class="pre">plot_walls_in_environment()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physped.visualization.html#module-physped.visualization.plot_utils">physped.visualization.plot_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_utils.apply_cartesian_velocity_plot_style"><code class="docutils literal notranslate"><span class="pre">apply_cartesian_velocity_plot_style()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_utils.apply_polar_plot_style"><code class="docutils literal notranslate"><span class="pre">apply_polar_plot_style()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_utils.apply_xy_plot_style"><code class="docutils literal notranslate"><span class="pre">apply_xy_plot_style()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_utils.convert_rad_to_deg"><code class="docutils literal notranslate"><span class="pre">convert_rad_to_deg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_utils.highlight_grid_box"><code class="docutils literal notranslate"><span class="pre">highlight_grid_box()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_utils.highlight_position_selection"><code class="docutils literal notranslate"><span class="pre">highlight_position_selection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_utils.highlight_velocity_selection"><code class="docutils literal notranslate"><span class="pre">highlight_velocity_selection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_utils.plot_cartesian_spatial_grid"><code class="docutils literal notranslate"><span class="pre">plot_cartesian_spatial_grid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_utils.plot_polar_grid"><code class="docutils literal notranslate"><span class="pre">plot_polar_grid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_utils.plot_polar_grid_on_cartesian_plot"><code class="docutils literal notranslate"><span class="pre">plot_polar_grid_on_cartesian_plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_utils.plot_polar_labels"><code class="docutils literal notranslate"><span class="pre">plot_polar_labels()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_utils.plot_polar_velocity_grid"><code class="docutils literal notranslate"><span class="pre">plot_polar_velocity_grid()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.visualization.html#physped.visualization.plot_utils.plot_station_background"><code class="docutils literal notranslate"><span class="pre">plot_station_background()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="physped.visualization.html#module-physped.visualization">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-physped.main">
+<span id="physped-main-module"></span><h2>physped.main module<a class="headerlink" href="#module-physped.main" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.main.main">
+<span class="sig-prename descclassname"><span class="pre">physped.main.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/main.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.main.main" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-physped.omegaconf_resolvers">
+<span id="physped-omegaconf-resolvers-module"></span><h2>physped.omegaconf_resolvers module<a class="headerlink" href="#module-physped.omegaconf_resolvers" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.omegaconf_resolvers.apply_periodic_conditions_to_the_angle_theta">
+<span class="sig-prename descclassname"><span class="pre">physped.omegaconf_resolvers.</span></span><span class="sig-name descname"><span class="pre">apply_periodic_conditions_to_the_angle_theta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/omegaconf_resolvers.html#apply_periodic_conditions_to_the_angle_theta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.omegaconf_resolvers.apply_periodic_conditions_to_the_angle_theta" title="Link to this definition">¶</a></dt>
+<dd><p>Apply periodic conditions to the angle theta.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>theta (float): The angle theta.</p>
+</dd>
+<dt>Returns:</dt><dd><p>float: The angle theta after applying the periodic conditions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.omegaconf_resolvers.create_grid_name">
+<span class="sig-prename descclassname"><span class="pre">physped.omegaconf_resolvers.</span></span><span class="sig-name descname"><span class="pre">create_grid_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><span class="pre">list</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/omegaconf_resolvers.html#create_grid_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.omegaconf_resolvers.create_grid_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.omegaconf_resolvers.register_new_resolvers">
+<span class="sig-prename descclassname"><span class="pre">physped.omegaconf_resolvers.</span></span><span class="sig-name descname"><span class="pre">register_new_resolvers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/omegaconf_resolvers.html#register_new_resolvers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.omegaconf_resolvers.register_new_resolvers" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-physped">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-physped" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="physped" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="physped.core.html" class="btn btn-neutral float-right" title="physped.core package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.io package &mdash; Data-driven physics-based modeling of pedestrian dynamics 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/documentation_options.js?v=27db1736"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="physped.preprocessing package" href="physped.preprocessing.html" />
+    <link rel="prev" title="physped.core package" href="physped.core.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0+unknown
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">physped</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="physped.html">physped package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="physped.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="physped.core.html">physped.core package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">physped.io package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.preprocessing.html">physped.preprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.tests.html">physped.tests package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.utils.html">physped.utils package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.visualization.html">physped.visualization package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="physped.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.html#module-physped.main">physped.main module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.html#module-physped.omegaconf_resolvers">physped.omegaconf_resolvers module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.html#module-physped">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release-history.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="min_versions.html">Minimum Version of Python and NumPy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">physped</a></li>
+          <li class="breadcrumb-item"><a href="physped.html">physped package</a></li>
+      <li class="breadcrumb-item active">physped.io package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/physped.io.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="physped-io-package">
+<h1>physped.io package<a class="headerlink" href="#physped-io-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-physped.io.readers">
+<span id="physped-io-readers-module"></span><h2>physped.io.readers module<a class="headerlink" href="#module-physped.io.readers" title="Link to this heading">¶</a></h2>
+<p>Trajectory readers for the pathintegral code.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.filter_trajectory">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">filter_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/io/readers.html#filter_trajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.filter_trajectory" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.preprocess_ehv">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">preprocess_ehv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#preprocess_ehv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.preprocess_ehv" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_asdz_pf34">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_asdz_pf34</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_asdz_pf34"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_asdz_pf34" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_curved_paths">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_curved_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_curved_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_curved_paths" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_curved_paths_synthetic">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_curved_paths_synthetic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_curved_paths_synthetic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_curved_paths_synthetic" title="Link to this definition">¶</a></dt>
+<dd><p>Read the curved paths data set.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_ehv_train_station_multifile">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_ehv_train_station_multifile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filelist</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_ehv_train_station_multifile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_ehv_train_station_multifile" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_intersecting_paths">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_intersecting_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_intersecting_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_intersecting_paths" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_intersecting_paths_synthetic">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_intersecting_paths_synthetic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_intersecting_paths_synthetic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_intersecting_paths_synthetic" title="Link to this definition">¶</a></dt>
+<dd><p>Read the intersecting paths data set.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_narrow_corridor_paths_4tu">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_narrow_corridor_paths_4tu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_narrow_corridor_paths_4tu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_narrow_corridor_paths_4tu" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_narrow_corridor_paths_local">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_narrow_corridor_paths_local</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_narrow_corridor_paths_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_narrow_corridor_paths_local" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_parallel_paths">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_parallel_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_parallel_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_parallel_paths" title="Link to this definition">¶</a></dt>
+<dd><p>Read the parallel paths data set.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_piecewise_potential_from_file">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_piecewise_potential_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">Path</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="physped.core.html#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_piecewise_potential_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_piecewise_potential_from_file" title="Link to this definition">¶</a></dt>
+<dd><p>Reads a piecewise potential from a file using pickle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The path to the file containing the piecewise potential.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The piecewise potential.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_single_paths">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_single_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_single_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_single_paths" title="Link to this definition">¶</a></dt>
+<dd><p>Read the single paths data set.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_station_paths">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_station_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_station_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_station_paths" title="Link to this definition">¶</a></dt>
+<dd><p>Read the station paths data set.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_trajectories_from_path">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_trajectories_from_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">Path</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_trajectories_from_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_trajectories_from_path" title="Link to this definition">¶</a></dt>
+<dd><p>Read trajectories from file.</p>
+</dd></dl>
+
+</section>
+<section id="module-physped.io.writers">
+<span id="physped-io-writers-module"></span><h2>physped.io.writers module<a class="headerlink" href="#module-physped.io.writers" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.writers.save_grid_bins">
+<span class="sig-prename descclassname"><span class="pre">physped.io.writers.</span></span><span class="sig-name descname"><span class="pre">save_grid_bins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gridbins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">gridname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/physped/io/writers.html#save_grid_bins"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.writers.save_grid_bins" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.writers.save_piecewise_potential">
+<span class="sig-prename descclassname"><span class="pre">physped.io.writers.</span></span><span class="sig-name descname"><span class="pre">save_piecewise_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="physped.core.html#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">folderpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'piecewise_potential.pickle'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/physped/io/writers.html#save_piecewise_potential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.writers.save_piecewise_potential" title="Link to this definition">¶</a></dt>
+<dd><p>Save a PiecewisePotential object to a file using pickle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (<a class="reference internal" href="physped.core.html#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><em>PiecewisePotential</em></a>) – The PiecewisePotential object to save.</p></li>
+<li><p><strong>folderpath</strong> (<em>Path</em>) – The path to the folder to save the file in.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.writers.save_trajectories">
+<span class="sig-prename descclassname"><span class="pre">physped.io.writers.</span></span><span class="sig-name descname"><span class="pre">save_trajectories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.2.2)"><span class="pre">DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">folderpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><span class="pre">Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.12)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/physped/io/writers.html#save_trajectories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.writers.save_trajectories" title="Link to this definition">¶</a></dt>
+<dd><p>Save trajectories to a CSV file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajectories</strong> (<em>pd.DataFrame</em>) – The DataFrame containing the trajectories to save.</p></li>
+<li><p><strong>folderpath</strong> (<em>Path</em>) – The path to the folder to save the file in.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-physped.io">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-physped.io" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="physped.core.html" class="btn btn-neutral float-left" title="physped.core package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="physped.preprocessing.html" class="btn btn-neutral float-right" title="physped.preprocessing package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,42 @@
+physped package
+===============
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   physped.core
+   physped.io
+   physped.preprocessing
+   physped.tests
+   physped.utils
+   physped.visualization
+
+Submodules
+----------
+
+physped.main module
+-------------------
+
+.. automodule:: physped.main
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+physped.omegaconf\_resolvers module
+-----------------------------------
+
+.. automodule:: physped.omegaconf_resolvers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: physped
+   :members:
+   :undoc-members:
+   :show-inheritance:

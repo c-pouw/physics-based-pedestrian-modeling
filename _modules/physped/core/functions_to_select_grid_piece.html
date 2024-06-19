@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.core.functions_to_select_grid_piece &mdash; Data-driven physics-based modeling of pedestrian dynamics 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/documentation_options.js?v=27db1736"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0+unknown
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">physped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release-history.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../min_versions.html">Minimum Version of Python and NumPy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">physped.core.functions_to_select_grid_piece</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for physped.core.functions_to_select_grid_piece</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">OmegaConf</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="apply_periodic_conditions_to_the_angle_theta">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.functions_to_select_grid_piece.apply_periodic_conditions_to_the_angle_theta">[docs]</a>
+<span class="k">def</span> <span class="nf">apply_periodic_conditions_to_the_angle_theta</span><span class="p">(</span><span class="n">theta</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply periodic conditions to the angle theta.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        theta (float): The angle theta.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: The angle theta after applying the periodic conditions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">theta</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="k">return</span> <span class="n">theta</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span></div>
+
+
+
+<div class="viewcode-block" id="is_selected_value_outside_bins">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.functions_to_select_grid_piece.is_selected_value_outside_bins">[docs]</a>
+<span class="k">def</span> <span class="nf">is_selected_value_outside_bins</span><span class="p">(</span><span class="n">selected_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">grid_dimension</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="n">outside_bins</span> <span class="o">=</span> <span class="p">(</span><span class="n">selected_value</span> <span class="o">&lt;</span> <span class="n">bins</span><span class="p">[</span><span class="n">grid_dimension</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="ow">or</span> <span class="p">(</span><span class="n">selected_value</span> <span class="o">&gt;</span> <span class="n">bins</span><span class="p">[</span><span class="n">grid_dimension</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">outside_bins</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="s2">&quot;The selected </span><span class="si">%s</span><span class="s2"> value (</span><span class="si">%s</span><span class="s2">) must be within the range of the bins [</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">].&quot;</span><span class="p">,</span>
+            <span class="n">grid_dimension</span><span class="p">,</span>
+            <span class="n">selected_value</span><span class="p">,</span>
+            <span class="n">bins</span><span class="p">[</span><span class="n">grid_dimension</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">bins</span><span class="p">[</span><span class="n">grid_dimension</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">outside_bins</span></div>
+
+
+
+<div class="viewcode-block" id="is_selected_point_within_grid">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.functions_to_select_grid_piece.is_selected_point_within_grid">[docs]</a>
+<span class="k">def</span> <span class="nf">is_selected_point_within_grid</span><span class="p">(</span><span class="n">selected_point</span><span class="p">:</span> <span class="n">OmegaConf</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate the selection.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        selection (OmegaConf): The selection.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x_value_outside_bins</span> <span class="o">=</span> <span class="n">is_selected_value_outside_bins</span><span class="p">(</span><span class="n">selected_point</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+    <span class="n">y_value_outside_bins</span> <span class="o">=</span> <span class="n">is_selected_value_outside_bins</span><span class="p">(</span><span class="n">selected_point</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+    <span class="n">r_value_outside_bins</span> <span class="o">=</span> <span class="n">is_selected_value_outside_bins</span><span class="p">(</span><span class="n">selected_point</span><span class="o">.</span><span class="n">r</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="n">theta_value_outside_bins</span> <span class="o">=</span> <span class="n">is_selected_value_outside_bins</span><span class="p">(</span><span class="n">selected_point</span><span class="o">.</span><span class="n">theta_periodic</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">)</span>
+    <span class="n">k_value_outside_bins</span> <span class="o">=</span> <span class="n">is_selected_value_outside_bins</span><span class="p">(</span><span class="n">selected_point</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">)</span>
+    <span class="n">selected_point_outside_bins</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">x_value_outside_bins</span><span class="p">,</span>
+        <span class="n">y_value_outside_bins</span><span class="p">,</span>
+        <span class="n">r_value_outside_bins</span><span class="p">,</span>
+        <span class="n">theta_value_outside_bins</span><span class="p">,</span>
+        <span class="n">k_value_outside_bins</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">selected_point_outside_bins</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The selected point is not located within the grid.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;The selectied point is located within the grid.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_boundaries_that_enclose_the_selected_bin">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.functions_to_select_grid_piece.get_boundaries_that_enclose_the_selected_bin">[docs]</a>
+<span class="k">def</span> <span class="nf">get_boundaries_that_enclose_the_selected_bin</span><span class="p">(</span><span class="n">bin_index</span><span class="p">:</span> <span class="n">OmegaConf</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="n">left_bound</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[</span><span class="n">bin_index</span><span class="p">]</span>
+    <span class="n">right_bound</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[</span><span class="n">bin_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">left_bound</span><span class="p">,</span> <span class="n">right_bound</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_index_of_the_enclosing_bin">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.functions_to_select_grid_piece.get_index_of_the_enclosing_bin">[docs]</a>
+<span class="k">def</span> <span class="nf">get_index_of_the_enclosing_bin</span><span class="p">(</span><span class="n">selected_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the index of the bin that encloses the value.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        selected_value (float): A single integer or float value.</span>
+<span class="sd">        bins (np.ndarray): An array of bin boundaries.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: The index of the bin that encloses the value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ! Note that the value can be outside the range of the bins.</span>
+    <span class="c1"># ! In this case it returns the extrema i.e. 0 or len(bins).</span>
+    <span class="k">if</span> <span class="n">selected_value</span> <span class="o">&lt;</span> <span class="n">bins</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="k">if</span> <span class="n">selected_value</span> <span class="o">&gt;</span> <span class="n">bins</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">shifted_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span> <span class="o">-</span> <span class="n">bins</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># print(shifted_bins)</span>
+    <span class="n">selected_value</span> <span class="o">=</span> <span class="n">selected_value</span> <span class="o">-</span> <span class="n">bins</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># print(selected_value)</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">selected_value</span><span class="p">,</span> <span class="n">shifted_bins</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="evaluate_selection_point">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.functions_to_select_grid_piece.evaluate_selection_point">[docs]</a>
+<span class="k">def</span> <span class="nf">evaluate_selection_point</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="n">selection</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">selection</span>
+    <span class="n">selected_point</span> <span class="o">=</span> <span class="n">selection</span><span class="o">.</span><span class="n">point</span>
+    <span class="n">grid_bins</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">bins</span>
+
+    <span class="n">selected_point</span><span class="o">.</span><span class="n">theta_periodic</span> <span class="o">=</span> <span class="n">apply_periodic_conditions_to_the_angle_theta</span><span class="p">(</span><span class="n">selected_point</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">is_selected_point_within_grid</span><span class="p">(</span><span class="n">selected_point</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">)</span>
+    <span class="n">selected_point</span><span class="o">.</span><span class="n">x_index</span> <span class="o">=</span> <span class="n">get_index_of_the_enclosing_bin</span><span class="p">(</span><span class="n">selected_point</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span>
+    <span class="n">selected_point</span><span class="o">.</span><span class="n">y_index</span> <span class="o">=</span> <span class="n">get_index_of_the_enclosing_bin</span><span class="p">(</span><span class="n">selected_point</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span>
+    <span class="n">selected_point</span><span class="o">.</span><span class="n">r_index</span> <span class="o">=</span> <span class="n">get_index_of_the_enclosing_bin</span><span class="p">(</span><span class="n">selected_point</span><span class="o">.</span><span class="n">r</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">])</span>
+    <span class="n">selected_point</span><span class="o">.</span><span class="n">theta_index</span> <span class="o">=</span> <span class="n">get_index_of_the_enclosing_bin</span><span class="p">(</span><span class="n">selected_point</span><span class="o">.</span><span class="n">theta_periodic</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;theta&quot;</span><span class="p">])</span>
+    <span class="n">selected_point</span><span class="o">.</span><span class="n">k_index</span> <span class="o">=</span> <span class="n">get_index_of_the_enclosing_bin</span><span class="p">(</span><span class="n">selected_point</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">config</span></div>
+
+    <span class="c1"># log.info(f&quot;Selection : {OmegaConf.to_yaml(selection)}&quot;)</span>
+
+
+<div class="viewcode-block" id="is_selected_range_within_grid">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.functions_to_select_grid_piece.is_selected_range_within_grid">[docs]</a>
+<span class="k">def</span> <span class="nf">is_selected_range_within_grid</span><span class="p">(</span><span class="n">selected_range</span><span class="p">:</span> <span class="n">OmegaConf</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">x_values_outside_bins</span> <span class="o">=</span> <span class="p">[</span><span class="n">is_selected_value_outside_bins</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">selected_range</span><span class="o">.</span><span class="n">x</span><span class="p">]</span>
+    <span class="n">y_values_outside_bins</span> <span class="o">=</span> <span class="p">[</span><span class="n">is_selected_value_outside_bins</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">selected_range</span><span class="o">.</span><span class="n">y</span><span class="p">]</span>
+    <span class="n">r_values_outside_bins</span> <span class="o">=</span> <span class="p">[</span><span class="n">is_selected_value_outside_bins</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">selected_range</span><span class="o">.</span><span class="n">r</span><span class="p">]</span>
+    <span class="n">theta_values_outside_bins</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">is_selected_value_outside_bins</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">selected_range</span><span class="o">.</span><span class="n">theta_periodic</span>
+    <span class="p">]</span>
+    <span class="n">k_values_outside_bins</span> <span class="o">=</span> <span class="p">[</span><span class="n">is_selected_value_outside_bins</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">selected_range</span><span class="o">.</span><span class="n">k</span><span class="p">]</span>
+    <span class="n">selected_point_outside_bins</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">x_values_outside_bins</span><span class="p">,</span>
+        <span class="n">y_values_outside_bins</span><span class="p">,</span>
+        <span class="n">r_values_outside_bins</span><span class="p">,</span>
+        <span class="n">theta_values_outside_bins</span><span class="p">,</span>
+        <span class="n">k_values_outside_bins</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="nb">any</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">selected_point_outside_bins</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The selected range is not located within the grid.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;The selected range is located within the grid.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="is_range_decreasing">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.functions_to_select_grid_piece.is_range_decreasing">[docs]</a>
+<span class="k">def</span> <span class="nf">is_range_decreasing</span><span class="p">(</span><span class="n">selected_range</span><span class="p">:</span> <span class="n">OmegaConf</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if the range is increasing.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        selected_range (OmegaConf): The selection.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if the range is increasing, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">range_decreasing</span> <span class="o">=</span> <span class="n">selected_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">selected_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">range_decreasing</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="s2">&quot;The selected range [</span><span class="si">%s</span><span class="s2">] must be increasing.&quot;</span><span class="p">,</span>
+            <span class="n">selected_range</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">range_decreasing</span></div>
+
+
+
+<div class="viewcode-block" id="is_selected_range_valid">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.functions_to_select_grid_piece.is_selected_range_valid">[docs]</a>
+<span class="k">def</span> <span class="nf">is_selected_range_valid</span><span class="p">(</span><span class="n">selected_range</span><span class="p">:</span> <span class="n">OmegaConf</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate the selection.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        selection (OmegaConf): The selection.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x_decreasing</span> <span class="o">=</span> <span class="n">is_range_decreasing</span><span class="p">(</span><span class="n">selected_range</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">y_decreasing</span> <span class="o">=</span> <span class="n">is_range_decreasing</span><span class="p">(</span><span class="n">selected_range</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">r_decreasing</span> <span class="o">=</span> <span class="n">is_range_decreasing</span><span class="p">(</span><span class="n">selected_range</span><span class="o">.</span><span class="n">r</span><span class="p">)</span>
+    <span class="n">theta_decreasing</span> <span class="o">=</span> <span class="n">is_range_decreasing</span><span class="p">(</span><span class="n">selected_range</span><span class="o">.</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">k_decreasing</span> <span class="o">=</span> <span class="n">is_range_decreasing</span><span class="p">(</span><span class="n">selected_range</span><span class="o">.</span><span class="n">k</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">x_decreasing</span><span class="p">,</span> <span class="n">y_decreasing</span><span class="p">,</span> <span class="n">r_decreasing</span><span class="p">,</span> <span class="n">theta_decreasing</span><span class="p">,</span> <span class="n">k_decreasing</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The selected range is invalid.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;The selected range is valid.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_indices_of_the_enclosing_range">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.functions_to_select_grid_piece.get_indices_of_the_enclosing_range">[docs]</a>
+<span class="k">def</span> <span class="nf">get_indices_of_the_enclosing_range</span><span class="p">(</span><span class="n">selected_range</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">bins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">get_index_of_the_enclosing_bin</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">selected_range</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_boundaries_that_enclose_the_selected_range">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.functions_to_select_grid_piece.get_boundaries_that_enclose_the_selected_range">[docs]</a>
+<span class="k">def</span> <span class="nf">get_boundaries_that_enclose_the_selected_range</span><span class="p">(</span><span class="n">selected_range</span><span class="p">:</span> <span class="n">OmegaConf</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="n">left_bound</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[</span><span class="n">selected_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">right_bound</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[</span><span class="n">selected_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">left_bound</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">right_bound</span><span class="p">)]</span></div>
+
+
+
+<div class="viewcode-block" id="evaluate_selection_range">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.functions_to_select_grid_piece.evaluate_selection_range">[docs]</a>
+<span class="k">def</span> <span class="nf">evaluate_selection_range</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="n">selected_range</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">range</span>
+    <span class="n">grid_bins</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">bins</span>
+    <span class="n">selected_range</span><span class="o">.</span><span class="n">theta_periodic</span> <span class="o">=</span> <span class="p">[</span><span class="n">apply_periodic_conditions_to_the_angle_theta</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="k">for</span> <span class="n">theta</span> <span class="ow">in</span> <span class="n">selected_range</span><span class="o">.</span><span class="n">theta</span><span class="p">]</span>
+    <span class="n">is_selected_range_valid</span><span class="p">(</span><span class="n">selected_range</span><span class="p">)</span>
+    <span class="n">is_selected_range_within_grid</span><span class="p">(</span><span class="n">selected_range</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">)</span>
+    <span class="n">selected_range</span><span class="o">.</span><span class="n">x_indices</span> <span class="o">=</span> <span class="n">get_indices_of_the_enclosing_range</span><span class="p">(</span><span class="n">selected_range</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span>
+    <span class="n">selected_range</span><span class="o">.</span><span class="n">y_indices</span> <span class="o">=</span> <span class="n">get_indices_of_the_enclosing_range</span><span class="p">(</span><span class="n">selected_range</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span>
+    <span class="n">selected_range</span><span class="o">.</span><span class="n">r_indices</span> <span class="o">=</span> <span class="n">get_indices_of_the_enclosing_range</span><span class="p">(</span><span class="n">selected_range</span><span class="o">.</span><span class="n">r</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">])</span>
+    <span class="n">selected_range</span><span class="o">.</span><span class="n">theta_indices</span> <span class="o">=</span> <span class="n">get_indices_of_the_enclosing_range</span><span class="p">(</span><span class="n">selected_range</span><span class="o">.</span><span class="n">theta_periodic</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;theta&quot;</span><span class="p">])</span>
+    <span class="n">selected_range</span><span class="o">.</span><span class="n">k_indices</span> <span class="o">=</span> <span class="n">get_indices_of_the_enclosing_range</span><span class="p">(</span><span class="n">selected_range</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">])</span>
+
+    <span class="n">selected_range</span><span class="o">.</span><span class="n">x_bounds</span> <span class="o">=</span> <span class="n">get_boundaries_that_enclose_the_selected_range</span><span class="p">(</span><span class="n">selected_range</span><span class="o">.</span><span class="n">x_indices</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span>
+    <span class="n">selected_range</span><span class="o">.</span><span class="n">y_bounds</span> <span class="o">=</span> <span class="n">get_boundaries_that_enclose_the_selected_range</span><span class="p">(</span><span class="n">selected_range</span><span class="o">.</span><span class="n">y_indices</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span>
+    <span class="n">selected_range</span><span class="o">.</span><span class="n">r_bounds</span> <span class="o">=</span> <span class="n">get_boundaries_that_enclose_the_selected_range</span><span class="p">(</span><span class="n">selected_range</span><span class="o">.</span><span class="n">r_indices</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">])</span>
+    <span class="n">selected_range</span><span class="o">.</span><span class="n">theta_bounds</span> <span class="o">=</span> <span class="n">get_boundaries_that_enclose_the_selected_range</span><span class="p">(</span><span class="n">selected_range</span><span class="o">.</span><span class="n">theta_indices</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;theta&quot;</span><span class="p">])</span>
+    <span class="n">selected_range</span><span class="o">.</span><span class="n">k_bounds</span> <span class="o">=</span> <span class="n">get_boundaries_that_enclose_the_selected_range</span><span class="p">(</span><span class="n">selected_range</span><span class="o">.</span><span class="n">k_indices</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">])</span>
+
+    <span class="c1"># log.info(f&quot;Selection : {OmegaConf.to_yaml(selected_range)}&quot;)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;x bins: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]])</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;range: </span><span class="si">%s</span><span class="s2"> ---&gt; </span><span class="si">%s</span><span class="s2"> ---&gt; </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">selected_range</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
+        <span class="n">selected_range</span><span class="o">.</span><span class="n">x_indices</span><span class="p">,</span>
+        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">selected_range</span><span class="o">.</span><span class="n">x_bounds</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;y bins: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]])</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;range: </span><span class="si">%s</span><span class="s2"> ---&gt; </span><span class="si">%s</span><span class="s2"> ---&gt; </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">selected_range</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+        <span class="n">selected_range</span><span class="o">.</span><span class="n">y_indices</span><span class="p">,</span>
+        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">selected_range</span><span class="o">.</span><span class="n">y_bounds</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;r bins: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">]])</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;range: </span><span class="si">%s</span><span class="s2"> ---&gt; </span><span class="si">%s</span><span class="s2"> ---&gt; </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">selected_range</span><span class="o">.</span><span class="n">r</span><span class="p">,</span>
+        <span class="n">selected_range</span><span class="o">.</span><span class="n">r_indices</span><span class="p">,</span>
+        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">selected_range</span><span class="o">.</span><span class="n">r_bounds</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;theta bins: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;theta&quot;</span><span class="p">]])</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;range: </span><span class="si">%s</span><span class="s2"> ---&gt; </span><span class="si">%s</span><span class="s2"> ---&gt; </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">selected_range</span><span class="o">.</span><span class="n">theta</span><span class="p">,</span>
+        <span class="n">selected_range</span><span class="o">.</span><span class="n">theta_indices</span><span class="p">,</span>
+        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">selected_range</span><span class="o">.</span><span class="n">theta_bounds</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;k bins: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">grid_bins</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">]])</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;range: </span><span class="si">%s</span><span class="s2"> ---&gt; </span><span class="si">%s</span><span class="s2"> ---&gt; </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">selected_range</span><span class="o">.</span><span class="n">k</span><span class="p">,</span>
+        <span class="n">selected_range</span><span class="o">.</span><span class="n">k_indices</span><span class="p">,</span>
+        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">selected_range</span><span class="o">.</span><span class="n">k_bounds</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">config</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
