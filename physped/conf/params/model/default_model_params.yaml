@@ -1,4 +1,6 @@
-taux: 2
-tauu: ${params.model.taux}
 dt: ${inv_prop:${params.fps}}
-sigma: 0.25
+sigma: 0.75
+slow_positions_algorithm: 'use_fast_dynamics'
+taux: 0
+slow_velocities_algorithm: 'low_pass_filter'
+tauu: 0.5

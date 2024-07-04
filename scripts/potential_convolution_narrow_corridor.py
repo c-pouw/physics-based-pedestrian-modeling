@@ -15,22 +15,23 @@ from physped.core.functions_to_select_grid_piece import (
 )
 from physped.io.readers import trajectory_reader
 from physped.omegaconf_resolvers import register_new_resolvers
-from physped.preprocessing.trajectories import preprocess_trajectories
+from physped.preprocessing.trajectories import preprocess_trajectories, process_slow_modes
+from physped.visualization.plot_discrete_grid import plot_discrete_grid
+from physped.visualization.plot_potential_at_slow_index import plot_potential_at_slow_index
 
-plt.style.use(Path.cwd() / "../conf/science.mplstyle")
+plt.style.use(Path.cwd().parent / "physped/conf/science.mplstyle")
 
 # %%
 
-
 env_name = "single_paths"
-with initialize(version_base=None, config_path="../conf", job_name="test_app"):
+with initialize(version_base=None, config_path="../physped/conf", job_name="test_app"):
     cfg = compose(
         config_name="config",
         return_hydra_config=True,
         overrides=[
             f"params={env_name}",
             "params.data_source=local",
-            # "params.grid.spatial_cell_size=0.1"
+            #    "params.grid.spatial_cell_size=0.1"
         ],
     )
     print(cfg)
@@ -49,9 +50,30 @@ logging.info(pformat(dict(cfg.params.selection.range)))
 
 trajectories = trajectory_reader[env_name](cfg)
 preprocessed_trajectories = preprocess_trajectories(trajectories, config=cfg)
+preprocessed_trajectories = process_slow_modes(preprocessed_trajectories, cfg)
 piecewise_potential = learn_potential_from_trajectories(preprocessed_trajectories, cfg)
 
 # %%
+
+# config.params.selection.range.x = [55] * 2
+# config.params.selection.range.y = [-5] * 2
+# config.params.selection.range.r = [1.3] * 2
+
+
+config = cfg
+config.params.selection.range.theta = [np.pi * 0] * 2
+# config.params.force_field_plot.scale = 20
+config = evaluate_selection_range(config)
+selection = config.params.selection.range
+slow_indices = (
+    selection.x_indices[0],
+    selection.y_indices[0],
+    selection.r_indices[0],
+    selection.theta_indices[0],
+    selection.k_indices[0],
+)
+plot_discrete_grid(config, slow_indices, preprocessed_trajectories)
+plot_potential_at_slow_index(config, slow_indices, piecewise_potential)
 
 # y_index = 3
 # offset = piecewise_potential.position_based_offset[bin_index[0], y_index]
@@ -73,19 +95,19 @@ def calculate_potential(curvature, center, offset, value):
 # Analytical parabolic potential
 yrange = np.arange(-0.6, 0.6, 0.01)
 px_to_mm = {"x": 3.9, "y": 4.1}
-beta = 1.8
-pot0 = 0.04
+beta = 1.1
+pot0 = 0.05
 # A = 0.3
-y_cent = 0.02
+y_cent = 0.055
 parabolic_potential = beta * (yrange - y_cent) ** 2 + pot0
 
 # Get index for a point on the grid
 # point = [0.45, -10, 0.6, 0, 3]
-point = [0.4, -10, 0.6, 0, 3]
+point = [0, -10, 1, 0, 3]
 bin_index = []
 for dim, value in zip(cfg.params.grid.bins, point):
     bin_index.append(get_index_of_the_enclosing_bin(value, cfg.params.grid.bins[dim]))
-bin_index[3] = 0
+# bin_index[3] = 0
 
 cmap = ["C0", "C1", "C2", "C3"] * 100
 fig, ax = plt.subplots(figsize=(3.54, 1.5))
@@ -114,7 +136,7 @@ for y_index in range(len(ybins) - 1):
         middle_bins[y_index],
     )
     ax.plot(middle_bins[y_index], Vy_mid, color="w", marker="|", ms=3, zorder=20)
-    ax.plot(X_dashed, Vy_dashed, alpha=0.4, linestyle="dashed", color=color, lw=lw)
+    # ax.plot(X_dashed, Vy_dashed, alpha=0.4, linestyle="dashed", color=color, lw=lw)
 
     X_solid = np.linspace(ybins[y_index], ybins[y_index + 1], 100)
     Vy_solid = calculate_potential(
@@ -124,7 +146,7 @@ for y_index in range(len(ybins) - 1):
 
 ax.set_xlim(cfg.params.default_ylims)
 ax.grid(False)
-ax.set_xticks(ybins)
+ax.set_xticks(ybins[::2])
 
 y_walls = cfg.params.trajectory_plot.ywalls
 # Plot grid
@@ -181,12 +203,12 @@ dymu = np.where(ymu == 0, np.nan, ymu - middle_bins[:-1])
 # vvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 7]
 # coefficients = vvar / (2 * yvar)
 coefficients = piecewise_potential.curvature_y[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4]]
-ybottom, ytop = -0.6, 0.6
-ax.plot(middle_bins[:-1], dymu, ".-", label="Mean $\\mu_y$")
-ax.plot(middle_bins[:-1], np.divide(coefficients, 10), ".-", label="Curvature $\\beta_y/10$")
+ybottom, ytop = -0.2, 0.2
+ax.plot(middle_bins[:-1], dymu, ".-", label="Mean $\\mu_y - y_s$")
+# ax.plot(middle_bins[:-1], np.divide(coefficients, 10), ".-", label="Curvature $\\beta_y/10$")
 ax.set_xlim(cfg.params.default_ylims)
 ax.grid(False)
-ax.set_xticks(ybins)
+ax.set_xticks(ybins[::2])
 
 y_walls = cfg.params.trajectory_plot.ywalls
 # Plot grid
@@ -211,7 +233,95 @@ for ywall in y_walls:
     )
 
 plt.legend(loc="lower center")
-plt.savefig("../figures/potential_parameters_narrow_corridor.pdf")
+plt.savefig("../figures/potential_mean_narrow_corridor.pdf")
+
+# %%
+fig, ax = plt.subplots()
+ymu = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
+dymu = np.where(ymu == 0, np.nan, ymu - middle_bins[:-1])
+# yvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 3]
+# vvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 7]
+# coefficients = vvar / (2 * yvar)
+coefficients = piecewise_potential.curvature_y[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4]]
+ybottom, ytop = 0, 15
+# ax.plot(middle_bins[:-1], dymu, ".-", label="Mean $\\mu_y$")
+ax.plot(middle_bins[:-1], coefficients, ".-", label="Curvature $\\beta_y$")
+ax.set_xlim(cfg.params.default_ylims)
+ax.grid(False)
+ax.set_xticks(ybins[::2])
+
+y_walls = cfg.params.trajectory_plot.ywalls
+# Plot grid
+ax.vlines(ybins, ybottom, ytop, lw=0.4, color="k", linestyle="dashed", alpha=0.6)
+ax.hlines(np.linspace(ybottom, ytop, 6), y_walls[0], y_walls[1], lw=0.4, color="k", linestyle="dashed", alpha=0.6)
+
+# Plot walls
+ax.vlines(y_walls, ytop, ybottom, "k")
+for ywall in y_walls:
+    if ywall < 0:
+        fillbetweenx = [10 * ywall, ywall]
+    elif ywall > 0:
+        fillbetweenx = [ywall, 10 * ywall]
+    ax.fill_between(
+        fillbetweenx,
+        ytop,
+        ybottom,
+        color="k",
+        alpha=0.3,
+        zorder=30,
+        hatch="//",
+    )
+
+plt.legend(loc="lower center")
+plt.savefig("../figures/potential_curvature_narrow_corridor.pdf")
+
+# %%
+fig, ax = plt.subplots()
+ymu = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
+# dymu = np.where(ymu == 0, np.nan, ymu - middle_bins[:-1])
+# yvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 3]
+# vvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 7]
+# coefficients = vvar / (2 * yvar)
+coefficients = piecewise_potential.curvature_y[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4]]
+middle_bins = ybins + dy / 2
+middle_bins = (middle_bins + 0.6) / 1.2
+ybottom, ytop = 0, 15
+# ax.plot(middle_bins[:-1], dymu, ".-", label="Mean $\\mu_y$")
+ax.plot(middle_bins[:-1], coefficients, ".-", label="Curvature $\\beta_y$")
+ax.set_xlim(-0.1, 1.1)
+ax.grid(False)
+# ax.set_xticks(ybins[::2])
+
+# y_walls = cfg.params.trajectory_plot.ywalls
+y_walls = [0, 1]
+# y_walls = (np.array(y_walls) + 0.6)/1.2
+# # Plot grid
+ax.vlines(np.arange(0, 1.1, 0.1), ybottom, ytop, lw=0.4, color="k", linestyle="dashed", alpha=0.6)
+ax.hlines(np.linspace(ybottom, ytop, 6), y_walls[0], y_walls[1], lw=0.4, color="k", linestyle="dashed", alpha=0.6)
+
+# Plot walls
+ax.vlines(y_walls, ytop, ybottom, "k")
+for ywall in y_walls:
+    if ywall < 0:
+        fillbetweenx = [10 * ywall, ywall]
+    elif ywall > 0:
+        fillbetweenx = [ywall, 10 * ywall]
+    else:
+        fillbetweenx = [-5, ywall]
+    ax.fill_between(
+        fillbetweenx,
+        ytop,
+        ybottom,
+        color="k",
+        alpha=0.3,
+        zorder=30,
+        hatch="//",
+    )
+
+plt.xlabel("$y/w_{cor}$")
+
+plt.legend(loc="lower center")
+plt.savefig("../figures/potential_curvature_narrow_corridor_relative.pdf")
 
 # # %%
 
@@ -324,3 +434,5 @@ plt.savefig("../figures/potential_parameters_narrow_corridor.pdf")
 # np.round(piecewise_potential.fit_params[:, :, bin_index[2], bin_index[3], bin_index[4], 0], 2)
 
 # # %%
+
+# %%

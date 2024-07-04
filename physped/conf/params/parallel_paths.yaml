@@ -20,12 +20,13 @@ colnames:
   Pid: Pid
   time: frame
 grid:
+  spatial_cell_size: 0.4
   x:
-    min: -2
-    max: 2
+    min: -2.3
+    max: 3
   y:
-    min: -3.8
-    max: 3.8
+    min: -4
+    max: 4
 selection:
   range:
     x: [-0.45, -0.45]
@@ -41,7 +42,7 @@ trajectory_plot:
   y_title: 0.9
   figsize: [3.54, 5]
   width_ratios: [2, 1]
-  yps: [2.3, 0.8, -1.7]
+  yps: [-1.8, -0.3, 2.8]
   ywalls: [3.8, -3.8]
   plot_walls: true
   plot_intended_path: true

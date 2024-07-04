@@ -50,7 +50,7 @@ def plot_discrete_grid(config: dict, slow_indices: tuple, trajectories: pd.DataF
     ax1 = apply_xy_plot_style(ax1, params)
     ax1 = plot_cartesian_spatial_grid(ax1, params.grid)
     if plot_params.plot_trajs:
-        ax1 = plot_position_trajectories_in_cartesian_coordinates(ax1, plot_trajs, alpha=plot_params.alpha, traj_type="f")
+        ax1 = plot_position_trajectories_in_cartesian_coordinates(ax1, plot_trajs, alpha=1, traj_type="f")
     ax1.set_xlabel(plot_params.position.xlabel)
     ax1.set_ylabel(plot_params.position.ylabel)
     ax1.set_xlim(params.grid.bins.x[0], params.grid.bins.x[-1])
@@ -68,7 +68,7 @@ def plot_discrete_grid(config: dict, slow_indices: tuple, trajectories: pd.DataF
     ax2 = plot_polar_velocity_grid(ax2, params.grid)
     ax2 = plot_polar_labels(ax2, params.grid)
     if plot_params.plot_trajs:
-        ax2 = plot_velocity_trajectories_in_polar_coordinates(ax2, plot_trajs, alpha=plot_params.alpha, traj_type="f")
+        ax2 = plot_velocity_trajectories_in_polar_coordinates(ax2, plot_trajs, alpha=1, traj_type="f")
     ax2.set_ylim(params.grid.bins.r[0], params.grid.bins.r[-2])
     ax2.grid(False)
     ax2.set_title(plot_params.title.velocity, y=1)

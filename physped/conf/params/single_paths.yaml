@@ -12,14 +12,17 @@ defaults:
 env_name: single_paths
 data_source: local
 fps: 15
-minimum_trajectory_length: 5
-velocity_window_length: 5
+minimum_trajectory_length: 10
+velocity_window_length: 10
 input_ntrajs: ???
 grid:
+  # spatial_cell_size: 0.2
   x:
+    step: 0.4
     min: -1
     max: 1
   y:
+    step: 0.1
     min: -0.6
     max: 0.6
 colnames:

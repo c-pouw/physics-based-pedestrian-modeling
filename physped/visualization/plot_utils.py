@@ -52,80 +52,80 @@ def apply_polar_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
     return ax
 
 
-def plot_polar_grid(ax: plt.Axes, r_grid: np.ndarray, theta_grid: np.ndarray) -> plt.Axes:
-    """
-    Plot polar grid lines on a given axes object.
+# def plot_polar_grid(ax: plt.Axes, r_grid: np.ndarray, theta_grid: np.ndarray) -> plt.Axes:
+#     """
+#     Plot polar grid lines on a given axes object.
 
-    Parameters:
-    - ax (matplotlib.axes.Axes): The axes object to plot on.
-    - r_grid (numpy.ndarray): Array of radial grid values.
-    - theta_grid (numpy.ndarray): Array of angular grid values.
+#     Parameters:
+#     - ax (matplotlib.axes.Axes): The axes object to plot on.
+#     - r_grid (numpy.ndarray): Array of radial grid values.
+#     - theta_grid (numpy.ndarray): Array of angular grid values.
 
-    Returns:
-    - ax (matplotlib.axes.Axes): The modified axes object.
-    """
-    r_range = np.linspace(r_grid[1], r_grid[-1], 100)
-    theta_range = np.linspace(0, 2 * np.pi, 100)
-    linestyle = "dashed"
-    for r in r_grid:
-        if r == 0:
-            continue
-        ax.plot(theta_range, np.ones(100) * r, color="k", linestyle=linestyle, lw=0.6)
-        ax.text(
-            np.pi / 2,
-            r + 0.2,
-            f"{r}",
-            ha="center",
-            va="center",
-            # bbox = dict(
-            #     facecolor='white', alpha=0.5,
-            #     edgecolor='none', boxstyle='round')
-        )
+#     Returns:
+#     - ax (matplotlib.axes.Axes): The modified axes object.
+#     """
+#     r_range = np.linspace(r_grid[1], r_grid[-1], 100)
+#     theta_range = np.linspace(0, 2 * np.pi, 100)
+#     linestyle = "dashed"
+#     for r in r_grid:
+#         if r == 0:
+#             continue
+#         ax.plot(theta_range, np.ones(100) * r, color="k", linestyle=linestyle, lw=0.6)
+#         ax.text(
+#             np.pi / 2,
+#             r + 0.2,
+#             f"{r}",
+#             ha="center",
+#             va="center",
+#             # bbox = dict(
+#             #     facecolor='white', alpha=0.5,
+#             #     edgecolor='none', boxstyle='round')
+#         )
 
-    for _, th in enumerate(theta_grid[:-1]):
-        ax.plot(np.ones(100) * th, r_range, color="k", linestyle=linestyle, lw=0.6)
-        ax.text(th, r_grid[-1] * 1.3, f"{th/np.pi:.1f}$\\pi$", ha="center", va="center")
-    ax.set_ylim(0, r_grid[-1])
-    return ax
-
-
-def plot_polar_grid_on_cartesian_plot(ax, r_grid, theta_grid):
-    for radius in r_grid:
-        circle = plt.Circle((0, 0), radius, color="k", linestyle="dashed", fill=False, lw=0.5, alpha=0.8)
-        ax.add_patch(circle)
-    for angle in theta_grid:
-        x1 = np.cos(angle) * 0.4
-        x2 = np.cos(angle) * 10
-        y1 = np.sin(angle) * 0.4
-        y2 = np.sin(angle) * 10
-        ax.plot([x1, x2], [y1, y2], color="k", linestyle="dashed", lw=0.5, alpha=0.8)
-    return ax
+#     for _, th in enumerate(theta_grid[:-1]):
+#         ax.plot(np.ones(100) * th, r_range, color="k", linestyle=linestyle, lw=0.6)
+#         ax.text(th, r_grid[-1] * 1.3, f"{th/np.pi:.1f}$\\pi$", ha="center", va="center")
+#     ax.set_ylim(0, r_grid[-1])
+#     return ax
 
 
-def apply_cartesian_velocity_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
-    """
-    Applies a polar plot style to the given axes object.
+# def plot_polar_grid_on_cartesian_plot(ax, r_grid, theta_grid):
+#     for radius in r_grid:
+#         circle = plt.Circle((0, 0), radius, color="k", linestyle="dashed", fill=False, lw=0.5, alpha=0.8)
+#         ax.add_patch(circle)
+#     for angle in theta_grid:
+#         x1 = np.cos(angle) * 0.4
+#         x2 = np.cos(angle) * 10
+#         y1 = np.sin(angle) * 0.4
+#         y2 = np.sin(angle) * 10
+#         ax.plot([x1, x2], [y1, y2], color="k", linestyle="dashed", lw=0.5, alpha=0.8)
+#     return ax
 
-    Parameters:
-    - ax: The axes object to apply the polar plot style to.
-    - params: A dictionary containing parameters for customizing the plot style.
 
-    Returns:
-    - The modified axes object.
+# def apply_cartesian_velocity_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
+#     """
+#     Applies a polar plot style to the given axes object.
 
-    """
-    ax.set_aspect("equal")
-    rgrid = params.grid.bins.r
-    thetagrid = params.grid.bins.theta
-    ax.set_xlim(-rgrid[-1], rgrid[-1])
-    ax.set_ylim(-rgrid[-1], rgrid[-1])
+#     Parameters:
+#     - ax: The axes object to apply the polar plot style to.
+#     - params: A dictionary containing parameters for customizing the plot style.
 
-    ax.set_xlabel(params.trajectory_plot.axis_labels.polar.x)
-    ax.set_ylabel(params.trajectory_plot.axis_labels.polar.y)
-    if params.trajectory_plot.plot_polar_grid:
-        ax.grid(False)
-        ax = plot_polar_grid_on_cartesian_plot(ax, rgrid, thetagrid)
-    return ax
+#     Returns:
+#     - The modified axes object.
+
+#     """
+#     ax.set_aspect("equal")
+#     rgrid = params.grid.bins.r
+#     thetagrid = params.grid.bins.theta
+#     ax.set_xlim(-rgrid[-1], rgrid[-1])
+#     ax.set_ylim(-rgrid[-1], rgrid[-1])
+
+#     ax.set_xlabel(params.trajectory_plot.axis_labels.polar.x)
+#     ax.set_ylabel(params.trajectory_plot.axis_labels.polar.y)
+#     if params.trajectory_plot.plot_polar_grid:
+#         ax.grid(False)
+#         ax = plot_polar_grid_on_cartesian_plot(ax, rgrid, thetagrid)
+#     return ax
 
 
 def highlight_grid_box(ax: plt.Axes, limits: Tuple, c: str = "k") -> plt.Axes:
@@ -247,14 +247,15 @@ def plot_polar_labels(ax: plt.Axes, grid_params: dict) -> plt.Axes:
     rbins = grid_params.bins.r
 
     for r in rbins[1:-1]:
+        textangle = 5 * np.pi / 8
         ax.text(
-            5 * np.pi / 8,
+            textangle,
             r,
             f"{r:.1f}",
             ha="center",
             va="center",
             fontsize=5,
-            rotation=12.5,
+            rotation=convert_rad_to_deg(textangle - np.pi / 2),
             bbox=dict(facecolor="white", alpha=1, edgecolor="none", boxstyle="round", pad=0.1),
         )
     winddirections = {

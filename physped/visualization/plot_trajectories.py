@@ -10,8 +10,7 @@ from bokeh import palettes
 
 from physped.core.functions_to_discretize_grid import get_boundary_coordinates_of_selection, make_grid_selection, return_grid_ids
 from physped.io.readers import read_piecewise_potential_from_file
-from physped.visualization.plot_utils import (
-    apply_cartesian_velocity_plot_style,
+from physped.visualization.plot_utils import (  # apply_cartesian_velocity_plot_style,
     apply_polar_plot_style,
     apply_xy_plot_style,
     highlight_grid_box,
@@ -119,11 +118,22 @@ def plot_walls_in_environment(ax: plt.Axes, traj_plot_params: dict) -> plt.Axes:
     return ax
 
 
+def intended_path_label_generator(label_count, i):
+    if label_count:
+        return "$y_{s}$"
+    else:
+        return f"$y_{{s_{{{i}}}}}$"
+
+
 def plot_intended_path(ax: plt.Axes, traj_plot_params: dict) -> plt.Axes:
     yps = traj_plot_params.get("yps", [])
-    for yp in yps:
-        ax.axhline(yp, color="k", ls="dashed", lw=1.5, zorder=-10)
-        ax.text(1.05, yp, "$y_p$", transform=ax.get_yaxis_transform(), va="center", ha="left", zorder=-10)
+    # colors = ["C0", "C1", "C4"]
+    colors = ["k", "k", "k"]
+
+    for i, yp in enumerate(yps, start=1):
+        label = intended_path_label_generator(len(yps), i)
+        ax.axhline(yp, color="k", ls="dashed", lw=1.5, zorder=10)
+        ax.text(1.05, yp, label, transform=ax.get_yaxis_transform(), va="center", ha="left", zorder=-10, c=colors[i - 1])
     return ax
 
 
@@ -157,7 +167,7 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
     ax = fig.add_subplot(spec[0])
     if traj_plot_params.plot_cartesian_grid:
         ax.grid(False)
-        ax = plot_cartesian_spatial_grid(ax, params.grid, alpha=traj_plot_params.trajectory_alpha)
+        ax = plot_cartesian_spatial_grid(ax, params.grid, alpha=0.5)
     ax = apply_xy_plot_style(ax, params)
     ax = plot_position_trajectories_in_cartesian_coordinates(ax, plot_trajs, 1, traj_type)
     ax.set_title("Positions $\\vec{x}$ [m]", y=1)
@@ -187,15 +197,15 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
 
         ax = highlight_grid_box(ax, plot_limits[::-1])
 
-    match traj_plot_params.velocity_grid:
-        case "polar":
-            ax = fig.add_subplot(spec[1], polar=True)
-            ax = apply_polar_plot_style(ax, params)
-            ax = plot_velocity_trajectories_in_polar_coordinates(ax, plot_trajs)
-        case "cartesian":
-            ax = fig.add_subplot(spec[1])
-            ax = apply_cartesian_velocity_plot_style(ax, params)
-            ax = plot_velocity_trajectories_in_cartesian_coordinates(ax, plot_trajs)
+    # match traj_plot_params.velocity_grid:
+    # case "polar":
+    ax = fig.add_subplot(spec[1], polar=True)
+    ax = apply_polar_plot_style(ax, params)
+    ax = plot_velocity_trajectories_in_polar_coordinates(ax, plot_trajs, 1, traj_type)
+    # case "cartesian":
+    # ax = fig.add_subplot(spec[1])
+    # ax = apply_cartesian_velocity_plot_style(ax, params)
+    # ax = plot_velocity_trajectories_in_cartesian_coordinates(ax, plot_trajs)
 
     ax.set_title("Velocities $\\vec{u}\\, [\\mathrm{ms^{-1}}]$", y=1.1)
 
@@ -208,10 +218,11 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
 
     if (traj_plot_params.text_box.show) and (trajectory_type == "simulated"):
         textstr = (
-            f"Model parameters\n"
+            # f"Model parameters\n"
+            f"$\\Delta t=\\,${config.params.model.dt:.3f} s\n"
             f"$\\sigma=\\,${config.params.model.sigma} ms$^{{\\mathdefault{{-3/2}}}}$\n"
-            f"$\\tau_x=\\tau_u=\\,${config.params.model.taux} s\n"
-            f"$\\Delta t=\\,${config.params.model.dt:.3f} s"
+            f"$\\tau_x=\\,${config.params.model.taux:.3f} s\n"
+            f"$\\tau_u=\\,${config.params.model.tauu} s"
         )
         props = {"boxstyle": "round", "facecolor": "white", "alpha": 1, "edgecolor": "black", "lw": 0.5}
         plt.figtext(

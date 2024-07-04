@@ -21,9 +21,9 @@ grid:
   y:
     min: -10
     max: 4
-  # theta:
-    # min_multiple_pi: -0.125
-    # segments: 8
+  theta:
+    min_multiple_pi: -1.125
+    segments: 8
 simulation:
   end: 50
 colnames:

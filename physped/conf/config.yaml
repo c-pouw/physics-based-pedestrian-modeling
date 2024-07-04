@@ -30,7 +30,7 @@ hydra:
     name: ${params.env_name}_${parameter_combinations}
     chdir: True
   run:
-    dir: ${root_dir}/outputs/${params.env_name}_tau${params.model.taux}/${params.grid.name}/${now:%Y-%m-%d_%H-%M-%S}
+    dir: ${root_dir}/outputs/${params.env_name}_taux${params.model.taux}_tauu${params.model.tauu}/${params.grid.name}/${now:%Y-%m-%d_%H-%M-%S}
   sweep:
-    dir: ${root_dir}/outputs/${params.env_name}_tau${params.model.taux}/${params.grid.name}
-    subdir: job${hydra.job.num}-sigma${params.model.sigma}-tau${params.model.taux}-${params.grid.name}-${now:%Y-%m-%d_%H-%M-%S}
+    dir: ${root_dir}/outputs/${params.env_name}_tau${params.model.taux}_tauu${params.model.tauu}/${params.grid.name}
+    subdir: job${hydra.job.num}-sigma${params.model.sigma}-tau${params.model.taux}-tauu${params.model.tauu}-${params.grid.name}-${now:%Y-%m-%d_%H-%M-%S}

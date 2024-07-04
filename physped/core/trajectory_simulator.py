@@ -62,7 +62,7 @@ def simulate_trajectories(piecewise_potential, config: dict) -> pd.DataFrame:
     trajectories = []
     Pid = 0
     with logging_redirect_tqdm():
-        for X_0 in tqdm(origins[:, :8], desc="Simulating trajectories", unit="trajs", total=origins.shape[0], miniters=10):
+        for X_0 in tqdm(origins[:, :8], desc="Simulating trajectories", unit="trajs", total=origins.shape[0], miniters=1):
             # X_0 = np.append(X_0[:4], X_0[:4]) # Test initializing without slow variables
             # X_0[-1] = 0
             # X_0[-2] = 0

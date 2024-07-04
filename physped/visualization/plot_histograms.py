@@ -128,12 +128,15 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
     - The axes object.
     """
     params = config.params
-    fig = plt.figure(figsize=(3.54, 2.36), layout="constrained")
+    width_single_panel = 1.77
+    height_single_panel = 1.18
+    subplot_grid = (1, 4)
+    fig = plt.figure(figsize=(width_single_panel * subplot_grid[1], height_single_panel * subplot_grid[0]), layout="constrained")
     sum_kl_div = 0
     hist_plot_params = params.histogram_plot
 
     for plotid, observable in enumerate(observables):
-        ax = fig.add_subplot(2, 2, plotid + 1)
+        ax = fig.add_subplot(subplot_grid[0], subplot_grid[1], plotid + 1)
 
         kldiv = sum(
             compute_KL_divergence(
