@@ -12,6 +12,42 @@ from physped.utils.functions import cart2pol, digitize_values_to_grid
 log = logging.getLogger(__name__)
 
 
+SLOW_DERIVATIVES = {}
+
+
+def register_slow_derivative(name):
+    def decorator(fn):
+        SLOW_DERIVATIVES[name] = fn
+        return fn
+
+    return decorator
+
+
+@register_slow_derivative("low_pass_filter")
+def low_pass_filter(**kwargs) -> float:
+    # relaxation of slow dynamics toward fast dynamics
+    return -1 / kwargs["tau"] * (kwargs["slow"] - kwargs["fast"])
+
+
+@register_slow_derivative("use_fast_dynamics")
+def use_fast_dynamics(**kwargs) -> float:
+    return kwargs["fastdot"]
+
+
+@register_slow_derivative("integrate_slow_velocity")
+def use_slow_dynamics(**kwargs) -> float:
+    return kwargs["slowdot"]
+
+
+@register_slow_derivative("savgol_smoothing")
+def use_fast_dynamics2(**kwargs) -> float:
+    return kwargs["fastdot"]
+
+
+def get_slow_derivative(name: str):
+    return SLOW_DERIVATIVES.get(name)
+
+
 class LangevinModel:
     """Langevin model class.
 
@@ -86,23 +122,16 @@ class LangevinModel:
         ufdot = -V_x - V_u
         vfdot = -V_y - V_v
 
-        # relaxation of slow modes toward fast modes
-        if self.params.model.slow_positions_algorithm == "low_pass_filter":
-            xsdot = -1 / self.params.model.taux * (xs - xf)
-            ysdot = -1 / self.params.model.taux * (ys - yf)
-        elif self.params.model.slow_positions_algorithm == "use_fast_dynamics":
-            xsdot = uf
-            ysdot = vf
-        elif self.params.model.slow_positions_algorithm == "slow_position_from_slow_velocity":
-            xsdot = us
-            ysdot = vs
+        taux = self.params.model.taux
+        tauu = self.params.model.tauu
+        slow_position_algorithm = self.params.model.slow_positions_algorithm
+        slow_velocities_algorithm = self.params.model.slow_velocities_algorithm
 
-        if self.params.model.slow_velocities_algorithm == "low_pass_filter":
-            usdot = -1 / self.params.model.tauu * (us - uf)
-            vsdot = -1 / self.params.model.tauu * (vs - vf)
-        elif self.params.model.slow_velocities_algorithm == "use_fast_dynamics":
-            usdot = ufdot
-            vsdot = vfdot
+        xsdot = get_slow_derivative(slow_position_algorithm)(tau=taux, slow=xs, fast=xf, slowdot=us, fastdot=uf)
+        ysdot = get_slow_derivative(slow_position_algorithm)(tau=taux, slow=ys, fast=yf, slowdot=vs, fastdot=vf)
+
+        usdot = get_slow_derivative(slow_velocities_algorithm)(tau=tauu, slow=us, fast=uf, fastdot=ufdot)
+        vsdot = get_slow_derivative(slow_velocities_algorithm)(tau=tauu, slow=vs, fast=vf, fastdot=vfdot)
 
         # return derivatives
         return np.array([uf, vf, ufdot, vfdot, xsdot, ysdot, usdot, vsdot])

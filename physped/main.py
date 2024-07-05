@@ -39,7 +39,7 @@ def main(config):
     preprocessed_trajectories = preprocess_trajectories(trajectories, config=config)
     config.params.input_ntrajs = len(preprocessed_trajectories.Pid.unique())
 
-    logging.info("MODELING PARAMETERS: " + pformat(OmegaConf.to_container(config.params.model, resolve=True), depth=1))
+    logging.info("MODELING PARAMETERS: \n%s", pformat(OmegaConf.to_container(config.params.model, resolve=True), depth=1))
 
     log.info("PROCESSING SLOW MODES")
     preprocessed_trajectories = process_slow_modes(preprocessed_trajectories, config)
