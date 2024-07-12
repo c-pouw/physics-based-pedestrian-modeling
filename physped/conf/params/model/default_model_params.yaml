@@ -1,5 +1,5 @@
 dt: ${inv_prop:${params.fps}}
-sigma: 0.65
+sigma: 0.6
 slow_positions_algorithm: 'integrate_slow_velocity'
 taux: 0
 slow_velocities_algorithm: 'low_pass_filter'
