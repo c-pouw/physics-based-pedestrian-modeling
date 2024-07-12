@@ -1,4 +1,5 @@
 import logging
+import pickle
 from pathlib import Path
 from typing import Any, Dict, List
 
@@ -8,6 +9,10 @@ import numpy.ma as ma
 import pandas as pd
 from matplotlib.axes import Axes
 from scipy.special import kl_div
+from scipy.stats import entropy
+
+from physped.core.functions_to_discretize_grid import add_trajectories_to_histogram, digitize_trajectories_to_grid
+from physped.core.piecewise_potential import PiecewisePotential
 
 log = logging.getLogger(__name__)
 
@@ -51,6 +56,20 @@ def create_all_histograms(
             values = trajectories[observable]
             histograms[traj_type][observable] = create_histogram(values, bins)
     return histograms
+
+
+def compute_joint_kl_divergence(
+    piecewise_potential: PiecewisePotential,
+    simulated_paths: pd.DataFrame,
+) -> float:
+    recorded_paths_histogram = piecewise_potential.histogram
+    simulated_paths = digitize_trajectories_to_grid(piecewise_potential.bins, simulated_paths)
+    simulated_paths_histogram = np.zeros_like(recorded_paths_histogram)
+    simulated_paths_histogram = add_trajectories_to_histogram(simulated_paths_histogram, simulated_paths, "fast_grid_indices")
+    recorded_paths_histogram = np.where(recorded_paths_histogram == 0, np.nan, recorded_paths_histogram)
+    simulated_paths_histogram = np.where(simulated_paths_histogram == 0, np.nan, simulated_paths_histogram)
+    kl = entropy(recorded_paths_histogram, simulated_paths_histogram, nan_policy="omit", axis=(0, 1, 2, 3, 4))
+    return kl
 
 
 def compute_KL_divergence(PDF1: np.ndarray, PDF2: np.ndarray, bin_width: np.ndarray) -> np.ndarray:
@@ -113,7 +132,7 @@ def plot_histogram(
     return ax
 
 
-def plot_multiple_histograms(observables: List, histograms: dict, histogram_type: str, config: dict):
+def plot_multiple_histograms(observables: List, histograms: dict, histogram_type: str, config: dict, joint_kl_divergence: float):
     """
     Plot histograms for all observables.
 
@@ -133,6 +152,7 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
     subplot_grid = (1, 4)
     fig = plt.figure(figsize=(width_single_panel * subplot_grid[1], height_single_panel * subplot_grid[0]), layout="constrained")
     sum_kl_div = 0
+    kl_divergence = {}
     hist_plot_params = params.histogram_plot
 
     for plotid, observable in enumerate(observables):
@@ -145,6 +165,7 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
                 histograms["recorded"][observable]["bin_width"],
             )
         )
+        kl_divergence[observable] = kldiv
 
         ax = plot_histogram(
             ax,
@@ -169,6 +190,16 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
             bbox=props,
         )
         sum_kl_div += kldiv
+    kl_divergence["sum"] = sum_kl_div
+    kl_divergence["env_name"] = params.env_name
+    kl_divergence["ntrajs"] = params.simulation.ntrajs
+    kl_divergence["tauu"] = params.model.tauu
+    kl_divergence["dt"] = params.model.dt
+    kl_divergence["noise"] = params.model.sigma
+    kl_divergence["joint_kl_divergence"] = joint_kl_divergence
+
+    with open(Path.cwd() / "kl_divergence.pkl", "wb") as f:
+        pickle.dump(kl_divergence, f)
 
     handles, labels = ax.get_legend_handles_labels()
 

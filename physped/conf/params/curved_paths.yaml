@@ -28,16 +28,15 @@ grid:
   y:
     min: -2.5
     max: 2.5
-  r:
-    list: [0,0.6,1.2,1.8,2.4,3]
+#  r:
+#    list: [0,0.6,1.2,1.8,2.4,3]
   bins:
     theta: ${cast_numpy_array:[0,6.283]}
-model:
-  sigma: 1
+# model:
+#   sigma: 1
 simulation:
   end: 20
   stop_condition: 3
-  ntrajs: 50
 selection:
   range:
     x: [-0.45, -0.45]

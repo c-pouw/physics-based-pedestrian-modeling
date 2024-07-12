@@ -78,17 +78,16 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: dict) 
 
 def calculate_curvature_of_the_potential(piecewise_potential: PiecewisePotential, config: dict) -> PiecewisePotential:
     var = config.params.model.sigma**2
-    # var = 0.5
     var_indices = [1, 3, 5, 7]
     variances = [piecewise_potential.fit_params[..., i] for i in var_indices]
 
-    # Replace 0 with np.nan
-    xvar, yvar, uvar, vvar = [np.where(v == 0, np.nan, v) for v in variances]
+    # xvar, yvar, uvar, vvar = [np.where(v == 0, np.nan, v) for v in variances]
+    xvar, yvar, uvar, vvar = variances
 
-    piecewise_potential.curvature_x = uvar / xvar
-    piecewise_potential.curvature_y = vvar / yvar
-    piecewise_potential.curvature_u = var / (2 * uvar)
-    piecewise_potential.curvature_v = var / (2 * vvar)
+    piecewise_potential.curvature_x = uvar / (2 * xvar)
+    piecewise_potential.curvature_y = vvar / (2 * yvar)
+    piecewise_potential.curvature_u = var / (4 * uvar)
+    piecewise_potential.curvature_v = var / (4 * vvar)
     return piecewise_potential
 
 
@@ -201,7 +200,7 @@ def fit_probability_distributions(group: pd.DataFrame) -> list:
     - A list of fitting parameters.
     """
     if len(group) < 10:
-        return None  # ? Can we do better if we have multiple files?
+        return np.nan  # ? Can we do better if we have multiple files?
     fit_func = norm.fit  # * Other functions can be implemented here
     params = []
     for i in ["xf", "yf", "uf", "vf"]:

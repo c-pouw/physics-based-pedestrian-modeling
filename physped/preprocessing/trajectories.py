@@ -202,7 +202,7 @@ def add_velocity(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
     # window_length = parameters.minimum_trajectory_length - 1
     for direction in [xpos, ypos]:
         df.loc[:, pos_to_vel[direction]] = df.groupby([groupby])[direction].transform(
-            lambda x: savgol_filter(x, window_length=window_length, polyorder=2, deriv=1, mode="interp") * framerate
+            lambda x: savgol_filter(x, window_length=window_length, polyorder=1, deriv=1, mode="interp") * framerate
         )
     return df
 

@@ -29,6 +29,10 @@ def create_grid_name(grid_list: list):
     return grid_name
 
 
+def normalize_noise(noise: float, dt: float):
+    return noise / np.sqrt(dt)
+
+
 def register_new_resolvers(replace=False):
     OmegaConf.register_new_resolver("get_root_dir", lambda: ROOT_DIR, replace=replace)
     OmegaConf.register_new_resolver("parse_pi", lambda a: a * np.pi, replace=replace)

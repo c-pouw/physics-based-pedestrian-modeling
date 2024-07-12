@@ -125,7 +125,7 @@ for ywall in y_walls:
         hatch="//",
     )
 
-plt.ylabel("$V(y \\, |\\, \\vec{x}_s,\\vec{u}_s) + O(\\vec{x}_s,\\vec{u}_s)$")  # A\ln[\\mathbb{P(\\cdot)}]$')
+plt.ylabel("$U(y \\mid \\vec{x}_s,\\vec{u}_s) + O(\\vec{x}_s,\\vec{u}_s)$")  # A\ln[\\mathbb{P(\\cdot)}]$')
 plt.xlabel("y [m]")
 plt.savefig("../figures/potential_convolution_wide_corridor.pdf")
 

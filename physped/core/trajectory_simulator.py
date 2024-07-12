@@ -57,20 +57,30 @@ def simulate_trajectories(piecewise_potential, config: dict) -> pd.DataFrame:
             log.warning("Trajectory origins will be sampled from the input trajectories.")
             origins = sample_trajectory_origins_from_trajectories(piecewise_potential, parameters)
 
-    lm = LangevinModel(piecewise_potential, parameters)
     t_eval = np.arange(parameters.simulation.start, parameters.simulation.end, parameters.simulation.step)
     trajectories = []
     Pid = 0
     with logging_redirect_tqdm():
         for X_0 in tqdm(origins[:, :8], desc="Simulating trajectories", unit="trajs", total=origins.shape[0], miniters=1):
-            # X_0 = np.append(X_0[:4], X_0[:4]) # Test initializing without slow variables
-            # X_0[-1] = 0
-            # X_0[-2] = 0
+            lm = LangevinModel(piecewise_potential, parameters, Pid)
             solution = lm.simulate(X_0, t_eval)
-            traj = pd.DataFrame(solution, columns=["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs"]).dropna()
+
+            # idx_111 = np.where(np.all(solution == 1, axis=1))[0]
+            # if len(idx_111) > 0:
+            #     log.critical("Trajectory %s outside grid at t = %.2f s", Pid, t_eval[idx_111[0]])
+            #     solution = solution[: idx_111[0]]
+
+            # idx_222 = np.where(np.all(solution == 2, axis=1))[0]
+            # if len(idx_222) > 0:
+            #     log.critical("Trajectory %s low statistics at t = %.2f s", Pid, t_eval[idx_222[0]])
+            #     solution = solution[: idx_222[0]]
+
+            traj = pd.DataFrame(solution, columns=["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs"])
+            traj = traj.dropna()
             traj["Pid"] = Pid
             traj["t"] = t_eval[: len(traj)]
             traj["k"] = range(len(traj))
+
             trajectories.append(traj)
             Pid += 1
 

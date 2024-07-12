@@ -10,6 +10,8 @@ import numpy as np
 import pandas as pd
 import requests
 from scipy import signal
+
+# from scipy.signal import savgol_filter
 from tqdm import tqdm
 
 from physped.core.piecewise_potential import PiecewisePotential
@@ -161,6 +163,13 @@ def filter_trajectory(df, cutoff=0.16, order=4):
     return df
 
 
+def savgol_smoothing(df: pd.DataFrame, smooth_colname, groupby_colname="Pid"):
+    slow = df.groupby(groupby_colname)[smooth_colname].transform(
+        lambda x: signal.savgol_filter(x, window_length=9, polyorder=1, deriv=0, mode="interp")
+    )
+    return slow
+
+
 def read_curved_paths(config) -> pd.DataFrame:
     # trajectory_data_dir = Path(config.trajectory_data_dir)
     # trajs = pd.read_csv(trajectory_data_dir / "linecross-2.csv")
@@ -179,9 +188,10 @@ def read_curved_paths(config) -> pd.DataFrame:
     # Trajectories recorded during experiment 1
     trajectory_data_dir = Path(config.trajectory_data_dir)
     trajs = pd.read_csv(trajectory_data_dir / "linecross-1.csv")
-    trajs = filter_trajectory(trajs)
+    # trajs = filter_trajectory(trajs)
     pid_column = "particle"
     time_column = "time"
+
     conversion_X = 2.30405921919033
     conversion_Y = 2.35579871138595
     trajs = trajs[trajs.frame > 380].copy()
@@ -202,16 +212,18 @@ def read_curved_paths(config) -> pd.DataFrame:
     trajs["x"] = trajs["x"] * conversion_X / 100
     trajs["y"] = trajs["y"] * conversion_Y / 100
 
-    trajs["v_x_m"] = trajs["v_x_m"].replace(-99, np.nan).interpolate()
-    trajs["v_y_m"] = trajs["v_y_m"].replace(-99, np.nan).interpolate()
+    # trajs["v_x_m"] = trajs["v_x_m"].replace(-99, np.nan).interpolate()
+    # trajs["v_y_m"] = trajs["v_y_m"].replace(-99, np.nan).interpolate()
 
     trajs["traj_len"] = trajs.groupby([pid_column])[pid_column].transform("size")
     trajs = trajs[trajs.traj_len > 10].copy()
     trajs.sort_values(by=[pid_column, time_column], inplace=True)
     trajs["k"] = trajs.groupby(pid_column)[pid_column].transform(lambda x: np.arange(x.size))
-    trajs["kp"] = trajs["k"] // 320
-    trajs["new_pid"] = trajs.apply(lambda x: int(f"{x[pid_column]:06}{x['kp']:04}"), axis=1)
+    # trajs["kp"] = trajs["k"] // 320
+    # trajs["new_pid"] = trajs.apply(lambda x: int(f"{x[pid_column]:06}{x['kp']:04}"), axis=1)
     # trajs["new_pid"] = trajs[pid_column] * 100000 + trajs["kp"] + 100
+    trajs["x"] = savgol_smoothing(trajs, "x", pid_column)  # Smooth the noisy trajectories to get reasonable velocities
+    trajs["y"] = savgol_smoothing(trajs, "y", pid_column)
     return trajs
 
 

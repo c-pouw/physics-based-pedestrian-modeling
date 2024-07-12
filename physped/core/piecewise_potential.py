@@ -51,7 +51,7 @@ class PiecewisePotential:
         ]
         self.no_fit_params = len(self.fit_param_names)  # (mu, sigma) for ('x','y','u','v')
         # Initialize potential grid
-        self.fit_params = np.zeros(self.grid_shape + (self.no_fit_params,))
+        self.fit_params = np.zeros(self.grid_shape + (self.no_fit_params,)) * np.nan
 
     # TODO: turn this into methods
     # def bin_centers(self):

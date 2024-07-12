@@ -103,7 +103,7 @@ parabolic_potential = beta * (yrange - y_cent) ** 2 + pot0
 
 # Get index for a point on the grid
 # point = [0.45, -10, 0.6, 0, 3]
-point = [0, -10, 1, 0, 3]
+point = [-0.4, -10, 1, 0, 3]
 bin_index = []
 for dim, value in zip(cfg.params.grid.bins, point):
     bin_index.append(get_index_of_the_enclosing_bin(value, cfg.params.grid.bins[dim]))
@@ -180,7 +180,7 @@ plt.plot(
     "k--",
     lw=1.5,
     zorder=-20,
-    label="Analytic potential \n$V(y) = \\beta y^2$ (Eq.~(6))",
+    label="Analytic potential \n$U(y) = \\beta y^2$ (Eq.~(6))",
 )
 plt.plot(
     yrange,

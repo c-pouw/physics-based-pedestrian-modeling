@@ -16,7 +16,7 @@ from physped.io.writers import save_piecewise_potential
 from physped.omegaconf_resolvers import register_new_resolvers
 from physped.preprocessing.trajectories import preprocess_trajectories, process_slow_modes
 from physped.visualization.plot_discrete_grid import plot_discrete_grid
-from physped.visualization.plot_histograms import create_all_histograms, plot_multiple_histograms
+from physped.visualization.plot_histograms import compute_joint_kl_divergence, create_all_histograms, plot_multiple_histograms
 from physped.visualization.plot_potential_at_slow_index import plot_potential_at_slow_index
 from physped.visualization.plot_trajectories import plot_trajectories
 
@@ -82,7 +82,8 @@ def main(config):
         observables = ["xf", "yf", "uf", "vf"]
         config.params.simulation.ntrajs = len(simulated_trajectories.Pid.unique())
         histograms = create_all_histograms(preprocessed_trajectories, simulated_trajectories, config)
-        plot_multiple_histograms(observables, histograms, "PDF", config)
+        joint_kl_divergence = compute_joint_kl_divergence(piecewise_potential, simulated_trajectories)
+        plot_multiple_histograms(observables, histograms, "PDF", config, joint_kl_divergence)
     else:
         log.warning("Configuration 'plot.simulated_trajectories' is set to False.")
 
