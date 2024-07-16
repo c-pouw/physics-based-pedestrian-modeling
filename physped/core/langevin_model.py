@@ -7,6 +7,7 @@ import sdeint
 
 from physped.core.functions_to_discretize_grid import get_grid_indices
 from physped.core.piecewise_potential import PiecewisePotential
+from physped.preprocessing.trajectories import periodic_angular_conditions
 from physped.utils.functions import cart2pol
 
 log = logging.getLogger(__name__)
@@ -113,6 +114,7 @@ class LangevinModel:
             return np.zeros(len(X_0)) * np.nan
 
         rs, thetas = cart2pol(us, vs)
+        thetas = periodic_angular_conditions(thetas, self.params.grid.bins["theta"])
         k = 2
         X_vals = [xs, ys, rs, thetas, k]
         X_indx = get_grid_indices(self.potential, X_vals)

@@ -10,6 +10,7 @@ from physped.core.functions_to_discretize_grid import convert_grid_indices_to_co
 from physped.core.langevin_model import LangevinModel
 from physped.io.readers import read_trajectories_from_path
 from physped.io.writers import save_trajectories
+from physped.preprocessing.trajectories import periodic_angular_conditions
 from physped.utils.functions import cart2pol
 
 log = logging.getLogger(__name__)
@@ -87,6 +88,8 @@ def simulate_trajectories(piecewise_potential, config: dict) -> pd.DataFrame:
     trajectories = pd.concat(trajectories)
     trajectories["rf"], trajectories["thetaf"] = cart2pol(trajectories.uf, trajectories.vf)
     trajectories["rs"], trajectories["thetas"] = cart2pol(trajectories.us, trajectories.vs)
+    trajectories["thetaf"] = periodic_angular_conditions(trajectories["thetaf"], config.params.grid.bins["theta"])
+    trajectories["thetas"] = periodic_angular_conditions(trajectories["thetas"], config.params.grid.bins["theta"])
     if config.save.simulated_trajectories:
         log.debug("Configuration 'save.simulated_trajectories' is set to True.")
         save_trajectories(trajectories, Path.cwd().parent, config.filename.simulated_trajectories)

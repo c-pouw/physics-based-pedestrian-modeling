@@ -94,6 +94,7 @@ def process_slow_modes(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     df["us"] = get_slow_algorithm(slow_velocities_algorithm)(df, colname="uf", tau=tauu, dt=dt, window_length=window_length)
     df["vs"] = get_slow_algorithm(slow_velocities_algorithm)(df, colname="vf", tau=tauu, dt=dt, window_length=window_length)
     df = add_velocity_in_polar_coordinates(df, mode="s")
+    df["thetas"] = periodic_angular_conditions(df["thetas"], config.params.grid.bins["theta"])
 
     taux = config.params.model["taux"]
     slow_positions_algorithm = config.params.model.slow_positions_algorithm
@@ -105,6 +106,13 @@ def process_slow_modes(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         df, colname="yf", vel_col="vs", tau=taux, dt=dt, window_length=window_length
     )
     return df
+
+
+def periodic_angular_conditions(theta, thetabins):
+    theta -= thetabins[0]
+    theta = theta % (2 * np.pi)
+    theta += thetabins[0]
+    return theta
 
 
 def add_velocity_in_polar_coordinates(df: pd.DataFrame, mode: str = "f") -> pd.DataFrame:
@@ -261,6 +269,7 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     #     log.info("Acceleration added.")
 
     df = add_velocity_in_polar_coordinates(df, mode="f")
+    df["thetaf"] = periodic_angular_conditions(df["thetaf"], config.params.grid.bins["theta"])
     log.info("Velocity transformed to polar coordinates.")
 
     # if parameters.intermediate_save.preprocessed_trajectories:

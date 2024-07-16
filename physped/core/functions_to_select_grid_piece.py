@@ -80,7 +80,7 @@ def get_index_of_the_enclosing_bin(selected_value: float, bins: np.ndarray) -> i
         int: The index of the bin that encloses the value.
     """
     # ! Note that the value can be outside the range of the bins.
-    # ! In this case it returns the extrema i.e. 0 or len(bins).
+    # ! In this case it returns nan.
     if selected_value < bins[0]:
         return np.nan
     if selected_value > bins[-1]:
