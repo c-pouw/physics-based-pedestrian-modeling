@@ -199,7 +199,7 @@ def fit_probability_distributions(group: pd.DataFrame) -> list:
     Returns:
     - A list of fitting parameters.
     """
-    if len(group) < 10:
+    if len(group) < 100:
         return np.nan  # ? Can we do better if we have multiple files?
     fit_func = norm.fit  # * Other functions can be implemented here
     params = []

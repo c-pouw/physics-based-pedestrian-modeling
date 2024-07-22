@@ -19,6 +19,9 @@ colnames:
   y: y_pos
   Pid: Pid
   time: frame
+model:
+  sigma: 0.7
+  tauu: 0.5
 grid:
   spatial_cell_size: 0.4
   x:
@@ -49,6 +52,8 @@ trajectory_plot:
   text_box:
     x: 0.86
     y: 0.3
+histogram_plot:
+  subplot_grid: [2, 2]
 force_field_plot:
   figsize: [3.54, 2]
   sparseness: 1

@@ -1,6 +1,7 @@
 """Discrete grid class"""
 
 import logging
+from pprint import pformat
 from typing import Dict
 
 import numpy as np
@@ -52,6 +53,33 @@ class PiecewisePotential:
         self.no_fit_params = len(self.fit_param_names)  # (mu, sigma) for ('x','y','u','v')
         # Initialize potential grid
         self.fit_params = np.zeros(self.grid_shape + (self.no_fit_params,)) * np.nan
+        self.cell_volume = self.compute_cell_volume()
+
+    def __repr__(self):
+        return f"PiecewisePotential(bins={pformat(self.bins)})"
+
+    def compute_cell_volume(self) -> np.ndarray:
+        """
+        Compute the volume of each cell in the grid.
+        """
+        dx = np.diff(self.bins["x"])
+        dy = np.diff(self.bins["y"])
+        dr = np.diff(self.bins["r"])
+        r = self.bin_centers["r"]
+        dtheta = np.diff(self.bins["theta"])
+        dk = np.diff(self.bins["k"])
+
+        i, j, k, l, m = np.meshgrid(
+            np.arange(len(self.bins["x"]) - 1),
+            np.arange(len(self.bins["y"]) - 1),
+            np.arange(len(self.bins["r"]) - 1),
+            np.arange(len(self.bins["theta"]) - 1),
+            np.arange(len(self.bins["k"]) - 1),
+            indexing="ij",
+        )
+
+        # return the volume for each cell using broadcasting
+        return dx[i] * dy[j] * r[k] * dr[k] * dtheta[l] * dk[m]
 
     # TODO: turn this into methods
     # def bin_centers(self):

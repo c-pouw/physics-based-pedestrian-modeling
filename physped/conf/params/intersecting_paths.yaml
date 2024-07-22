@@ -20,6 +20,9 @@ colnames:
   yf: Y_SG
   Pid: Pid
   time: Rstep
+model:
+  sigma: 0.5
+  tauu: 0.8
 grid:
   x:
     min: -1

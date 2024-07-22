@@ -21,27 +21,31 @@ colnames:
   # vf: v_y_m
   Pid: particle
   time: time
+model:
+  sigma: 0.6
+  tauu: 0.6
 grid:
+  spatial_cell_size: 1.5
   x:
-    min: -3.8
-    max: 4
+    min: -4.5
+    max: 4.6
   y:
-    min: -2.5
-    max: 2.5
+    min: -3
+    max: 3
 #  r:
-#    list: [0,0.6,1.2,1.8,2.4,3]
+  #  list: [0,0.6,1.2,1.8,2.4,3]
   bins:
     theta: ${cast_numpy_array:[0,6.283]}
 # model:
 #   sigma: 1
 simulation:
-  end: 20
-  stop_condition: 3
+  end: 40
+  # stop_condition: 3
 selection:
   range:
     x: [-0.45, -0.45]
     y: [1.15, 1.15]
-    r: [0.75, 0.75]
+    r: [1.2, 1.2]
     theta: [0.15, 0.15]
     k: [1.2, 1.2]
 plot_style: physped/conf/science.mplstyle

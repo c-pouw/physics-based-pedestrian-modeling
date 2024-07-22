@@ -110,7 +110,7 @@ class LangevinModel:
             return np.zeros(len(X_0))
 
         if self.particle_outside_grid(xf, yf):
-            log.critical("%s: Trajectory outside grid at t = %.2f s", self.pid, t)
+            log.debug("%s: Trajectory outside grid at t = %.2f s", self.pid, t)
             return np.zeros(len(X_0)) * np.nan
 
         rs, thetas = cart2pol(us, vs)
@@ -123,7 +123,7 @@ class LangevinModel:
         ]
 
         if np.all([np.isnan(x) for x in [xmean, ymean, umean, vmean, xvar, yvar, uvar, vvar]]):
-            log.critical("%s: All free parameters nan at t = %.2f s", self.pid, t)
+            log.debug("%s: All free parameters nan at t = %.2f s", self.pid, t)
             return np.zeros(len(X_0)) * np.nan
 
         # if np.any([np.isnan(x) for x in [xmean, ymean, umean, vmean]]):

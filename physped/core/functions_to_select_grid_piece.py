@@ -199,36 +199,36 @@ def evaluate_selection_range(config):
     selected_range.k_bounds = get_boundaries_that_enclose_the_selected_range(selected_range.k_indices, grid_bins["k"])
 
     # log.info(f"Selection : {OmegaConf.to_yaml(selected_range)}")
-    log.info("x bins: %s", [np.round(x, 2) for x in grid_bins["x"]])
-    log.info(
+    log.debug("x bins: %s", [np.round(x, 2) for x in grid_bins["x"]])
+    log.debug(
         "range: %s ---> %s ---> %s",
         selected_range.x,
         selected_range.x_indices,
         [np.round(x, 2) for x in selected_range.x_bounds],
     )
-    log.info("y bins: %s", [np.round(x, 2) for x in grid_bins["y"]])
-    log.info(
+    log.debug("y bins: %s", [np.round(x, 2) for x in grid_bins["y"]])
+    log.debug(
         "range: %s ---> %s ---> %s",
         selected_range.y,
         selected_range.y_indices,
         [np.round(x, 2) for x in selected_range.y_bounds],
     )
-    log.info("r bins: %s", [np.round(x, 2) for x in grid_bins["r"]])
-    log.info(
+    log.debug("r bins: %s", [np.round(x, 2) for x in grid_bins["r"]])
+    log.debug(
         "range: %s ---> %s ---> %s",
         selected_range.r,
         selected_range.r_indices,
         [np.round(x, 2) for x in selected_range.r_bounds],
     )
-    log.info("theta bins: %s", [np.round(x, 2) for x in grid_bins["theta"]])
-    log.info(
+    log.debug("theta bins: %s", [np.round(x, 2) for x in grid_bins["theta"]])
+    log.debug(
         "range: %s ---> %s ---> %s",
         selected_range.theta,
         selected_range.theta_indices,
         [np.round(x, 2) for x in selected_range.theta_bounds],
     )
-    log.info("k bins: %s", [np.round(x, 2) for x in grid_bins["k"]])
-    log.info(
+    log.debug("k bins: %s", [np.round(x, 2) for x in grid_bins["k"]])
+    log.debug(
         "range: %s ---> %s ---> %s",
         selected_range.k,
         selected_range.k_indices,

@@ -16,7 +16,12 @@ from physped.io.writers import save_piecewise_potential
 from physped.omegaconf_resolvers import register_new_resolvers
 from physped.preprocessing.trajectories import preprocess_trajectories, process_slow_modes
 from physped.visualization.plot_discrete_grid import plot_discrete_grid
-from physped.visualization.plot_histograms import compute_joint_kl_divergence, create_all_histograms, plot_multiple_histograms
+from physped.visualization.plot_histograms import (
+    compute_joint_kl_divergence,
+    create_all_histograms,
+    plot_multiple_histograms,
+    save_joint_kl_divergence_to_file,
+)
 from physped.visualization.plot_potential_at_slow_index import plot_potential_at_slow_index
 from physped.visualization.plot_trajectories import plot_trajectories
 
@@ -37,6 +42,8 @@ def main(config):
     trajectories = trajectory_reader[env_name](config)
     log.info("PREPROCESSING TRAJECTORIES")
     preprocessed_trajectories = preprocess_trajectories(trajectories, config=config)
+
+    # TODO Check if input_ntrajs is still needed
     config.params.input_ntrajs = len(preprocessed_trajectories.Pid.unique())
 
     logging.info("MODELING PARAMETERS: \n%s", pformat(OmegaConf.to_container(config.params.model, resolve=True), depth=1))
@@ -54,7 +61,7 @@ def main(config):
         )
 
     log.info("SIMULATING TRAJECTORIES")
-    simulated_trajectories = simulate_trajectories(piecewise_potential, config)
+    simulated_trajectories = simulate_trajectories(piecewise_potential, config, preprocessed_trajectories)
 
     log.info("PLOTTING FIGURES")
     # * Optional plotting of preprocessed trajectories
@@ -83,7 +90,8 @@ def main(config):
         config.params.simulation.ntrajs = len(simulated_trajectories.Pid.unique())
         histograms = create_all_histograms(preprocessed_trajectories, simulated_trajectories, config)
         joint_kl_divergence = compute_joint_kl_divergence(piecewise_potential, simulated_trajectories)
-        plot_multiple_histograms(observables, histograms, "PDF", config, joint_kl_divergence)
+        save_joint_kl_divergence_to_file(joint_kl_divergence, config)
+        plot_multiple_histograms(observables, histograms, "PDF", config)
     else:
         log.warning("Configuration 'plot.simulated_trajectories' is set to False.")
 

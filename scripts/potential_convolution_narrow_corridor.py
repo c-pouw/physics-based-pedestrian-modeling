@@ -95,15 +95,15 @@ def calculate_potential(curvature, center, offset, value):
 # Analytical parabolic potential
 yrange = np.arange(-0.6, 0.6, 0.01)
 px_to_mm = {"x": 3.9, "y": 4.1}
-beta = 1.1
+beta = 1
 pot0 = 0.05
 # A = 0.3
-y_cent = 0.055
+y_cent = 0.07
 parabolic_potential = beta * (yrange - y_cent) ** 2 + pot0
 
 # Get index for a point on the grid
 # point = [0.45, -10, 0.6, 0, 3]
-point = [-0.4, -10, 1, 0, 3]
+point = [0, -10, 1, 0, 3]
 bin_index = []
 for dim, value in zip(cfg.params.grid.bins, point):
     bin_index.append(get_index_of_the_enclosing_bin(value, cfg.params.grid.bins[dim]))

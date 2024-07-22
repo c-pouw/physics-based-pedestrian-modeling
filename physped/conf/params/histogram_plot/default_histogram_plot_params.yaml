@@ -5,6 +5,7 @@ vflims: [-2, 2]
 rflims: [0, 2]
 observables: ['xf', 'yf', 'uf', 'vf']
 thetaflims: [-3.1415, 3.1415]
+subplot_grid: [1, 4]
 recorded:
   edgecolor: "#77AADD"
   facecolor: "#77AADD"

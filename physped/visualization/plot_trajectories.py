@@ -221,8 +221,8 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
             # f"Model parameters\n"
             f"$\\Delta t=\\,${config.params.model.dt:.3f} s\n"
             f"$\\sigma=\\,${config.params.model.sigma} ms$^{{\\mathdefault{{-3/2}}}}$\n"
-            f"$\\tau_x=\\,${config.params.model.taux:.3f} s\n"
-            f"$\\tau_u=\\,${config.params.model.tauu} s"
+            # f"$\\tau_x=\\,${config.params.model.taux:.3f} s\n"
+            f"$\\tau=\\,${config.params.model.tauu} s"
         )
         props = {"boxstyle": "round", "facecolor": "white", "alpha": 1, "edgecolor": "black", "lw": 0.5}
         plt.figtext(

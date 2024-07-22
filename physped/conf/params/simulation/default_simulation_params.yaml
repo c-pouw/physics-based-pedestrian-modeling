@@ -4,3 +4,4 @@ end: 3
 step: ${inv_prop:${params.fps}}
 stop_condition: 5
 sample_origins_from: trajectories
+sample_state: 20

@@ -66,9 +66,8 @@ def integrate_slow_velocity(df: pd.DataFrame, **kwargs):
             total=len(df.Pid.unique()),
             miniters=100,
         ):
-            slow_path = integrate_slow_velocity_single_path(
-                traj_i[kwargs["colname"]].iloc[0], traj_i[kwargs["vel_col"]], dt=kwargs["dt"]
-            )
+            x0 = traj_i[kwargs["colname"]].iloc[0]
+            slow_path = integrate_slow_velocity_single_path(x0, traj_i[kwargs["vel_col"]], dt=kwargs["dt"])
             slow.extend(slow_path)
     return slow
 
@@ -89,22 +88,18 @@ def process_slow_modes(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     dt = config.params.model["dt"]
     tauu = config.params.model["tauu"]
     window_length = config.params.minimum_trajectory_length
-    slow_velocities_algorithm = config.params.model.slow_velocities_algorithm
-    log.info("Slow velocity algorithm: %s", slow_velocities_algorithm)
-    df["us"] = get_slow_algorithm(slow_velocities_algorithm)(df, colname="uf", tau=tauu, dt=dt, window_length=window_length)
-    df["vs"] = get_slow_algorithm(slow_velocities_algorithm)(df, colname="vf", tau=tauu, dt=dt, window_length=window_length)
+    slow_velocity_algorithm = get_slow_algorithm(config.params.model.slow_velocities_algorithm)
+    log.info("Slow velocity algorithm: %s", slow_velocity_algorithm)
+    df["us"] = slow_velocity_algorithm(df, colname="uf", tau=tauu, dt=dt, window_length=window_length)
+    df["vs"] = slow_velocity_algorithm(df, colname="vf", tau=tauu, dt=dt, window_length=window_length)
     df = add_velocity_in_polar_coordinates(df, mode="s")
     df["thetas"] = periodic_angular_conditions(df["thetas"], config.params.grid.bins["theta"])
 
     taux = config.params.model["taux"]
-    slow_positions_algorithm = config.params.model.slow_positions_algorithm
-    log.info("Slow position algorithm: %s", slow_positions_algorithm)
-    df["xs"] = get_slow_algorithm(slow_positions_algorithm)(
-        df, colname="xf", vel_col="us", tau=taux, dt=dt, window_length=window_length
-    )
-    df["ys"] = get_slow_algorithm(slow_positions_algorithm)(
-        df, colname="yf", vel_col="vs", tau=taux, dt=dt, window_length=window_length
-    )
+    slow_position_algorithm = get_slow_algorithm(config.params.model.slow_positions_algorithm)
+    log.info("Slow position algorithm: %s", slow_position_algorithm)
+    df["xs"] = slow_position_algorithm(df, colname="xf", vel_col="us", tau=taux, dt=dt, window_length=window_length)
+    df["ys"] = slow_position_algorithm(df, colname="yf", vel_col="vs", tau=taux, dt=dt, window_length=window_length)
     return df
 
 

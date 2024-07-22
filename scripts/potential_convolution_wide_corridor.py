@@ -49,8 +49,8 @@ def calculate_potential(curvature, center, offset, value):
 
 
 # Get index for a point on the grid
-point = [-0.5, -10, 0.6, 0, 3]
-point = [0, -10, 0.6, 0, 3]
+# point = [-0.5, -10, 0.6, 0, 3]
+point = [0, -10, 1, 0, 3]
 bin_index = []
 for dim, value in zip(cfg.params.grid.bins, point):
     bin_index.append(get_index_of_the_enclosing_bin(value, cfg.params.grid.bins[dim]))
@@ -222,7 +222,7 @@ dymu = np.where(ymu == 0, np.nan, ymu - middle_bins[:-1])
 # vvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 7]
 # coefficients = vvar / (2 * yvar)
 coefficients = piecewise_potential.curvature_y[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4]]
-ybottom, ytop = 0, 18
+ybottom, ytop = 0, 5
 # ax.plot(middle_bins[:-1], dymu, ".-", label="Mean $\\mu_y$")
 ax.plot(middle_bins[:-1], coefficients, ".-", label="Curvature $\\beta_y$")
 ax.set_xlim(cfg.params.default_ylims)
@@ -264,7 +264,7 @@ ymu = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3]
 coefficients = piecewise_potential.curvature_y[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4]]
 middle_bins = ybins + dy / 2
 middle_bins = (middle_bins + 3.8) / 7.6
-ybottom, ytop = 0, 15
+ybottom, ytop = 0, 3
 # ax.plot(middle_bins[:-1], dymu, ".-", label="Mean $\\mu_y$")
 ax.plot(middle_bins[:-1], coefficients, ".-", label="Curvature $\\beta_y$")
 ax.set_xlim(-0.1, 1.1)
