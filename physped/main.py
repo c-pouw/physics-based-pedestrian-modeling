@@ -77,6 +77,7 @@ def main(config):
     if config.plot.simulated_trajectories:
         log.info("Plot simulated trajectories")
         log.debug("Configuration 'plot.simulated_trajectories' is set to True.")
+        config.params.trajectory_plot.plot_intended_path = False
         plot_trajectories(simulated_trajectories, config, "simulated")
         plot_trajectories(simulated_trajectories, config, "simulated", traj_type="s")
     else:

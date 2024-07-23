@@ -15,9 +15,9 @@ fps: 15
 minimum_trajectory_length: 10
 velocity_window_length: 10
 input_ntrajs: ???
-model:
-  sigma: 0.6
-  tauu: 0.2
+# model:
+#   sigma: 0.6
+#   tauu: 0.2
 grid:
   # spatial_cell_size: 0.2
   x:

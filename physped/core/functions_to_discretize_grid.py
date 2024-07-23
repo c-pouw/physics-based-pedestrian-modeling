@@ -67,11 +67,13 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: dict) 
     )
     if config.params.simulation.sample_origins_from == "trajectories":
         piecewise_potential.trajectory_origins = trajectories.groupby("Pid").apply(lambda g: g.iloc[0][["xf", "yf", "uf", "vf"]])
-    piecewise_potential.fit_params = fit_trajectories_on_grid(piecewise_potential.fit_params, trajectories)
+    piecewise_potential.fit_params = fit_trajectories_on_grid(piecewise_potential.fit_params, trajectories, config)
     log.info("Finished learning piecewise potential from trajectories.")
     piecewise_potential = calculate_curvature_of_the_potential(piecewise_potential, config)
     piecewise_potential = derive_potential_center(piecewise_potential, config)
-    piecewise_potential.position_based_offset = calculate_position_based_emperic_potential(piecewise_potential.histogram_slow)
+    piecewise_potential.position_based_offset = calculate_position_based_emperic_potential(
+        piecewise_potential.histogram_slow, config
+    )
     # piecewise_potential = calculate_position_based_offset(piecewise_potential, config)
     return piecewise_potential
 
@@ -109,9 +111,9 @@ def derive_potential_center(piecewise_potential: PiecewisePotential, config: dic
 #     return piecewise_potential
 
 
-def calculate_position_based_emperic_potential(histogram_slow):
+def calculate_position_based_emperic_potential(histogram_slow, config):
     position_counts = np.nansum(histogram_slow, axis=(2, 3, 4))
-    position_counts = np.where(position_counts == 0, np.nan, position_counts)
+    position_counts = np.where(position_counts < config.params.model.minimum_fitting_threshold, np.nan, position_counts)
     A = 0.02  # TODO: Move to config
     position_based_emperic_potential = A * (-np.log(position_counts) + np.log(np.nansum(histogram_slow)))
     return position_based_emperic_potential
@@ -189,7 +191,7 @@ def digitize_trajectories_to_grid(grid_bins: dict, trajectories: pd.DataFrame) -
     return trajectories
 
 
-def fit_probability_distributions(group: pd.DataFrame) -> list:
+def fit_probability_distributions(group: pd.DataFrame, config: dict) -> list:
     """
     Fits normal distribution to a group of data points and returns fitting parameters.
 
@@ -199,7 +201,7 @@ def fit_probability_distributions(group: pd.DataFrame) -> list:
     Returns:
     - A list of fitting parameters.
     """
-    if len(group) < 100:
+    if len(group) < config.params.model.minimum_fitting_threshold:
         return np.nan  # ? Can we do better if we have multiple files?
     fit_func = norm.fit  # * Other functions can be implemented here
     params = []
@@ -209,7 +211,7 @@ def fit_probability_distributions(group: pd.DataFrame) -> list:
     return params
 
 
-def fit_trajectories_on_grid(param_grid, trajectories: pd.DataFrame):
+def fit_trajectories_on_grid(param_grid, trajectories: pd.DataFrame, config: dict):
     """
     Fit trajectories to the parameter grid.
 
@@ -220,7 +222,7 @@ def fit_trajectories_on_grid(param_grid, trajectories: pd.DataFrame):
     Returns:
     - The grid with fit parameters.
     """
-    fit_params = trajectories.groupby("slow_grid_indices").apply(fit_probability_distributions).dropna().to_dict()
+    fit_params = trajectories.groupby("slow_grid_indices").apply(fit_probability_distributions, config=config).dropna().to_dict()
     for key, value in fit_params.items():
         param_grid[key] = value
     return param_grid

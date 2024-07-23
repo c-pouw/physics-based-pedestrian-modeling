@@ -2,6 +2,6 @@ ntrajs: 1000
 start: 0
 end: 3
 step: ${inv_prop:${params.fps}}
-stop_condition: 5
+# stop_condition: 5
 sample_origins_from: trajectories
-sample_state: 20
+sample_state: 0

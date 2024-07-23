@@ -19,9 +19,9 @@ colnames:
   y: y_pos
   Pid: Pid
   time: frame
-model:
-  sigma: 0.7
-  tauu: 0.5
+# model:
+#   sigma: 0.7
+#   tauu: 0.5
 grid:
   spatial_cell_size: 0.4
   x:

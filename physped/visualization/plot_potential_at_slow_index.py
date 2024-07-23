@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 
 def get_position_based_emperic_potential_from_state(config, slices, piecewise_potential):
     sliced_histogram = get_slice_of_multidimensional_matrix(piecewise_potential.histogram_slow, slices)
-    position_based_emperic_potential = calculate_position_based_emperic_potential(sliced_histogram)
+    position_based_emperic_potential = calculate_position_based_emperic_potential(sliced_histogram, config)
     return position_based_emperic_potential
 
 
@@ -119,3 +119,6 @@ def plot_potential_at_slow_index(config, slow_indices, piecewise_potential):
     # if plot_trajectories_on_field:
     # ax.plot(traj.xf, traj.yf, ms=10, zorder=20, c = 'C0', lw = 0.5)
     # ax.plot(traj['xs'], traj['ys'], ms=10, zorder=20, linestyle = 'dashed', c = 'C1', lw = 0.5)
+
+
+# %%

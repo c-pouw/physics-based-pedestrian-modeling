@@ -48,7 +48,11 @@ def apply_polar_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
     ax.set_xticks([])
     ax = plot_polar_velocity_grid(ax, params.grid)
     ax = plot_polar_labels(ax, params.grid)
-    ax.set_ylim(0, params.grid.bins.r[-2])
+    # TODO Check if this is still the preferred behavior
+    # if len(params.grid.bins.r) > 2:
+    # ax.set_ylim(0, params.grid.bins.r[-2])
+    # else:
+    ax.set_ylim(0, params.grid.bins.r[-1])
     return ax
 
 
@@ -222,31 +226,35 @@ def plot_polar_velocity_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
     alpha = 0.8
     color = "k"
     linewidth = 0.6
-    for r in rbins[:-1]:
-        ax.plot(
-            np.linspace(0, 2 * np.pi, 100),
-            np.ones(100) * r,
-            color=color,
-            linestyle=linestyle,
-            lw=linewidth,
-            alpha=alpha,
-        )
-    for theta in thetabins:
-        ax.plot(
-            [theta, theta],
-            [rbins[1], rbins[-2]],
-            color=color,
-            alpha=alpha,
-            linestyle=linestyle,
-            linewidth=linewidth,
-        )
+    if len(rbins) > 2:
+        for r in rbins[:-1]:
+            ax.plot(
+                np.linspace(0, 2 * np.pi, 100),
+                np.ones(100) * r,
+                color=color,
+                linestyle=linestyle,
+                lw=linewidth,
+                alpha=alpha,
+            )
+    if len(thetabins) > 2:
+        for theta in thetabins:
+            ax.plot(
+                [theta, theta],
+                [rbins[1], rbins[-1]],
+                color=color,
+                alpha=alpha,
+                linestyle=linestyle,
+                linewidth=linewidth,
+            )
     return ax
 
 
 def plot_polar_labels(ax: plt.Axes, grid_params: dict) -> plt.Axes:
     rbins = grid_params.bins.r
 
-    for r in rbins[1:-1]:
+    for r in rbins:
+        if r == 0:
+            continue
         textangle = 5 * np.pi / 8
         ax.text(
             textangle,
@@ -258,7 +266,9 @@ def plot_polar_labels(ax: plt.Axes, grid_params: dict) -> plt.Axes:
             rotation=convert_rad_to_deg(textangle - np.pi / 2),
             bbox=dict(facecolor="white", alpha=1, edgecolor="none", boxstyle="round", pad=0.1),
         )
+
     winddirections = {
+        1: zip([np.pi / 2, 0, -np.pi / 2, np.pi], ["N", "E", "S", "W"], [5, 5, 5, 5]),
         4: zip([np.pi / 2, 0, -np.pi / 2, np.pi], ["N", "E", "S", "W"], [5, 5, 5, 5]),
         8: zip(
             [np.pi / 2, np.pi / 4, 0, -np.pi / 4, -np.pi / 2, -3 * np.pi / 4, np.pi, 3 * np.pi / 4],
@@ -270,23 +280,14 @@ def plot_polar_labels(ax: plt.Axes, grid_params: dict) -> plt.Axes:
         for theta, winddirection, fontsize in winddirections[grid_params.theta.segments]:
             ax.text(
                 theta,
-                rbins[-2],
+                rbins[-1],
                 winddirection,
                 ha="center",
                 va="center",
                 fontsize=fontsize,
                 bbox=dict(facecolor="white", alpha=1, edgecolor="k", boxstyle="circle,pad=0.4", lw=0.4),
             )
-    # for theta in thetabins[:-1]:
-    #     ax.text(
-    #         theta,
-    #         rbins[-1] + 0.3 + np.abs(np.cos(theta)) / 4,
-    #         f"{theta/np.pi:.1f}$\\pi$",
-    #         ha="center",
-    #         va="center",
-    #         fontsize=7,
-    #     )
-    # ax.text(theta, rbins[-1] * 1.35, f"{convert_rad_to_deg(theta):.1f}$^\\circ$", ha="center", va="center")
+
     return ax
 
 

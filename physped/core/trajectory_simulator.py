@@ -38,11 +38,16 @@ def sample_trajectory_origins_from_heatmap(piecewise_potential: PiecewisePotenti
 def sample_trajectory_origins_from_trajectory_state_n(
     parameters: dict, measured_trajectories: pd.DataFrame, state_n
 ) -> np.ndarray:
-    # ntrajs = np.min([parameters.simulation.ntrajs, parameters.input_ntrajs])
+    # TODO Fix sampling outside the grid
+
     ntrajs = parameters.simulation.ntrajs
-    sampled_origins = measured_trajectories[measured_trajectories["k"] == state_n][
-        ["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs"]
-    ].sample(n=ntrajs, replace=True)
+    if state_n == -1:
+        # Random point in each path
+        points_to_sample_from = measured_trajectories.groupby("Pid").apply(lambda x: x.sample(1)).reset_index(drop=True)
+    else:
+        # State n along each path
+        points_to_sample_from = measured_trajectories[measured_trajectories["k"] == state_n]
+    sampled_origins = points_to_sample_from[["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs"]].sample(n=ntrajs, replace=True)
     # Stacking to go from [x,y,u,v] to [x,y,u,v,xs,ys,us,vs]
     # sampled_origins = np.hstack((sampled_origins, sampled_origins))
     log.info("Sampled %d origins from the input trajectories.", ntrajs)
@@ -83,7 +88,7 @@ def simulate_trajectories(piecewise_potential: PiecewisePotential, config: dict,
             solution = lm.simulate(X_0, t_eval)
 
             traj = pd.DataFrame(solution, columns=["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs"])
-            traj = traj.dropna()
+            # traj = traj.dropna()
             traj["Pid"] = Pid
             traj["t"] = t_eval[: len(traj)]
             traj["k"] = range(len(traj))
