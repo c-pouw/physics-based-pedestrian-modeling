@@ -1,4 +1,8 @@
 # %%
+# %load_ext autoreload
+# %autoreload 2
+# %%
+
 import logging
 from pathlib import Path
 from pprint import pformat
@@ -27,7 +31,9 @@ plt.style.use(Path.cwd().parent / "physped/conf/science.mplstyle")
 
 # %%
 # env_name = "curved_paths_synthetic"
-env_name = "station_paths"
+# env_name = "station_paths"
+env_name = "single_paths"
+# env_name = "parallel_paths"
 with initialize(version_base=None, config_path="../physped/conf", job_name="test_app"):
     config = compose(
         config_name="config",
@@ -44,7 +50,7 @@ with initialize(version_base=None, config_path="../physped/conf", job_name="test
             # "params.grid.theta.min_multiple_pi=-1.125",
             # "params.grid.theta.segments=8",
             # "params.grid.r.list=[0, 0.5, 1.0, 1.5, 2, 2.5]",
-            # "params.grid.spatial_cell_size=0.4"
+            # "params.grid.spatial_cell_size=0.2"
         ],
     )
     print(config)
@@ -62,13 +68,19 @@ logging.info("GRID PARAMETERS: \n%s", pformat(OmegaConf.to_container(config.para
 # %%
 
 trajectories = trajectory_reader[env_name](config)
+trajectories.head()
+
+# %%
+
 preprocessed_trajectories = preprocess_trajectories(trajectories, config=config)
 preprocessed_trajectories = process_slow_modes(preprocessed_trajectories, config)
+
 # %%
 
 piecewise_potential = learn_potential_from_trajectories(preprocessed_trajectories, config)
 
 # %%
+
 # config.params.simulation.sample_state = 0
 config.params.simulation.ntrajs = 21
 config.params.input_ntrajs = len(preprocessed_trajectories.Pid.unique())
@@ -83,13 +95,14 @@ plot_trajectories(simulated_trajectories, config, "simulated", traj_type="s")
 
 # %%
 
-traj_pid = simulated_trajectories[simulated_trajectories["Pid"] == 4].copy()
+traj_pid = simulated_trajectories[simulated_trajectories["Pid"] == 1].copy()
 traj_pid.dropna(subset=["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs"], inplace=True, how="all")
 last_state = traj_pid.iloc[-1]
 plot_trajectories(traj_pid, config, "simulated", traj_type="f")
 
-
 # %%
+
+
 def get_curvature_point(config, state):
     xf, yf, uf, vf, xs, ys, us, vs, rs, thetas = state[["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs", "rs", "thetas"]]
     k = 2
@@ -125,21 +138,21 @@ traj_pid.loc[:, ["xmean", "ymean", "umean", "vmean", "betax", "betay", "betau", 
 # %%
 
 
-def plot_potential(ax, state, pot_type):
+def plot_potential(ax, state, potential_type):
     color_coding = {
         "x": "C0",
         "y": "C1",
         "u": "C2",
         "v": "C3",
     }
-    beta_type = f"beta{pot_type}"
-    mean_type = f"{pot_type}mean"
-    position_type = f"{pot_type}s"
+    beta_type = f"beta{potential_type}"
+    mean_type = f"{potential_type}mean"
+    position_type = f"{potential_type}s"
     beta = state[beta_type]
     mean = state[mean_type]
     pot_range = np.arange(mean - 1, mean + 1, 0.1)
     potential = beta * (pot_range - mean) ** 2
-    ax.plot(pot_range, potential, c=color_coding[pot_type])
+    ax.plot(pot_range, potential, c=color_coding[potential_type])
     pot_position = beta * (state[position_type] - mean) ** 2
     ax.plot(state[position_type], pot_position, "kx")
     return ax

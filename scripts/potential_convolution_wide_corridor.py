@@ -44,6 +44,19 @@ piecewise_potential = learn_potential_from_trajectories(preprocessed_trajectorie
 # %%
 
 
+def make_line_variable_width(x, y, color, ax):
+    middle_index = len(x) // 2
+    middle_x = x[middle_index]
+    d_to_center = np.abs(x - middle_x)
+    width_in_center = 2
+    # normalize the width
+    d_to_center = (d_to_center / d_to_center.max()) * width_in_center
+    line_widths = width_in_center - d_to_center
+    line_alphas = line_widths**2 / np.max(line_widths**2)
+    ax.scatter(x, y, s=line_widths, color=color, alpha=line_alphas, zorder=20)
+    return ax
+
+
 def calculate_potential(curvature, center, offset, value):
     return curvature * (value - center) ** 2 + offset
 
@@ -90,14 +103,16 @@ for y_index in range(len(ybins) - 1)[::1]:
         offset,
         middle_bins[y_index],
     )
-    ax.plot(middle_bins[y_index], Vy_mid, color="w", marker="|", ms=3, zorder=20)
-    # ax.plot(X_dashed, Vy_dashed, alpha=0.4, linestyle="dashed", color=color, lw=lw)
+    ax = make_line_variable_width(X_dashed, Vy_dashed, color=color, ax=ax)
 
-    X_solid = np.linspace(ybins[y_index], ybins[y_index + 1], 100)
-    Vy_solid = calculate_potential(
-        piecewise_potential.curvature_y[*bin_index], piecewise_potential.center_y[*bin_index], offset, X_solid
-    )
-    ax.plot(X_solid, Vy_solid, color=color, lw=lw)
+    # ax.plot(middle_bins[y_index], Vy_mid, color="w", marker="|", ms=3, zorder=20)
+    # # ax.plot(X_dashed, Vy_dashed, alpha=0.4, linestyle="dashed", color=color, lw=lw)
+
+    # X_solid = np.linspace(ybins[y_index], ybins[y_index + 1], 100)
+    # Vy_solid = calculate_potential(
+    #     piecewise_potential.curvature_y[*bin_index], piecewise_potential.center_y[*bin_index], offset, X_solid
+    # )
+    # ax.plot(X_solid, Vy_solid, color=color, lw=lw)
 
 ax.grid(False)
 ax.set_xlim(cfg.params.default_ylims)

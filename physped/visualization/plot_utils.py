@@ -48,10 +48,6 @@ def apply_polar_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
     ax.set_xticks([])
     ax = plot_polar_velocity_grid(ax, params.grid)
     ax = plot_polar_labels(ax, params.grid)
-    # TODO Check if this is still the preferred behavior
-    # if len(params.grid.bins.r) > 2:
-    # ax.set_ylim(0, params.grid.bins.r[-2])
-    # else:
     ax.set_ylim(0, params.grid.bins.r[-1])
     return ax
 

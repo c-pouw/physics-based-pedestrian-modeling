@@ -20,7 +20,6 @@ colnames:
   Pid: Pid
   time: t
 grid:
-  spatial_cell_size: 0.4
   x:
     min: -2.7
     max: 3.2

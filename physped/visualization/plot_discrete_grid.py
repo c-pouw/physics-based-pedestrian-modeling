@@ -69,7 +69,6 @@ def plot_discrete_grid(config: dict, slow_indices: tuple, trajectories: pd.DataF
     ax2 = plot_polar_labels(ax2, params.grid)
     if plot_params.plot_trajs:
         ax2 = plot_velocity_trajectories_in_polar_coordinates(ax2, plot_trajs, alpha=1, traj_type="f")
-    ax2.set_ylim(params.grid.bins.r[0], params.grid.bins.r[-2])
     ax2.grid(False)
     ax2.set_title(plot_params.title.velocity, y=1)
 

@@ -6,6 +6,7 @@ from pprint import pformat
 import matplotlib.pyplot as plt
 import numpy as np
 from hydra import compose, initialize
+from omegaconf import OmegaConf
 
 from physped.core.functions_to_discretize_grid import learn_potential_from_trajectories
 from physped.core.functions_to_select_grid_piece import (
@@ -18,6 +19,7 @@ from physped.omegaconf_resolvers import register_new_resolvers
 from physped.preprocessing.trajectories import preprocess_trajectories, process_slow_modes
 from physped.visualization.plot_discrete_grid import plot_discrete_grid
 from physped.visualization.plot_potential_at_slow_index import plot_potential_at_slow_index
+from physped.visualization.plot_trajectories import plot_trajectories
 
 plt.style.use(Path.cwd().parent / "physped/conf/science.mplstyle")
 
@@ -25,7 +27,7 @@ plt.style.use(Path.cwd().parent / "physped/conf/science.mplstyle")
 
 env_name = "single_paths"
 with initialize(version_base=None, config_path="../physped/conf", job_name="test_app"):
-    cfg = compose(
+    config = compose(
         config_name="config",
         return_hydra_config=True,
         overrides=[
@@ -34,33 +36,40 @@ with initialize(version_base=None, config_path="../physped/conf", job_name="test
             #    "params.grid.spatial_cell_size=0.1"
         ],
     )
-    print(cfg)
-register_new_resolvers()
+    print(config)
+register_new_resolvers(replace=True)
 
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-# %%
+logging.info("MODELING PARAMETERS: \n%s", pformat(OmegaConf.to_container(config.params.model, resolve=True), depth=1))
+logging.info("GRID PARAMETERS: \n%s", pformat(OmegaConf.to_container(config.params.grid, resolve=True), depth=2))
 
-cfg = evaluate_selection_range(cfg)
-cfg = evaluate_selection_point(cfg)
-logging.info(pformat(dict(cfg.params.selection.range)))
 
 # %%
 
-trajectories = trajectory_reader[env_name](cfg)
-preprocessed_trajectories = preprocess_trajectories(trajectories, config=cfg)
-preprocessed_trajectories = process_slow_modes(preprocessed_trajectories, cfg)
-piecewise_potential = learn_potential_from_trajectories(preprocessed_trajectories, cfg)
+config = evaluate_selection_range(config)
+config = evaluate_selection_point(config)
+logging.info(pformat(dict(config.params.selection.range)))
 
 # %%
 
+trajectories = trajectory_reader[env_name](config)
+preprocessed_trajectories = preprocess_trajectories(trajectories, config=config)
+preprocessed_trajectories = process_slow_modes(preprocessed_trajectories, config)
+piecewise_potential = learn_potential_from_trajectories(preprocessed_trajectories, config)
+
+# %%
+
+
+plot_trajectories(preprocessed_trajectories, config, "recorded")
+# plot_trajectories(simulated_trajectories, config, "simulated")
+
+# %%
 # config.params.selection.range.x = [55] * 2
 # config.params.selection.range.y = [-5] * 2
 # config.params.selection.range.r = [1.3] * 2
 
-
-config = cfg
 config.params.selection.range.theta = [np.pi * 0] * 2
 # config.params.force_field_plot.scale = 20
 config = evaluate_selection_range(config)
@@ -85,9 +94,22 @@ plot_potential_at_slow_index(config, slow_indices, piecewise_potential)
 # )
 # print(Vy_dashed)
 # print(piecewise_potential.curvature_y[:,:,1,0,1])
-
-
 # %%
+
+
+def make_line_variable_width(x, y, color, ax):
+    middle_index = len(x) // 2
+    middle_x = x[middle_index]
+    d_to_center = np.abs(x - middle_x)
+    width_in_center = 3
+    # normalize the width
+    d_to_center = (d_to_center / d_to_center.max()) * width_in_center
+    line_widths = width_in_center - d_to_center
+
+    ax.scatter(x, y, s=line_widths, color=color, alpha=line_widths / np.max(line_widths), zorder=20)
+    return ax
+
+
 def calculate_potential(curvature, center, offset, value):
     return curvature * (value - center) ** 2 + offset
 
@@ -95,25 +117,25 @@ def calculate_potential(curvature, center, offset, value):
 # Analytical parabolic potential
 yrange = np.arange(-0.6, 0.6, 0.01)
 px_to_mm = {"x": 3.9, "y": 4.1}
-beta = 1
-pot0 = 0.05
+beta = 1.1
+pot0 = 0.045
 # A = 0.3
-y_cent = 0.07
+y_cent = 0.01
 parabolic_potential = beta * (yrange - y_cent) ** 2 + pot0
 
 # Get index for a point on the grid
 # point = [0.45, -10, 0.6, 0, 3]
-point = [0, -10, 1, 0, 3]
+point = [0, -10, 1.3, 0, 3]
 bin_index = []
-for dim, value in zip(cfg.params.grid.bins, point):
-    bin_index.append(get_index_of_the_enclosing_bin(value, cfg.params.grid.bins[dim]))
+for dim, value in zip(config.params.grid.bins, point):
+    bin_index.append(get_index_of_the_enclosing_bin(value, config.params.grid.bins[dim]))
 # bin_index[3] = 0
 
-cmap = ["C0", "C1", "C2", "C3"] * 100
+cmap = ["C2", "C1", "C3", "C0"] * 100
 fig, ax = plt.subplots(figsize=(3.54, 1.5))
 lw = 2
 
-ybins = cfg.params.grid.bins.y
+ybins = config.params.grid.bins.y
 dy = ybins[1] - ybins[0]
 middle_bins = ybins + dy / 2
 for y_index in range(len(ybins) - 1):
@@ -123,7 +145,8 @@ for y_index in range(len(ybins) - 1):
     #     continue
 
     offset = piecewise_potential.position_based_offset[bin_index[0], y_index]
-    X_dashed = np.linspace(ybins[y_index] - dy / 2, ybins[y_index + 1] + dy / 2, 100)
+    length_outside_bin = dy
+    X_dashed = np.linspace(ybins[y_index] - length_outside_bin, ybins[y_index + 1] + length_outside_bin, 100)
     Vy_dashed = calculate_potential(
         piecewise_potential.curvature_y[*bin_index], piecewise_potential.center_y[*bin_index], offset, X_dashed
     )
@@ -135,20 +158,22 @@ for y_index in range(len(ybins) - 1):
         offset,
         middle_bins[y_index],
     )
-    ax.plot(middle_bins[y_index], Vy_mid, color="w", marker="|", ms=3, zorder=20)
+    # ax.plot(middle_bins[y_index], Vy_mid, color="w", marker="|", ms=3, zorder=20)
+    ax = make_line_variable_width(X_dashed, Vy_dashed, color=color, ax=ax)
+    # ax.add_collection(lc)
     # ax.plot(X_dashed, Vy_dashed, alpha=0.4, linestyle="dashed", color=color, lw=lw)
 
-    X_solid = np.linspace(ybins[y_index], ybins[y_index + 1], 100)
-    Vy_solid = calculate_potential(
-        piecewise_potential.curvature_y[*bin_index], piecewise_potential.center_y[*bin_index], offset, X_solid
-    )
-    ax.plot(X_solid, Vy_solid, color=color, lw=lw)
+    # X_solid = np.linspace(ybins[y_index], ybins[y_index + 1], 100)
+    # Vy_solid = calculate_potential(
+    #     piecewise_potential.curvature_y[*bin_index], piecewise_potential.center_y[*bin_index], offset, X_solid
+    # )
+    # ax.plot(X_solid, Vy_solid, color=color, lw=lw)
 
-ax.set_xlim(cfg.params.default_ylims)
+ax.set_xlim(config.params.default_ylims)
 ax.grid(False)
 ax.set_xticks(ybins[::2])
 
-y_walls = cfg.params.trajectory_plot.ywalls
+y_walls = config.params.trajectory_plot.ywalls
 # Plot grid
 ax.vlines(ybins, 0, 1, lw=0.4, color="k", linestyle="dashed", alpha=0.6)
 ax.hlines(np.linspace(0, 1, 6), y_walls[0], y_walls[1], lw=0.4, color="k", linestyle="dashed", alpha=0.6)
@@ -172,25 +197,25 @@ for ywall in y_walls:
 
 plt.ylim(0, 0.6)
 plt.ylabel("$U(y\\,|\\,\\Phi) + O(\\Phi)$")
-plt.ylabel("$U(y\\,|\\vec{x}_s, \\vec{u}_s) + O(\\vec{x}_x, \\vec{u}_s)$")
+plt.ylabel("$U(y\\,|\\vec{x}_s, \\vec{u}_s) + O(\\vec{x}_s, \\vec{u}_s)$")
 plt.xlabel("y [m]")
 plt.plot(
     yrange,
     parabolic_potential,
     "k--",
-    lw=1.5,
-    zorder=-20,
-    label="Analytic potential \n$U(y) = \\beta y^2$ (Eq.~(6))",
+    lw=1,
+    zorder=90,
+    label="Analytic potential \n$U(y) = \\beta y^2$ (Eq.~(5))",
 )
-plt.plot(
-    yrange,
-    parabolic_potential,
-    "k--",
-    lw=1.5,
-    zorder=20,
-    alpha=0.3,
-    # label="Analytic potential \n$V(y) = \\beta y^2$ (Eq.~(5))",
-)
+# plt.plot(
+#     yrange,
+#     parabolic_potential,
+#     "k--",
+#     lw=1.5,
+#     zorder=20,
+#     alpha=0.3,
+#     # label="Analytic potential \n$V(y) = \\beta y^2$ (Eq.~(5))",
+# )
 plt.legend(loc="upper center")
 plt.savefig("../figures/potential_convolution_narrow_corridor.pdf")
 
@@ -206,11 +231,11 @@ coefficients = piecewise_potential.curvature_y[bin_index[0], :, bin_index[2], bi
 ybottom, ytop = -0.2, 0.2
 ax.plot(middle_bins[:-1], dymu, ".-", label="Mean $\\mu_y - y_s$")
 # ax.plot(middle_bins[:-1], np.divide(coefficients, 10), ".-", label="Curvature $\\beta_y/10$")
-ax.set_xlim(cfg.params.default_ylims)
+ax.set_xlim(config.params.default_ylims)
 ax.grid(False)
 ax.set_xticks(ybins[::2])
 
-y_walls = cfg.params.trajectory_plot.ywalls
+y_walls = config.params.trajectory_plot.ywalls
 # Plot grid
 ax.vlines(ybins, ybottom, ytop, lw=0.4, color="k", linestyle="dashed", alpha=0.6)
 ax.hlines(np.linspace(ybottom, ytop, 6), y_walls[0], y_walls[1], lw=0.4, color="k", linestyle="dashed", alpha=0.6)
@@ -246,11 +271,11 @@ coefficients = piecewise_potential.curvature_y[bin_index[0], :, bin_index[2], bi
 ybottom, ytop = 0, 15
 # ax.plot(middle_bins[:-1], dymu, ".-", label="Mean $\\mu_y$")
 ax.plot(middle_bins[:-1], coefficients, ".-", label="Curvature $\\beta_y$")
-ax.set_xlim(cfg.params.default_ylims)
+ax.set_xlim(config.params.default_ylims)
 ax.grid(False)
 ax.set_xticks(ybins[::2])
 
-y_walls = cfg.params.trajectory_plot.ywalls
+y_walls = config.params.trajectory_plot.ywalls
 # Plot grid
 ax.vlines(ybins, ybottom, ytop, lw=0.4, color="k", linestyle="dashed", alpha=0.6)
 ax.hlines(np.linspace(ybottom, ytop, 6), y_walls[0], y_walls[1], lw=0.4, color="k", linestyle="dashed", alpha=0.6)

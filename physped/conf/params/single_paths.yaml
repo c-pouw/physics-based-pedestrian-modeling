@@ -15,17 +15,11 @@ fps: 15
 minimum_trajectory_length: 10
 velocity_window_length: 10
 input_ntrajs: ???
-# model:
-#   sigma: 0.6
-#   tauu: 0.2
 grid:
-  # spatial_cell_size: 0.2
   x:
-    step: 0.4
     min: -1
     max: 1
   y:
-    step: 0.1
     min: -0.6
     max: 0.6
 colnames:
@@ -44,6 +38,6 @@ trajectory_plot:
   plot_intended_path: true
   customyticklabels: [-0.6,0,0.6]
 histogram_plot:
-  subplot_grid: [2, 2]
+  subplot_grid: [1, 4]
 grid_plot:
   customyticklabels: [-0.6,0,0.6]

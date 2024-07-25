@@ -23,7 +23,6 @@ colnames:
 #   sigma: 0.7
 #   tauu: 0.5
 grid:
-  spatial_cell_size: 0.4
   x:
     min: -2.3
     max: 3

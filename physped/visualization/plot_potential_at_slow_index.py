@@ -13,7 +13,6 @@ from physped.visualization.plot_utils import (
     apply_polar_plot_style,
     apply_xy_plot_style,
     highlight_velocity_selection,
-    plot_polar_labels,
     plot_polar_velocity_grid,
 )
 
@@ -100,10 +99,10 @@ def plot_potential_at_slow_index(config, slow_indices, piecewise_potential):
     ax2 = fig.add_subplot(spec[1], polar=True)
     ax2 = apply_polar_plot_style(ax2, params)
     ax2 = plot_polar_velocity_grid(ax2, params.grid)
-    ax2 = plot_polar_labels(ax2, params.grid)
+    # ax2 = plot_polar_labels(ax2, params.grid)
     # if plot_params.plot_trajs:
     # ax2 = plot_velocity_trajectories_in_polar_coordinates(ax2, plot_trajs, alpha=plot_params.alpha, traj_type="f")
-    ax2.set_ylim(params.grid.bins.r[0], params.grid.bins.r[-2])
+    # ax2.set_ylim(params.grid.bins.r[0], params.grid.bins.r[-1])
     ax2.grid(False)
     # ax2.set_title(plot_params.title.velocity, y=1)
 
