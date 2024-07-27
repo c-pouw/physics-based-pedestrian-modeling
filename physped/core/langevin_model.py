@@ -100,16 +100,16 @@ class LangevinModel:
         xf, yf, uf, vf, xs, ys, us, vs, t, k, Pid = state
         xfdot = uf
         yfdot = vf
-        # k = 2  # np.max([k, 1])
+        k = np.max([k, 1])
         dt = 1
         dk = self.params.fps
 
-        if np.all(np.isnan(state)):
+        if np.all(np.isnan(state)) or np.all(np.isinf(state)):
             return np.zeros(len(state))
 
         if self.particle_outside_grid(xf, yf):
             log.info("Pid %s: left the grid at t = %.2f s", int(Pid), t)
-            return np.zeros(len(state)) * np.nan
+            return np.repeat(np.inf, len(state))
 
         rs, thetas = cart2pol(us, vs)
         thetas = periodic_angular_conditions(thetas, self.params.grid.bins["theta"])
@@ -119,24 +119,25 @@ class LangevinModel:
             slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4], :
         ]
 
-        if np.all([np.isnan(x) for x in [xmean, ymean, umean, vmean, xvar, yvar, uvar, vvar]]):
-            log.warning("Pid %s: reached hole in the potential at t = %.2f s", int(Pid), t)
-            # TODO : Find a fix to handle holes in the potential
-            # TODO : e.g. coarse graining, closest neighbour or taking a few steps back
-            if slow_state_index[2] > 0:  # Reduce the speed
-                slow_state_index[2] = slow_state_index[2] - 1
-                xmean, xvar, ymean, yvar, umean, uvar, vmean, vvar = self.potential.fit_params[
-                    slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4], :
-                ]
-                if np.all([np.isnan(x) for x in [xmean, ymean, umean, vmean, xvar, yvar, uvar, vvar]]):
-                    return np.zeros(len(state)) * np.nan
-                else:
-                    log.critical("Temporary fix! Continueing ...")
-
         beta_x = self.potential.curvature_x[*slow_state_index]
         beta_y = self.potential.curvature_y[*slow_state_index]
         beta_u = self.potential.curvature_u[*slow_state_index]
         beta_v = self.potential.curvature_v[*slow_state_index]
+
+        if np.all(np.isnan([xmean, ymean, umean, vmean, xvar, yvar, uvar, vvar])):
+            # log.warning("Pid %s: reached hole in the potential at t = %.2f s", int(Pid), t)
+            # TODO : Find a fix to handle holes in the potential e.g. coarse graining, closest neighbour
+
+            return np.zeros(len(state)) * np.nan
+            # if slow_state_index[2] > 0:  # Reduce the speed
+            #     slow_state_index[2] = slow_state_index[2] - 1
+            #     xmean, xvar, ymean, yvar, umean, uvar, vmean, vvar = self.potential.fit_params[
+            #         slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4], :
+            #     ]
+            #     if np.all([np.isnan(x) for x in [xmean, ymean, umean, vmean, xvar, yvar, uvar, vvar]]):
+            #         return np.zeros(len(state)) * np.nan
+            #     else:
+            #         log.critical("Temporary fix! Continueing ...")
 
         V_x = beta_x * (xf - xmean)
         V_y = beta_y * (yf - ymean)

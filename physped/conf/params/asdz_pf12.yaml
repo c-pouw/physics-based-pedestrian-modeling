@@ -41,19 +41,19 @@ selection:
     k: [1.2, 1.2]
 plot_style: physped/conf/science.mplstyle
 default_xlims: [-6, 20]
-default_ylims: [-2, 8]
-# background:
-#   imgpath: 'data/backgrounds/EHV.Perron2.1_multisensor_1.png'
-#   alpha: 1
-#   xmin: -6039
-#   xmax: 75091
-#   ymin: -16539
-#   ymax: 10909
+default_ylims: [-5, 10]
+background:
+  imgpath: 'data/backgrounds/Background Amsterdam Zuid track 1-2.png'
+  alpha: 1
+  xmin: -6750
+  xmax: 21870
+  ymin: -7967
+  ymax: 13711
 trajectory_plot:
   title: "paths on a train platform"
   figsize: [3.54, 3]
   y_title: 0.8
-  show_background: false
+  show_background: true
   plot_cartesian_grid: False
   text_box:
     x: 0.86

@@ -29,11 +29,11 @@ grid:
     min_multiple_pi: -1.125
     segments: 8
 simulation:
-  end: 50
+  end: 100
 colnames:
-  xf: xf
-  yf: yf
-  Pid: Pid
+  xf: x_pos
+  yf: y_pos
+  Pid: tracked_object
   time: date_time_utc
 selection:
   point:

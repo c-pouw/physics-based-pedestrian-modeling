@@ -30,9 +30,10 @@ from physped.visualization.plot_utils import apply_xy_plot_style
 plt.style.use(Path.cwd().parent / "physped/conf/science.mplstyle")
 
 # %%
-# env_name = "curved_paths_synthetic"
+
+env_name = "curved_paths_synthetic"
 # env_name = "station_paths"
-env_name = "single_paths"
+# env_name = "single_paths"
 # env_name = "parallel_paths"
 with initialize(version_base=None, config_path="../physped/conf", job_name="test_app"):
     config = compose(
@@ -82,9 +83,12 @@ piecewise_potential = learn_potential_from_trajectories(preprocessed_trajectorie
 # %%
 
 # config.params.simulation.sample_state = 0
-config.params.simulation.ntrajs = 21
+config.params.simulation.ntrajs = 1
 config.params.input_ntrajs = len(preprocessed_trajectories.Pid.unique())
 simulated_trajectories = simulate_trajectories(piecewise_potential, config, preprocessed_trajectories)
+
+# %%
+
 
 # %%
 
@@ -99,6 +103,13 @@ traj_pid = simulated_trajectories[simulated_trajectories["Pid"] == 1].copy()
 traj_pid.dropna(subset=["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs"], inplace=True, how="all")
 last_state = traj_pid.iloc[-1]
 plot_trajectories(traj_pid, config, "simulated", traj_type="f")
+
+# %%
+
+traj_pid["c"] = traj_pid.apply(lambda x: f"C{x.piece_id}", axis=1)
+
+for piece_id, traj in traj_pid.groupby("piece_id"):
+    plt.plot(traj["xf"], traj["yf"], color=f"C{piece_id}", marker=".")
 
 # %%
 

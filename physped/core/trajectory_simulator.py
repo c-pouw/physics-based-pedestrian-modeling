@@ -6,7 +6,7 @@ import pandas as pd
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from physped.core.functions_to_discretize_grid import convert_grid_indices_to_coordinates, sample_from_ndarray
+from physped.core.functions_to_discretize_grid import convert_grid_indices_to_coordinates, get_grid_indices, sample_from_ndarray
 from physped.core.langevin_model import LangevinModel
 from physped.core.piecewise_potential import PiecewisePotential
 from physped.io.readers import read_trajectories_from_path
@@ -78,6 +78,22 @@ def read_simulated_trajectories_from_file(config):
         log.error("Preprocessed trajectories not found: %s", e)
 
 
+def heatmap_zero_at_slow_state(piecewise_potential: PiecewisePotential, slow_state) -> bool:
+    """
+    Check if the heatmap is zero at the given position.
+
+    Parameters:
+        piecewise_potential (PiecewisePotential): The piecewise potential object.
+        position (np.ndarray): The position to check.
+
+    Returns:
+        bool: True if the heatmap is zero at the given position, False otherwise.
+    """
+    heatmap = np.sum(piecewise_potential.histogram, axis=(2, 3, 4))
+    slow_state_index = get_grid_indices(piecewise_potential, slow_state)
+    return heatmap[slow_state_index[0], slow_state_index[1]] == 0
+
+
 def simulate_trajectories(piecewise_potential: PiecewisePotential, config: dict, measured_trajectories: None) -> pd.DataFrame:
     parameters = config.params
 
@@ -104,22 +120,46 @@ def simulate_trajectories(piecewise_potential: PiecewisePotential, config: dict,
     Pids = np.arange(origins.shape[0])
     origins = np.hstack((origins, Pids[:, None]))
 
-    t_eval = np.arange(parameters.simulation.start, parameters.simulation.end, parameters.simulation.step)
+    evaluation_time = np.arange(parameters.simulation.start, parameters.simulation.end, parameters.simulation.step)
     trajectories = []
 
+    model = LangevinModel(piecewise_potential, parameters)
+    n_frames_back = config.params.fps  # Go 1 seconds back
     with logging_redirect_tqdm():
-        for X_0 in tqdm(origins[:, :11], desc="Simulating trajectories", unit="trajs", total=origins.shape[0], miniters=1):
+        for starting_state in tqdm(
+            origins[:, :11], desc="Simulating trajectories", unit="trajs", total=origins.shape[0], miniters=1
+        ):
+            first_trajectory_piece = simulate_trajectory_piece(model, starting_state, evaluation_time, 0)
+            pid = int(first_trajectory_piece.iloc[0]["Pid"])
+            trajectory_pieces = [first_trajectory_piece]
 
-            lm = LangevinModel(piecewise_potential, parameters)
-            solution = lm.simulate(X_0, t_eval)
-            traj = pd.DataFrame(solution, columns=["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs", "t", "k", "Pid"])
-            traj = traj.dropna()
-            # Todo : Add a second iteration of simulations for the trajectories that are not finished
-            # traj["Pid"] = Pid
-            # traj["t"] = t_eval[: len(traj)]
-            # traj["k"] = range(len(traj))
+            while check_restarting_conditions(trajectory_pieces[-1], n_frames_back, piecewise_potential):
+                last_trajectory_piece = trajectory_pieces[-1]
+                no_last_trajectory_piece = int(last_trajectory_piece.iloc[0]["piece_id"])
+                restarting_state = last_trajectory_piece.iloc[-n_frames_back]
+                restarting_time = restarting_state["t"]
+                log.info(
+                    "Pid %s piece %s: Removing %s frames. Restarting at t = %.2f.",
+                    int(pid),
+                    no_last_trajectory_piece,
+                    n_frames_back,
+                    restarting_time,
+                )
 
-            trajectories.append(traj)
+                last_trajectory_piece = last_trajectory_piece.iloc[
+                    : -n_frames_back - 1
+                ]  # strip frames from last trajectory piece
+                trajectory_pieces[-1] = last_trajectory_piece
+                frame_to_restart_from = int(restarting_state["k"])
+
+                new_evaluation_time = evaluation_time[frame_to_restart_from:]
+
+                no_new_traj_piece = no_last_trajectory_piece + 1
+                new_trajectory_piece = simulate_trajectory_piece(model, restarting_state, new_evaluation_time, no_new_traj_piece)
+                trajectory_pieces.append(new_trajectory_piece)
+
+            trajectory_pieces = pd.concat(trajectory_pieces)
+            trajectories.append(trajectory_pieces)
 
     trajectories = pd.concat(trajectories)
     trajectories["rf"], trajectories["thetaf"] = cart2pol(trajectories.uf, trajectories.vf)
@@ -130,3 +170,41 @@ def simulate_trajectories(piecewise_potential: PiecewisePotential, config: dict,
         log.debug("Configuration 'save.simulated_trajectories' is set to True.")
         save_trajectories(trajectories, Path.cwd().parent, config.filename.simulated_trajectories)
     return trajectories
+
+
+def check_restarting_conditions(traj, n_frames_back, piecewise_potential):
+    # traj is the last trajectory_piece
+    last_trajectory_piece_too_short = len(traj) < n_frames_back
+    if last_trajectory_piece_too_short:
+        log.warning("Last trajectory piece has only %s frames. Not restarting.", len(traj))
+        return False
+
+    trajectory_already_left_the_measurement_domain = heatmap_zero_at_slow_state(
+        piecewise_potential, traj.iloc[-1][["xs", "ys", "us", "vs", "k"]]
+    )
+    if trajectory_already_left_the_measurement_domain:
+        log.warning("Last trajectory piece already left the measurement domain. Not restarting.")
+        return False
+
+    particle_left_the_lattice = np.all(np.isinf(traj.iloc[-1]))
+    if particle_left_the_lattice:
+        log.warning("Last trajectory piece already left the lattice. Not restarting.")
+        return False
+
+    max_restarts = 4
+    simulation_already_restarted_too_often = traj["piece_id"].iloc[0] > max_restarts
+    if simulation_already_restarted_too_often:
+        log.warning("Simulation already restarted %s times. Not restarting.", max_restarts)
+        return False
+
+    return True
+
+
+def simulate_trajectory_piece(
+    model: LangevinModel, starting_state: np.ndarray, evaluation_time: np.ndarray, no_traj_piece: int
+) -> pd.DataFrame:
+    integration_output = model.simulate(starting_state[:11], evaluation_time)
+    columns = ["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs", "t", "k", "Pid"]
+    trajectory_piece = pd.DataFrame(integration_output, columns=columns).dropna()
+    trajectory_piece["piece_id"] = no_traj_piece
+    return trajectory_piece
