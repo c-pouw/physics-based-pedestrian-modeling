@@ -10,10 +10,7 @@
        <img src="https://img.shields.io/pypi/pyversions/physics-based-pedestrian-modeling" alt="PyPI - Python Version" /></a>
     <a href="https://github.com/psf/black">
        <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black" /></a>
-
 </p>
-
-<! <a href="full-doi-link">  <img src="https://img.shields.io/badge/DOI-doinumber/shortdoilink-blue.svg" alt="doi paper" /></a> -->
 
 # Project Overview
 
