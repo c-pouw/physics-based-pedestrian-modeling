@@ -13,7 +13,7 @@
 
 </p>
 
-<! <a href="https://doi.org/10.1016/j.trc.2023.104468">  <img src="https://img.shields.io/badge/DOI-10.1016/j.trc.2023.104468-blue.svg" alt="doi paper" /></a> -->
+<! <a href="full-doi-link">  <img src="https://img.shields.io/badge/DOI-doinumber/shortdoilink-blue.svg" alt="doi paper" /></a> -->
 
 # Project Overview
 
