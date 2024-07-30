@@ -99,18 +99,15 @@ def read_parallel_paths(config) -> pd.DataFrame:
     return df
 
 
-# def read_intersecting_paths_synthetic(config) -> pd.DataFrame:
-#     """Read the intersecting paths data set."""
-#     trajectory_data_dir = Path(config.trajectory_data_dir)
-#     file_path = trajectory_data_dir / "simulations_crossing.parquet"
-#     df = pd.read_parquet(file_path)
-#     df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
-#     df["k"] = df.groupby("Pid").cumcount()
-#     df["time"] = df["k"]
-#     return df
+def read_intersecting_paths(config: dict) -> pd.DataFrame:
+    """Read the intersecting paths data set.
 
+    Args:
+        config: configuration parameters
 
-def read_intersecting_paths(config) -> pd.DataFrame:
+    Returns:
+        The trajectory dataset with intersecting paths.
+    """
     data_source = config.params.data_source
     paths_ltr, paths_rtl = narrow_corridor_path_reader[data_source](config)
 
@@ -200,7 +197,7 @@ def filter_trajectory(df, cutoff=0.16, order=4):
 #     return trajs
 
 
-def read_ehv_pf34_paths_geert(config) -> pd.DataFrame:
+def read_ehv_pf34_paths_geert(config: dict) -> pd.DataFrame:
     """Read the station paths data set."""
     trajectory_data_dir = Path(config.trajectory_data_dir)
     file_path = trajectory_data_dir / "trajectories_EHV_platform_2_1_refined.parquet"
