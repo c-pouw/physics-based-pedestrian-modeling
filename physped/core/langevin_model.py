@@ -119,10 +119,18 @@ class LangevinModel:
             slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4], :
         ]
 
-        beta_x = self.potential.curvature_x[*slow_state_index]
-        beta_y = self.potential.curvature_y[*slow_state_index]
-        beta_u = self.potential.curvature_u[*slow_state_index]
-        beta_v = self.potential.curvature_v[*slow_state_index]
+        beta_x = self.potential.curvature_x[
+            slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4]
+        ]
+        beta_y = self.potential.curvature_y[
+            slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4]
+        ]
+        beta_u = self.potential.curvature_u[
+            slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4]
+        ]
+        beta_v = self.potential.curvature_v[
+            slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4]
+        ]
 
         if np.all(np.isnan([xmean, ymean, umean, vmean, xvar, yvar, uvar, vvar])):
             # log.warning("Pid %s: reached hole in the potential at t = %.2f s", int(Pid), t)
