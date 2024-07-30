@@ -205,7 +205,7 @@ def read_ehv_pf34_paths_geert(config) -> pd.DataFrame:
     trajectory_data_dir = Path(config.trajectory_data_dir)
     file_path = trajectory_data_dir / "trajectories_EHV_platform_2_1_refined.parquet"
     df = pd.read_parquet(file_path)
-    # df = df[["date_time_utc", "Pid", "xf", "yf"]]
+    df = df[["date_time_utc", "Pid", "xf", "yf"]]
 
     # Rotate the domain
     df.rename({"xf": "yf", "yf": "xf", "uf": "vf", "vf": "uf"}, axis=1, inplace=True)
