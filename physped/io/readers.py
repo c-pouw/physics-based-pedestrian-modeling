@@ -438,11 +438,11 @@ def read_asdz_pf12_paths_4tu(config):
     Returns:
         The trajectory dataset with Amsterdam Zuid platform 1-2 paths
     """
-    link = "https://data.4tu.nl/file/af4ef093-69ef-4e1c-8fbc-c40c447c618c/d07747f0-9101-4cfc-9939-4a63c2677b22"
+    link = "https://data.4tu.nl/file/af4ef093-69ef-4e1c-8fbc-c40c447c618c/ca88bfc5-5a79-496a-8c90-433fa40929b9"
     bytestring = requests.get(link, timeout=10)
 
     with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as zipped_file:
-        with zipped_file.open("Amsterdam Zuid - platform 1-2 - set32.csv") as paths:
+        with zipped_file.open("Amsterdam Zuid - platform 1-2 - set10.csv") as paths:
             paths = paths.read().decode("utf-8")
 
     df = pd.read_csv(io.StringIO(paths), sep=",")
