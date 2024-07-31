@@ -48,9 +48,9 @@ def read_piecewise_potential_from_file(filepath: Path) -> PiecewisePotential:
 
 
 def read_narrow_corridor_paths_local(config):
-    """Read the narrow corridor paths data set from a local zip archive.
+    """Read the narrow corridor paths archive from a local zip.
 
-    Read the narrow corridor paths data set from a local zip archive. The data set contains two files:
+    The archive contains two files:
 
     - left-to-right.ssv: paths of pedestrians walking from left to right.
     - right-to-left.ssv: paths of pedestrians walking from right to left.
@@ -58,10 +58,8 @@ def read_narrow_corridor_paths_local(config):
 
     Args:
         config: configuration parameters
-
-    Returns:
-        # TODO : add return type. Perhaps refactor to return the archive.
     """
+    # TODO : add return type
     trajectory_data_dir = Path(config.trajectory_data_dir)
     log.info("Start reading single paths data set.")
     archive = zipfile.ZipFile(trajectory_data_dir / "data.zip")
@@ -75,19 +73,17 @@ def read_narrow_corridor_paths_local(config):
 
 
 def read_narrow_corridor_paths_4tu(config):
-    """Read the narrow corridor paths data set from 4TU.
+    """Read the narrow corridor paths archive from 4TU remote repository.
 
-    Read the narrow corridor paths data set from 4TU. The data set contains two files:
+    The archive contains two files:
 
     - left-to-right.ssv: paths of pedestrians walking from left to right.
     - right-to-left.ssv: paths of pedestrians walking from right to left.
 
     Args:
         config: configuration parameters
-
-    Returns:
-        # TODO : add return type
     """
+    # TODO : add return type
     link = "https://data.4tu.nl/ndownloader/items/b8e30f8c-3931-4604-842a-77c7fb8ac3fc/versions/1"
     bytestring = requests.get(link, timeout=10)
     with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as outerzip:

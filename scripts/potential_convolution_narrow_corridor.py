@@ -171,7 +171,10 @@ for y_index in range(len(ybins) - 1):
 
 ax.set_xlim(config.params.default_ylims)
 ax.grid(False)
-ax.set_xticks(ybins[::2])
+# ax.set_xticks(ybins[::2], minor = True)
+ax.set_xticks([-0.4, -0.2, 0, 0.2, 0.4], minor=True)
+ax.set_xticks([-0.6, -0.3, -0.1, 0.1, 0.3, 0.6])
+# ax.xaxis.set_minor_locator(ybins[::2])
 
 y_walls = config.params.trajectory_plot.ywalls
 # Plot grid
@@ -234,6 +237,7 @@ ax.plot(middle_bins[:-1], dymu, ".-", label="Mean $\\mu_y - y_s$")
 ax.set_xlim(config.params.default_ylims)
 ax.grid(False)
 ax.set_xticks(ybins[::2])
+# ax.set_xticks([-0.6, -0.3,-0.1, 0.1, 0.3, 0.6])
 
 y_walls = config.params.trajectory_plot.ywalls
 # Plot grid
