@@ -2,16 +2,10 @@
 Usage
 =====
 
-Basic usage of the package is explained in the Colab notebooks.
+Basic usage of the package is explained in the following notebook.
 
-Start by importing Data-driven physics-based modeling of pedestrian dynamics.
+.. raw:: html
 
-.. code-block:: python
-
-    import physped
-
-    Then, you can create a model and run simulations.
-
-    You can use your own pedestrian trajectory data set or use one of the built-in trajectory readers.
-
-    .. autofunction:: physped.core.functions_to_discretize_grid.cast_trajectories_to_discrete_grid
+    <h2 align="left" style="vertical-align: middle;">
+        <a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_narrow_corridor_colab.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a><sup><sub> - Narrow corridor model. </sub></sup> <br>
+    </h2>
