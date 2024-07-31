@@ -443,9 +443,8 @@ def read_asdz_pf12_paths_4tu(config):
 
     with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as zipped_file:
         with zipped_file.open("Amsterdam Zuid - platform 1-2 - set10.csv") as paths:
-            paths = paths.read().decode("utf-8")
+            df = pd.read_csv(paths)
 
-    df = pd.read_csv(io.StringIO(paths), sep=",")
     return df
 
 
