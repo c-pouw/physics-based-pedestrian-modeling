@@ -2,6 +2,8 @@
 Usage
 =====
 
+Basic usage of the package is explained in the Colab notebooks.
+
 Start by importing Data-driven physics-based modeling of pedestrian dynamics.
 
 .. code-block:: python
