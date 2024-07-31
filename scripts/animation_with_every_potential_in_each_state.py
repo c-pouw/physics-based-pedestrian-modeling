@@ -31,10 +31,11 @@ plt.style.use(Path.cwd().parent / "physped/conf/science.mplstyle")
 
 # %%
 
-env_name = "curved_paths_synthetic"
-# env_name = "station_paths"
 # env_name = "single_paths"
 # env_name = "parallel_paths"
+# env_name = "curved_paths_synthetic"
+# env_name = "station_paths"
+env_name = "asdz_pf34"
 with initialize(version_base=None, config_path="../physped/conf", job_name="test_app"):
     config = compose(
         config_name="config",
@@ -77,6 +78,10 @@ preprocessed_trajectories = preprocess_trajectories(trajectories, config=config)
 preprocessed_trajectories = process_slow_modes(preprocessed_trajectories, config)
 
 # %%
+preprocessed_trajectories = preprocess_trajectories(trajectories, config=config)
+preprocessed_trajectories = process_slow_modes(preprocessed_trajectories, config)
+
+# %%
 
 piecewise_potential = learn_potential_from_trajectories(preprocessed_trajectories, config)
 
@@ -99,10 +104,16 @@ plot_trajectories(simulated_trajectories, config, "simulated", traj_type="s")
 
 # %%
 
-traj_pid = simulated_trajectories[simulated_trajectories["Pid"] == 1].copy()
+traj_pid = simulated_trajectories[simulated_trajectories["Pid"] == 2].copy()
 traj_pid.dropna(subset=["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs"], inplace=True, how="all")
 last_state = traj_pid.iloc[-1]
 plot_trajectories(traj_pid, config, "simulated", traj_type="f")
+
+print(len(traj_pid))
+# plt.hist(traj_pid["vf"], bins=100)
+
+plt.hist(traj_pid["rf"], bins=100)
+plt.xlim(0, 2)
 
 # %%
 
@@ -124,10 +135,10 @@ def get_curvature_point(config, state):
     ]
 
     # determine potential energy contributions
-    betax = piecewise_potential.curvature_x[*X_indx]
-    betay = piecewise_potential.curvature_y[*X_indx]
-    betau = piecewise_potential.curvature_u[*X_indx]
-    betav = piecewise_potential.curvature_v[*X_indx]
+    betax = piecewise_potential.curvature_x[X_indx[0], X_indx[1], X_indx[2], X_indx[3], X_indx[4]]
+    betay = piecewise_potential.curvature_y[X_indx[0], X_indx[1], X_indx[2], X_indx[3], X_indx[4]]
+    betau = piecewise_potential.curvature_u[X_indx[0], X_indx[1], X_indx[2], X_indx[3], X_indx[4]]
+    betav = piecewise_potential.curvature_v[X_indx[0], X_indx[1], X_indx[2], X_indx[3], X_indx[4]]
 
     V_x = betax * (xf - xmean)
     V_y = betay * (yf - ymean)
