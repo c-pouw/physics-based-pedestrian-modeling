@@ -6,22 +6,31 @@
 Data-driven physics-based modeling of pedestrian dynamics
 =========================================================
 
-<p align="center">
-    <a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/testing.yml" alt="Unit Tests">
-       <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/testing.yml/badge.svg" /></a>
-	<a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml" alt="Integration Tests">
-       <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml/badge.svg" /></a>
-	<a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/pages/pages-build-deployment" alt="pages-build-deployment">
-	   <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/pages/pages-build-deployment/badge.svg" /></a>
-    <a href="https://pypi.python.org/pypi/physics-based-pedestrian-modeling" alt="pypi version">
-       <img src="https://img.shields.io/pypi/v/physics-based-pedestrian-modeling.svg" /></a>
-    <a href="#">
-       <img src="https://img.shields.io/pypi/pyversions/physics-based-pedestrian-modeling" alt="PyPI - Python Version" /></a>
-    <a href="https://github.com/psf/black">
-       <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black" /></a>
-	<a href="https://arxiv.org/abs/2407.20794">
-	   <img src="https://img.shields.io/badge/arXiv-2407.20794-b31b1b.svg?style=flat" alt="arXiv" /></a>
-</p>
+<p align="center"> <a
+    href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/testing.yml"
+    alt="Unit Tests"> <img
+    src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/testing.yml/badge.svg"
+    /></a> <a
+    href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml"
+    alt="Integration Tests"> <img
+    src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml/badge.svg"
+    /></a> <a
+    href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/pages/pages-build-deployment"
+    alt="pages-build-deployment"> <img
+    src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/pages/pages-build-deployment/badge.svg"
+    /></a> <a
+    href="https://pypi.python.org/pypi/physics-based-pedestrian-modeling"
+    alt="pypi version"> <img
+    src="https://img.shields.io/pypi/v/physics-based-pedestrian-modeling.svg"
+    /></a> <a href="#"> <img
+    src="https://img.shields.io/pypi/pyversions/physics-based-pedestrian-modeling"
+    alt="PyPI - Python Version" /></a> <a
+    href="https://github.com/psf/black"> <img
+    src="https://img.shields.io/badge/code%20style-black-000000.svg"
+    alt="Code style: black" /></a> <a
+    href="https://arxiv.org/abs/2407.20794"> <img
+    src="https://img.shields.io/badge/arXiv-2407.20794-b31b1b.svg?style=flat"
+    alt="arXiv" /></a> </p>
 
 # Project Overview
 
