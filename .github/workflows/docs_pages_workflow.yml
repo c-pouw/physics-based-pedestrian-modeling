@@ -1,8 +1,11 @@
+# Run the buildDocs.sh script to build the documentation and update the GitHub Pages site.
 name: docs_pages_workflow
 
 # execute this workflow automatically when a we push to master
-on: workflow_dispatch
-  # push:
+on: #workflow_dispatch
+  push:
+    branches:
+      - master
 
 jobs:
 
