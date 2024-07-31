@@ -10,7 +10,8 @@ from pathlib import Path
 # from scipy.signal import savgol_filter
 import pandas as pd
 import requests
-from scipy import signal
+
+# from scipy import signal
 from tqdm import tqdm
 
 from physped.core.piecewise_potential import PiecewisePotential
@@ -19,24 +20,46 @@ log = logging.getLogger(__name__)
 
 
 def read_trajectories_from_path(filepath: Path) -> pd.DataFrame:
-    """Read trajectories from file. Used to read intermediate results."""
+    """Read trajectories from a csv file.
+
+    Used to read intermediate outputs.
+
+    Args:
+        filepath: Path to the csv file containing the trajectories.
+
+    Returns:
+        The trajectory dataset.
+    """
     return pd.read_csv(filepath)
 
 
 def read_piecewise_potential_from_file(filepath: Path) -> PiecewisePotential:
+    """Read piecewise potential from file.
+
+    Args:
+        filepath: Path to the file containing the piecewise potential.
+
+    Returns:
+        The piecewise potential.
     """
-    Reads a piecewise potential from a file using pickle.
+    with open(filepath, "rb") as file:
+        piecewise_potential = pickle.load(file)
+    return piecewise_potential
 
-    :param filename: The path to the file containing the piecewise potential.
-    :type filename: str
-    :return: The piecewise potential.
+
+def read_narrow_corridor_paths_local(config):
+    """Read the narrow corridor paths data set from a local zip archive.
+
+    Read the narrow corridor paths data set from a local zip archive. The data set contains two files:
+    - left-to-right.ssv with paths of pedestrians walking from left to right.
+    - right-to-left.ssv with paths of pedestrians walking from right to left.
+
+    Args:
+        config: configuration parameters
+
+    Returns:
+        # TODO : add return type
     """
-    with open(filepath, "rb") as f:
-        val = pickle.load(f)
-    return val
-
-
-def read_narrow_corridor_paths_local(config) -> pd.DataFrame:
     trajectory_data_dir = Path(config.trajectory_data_dir)
     log.info("Start reading single paths data set.")
     archive = zipfile.ZipFile(trajectory_data_dir / "data.zip")
@@ -49,7 +72,19 @@ def read_narrow_corridor_paths_local(config) -> pd.DataFrame:
     return paths_ltr, paths_rtl
 
 
-def read_narrow_corridor_paths_4tu(config) -> pd.DataFrame:
+def read_narrow_corridor_paths_4tu(config):
+    """Read the narrow corridor paths data set from 4TU.
+
+    Read the narrow corridor paths data set from 4TU. The data set contains two files:
+    - left-to-right.ssv with paths of pedestrians walking from left to right.
+    - right-to-left.ssv with paths of pedestrians walking from right to left.
+
+    Args:
+        config: configuration parameters
+
+    Returns:
+        # TODO : add return type
+    """
     link = "https://data.4tu.nl/ndownloader/items/b8e30f8c-3931-4604-842a-77c7fb8ac3fc/versions/1"
     bytestring = requests.get(link, timeout=10)
     with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as outerzip:
@@ -67,8 +102,17 @@ narrow_corridor_path_reader = {
 }
 
 
-def read_single_paths(config) -> pd.DataFrame:
-    """Read the single paths data set."""
+def read_narrow_corridor_paths(config) -> pd.DataFrame:
+    """Read the narrow corridor data set.
+
+    The trajectories are read from local or remote sources based on the configuration.
+
+    Args:
+        config: configuration parameters
+
+    Returns:
+        The trajectory dataset with single paths.
+    """
     data_source = config.params.data_source
     paths_ltr, paths_rtl = narrow_corridor_path_reader[data_source](config)
 
@@ -84,7 +128,14 @@ def read_single_paths(config) -> pd.DataFrame:
 
 
 def read_parallel_paths(config) -> pd.DataFrame:
-    """Read the parallel paths data set."""
+    """Read the parallel paths data set from a local file.
+
+    Args:
+        config: configuration parameters
+
+    Returns:
+        The trajectory dataset with parallel paths.
+    """
     trajectory_data_dir = Path(config.trajectory_data_dir)
     file_path = trajectory_data_dir / "df_single_pedestrians_small.h5"
     df = pd.read_hdf(file_path)
@@ -95,12 +146,15 @@ def read_parallel_paths(config) -> pd.DataFrame:
     df.reset_index(inplace=True)
     df = df.query("Umean>0.5").loc[abs(df.X0 - df.X1) > 2]
     df = df.groupby("Pid").filter(lambda x: max(x.uf) < 3.5)
-    # df["time"] = df["frame"]
     return df
 
 
 def read_intersecting_paths(config: dict) -> pd.DataFrame:
     """Read the intersecting paths data set.
+
+    The intersecting paths dataset is created by combining the left-to-right and right-to-left
+    paths from the narrow corridor dataset. The paths from the right-to-left dataset are rotated
+    by 90 degrees to create intersecting paths.
 
     Args:
         config: configuration parameters
@@ -118,9 +172,9 @@ def read_intersecting_paths(config: dict) -> pd.DataFrame:
     df2 = pd.read_csv(io.StringIO(paths_rtl), sep=" ")
     df2["X_SG"] = df2["X_SG"] + 0.1
     df2["Y_SG"] = df2["Y_SG"] - 0.05
-    df2.rename(  # swap x and y coordinates
-        columns={"X": "Y", "Y": "X", "X_SG": "Y_SG", "Y_SG": "X_SG", "U_SG": "V_SG", "V_SG": "U_SG"}, inplace=True
-    )
+
+    # swap x and y coordinates to rotate by 90 degrees
+    df2.rename(columns={"X": "Y", "Y": "X", "X_SG": "Y_SG", "Y_SG": "X_SG", "U_SG": "V_SG", "V_SG": "U_SG"}, inplace=True)
 
     df = pd.concat([df1, df2], ignore_index=True)
 
@@ -129,7 +183,14 @@ def read_intersecting_paths(config: dict) -> pd.DataFrame:
 
 
 def read_curved_paths_synthetic(config) -> pd.DataFrame:
-    """Read the curved paths data set."""
+    """Read the synthetic curved paths data set.
+
+    Args:
+        config: configuration parameters
+
+    Returns:
+        The synthetic curved paths dataset.
+    """
     trajectory_data_dir = Path(config.trajectory_data_dir)
     file_path = trajectory_data_dir / "artificial_measurements_ellipse.parquet"
     df = pd.read_parquet(file_path)
@@ -137,14 +198,14 @@ def read_curved_paths_synthetic(config) -> pd.DataFrame:
     return df
 
 
-def filter_trajectory(df, cutoff=0.16, order=4):
-    b, a = signal.butter(order, cutoff, "low")
-    df = df.sort_values(["particle", "time"])
-    df = df.groupby("particle").filter(lambda x: len(x) > 52)
+# def filter_trajectory(df, cutoff=0.16, order=4):
+#     b, a = signal.butter(order, cutoff, "low")
+#     df = df.sort_values(["particle", "time"])
+#     df = df.groupby("particle").filter(lambda x: len(x) > 52)
 
-    f_df = df.groupby(df["particle"]).apply(lambda x: pd.DataFrame(signal.filtfilt(b, a, x[["x", "y"]].values, axis=0)))
-    df[["x", "y"]] = f_df.set_index(df.index)
-    return df
+#     f_df = df.groupby(df["particle"]).apply(lambda x: pd.DataFrame(signal.filtfilt(b, a, x[["x", "y"]].values, axis=0)))
+#     df[["x", "y"]] = f_df.set_index(df.index)
+#     return df
 
 
 # def savgol_smoothing(df: pd.DataFrame, smooth_colname, groupby_colname="Pid"):
@@ -198,7 +259,14 @@ def filter_trajectory(df, cutoff=0.16, order=4):
 
 
 def read_ehv_pf34_paths_geert(config: dict) -> pd.DataFrame:
-    """Read the station paths data set."""
+    """Read the Eindhoven platform 3-4 paths data set from Geert.
+
+    Args:
+        config: configuration parameters
+
+    Returns:
+        The trajectory dataset with Eindhoven platform 3-4 paths
+    """
     trajectory_data_dir = Path(config.trajectory_data_dir)
     file_path = trajectory_data_dir / "trajectories_EHV_platform_2_1_refined.parquet"
     df = pd.read_parquet(file_path)
@@ -216,6 +284,14 @@ def filter_part_of_the_domain(df, xmin, xmax):
 
 
 def read_ehv_pf34_paths_local(config) -> pd.DataFrame:
+    """Read the Eindhoven platform 3-4 paths data set from a local file.
+
+    Args:
+        config: configuration parameters
+
+    Returns:
+        The trajectory dataset with Eindhoven platform 3-4 paths
+    """
     trajectory_data_dir = Path(config.trajectory_data_dir)
     glob_string = f"{str(trajectory_data_dir)}/ehv_pf34/*.parquet"
     filelist = glob.glob(glob_string)
@@ -243,8 +319,15 @@ ehv_pf34_path_reader = {
 }
 
 
-def read_station_paths(config) -> pd.DataFrame:
-    """Read the station paths data set."""
+def read_eindhoven_pf34_paths(config) -> pd.DataFrame:
+    """Read the Eindhoven platform 3-4 paths data set.
+
+    Args:
+        config: configuration parameters
+
+    Returns:
+        The trajectory dataset with Eindhoven platform 3-4 paths.
+    """
     path_reader = ehv_pf34_path_reader[config.params.data_source]
     df = path_reader(config)
     return df
@@ -336,13 +419,13 @@ def read_asdz_pf12_paths(config) -> pd.DataFrame:
 
 
 trajectory_reader = {
-    "single_paths": read_single_paths,
+    "single_paths": read_narrow_corridor_paths,
     "parallel_paths": read_parallel_paths,
     "intersecting_paths": read_intersecting_paths,
     # "intersecting_paths_synthetic": read_intersecting_paths_synthetic,
     # "curved_paths": read_curved_paths,
     "curved_paths_synthetic": read_curved_paths_synthetic,
-    "station_paths": read_station_paths,
+    "station_paths": read_eindhoven_pf34_paths,
     "asdz_pf34": read_asdz_pf34_paths,
     "utrecht_pf5": read_utrecht_pf5_paths,
     "asdz_pf12": read_asdz_pf12_paths,
