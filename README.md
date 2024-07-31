@@ -10,13 +10,20 @@
        <img src="https://img.shields.io/pypi/pyversions/physics-based-pedestrian-modeling" alt="PyPI - Python Version" /></a>
     <a href="https://github.com/psf/black">
        <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black" /></a>
+	<a href="https://arxiv.org/abs/2407.20794">
+	   <img src="https://img.shields.io/badge/arXiv-2407.20794-b31b1b.svg?style=flat" alt="arXiv" /></a>
 </p>
 
 # Project Overview
 
 Python package to create physics-based pedestrian models from pedestrian trajectory measurements. This package is an implementation of the data-driven generalized pedestrian model presented in:
 
-Pouw, C. A. S., van der Vleuten, G., Corbetta, A., & Toschi, F. (2024). Data-driven physics-based modeling of pedestrian dynamics. To appear xx.
+Pouw, C. A. S., van der Vleuten, G., Corbetta, A., & Toschi, F. (2024). Data-driven physics-based modeling of pedestrian dynamics. Preprint, https://arxiv.org/abs/2407.20794
+
+
+# Documentation
+
+* Documentation: https://c-pouw.github.io/physics-based-pedestrian-modeling.
 
 
 # Getting started
@@ -29,7 +36,7 @@ cd physics-based-pedestrian-modeling
 pip install -e .
 ```
 
-Run the main prcessing script for one of the available parameter files (listed below)
+Run the main processing script for one of the available parameter files (listed below)
 
 ```bash
 python physped/main.py params=PARAM_NAME
@@ -44,7 +51,7 @@ Configuration of parameter files is handled by ![Hydra](https://github.com/faceb
 * **station_paths:** Complex trajectories in a train station.
 
 ## Featured Notebooks
-A couple of usage notebooks are available for the following cases:
+We provide the following usage notebooks:
 * Narrow corridor paths [![Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_narrow_corridor_colab.ipynb)
 * Train station paths
 * User input paths
@@ -59,10 +66,6 @@ Learn the potential
 
 ### Simulate new trajectories using the learned potential
 Simulate new trajectories
-
-
-# Documentation
-* Documentation: https://c-pouw.github.io/physics-based-pedestrian-modeling.
 
 # License
 * Free software: 3-clause BSD license
