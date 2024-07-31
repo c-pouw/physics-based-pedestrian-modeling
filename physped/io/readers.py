@@ -51,14 +51,16 @@ def read_narrow_corridor_paths_local(config):
     """Read the narrow corridor paths data set from a local zip archive.
 
     Read the narrow corridor paths data set from a local zip archive. The data set contains two files:
-    - left-to-right.ssv with paths of pedestrians walking from left to right.
-    - right-to-left.ssv with paths of pedestrians walking from right to left.
+
+    - left-to-right.ssv: paths of pedestrians walking from left to right.
+    - right-to-left.ssv: paths of pedestrians walking from right to left.
+
 
     Args:
         config: configuration parameters
 
     Returns:
-        # TODO : add return type
+        # TODO : add return type. Perhaps refactor to return the archive.
     """
     trajectory_data_dir = Path(config.trajectory_data_dir)
     log.info("Start reading single paths data set.")
@@ -76,8 +78,9 @@ def read_narrow_corridor_paths_4tu(config):
     """Read the narrow corridor paths data set from 4TU.
 
     Read the narrow corridor paths data set from 4TU. The data set contains two files:
-    - left-to-right.ssv with paths of pedestrians walking from left to right.
-    - right-to-left.ssv with paths of pedestrians walking from right to left.
+
+    - left-to-right.ssv: paths of pedestrians walking from left to right.
+    - right-to-left.ssv: paths of pedestrians walking from right to left.
 
     Args:
         config: configuration parameters
@@ -302,10 +305,10 @@ def read_ehv_pf34_paths_local(config) -> pd.DataFrame:
 
     df = pd.concat(df_list)
 
-    # Rotate the domain
+    # Rotate the domain by 90 degrees
     df.rename({"x_pos": "y_pos", "y_pos": "x_pos"}, axis=1, inplace=True)
 
-    # Convert position units to meters
+    # Convert spatial coordinates from milimeters to meters
     df["x_pos"] /= 1000
     df["y_pos"] /= 1000
 
@@ -349,12 +352,21 @@ def read_asdz_pf34_paths(config) -> pd.DataFrame:
 
         df = pd.read_csv(io.StringIO(paths), sep=",")
 
+    # Convert spatial coordinates from milimeters to meters
     df["x_pos"] /= 1000
     df["y_pos"] /= 1000
     return df
 
 
 def read_utrecht_pf5_paths_4tu(config):
+    """Read the Utrecht Centraal platform 5 paths data set from 4TU.
+
+    Args:
+        config: configuration parameters
+
+    Returns:
+        The trajectory dataset with Utrecht Centraal platform 5 paths
+    """
     link = "https://data.4tu.nl/file/d4d548c6-d198-49b3-986c-e22319970a5e/a58041fb-0318-4bee-9b2c-934bd8e5df83"
     bytestring = requests.get(link, timeout=10)
 
@@ -367,6 +379,14 @@ def read_utrecht_pf5_paths_4tu(config):
 
 
 def read_utrecht_pf5_paths_local(config):
+    """Read the Utrecht Centraal platform 5 paths data set from a local file.
+
+    Args:
+        config: configuration parameters
+
+    Returns:
+        The trajectory dataset with Utrecht Centraal platform 5 paths.
+    """
     file_list = glob.glob(config.trajectory_data_dir + "/Utrecht*.csv")
     file_path = file_list[0]
     return pd.read_csv(file_path)
@@ -379,14 +399,35 @@ utrecht_pf5_path_reader = {
 
 
 def read_utrecht_pf5_paths(config) -> pd.DataFrame:
+    """Read the Utrecht Centraal platform 5 paths data set.
+
+    The trajectories are read from local or remote sources based on the configuration.
+    The spatial coordinates of the trajectories are converted from milimeters to meters.
+
+    Args:
+        config: configuration parameters
+
+    Returns:
+        The trajectory dataset with Utrecht Centraal platform 5 paths.
+    """
     path_reader = utrecht_pf5_path_reader[config.params.data_source]
     df = path_reader(config)
-    df["x_pos"] /= 1000  # Convert milimeters to meters
+
+    # Convert spatial coordinates from milimeters to meters
+    df["x_pos"] /= 1000
     df["y_pos"] /= 1000
     return df
 
 
 def read_asdz_pf12_paths_4tu(config):
+    """Read the Amsterdam Zuid platform 1-2 paths data set from 4TU.
+
+    Args:
+        config: configuration parameters
+
+    Returns:
+        The trajectory dataset with Amsterdam Zuid platform 1-2 paths
+    """
     link = "https://data.4tu.nl/file/af4ef093-69ef-4e1c-8fbc-c40c447c618c/d07747f0-9101-4cfc-9939-4a63c2677b22"
     bytestring = requests.get(link, timeout=10)
 
@@ -399,6 +440,14 @@ def read_asdz_pf12_paths_4tu(config):
 
 
 def read_asdz_pf12_paths_local(config):
+    """Read the Amsterdam Zuid platform 1-2 paths data set from a local file.
+
+    Args:
+        config: configuration parameters
+
+    Returns:
+        The trajectory dataset with Amsterdam Zuid platform 1-2 paths
+    """
     file_list = glob.glob(config.trajectory_data_dir + "/Amsterdam*Zuid*1-2*.csv")
     file_path = file_list[0]
     return pd.read_csv(file_path)
@@ -411,9 +460,22 @@ asdz_pf12_path_reader = {
 
 
 def read_asdz_pf12_paths(config) -> pd.DataFrame:
+    """Read the Amsterdam Zuid platform 1-2 paths data set.
+
+    The trajectories are read from local or remote sources based on the configuration.
+    The spatial coordinates of the trajectories are converted from milimeters to meters.
+
+    Args:
+        config: configuration parameters
+
+    Returns:
+        The trajectory dataset with Amsterdam Zuid platform 1-2 paths.
+    """
     path_reader = asdz_pf12_path_reader[config.params.data_source]
     df = path_reader(config)
-    df["x_pos"] /= 1000  # Convert milimeters to meters
+
+    # Convert spatial coordinates from milimeters to meters
+    df["x_pos"] /= 1000
     df["y_pos"] /= 1000
     return df
 
