@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 def read_trajectories_from_path(filepath: Path) -> pd.DataFrame:
     """Read trajectories from a csv file.
 
-    Used to read intermediate outputs.
+    Mainly used to read intermediate outputs.
 
     Args:
         filepath: Path to the csv file containing the trajectories.
@@ -121,7 +121,10 @@ def read_narrow_corridor_paths(config) -> pd.DataFrame:
 
     df["X_SG"] = df["X_SG"] + 0.1
     df["Y_SG"] = df["Y_SG"] - 0.05
-    df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
+    # df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
+
+    # Only keep the columns that are needed
+    df = df[["Pid", "Rstep", "X_SG", "Y_SG"]]
     log.info("Finished reading single paths data set.")
     return df
 

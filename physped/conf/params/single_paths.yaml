@@ -23,8 +23,8 @@ grid:
     min: -0.6
     max: 0.6
 colnames:
-  xf: xf
-  yf: yf
+  xf: X_SG
+  yf: Y_SG
   Pid: Pid
   time: Rstep
 plot_style: physped/conf/science.mplstyle
