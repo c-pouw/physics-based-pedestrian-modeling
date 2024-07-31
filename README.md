@@ -28,6 +28,16 @@ Pouw, C. A. S., van der Vleuten, G., Corbetta, A., & Toschi, F. (2024). Data-dri
 * Documentation: https://c-pouw.github.io/physics-based-pedestrian-modeling.
 
 
+## Featured Notebooks
+We provide the following usage notebooks:
+
+<h2 align="left" style="vertical-align: middle;">
+    <a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_narrow_corridor_colab.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a><sup><sub> - Narrow corridor model. </sub></sup> <br>
+	    <a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_narrow_corridor_colab.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a><sup><sub> - Intersecting paths model. </sub></sup> <br>
+	    <a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_narrow_corridor_colab.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a><sup><sub> - Train station platform model. </sub></sup>
+</h2>
+
+
 # Getting started
 
 Install the package from source
@@ -51,13 +61,6 @@ Configuration of parameter files is handled by ![Hydra](https://github.com/faceb
 * **curved_paths_synthetic:** Trajectories along a closed elliptical path.
 * **intersecting_paths:** Trajectories intersecting in the origin.
 * **station_paths:** Complex trajectories in a train station.
-
-## Featured Notebooks
-We provide the following usage notebooks:
-* Narrow corridor paths [![Google Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_narrow_corridor_colab.ipynb)
-* Train station paths
-* User input paths
-
 
 # Features
 ### Preprocessing of trajectories
