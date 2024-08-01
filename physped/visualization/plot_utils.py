@@ -1,15 +1,16 @@
 import logging
-from pathlib import Path
 from typing import Tuple
 
-import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
+from omegaconf import DictConfig
+
+from physped.io.readers import read_background_image
 
 log = logging.getLogger(__name__)
 
 
-def apply_xy_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
+def apply_xy_plot_style(ax: plt.Axes, params: DictConfig) -> plt.Axes:
     """
     Apply XY plot style to the given Axes object.
 
@@ -30,7 +31,7 @@ def apply_xy_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
     return ax
 
 
-def apply_polar_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
+def apply_polar_plot_style(ax: plt.Axes, params: DictConfig) -> plt.Axes:
     """
     Applies a polar plot style to the given axes object.
 
@@ -160,7 +161,7 @@ def highlight_grid_box(ax: plt.Axes, limits: Tuple, c: str = "k") -> plt.Axes:
     return ax
 
 
-def plot_station_background(ax: plt.Axes, config: dict) -> plt.Axes:
+def plot_station_background(ax: plt.Axes, config: DictConfig) -> plt.Axes:
     """
     Plot the background image of the station.
 
@@ -172,9 +173,10 @@ def plot_station_background(ax: plt.Axes, config: dict) -> plt.Axes:
         plt.Axes: The modified matplotlib Axes object.
 
     """
-    img = mpimg.imread(Path(config.root_dir) / config.params.background.imgpath)
+    bg_source = config.params.background.bg_source
+    image = read_background_image[bg_source](config)
     ax.imshow(
-        img,
+        image,
         cmap="gray",
         origin="upper",
         extent=(
@@ -188,7 +190,7 @@ def plot_station_background(ax: plt.Axes, config: dict) -> plt.Axes:
     return ax
 
 
-def plot_cartesian_spatial_grid(ax: plt.Axes, grid_params: dict, alpha: float = 0.8) -> plt.Axes:
+def plot_cartesian_spatial_grid(ax: plt.Axes, grid_params: DictConfig, alpha: float = 0.8) -> plt.Axes:
     xbins = grid_params.bins.x
     ybins = grid_params.bins.y
     linestyle = "dashed"
@@ -215,7 +217,7 @@ def plot_cartesian_spatial_grid(ax: plt.Axes, grid_params: dict, alpha: float = 
     return ax
 
 
-def plot_polar_velocity_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
+def plot_polar_velocity_grid(ax: plt.Axes, grid_params: DictConfig) -> plt.Axes:
     rbins = grid_params.bins.r
     thetabins = grid_params.bins.theta
     linestyle = "dashed"
@@ -245,7 +247,7 @@ def plot_polar_velocity_grid(ax: plt.Axes, grid_params: dict) -> plt.Axes:
     return ax
 
 
-def plot_polar_labels(ax: plt.Axes, grid_params: dict) -> plt.Axes:
+def plot_polar_labels(ax: plt.Axes, grid_params: DictConfig) -> plt.Axes:
     rbins = grid_params.bins.r
 
     for r in rbins:
@@ -291,7 +293,7 @@ def convert_rad_to_deg(theta: float) -> float:
     return theta * 180 / np.pi
 
 
-def highlight_position_selection(ax: plt.Axes, params: dict) -> plt.Axes:
+def highlight_position_selection(ax: plt.Axes, params: DictConfig) -> plt.Axes:
     x_bounds = params.selection.range.x_bounds
     y_bounds = params.selection.range.y_bounds
     xrange = np.linspace(x_bounds[0], x_bounds[1], 100)
@@ -313,7 +315,7 @@ def highlight_position_selection(ax: plt.Axes, params: dict) -> plt.Axes:
     return ax
 
 
-def highlight_velocity_selection(ax: plt.Axes, params: dict) -> plt.Axes:
+def highlight_velocity_selection(ax: plt.Axes, params: DictConfig) -> plt.Axes:
     r_bounds = params.selection.range.r_bounds
     theta_bounds = params.selection.range.theta_bounds
     theta_range = np.linspace(theta_bounds[0], theta_bounds[1], 100)

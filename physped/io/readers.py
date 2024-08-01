@@ -8,6 +8,8 @@ import zipfile
 from pathlib import Path
 from typing import Tuple
 
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import requests
 from omegaconf import DictConfig
@@ -498,11 +500,51 @@ trajectory_reader = {
     "single_paths": read_narrow_corridor_paths,
     "parallel_paths": read_parallel_paths,
     "intersecting_paths": read_intersecting_paths,
-    # "intersecting_paths_synthetic": read_intersecting_paths_synthetic,
-    # "curved_paths": read_curved_paths,
     "curved_paths_synthetic": read_curved_paths_synthetic,
     "station_paths": read_eindhoven_pf34_paths,
     "asdz_pf34": read_asdz_pf34_paths,
     "utrecht_pf5": read_utrecht_pf5_paths,
     "asdz_pf12": read_asdz_pf12_paths,
+}
+
+
+def get_local_background_image(config: DictConfig) -> np.ndarray:
+    """Read the background image from a local file.
+
+    Args:
+        config: configuration parameters.
+
+    Returns:
+        The background image as a numpy array.
+    """
+    image = plt.imread(Path(config.root_dir) / config.params.background.imgpath)
+    return image
+
+
+def get_background_image_from_remote_zip(config: DictConfig) -> np.ndarray:
+    """Read the background image from a remote archive.
+
+    Args:
+        config: configuration parameters.
+
+    Returns:
+        The background image as a numpy array.
+    """
+    link = config.params.background.img_link_4tu
+    bytestring = requests.get(link, timeout=10)
+
+    archive = zipfile.ZipFile(io.BytesIO(bytestring.content), "r")
+    background_name = [x for x in archive.namelist() if x.endswith(".png")][0]
+
+    with archive.open(background_name) as contents:
+        image_data = contents.read()
+
+    image_array = np.frombuffer(image_data, dtype=np.uint8)
+    image = plt.imread(io.BytesIO(image_array))
+    return image
+
+
+read_background_image = {
+    "local": get_local_background_image,
+    "4tu": get_background_image_from_remote_zip,
 }

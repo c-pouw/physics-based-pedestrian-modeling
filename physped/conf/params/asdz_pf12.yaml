@@ -43,7 +43,9 @@ plot_style: physped/conf/science.mplstyle
 default_xlims: [-6, 20]
 default_ylims: [-5, 10]
 background:
+  bg_source: 4tu
   imgpath: 'data/backgrounds/Background Amsterdam Zuid track 1-2.png'
+  img_link_4tu: "https://data.4tu.nl/file/af4ef093-69ef-4e1c-8fbc-c40c447c618c/05048842-17d8-4191-b3bb-dd4d28561411"
   alpha: 1
   xmin: -6750
   xmax: 21870
