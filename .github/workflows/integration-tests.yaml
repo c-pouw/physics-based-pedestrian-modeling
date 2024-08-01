@@ -55,7 +55,7 @@ jobs:
       - name: Test Integration
         run: |
           set -vxeuo pipefail
-          python physped/main.py params=single_paths root_dir=$GITHUB_WORKSPACE hydra.run.dir=${GITHUB_WORKSPACE}/outputs params.plot_style="${GITHUB_WORKSPACE}/physped/conf/science_no_latex.mplstyle" params.data_source=4tu
+          python physped/main.py params=single_paths root_dir=$GITHUB_WORKSPACE hydra.run.dir=${GITHUB_WORKSPACE}/outputs plot_style="${GITHUB_WORKSPACE}/physped/conf/science_no_latex.mplstyle" params.data_source=4tu
 
       - uses: actions/upload-artifact@v4
         with:
