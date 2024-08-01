@@ -1,6 +1,6 @@
 # Data-driven physics-based modeling of pedestrian dynamics
 <p align="center">
-    <a href="" alt="Repository">
+    <a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/" alt="Repository">
 	   <img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white" /></a>
     <a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/testing.yml" alt="Unit Tests">
        <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/testing.yml/badge.svg" /></a>

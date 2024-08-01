@@ -13,8 +13,8 @@ from physped.core.functions_to_select_grid_piece import evaluate_selection_range
 from physped.core.trajectory_simulator import simulate_trajectories
 from physped.io.readers import trajectory_reader
 from physped.io.writers import save_piecewise_potential
-from physped.omegaconf_resolvers import register_new_resolvers
 from physped.preprocessing.trajectories import preprocess_trajectories, process_slow_modes
+from physped.utils.config_utils import register_new_resolvers
 from physped.visualization.plot_discrete_grid import plot_discrete_grid
 from physped.visualization.plot_histograms import (
     compute_joint_kl_divergence,
@@ -29,14 +29,14 @@ log = logging.getLogger(__name__)
 
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
-def main(config):
+def model(config):
     env_name = config.params.env_name
     log.debug("Configuration: \n%s", pformat(dict(config)))
     log.critical("Environment name: %s", env_name)
     log.info("Working directory %s", Path.cwd())
     log.info("Project root %s", config.root_dir)
 
-    plt.style.use(Path(config.root_dir) / config.params.plot_style)
+    plt.style.use(Path(config.root_dir) / config.plot_style)
 
     log.info("READING TRAJECTORIES")
     trajectories = trajectory_reader[env_name](config)
@@ -128,6 +128,11 @@ def main(config):
         shutil.copyfile(figure, Path.cwd().parent / figure)
 
 
-if __name__ == "__main__":
+def main():
     register_new_resolvers()
+    print("Resolvers registered")
+    model()
+
+
+if __name__ == "__main__":
     main()

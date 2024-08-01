@@ -235,7 +235,7 @@ def preprocess_trajectories(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         try:
             preprocessed_trajectories = read_trajectories_from_path(filepath)
             log.warning("Preprocessed trajectories read from file.")
-            log.debug("Filepath %s", filepath.relative_to(config.root_dir))
+            # log.debug("Filepath %s", filepath.relative_to(config.root_dir))
             return preprocessed_trajectories
         except FileNotFoundError as e:
             log.error("Preprocessed trajectories not found: %s", e)

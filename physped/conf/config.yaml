@@ -21,8 +21,10 @@ plot:
   histograms: True
   grid: True
   potential_at_selection: True
+plot_style: conf/science.mplstyle
 root_dir: ${get_root_dir:}
-trajectory_data_dir: ${root_dir}/data/trajectories
+trajectory_data_dir: data/trajectories
+# trajectory_data_dir: data/trajectories
 parameter_combinations: sigma${params.model.sigma}_${params.grid.name}
 hydra:
   verbose: False
@@ -30,7 +32,8 @@ hydra:
     name: ${params.env_name}_${parameter_combinations}
     chdir: True
   run:
-    dir: ${root_dir}/outputs/${params.env_name}_tauu${params.model.tauu}/${params.grid.name}/${now:%Y-%m-%d_%H-%M-%S}
+    # dir: ${root_dir}/outputs/${params.env_name}_tauu${params.model.tauu}/${params.grid.name}/${now:%Y-%m-%d_%H-%M-%S}
+    dir: outputs/${params.env_name}_tauu${params.model.tauu}/${params.grid.name}/${now:%Y-%m-%d_%H-%M-%S}
   sweep:
-    dir: ${root_dir}/multirun/${params.env_name}/${params.grid.name}
+    dir: multirun/${params.env_name}/${params.grid.name}
     subdir: job${hydra.job.num}-sigma${params.model.sigma}-tauu${params.model.tauu}-${params.grid.name}-${now:%Y-%m-%d_%H-%M-%S}

@@ -51,7 +51,7 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: dict) 
         try:
             piecewise_potential = read_piecewise_potential_from_file(filepath)
             log.warning("Piecewise potential read from file")
-            log.debug("Filepath %s", filepath.relative_to(config.root_dir))
+            # log.debug("Filepath %s", filepath.relative_to(config.root_dir))
             return piecewise_potential
         except FileNotFoundError as e:
             log.error("Piecewise potential not found: %s", e)

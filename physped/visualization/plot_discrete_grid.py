@@ -79,4 +79,4 @@ def plot_discrete_grid(config: dict, slow_indices: tuple, trajectories: pd.DataF
     fig.suptitle(plot_params.title.figure, y=0.9)
     filepath = Path.cwd() / (params.grid.name + ".pdf")
     plt.savefig(filepath, bbox_inches="tight")
-    log.info("Saving plot of the grid to %s.", filepath.relative_to(config.root_dir))
+    # log.info("Saving plot of the grid to %s.", filepath.relative_to(config.root_dir))

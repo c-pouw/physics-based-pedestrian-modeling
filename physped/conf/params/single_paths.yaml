@@ -27,7 +27,6 @@ colnames:
   yf: Y_SG
   Pid: Pid
   time: Rstep
-plot_style: physped/conf/science.mplstyle
 default_xlims: [-1.1,1.1]
 default_ylims:  [-0.7,0.7]
 trajectory_plot:

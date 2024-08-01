@@ -72,7 +72,7 @@ def read_simulated_trajectories_from_file(config):
     try:
         simulated_trajectories = read_trajectories_from_path(filepath)
         log.warning("Simulated trajectories read from file")
-        log.debug("Filepath %s", filepath.relative_to(config.root_dir))
+        # log.debug("Filepath %s", filepath.relative_to(config.root_dir))
         return simulated_trajectories
     except FileNotFoundError as e:
         log.error("Preprocessed trajectories not found: %s", e)

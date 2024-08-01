@@ -204,5 +204,5 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
 
     fig.legend(handles, labels, bbox_to_anchor=(0.5, -0.05), ncol=2, fontsize=7, loc="center")
     filepath = Path.cwd() / f"histograms_{params.env_name}.pdf"
-    log.info("Saving histograms figure to %s.", filepath.relative_to(config.root_dir))
+    # log.info("Saving histograms figure to %s.", filepath.relative_to(config.root_dir))
     plt.savefig(filepath)

@@ -263,5 +263,5 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
         title = f"Sample of {num_trajectories_to_plot} {traj_type_description[trajectory_type]}" f" {traj_plot_params.title}"
         fig.suptitle(title, x=0.5, y=traj_plot_params.y_title, ha="center", va="center")
     filepath = Path.cwd() / f"{trajectory_type}_trajectories_{traj_type}_{params.env_name}.pdf"
-    log.info("Saving trajectory plot to %s.", filepath.relative_to(config.root_dir))
+    # log.info("Saving trajectory plot to %s.", filepath.relative_to(config.root_dir))
     plt.savefig(filepath)

@@ -15,8 +15,8 @@ from physped.core.functions_to_select_grid_piece import (
     get_index_of_the_enclosing_bin,
 )
 from physped.io.readers import trajectory_reader
-from physped.omegaconf_resolvers import register_new_resolvers
 from physped.preprocessing.trajectories import preprocess_trajectories, process_slow_modes
+from physped.utils.config_utils import register_new_resolvers
 from physped.visualization.plot_discrete_grid import plot_discrete_grid
 from physped.visualization.plot_potential_at_slow_index import plot_potential_at_slow_index
 from physped.visualization.plot_trajectories import plot_trajectories
@@ -32,7 +32,7 @@ with initialize(version_base=None, config_path="../physped/conf", job_name="test
         return_hydra_config=True,
         overrides=[
             f"params={env_name}",
-            "params.data_source=local",
+            "params.data_source=4tu",
             #    "params.grid.spatial_cell_size=0.1"
         ],
     )
@@ -55,6 +55,8 @@ logging.info(pformat(dict(config.params.selection.range)))
 # %%
 
 trajectories = trajectory_reader[env_name](config)
+
+# %%
 preprocessed_trajectories = preprocess_trajectories(trajectories, config=config)
 preprocessed_trajectories = process_slow_modes(preprocessed_trajectories, config)
 piecewise_potential = learn_potential_from_trajectories(preprocessed_trajectories, config)

@@ -68,11 +68,12 @@ def read_narrow_corridor_paths_local(config: DictConfig) -> Tuple[pd.DataFrame, 
     archive = zipfile.ZipFile(trajectory_data_dir / "data.zip")
 
     with archive.open("left-to-right.ssv") as paths_ltr:
-        df_ltr = pd.read_csv(paths_ltr)
+        paths_ltr = paths_ltr.read().decode("utf-8")
+    df_ltr = pd.read_csv(io.StringIO(paths_ltr), sep=" ")
 
     with archive.open("right-to-left.ssv") as paths_rtl:
-        df_rtl = pd.read_csv(paths_rtl)
-
+        paths_rtl = paths_rtl.read().decode("utf-8")
+    df_rtl = pd.read_csv(io.StringIO(paths_rtl), sep=" ")
     return df_ltr, df_rtl
 
 
@@ -97,11 +98,11 @@ def read_narrow_corridor_paths_4tu(config: DictConfig) -> Tuple[pd.DataFrame, pd
     with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as outerzip:
         with zipfile.ZipFile(outerzip.open("data.zip")) as innerzip:
             with innerzip.open("left-to-right.ssv") as paths_ltr:
-                df_ltr = pd.read_csv(paths_ltr)
-                # paths_ltr = paths_ltr.read().decode("utf-8")
+                paths_ltr = paths_ltr.read().decode("utf-8")
             with innerzip.open("right-to-left.ssv") as paths_rtl:
-                df_rtl = pd.read_csv(paths_rtl)
-                # paths_rtl = paths_rtl.read().decode("utf-8")
+                paths_rtl = paths_rtl.read().decode("utf-8")
+    df_ltr = pd.read_csv(io.StringIO(paths_ltr), sep=" ")
+    df_rtl = pd.read_csv(io.StringIO(paths_rtl), sep=" ")
     return df_ltr, df_rtl
 
 
@@ -154,11 +155,9 @@ def read_narrow_corridor_paths(config: DictConfig) -> pd.DataFrame:
         The trajectory dataset with single paths.
     """
     data_source = config.params.data_source
-    df = narrow_corridor_path_reader[data_source](config)
+    df_ltr, df_rtl = narrow_corridor_path_reader[data_source](config)
 
-    # df1 = pd.read_csv(io.StringIO(paths_ltr), sep=" ")
-    # df2 = pd.read_csv(io.StringIO(paths_rtl), sep=" ")
-    # df = pd.concat([df1, df2], ignore_index=True)
+    df = pd.concat([df_ltr, df_rtl], ignore_index=True)
 
     df["X_SG"] = df["X_SG"] + 0.1
     df["Y_SG"] = df["Y_SG"] - 0.05
