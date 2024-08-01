@@ -6,7 +6,7 @@
        <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/testing.yml/badge.svg" /></a>
 	<a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml" alt="Integration Tests">
        <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml/badge.svg" /></a>
-	<a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/pages/pages-build-deployment" alt="pages-build-deployment">
+	<a href="https://c-pouw.github.io/physics-based-pedestrian-modeling" alt="read-the-docs">
 	   <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/pages/pages-build-deployment/badge.svg" /></a>
     <a href="https://pypi.python.org/pypi/physics-based-pedestrian-modeling" alt="pypi version">
        <img src="https://img.shields.io/pypi/v/physics-based-pedestrian-modeling.svg" /></a>
@@ -36,7 +36,7 @@ Pouw, C. A. S., van der Vleuten, G., Corbetta, A., & Toschi, F. (2024). Data-dri
 We provide the following usage notebook on Google Colab:
 
 <h2 align="left" style="vertical-align: middle;">
-    <a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_quick_start.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a><sup><sub> - Quick-start with the generalized pedestrian model. </sub></sup> <br>
+    <a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_quick_start.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a><sup><sub> - Quick-start notebook for the generalized pedestrian model. </sub></sup> <br>
 </h2>
 
 The notebook can be used to create a model for the following environments:
@@ -47,22 +47,20 @@ The notebook can be used to create a model for the following environments:
 
 ## Using the CLI
 
-Install the package from source
+Install the package from PyPI
 
 ```bash
-git clone https://github.com/c-pouw/physics-based-pedestrian-modeling.git
-cd physics-based-pedestrian-modeling
-pip install -e .
+pip install --upgrade physics-based-pedestrian-modeling
 ```
 
 Run the main processing script for one of the available parameter files (listed below)
 
 ```bash
-python physped/main.py params=PARAM_NAME
+physped_cli params=PARAM_NAME
 ```
 
 ### Parameter Files
-Parameter configurations are handled by ![Hydra](https://github.com/facebookresearch/hydra). Default parameter files are provided for the following cases:
+Parameter configurations are handled by ![Hydra](https://github.com/facebookresearch/hydra). Default parameter files can be used by replacing PARAM_NAME with one of the following names:
 * **single_paths:** Trajectories in a narrow corridor.
 * **intersecting_paths:** Trajectories intersecting in the origin.
 * **asdz_pf12:** Complex trajectories on the Amsterdam Zuid train platform 1 and 2.
