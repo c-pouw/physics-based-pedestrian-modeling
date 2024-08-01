@@ -186,17 +186,14 @@ class LangevinModel:
         return np.diag([0.0, 0.0, noise, noise, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
     def particle_outside_grid(self, xf: float, yf: float) -> bool:
-        """
-        Custom stopping condition to terminate a trajectory when the potential goes to infinity.
+        """Check if particle is outside the grid.
 
-        Parameters:
-        - xf (float): The x-coordinate of the pedestrian.
-        - yf (float): The y-coordinate of the pedestrian.
-        - stop_condition (float): The threshold value for the stopping condition.
+        Args:
+            xf: The x-coordinate of the particle.
+            yf: The y-coordinate of the particle.
 
         Returns:
-        - bool: A boolean indicating whether the stopping condition has been met.
-
+            Whether the particle is outside the grid.
         """
         c0 = xf < self.params.grid.x.min
         c1 = xf > self.params.grid.x.max
