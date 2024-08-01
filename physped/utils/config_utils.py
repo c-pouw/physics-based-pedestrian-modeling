@@ -35,4 +35,4 @@ def set_plot_style(use_latex: bool = False) -> None:
     """
     get_style = {True: "science", False: "science_no_latex"}
     style = get_style[use_latex]
-    plt.style.use(f"../physped/conf/{style}.mplstyle")
+    plt.style.use(f"../conf/{style}.mplstyle")
