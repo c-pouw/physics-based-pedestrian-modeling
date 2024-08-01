@@ -5,10 +5,8 @@ from typing import Any, Dict, List
 
 import matplotlib.pyplot as plt
 import numpy as np
-import numpy.ma as ma
 import pandas as pd
 from matplotlib.axes import Axes
-from scipy.special import kl_div
 from scipy.stats import entropy
 
 from physped.core.functions_to_discretize_grid import add_trajectories_to_histogram, digitize_trajectories_to_grid
@@ -97,22 +95,6 @@ def compute_joint_kl_divergence_with_volume(
     return kl
 
 
-def compute_KL_divergence(PDF1: np.ndarray, PDF2: np.ndarray, bin_width: np.ndarray) -> np.ndarray:
-    """
-    Compute KL divergence between two probability density functions.
-
-    Parameters:
-    - PDF1 (np.ndarray): The first probability density function.
-    - PDF2 (np.ndarray): The second probability density function.
-    - bin_width (float): The width of the bins used to compute the PDFs.
-
-    Returns:
-    - An array of KL divergence values.
-    """
-    kl = kl_div(PDF1 * bin_width, PDF2 * bin_width)
-    return ma.masked_invalid(kl).compressed()
-
-
 def plot_histogram(
     ax: Axes,
     histograms: Dict[str, Any],
@@ -190,20 +172,10 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
     height_single_panel = 1.18
     subplot_grid = params.histogram_plot.subplot_grid
     fig = plt.figure(figsize=(width_single_panel * subplot_grid[1], height_single_panel * subplot_grid[0]), layout="constrained")
-    # sum_kl_div = 0
     hist_plot_params = params.histogram_plot
 
     for plotid, observable in enumerate(observables):
         ax = fig.add_subplot(subplot_grid[0], subplot_grid[1], plotid + 1)
-
-        # kldiv = sum(
-        #     compute_KL_divergence(
-        #         histograms["recorded"][observable][histogram_type],
-        #         histograms["simulated"][observable][histogram_type],
-        #         histograms["recorded"][observable]["bin_width"],
-        #     )
-        # )
-        # kl_divergence[observable] = kldiv
 
         ax = plot_histogram(
             ax,
@@ -227,8 +199,6 @@ def plot_multiple_histograms(observables: List, histograms: dict, histogram_type
     #         fontsize=6,
     #         bbox=props,
     #     )
-    #     sum_kl_div += kldiv
-    # kl_divergence["sum"] = sum_kl_div
 
     handles, labels = ax.get_legend_handles_labels()
 
