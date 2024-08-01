@@ -6,7 +6,6 @@ from pathlib import Path
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
-from bokeh import palettes
 
 from physped.core.functions_to_discretize_grid import get_boundary_coordinates_of_selection, make_grid_selection, return_grid_ids
 from physped.io.readers import read_piecewise_potential_from_file
@@ -20,7 +19,29 @@ from physped.visualization.plot_utils import (  # apply_cartesian_velocity_plot_
 
 log = logging.getLogger(__name__)
 
-trajectory_colorset = list(palettes.TolRainbow20)[::-1]
+# Colorset from bokeh.palettes.TolRainbow20
+trajectory_colorset = [
+    "#72190E",
+    "#A5170E",
+    "#DC050C",
+    "#E8601C",
+    "#F1932D",
+    "#F6C141",
+    "#F7F056",
+    "#CAE0AB",
+    "#90C987",
+    "#4EB265",
+    "#7BAFDE",
+    "#6195CF",
+    "#437DBF",
+    "#1965B0",
+    "#882E72",
+    "#994F88",
+    "#AA6F9E",
+    "#BA8DB4",
+    "#CAACCB",
+    "#D9CCE3",
+]
 
 
 def plot_position_trajectories_in_cartesian_coordinates(
