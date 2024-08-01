@@ -1,9 +1,10 @@
-import glob
+# import glob
 import logging
-import shutil
+
+# import shutil
 from pathlib import Path
 
-import hydra
+# import hydra
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -12,8 +13,9 @@ from scipy.stats import norm
 from physped.core.functions_to_discretize_grid import digitize_trajectories_to_grid
 from physped.core.functions_to_select_grid_piece import evaluate_selection_range
 from physped.core.piecewise_potential import PiecewisePotential
-from physped.omegaconf_resolvers import register_new_resolvers
-from physped.visualization.plot_discrete_grid import plot_discrete_grid
+
+# from physped.utils.config_utils import register_new_resolvers
+# from physped.visualization.plot_discrete_grid import plot_discrete_grid
 
 log = logging.getLogger(__name__)
 
@@ -122,16 +124,16 @@ def learn_piece_of_potential_plot(config: dict, preprocessed_trajectories: pd.Da
     log.info("Saved plot to %s", filepath.relative_to(config.root_dir))
 
 
-@hydra.main(version_base=None, config_path="../../conf", config_name="config")
-def plot_piecewise_potential_fit(cfg):
-    plt.style.use(str(cfg.root_dir / cfg.plot_style))
-    plot_discrete_grid(cfg)
-    learn_piece_of_potential_plot(cfg)
-    output_figures = glob.glob("*.pdf")
-    for figure in output_figures:
-        shutil.copyfile(figure, Path.cwd().parent / figure)
+# @hydra.main(version_base=None, config_path="../../conf", config_name="config")
+# def plot_piecewise_potential_fit(cfg):
+#     plt.style.use(str(cfg.root_dir / cfg.plot_style))
+#     plot_discrete_grid(cfg)
+#     learn_piece_of_potential_plot(cfg)
+#     output_figures = glob.glob("*.pdf")
+#     for figure in output_figures:
+#         shutil.copyfile(figure, Path.cwd().parent / figure)
 
 
-if __name__ == "__main__":
-    register_new_resolvers()
-    plot_piecewise_potential_fit()
+# if __name__ == "__main__":
+#     register_new_resolvers()
+#     plot_piecewise_potential_fit()

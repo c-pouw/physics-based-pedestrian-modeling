@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "physics-based-pedestrian-modeling"
-version = "0.2.2"
+version = "0.2.3"
 description = "Python package to create physics-based pedestrian models from crowd measurements"
 authors = ["Cas Pouw <c.a.s.pouw@tue.nl>"]
 license = "BSD-3-Clause"
