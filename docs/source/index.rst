@@ -41,9 +41,8 @@ Python package to create physics-based pedestrian models from pedestrian traject
 
 Pouw, C. A. S., van der Vleuten, G., Corbetta, A., & Toschi, F. (2024). Data-driven physics-based modeling of pedestrian dynamics. Preprint, https://arxiv.org/abs/2407.20794
 
-
-Content
-+++++++
+Contents
+++++++++
 
 .. toctree::
    :maxdepth: 2
@@ -52,4 +51,3 @@ Content
    usage
    modules
    release-history
-   min_versions

@@ -14,6 +14,8 @@
        <img src="https://img.shields.io/pypi/pyversions/physics-based-pedestrian-modeling" alt="PyPI - Python Version" /></a>
     <a href="https://github.com/psf/black">
        <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black" /></a>
+	<a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_quick_start.ipynb">
+	   <img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
 	<a href="https://arxiv.org/abs/2407.20794">
 	   <img src="https://img.shields.io/badge/arXiv-2407.20794-b31b1b.svg?style=flat" alt="arXiv" /></a>
 </p>
@@ -34,7 +36,7 @@ Pouw, C. A. S., van der Vleuten, G., Corbetta, A., & Toschi, F. (2024). Data-dri
 We provide the following usage notebook on Google Colab:
 
 <h2 align="left" style="vertical-align: middle;">
-    <a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_narrow_corridor_colab.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a><sup><sub> - Quick-start with the generalized pedestrian model. </sub></sup> <br>
+    <a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_quick_start.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a><sup><sub> - Quick-start with the generalized pedestrian model. </sub></sup> <br>
 </h2>
 
 The notebook can be used to create a model for the following environments:
