@@ -1,4 +1,4 @@
-"""Trajectory readers for the pathintegral code."""
+"""Data readers for the physics based pedestrian modeling code."""
 
 import glob
 import io
@@ -6,13 +6,11 @@ import logging
 import pickle
 import zipfile
 from pathlib import Path
+from typing import Tuple
 
-# from scipy.signal import savgol_filter
 import pandas as pd
 import requests
 from omegaconf import DictConfig
-
-# from scipy import signal
 from tqdm import tqdm
 
 from physped.core.piecewise_potential import PiecewisePotential
@@ -48,7 +46,7 @@ def read_piecewise_potential_from_file(filepath: Path) -> PiecewisePotential:
     return piecewise_potential
 
 
-def read_narrow_corridor_paths_local(config):
+def read_narrow_corridor_paths_local(config: DictConfig) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Read the narrow corridor paths archive from a local zip.
 
     The archive contains two files:
@@ -59,21 +57,26 @@ def read_narrow_corridor_paths_local(config):
 
     Args:
         config: configuration parameters
+
+    Returns:
+        A tuple containing two DataFrames:
+        - df_ltr: DataFrame for paths of pedestrians walking from left to right.
+        - df_rtl: DataFrame for paths of pedestrians walking from right to left.
     """
-    # TODO : add return type
     trajectory_data_dir = Path(config.trajectory_data_dir)
     log.info("Start reading single paths data set.")
     archive = zipfile.ZipFile(trajectory_data_dir / "data.zip")
 
-    with archive.open("left-to-right.ssv") as f:
-        paths_ltr = f.read().decode("utf-8")
+    with archive.open("left-to-right.ssv") as paths_ltr:
+        df_ltr = pd.read_csv(paths_ltr)
 
-    with archive.open("right-to-left.ssv") as f:
-        paths_rtl = f.read().decode("utf-8")
-    return paths_ltr, paths_rtl
+    with archive.open("right-to-left.ssv") as paths_rtl:
+        df_rtl = pd.read_csv(paths_rtl)
+
+    return df_ltr, df_rtl
 
 
-def read_narrow_corridor_paths_4tu(config: DictConfig):
+def read_narrow_corridor_paths_4tu(config: DictConfig) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Read the narrow corridor paths archive from 4TU remote repository.
 
     The archive contains two files:
@@ -83,17 +86,54 @@ def read_narrow_corridor_paths_4tu(config: DictConfig):
 
     Args:
         config: configuration parameters
+
+    Returns:
+        A tuple containing two DataFrames:
+        - df_ltr: DataFrame for paths of pedestrians walking from left to right.
+        - df_rtl: DataFrame for paths of pedestrians walking from right to left.
     """
-    # TODO : add return type
     link = "https://data.4tu.nl/ndownloader/items/b8e30f8c-3931-4604-842a-77c7fb8ac3fc/versions/1"
     bytestring = requests.get(link, timeout=10)
     with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as outerzip:
         with zipfile.ZipFile(outerzip.open("data.zip")) as innerzip:
             with innerzip.open("left-to-right.ssv") as paths_ltr:
-                paths_ltr = paths_ltr.read().decode("utf-8")
+                df_ltr = pd.read_csv(paths_ltr)
+                # paths_ltr = paths_ltr.read().decode("utf-8")
             with innerzip.open("right-to-left.ssv") as paths_rtl:
-                paths_rtl = paths_rtl.read().decode("utf-8")
-    return paths_ltr, paths_rtl
+                df_rtl = pd.read_csv(paths_rtl)
+                # paths_rtl = paths_rtl.read().decode("utf-8")
+    return df_ltr, df_rtl
+
+
+def read_intersecting_paths(config: DictConfig) -> pd.DataFrame:
+    """Read the intersecting paths data set.
+
+    The intersecting paths dataset is created by combining the left-to-right and right-to-left
+    paths from the narrow corridor dataset. The paths from the right-to-left dataset are rotated
+    by 90 degrees to create intersecting paths.
+
+    Args:
+        config: configuration parameters
+
+    Returns:
+        The trajectory dataset with intersecting paths.
+    """
+    data_source = config.params.data_source
+    df_ltr, df_rtl = narrow_corridor_path_reader[data_source](config)
+
+    df_ltr["X_SG"] = df_ltr["X_SG"] + 0.1
+    df_ltr["Y_SG"] = df_ltr["Y_SG"] - 0.05
+
+    df_rtl["X_SG"] = df_rtl["X_SG"] + 0.1
+    df_rtl["Y_SG"] = df_rtl["Y_SG"] - 0.05
+
+    # swap x and y coordinates to rotate by 90 degrees
+    df_rtl.rename(columns={"X": "Y", "Y": "X", "X_SG": "Y_SG", "Y_SG": "X_SG", "U_SG": "V_SG", "V_SG": "U_SG"}, inplace=True)
+
+    df = pd.concat([df_ltr, df_rtl], ignore_index=True)
+
+    log.info("Finished reading single paths data set.")
+    return df
 
 
 narrow_corridor_path_reader = {
@@ -114,15 +154,14 @@ def read_narrow_corridor_paths(config: DictConfig) -> pd.DataFrame:
         The trajectory dataset with single paths.
     """
     data_source = config.params.data_source
-    paths_ltr, paths_rtl = narrow_corridor_path_reader[data_source](config)
+    df = narrow_corridor_path_reader[data_source](config)
 
-    df1 = pd.read_csv(io.StringIO(paths_ltr), sep=" ")
-    df2 = pd.read_csv(io.StringIO(paths_rtl), sep=" ")
-    df = pd.concat([df1, df2], ignore_index=True)
+    # df1 = pd.read_csv(io.StringIO(paths_ltr), sep=" ")
+    # df2 = pd.read_csv(io.StringIO(paths_rtl), sep=" ")
+    # df = pd.concat([df1, df2], ignore_index=True)
 
     df["X_SG"] = df["X_SG"] + 0.1
     df["Y_SG"] = df["Y_SG"] - 0.05
-    # df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
 
     # Only keep the columns that are needed
     df = df[["Pid", "Rstep", "X_SG", "Y_SG"]]
@@ -149,39 +188,6 @@ def read_parallel_paths(config: DictConfig) -> pd.DataFrame:
     df.reset_index(inplace=True)
     df = df.query("Umean>0.5").loc[abs(df.X0 - df.X1) > 2]
     df = df.groupby("Pid").filter(lambda x: max(x.uf) < 3.5)
-    return df
-
-
-def read_intersecting_paths(config: DictConfig) -> pd.DataFrame:
-    """Read the intersecting paths data set.
-
-    The intersecting paths dataset is created by combining the left-to-right and right-to-left
-    paths from the narrow corridor dataset. The paths from the right-to-left dataset are rotated
-    by 90 degrees to create intersecting paths.
-
-    Args:
-        config: configuration parameters
-
-    Returns:
-        The trajectory dataset with intersecting paths.
-    """
-    data_source = config.params.data_source
-    paths_ltr, paths_rtl = narrow_corridor_path_reader[data_source](config)
-
-    df1 = pd.read_csv(io.StringIO(paths_ltr), sep=" ")
-    df1["X_SG"] = df1["X_SG"] + 0.1
-    df1["Y_SG"] = df1["Y_SG"] - 0.05
-
-    df2 = pd.read_csv(io.StringIO(paths_rtl), sep=" ")
-    df2["X_SG"] = df2["X_SG"] + 0.1
-    df2["Y_SG"] = df2["Y_SG"] - 0.05
-
-    # swap x and y coordinates to rotate by 90 degrees
-    df2.rename(columns={"X": "Y", "Y": "X", "X_SG": "Y_SG", "Y_SG": "X_SG", "U_SG": "V_SG", "V_SG": "U_SG"}, inplace=True)
-
-    df = pd.concat([df1, df2], ignore_index=True)
-
-    log.info("Finished reading single paths data set.")
     return df
 
 
