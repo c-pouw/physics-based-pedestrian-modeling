@@ -1,5 +1,7 @@
 # Data-driven physics-based modeling of pedestrian dynamics
 <p align="center">
+    <a href="" alt="Repository">
+	   <img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white" /></a>
     <a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/testing.yml" alt="Unit Tests">
        <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/testing.yml/badge.svg" /></a>
 	<a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml" alt="Integration Tests">
@@ -23,7 +25,7 @@ Python package to create physics-based pedestrian models from pedestrian traject
 Pouw, C. A. S., van der Vleuten, G., Corbetta, A., & Toschi, F. (2024). Data-driven physics-based modeling of pedestrian dynamics. Preprint, https://arxiv.org/abs/2407.20794
 
 
-# Documentation
+## Documentation
 
 * Documentation: https://c-pouw.github.io/physics-based-pedestrian-modeling.
 
@@ -32,16 +34,16 @@ Pouw, C. A. S., van der Vleuten, G., Corbetta, A., & Toschi, F. (2024). Data-dri
 We provide the following usage notebook on Google Colab:
 
 <h2 align="left" style="vertical-align: middle;">
-    <a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_narrow_corridor_colab.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a><sup><sub> - Generalized pedestrian model. </sub></sup> <br>
+    <a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_narrow_corridor_colab.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a><sup><sub> - Quick-start with the generalized pedestrian model. </sub></sup> <br>
 </h2>
 
 The notebook can be used to create a model for the following environments:
 
-- Walking paths in a narrow corridor
-- Intersecting walking paths
-- Walking paths on a train station platform
+- Walking paths in a narrow corridor.
+- Intersecting walking paths.
+- Walking paths on a train station platform.
 
-# Getting started
+## Using the CLI
 
 Install the package from source
 
@@ -57,23 +59,11 @@ Run the main processing script for one of the available parameter files (listed 
 python physped/main.py params=PARAM_NAME
 ```
 
-## Parameter Files
-Configuration of parameter files is handled by ![Hydra](https://github.com/facebookresearch/hydra). Default parameter files are provided for the following cases:
+### Parameter Files
+Parameter configurations are handled by ![Hydra](https://github.com/facebookresearch/hydra). Default parameter files are provided for the following cases:
 * **single_paths:** Trajectories in a narrow corridor.
-* **parallel_paths:** Trajectories in a wide corridor.
-* **curved_paths_synthetic:** Trajectories along a closed elliptical path.
 * **intersecting_paths:** Trajectories intersecting in the origin.
-* **station_paths:** Complex trajectories in a train station.
-
-# Features
-### Preprocessing of trajectories
-Calculate slow dynamics
-
-### Learn potential from the preprocessed trajectories
-Learn the potential
-
-### Simulate new trajectories using the learned potential
-Simulate new trajectories
+* **asdz_pf12:** Complex trajectories on the Amsterdam Zuid train platform 1 and 2.
 
 # License
 * Free software: 3-clause BSD license
