@@ -10,10 +10,15 @@ authors = ["Cas Pouw <c.a.s.pouw@tue.nl>"]
 license = "BSD-3-Clause"
 readme = "README.md"
 repository = "https://github.com/c-pouw/physics-based-pedestrian-modeling/"
+documentation = "https://c-pouw.github.io/physics-based-pedestrian-modeling/"
 packages = [{include = "physped"}]
+include = [{path = "physped/conf", format = ["sdist", "wheel"]}]
 
-[project.scripts]
-physped-main = "physped.main:main"
+[tool.poetry.scripts]
+physped_cli = "physped.main:main"
+
+[tool.poetry.urls]
+"arXiv" = "https://arxiv.org/abs/2407.20794"
 
 [tool.poetry.dependencies]
 python = "^3.10"
