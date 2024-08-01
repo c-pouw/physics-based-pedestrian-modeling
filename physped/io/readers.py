@@ -10,6 +10,7 @@ from pathlib import Path
 # from scipy.signal import savgol_filter
 import pandas as pd
 import requests
+from omegaconf import DictConfig
 
 # from scipy import signal
 from tqdm import tqdm
@@ -72,7 +73,7 @@ def read_narrow_corridor_paths_local(config):
     return paths_ltr, paths_rtl
 
 
-def read_narrow_corridor_paths_4tu(config):
+def read_narrow_corridor_paths_4tu(config: DictConfig):
     """Read the narrow corridor paths archive from 4TU remote repository.
 
     The archive contains two files:
@@ -101,7 +102,7 @@ narrow_corridor_path_reader = {
 }
 
 
-def read_narrow_corridor_paths(config) -> pd.DataFrame:
+def read_narrow_corridor_paths(config: DictConfig) -> pd.DataFrame:
     """Read the narrow corridor data set.
 
     The trajectories are read from local or remote sources based on the configuration.
@@ -129,7 +130,7 @@ def read_narrow_corridor_paths(config) -> pd.DataFrame:
     return df
 
 
-def read_parallel_paths(config) -> pd.DataFrame:
+def read_parallel_paths(config: DictConfig) -> pd.DataFrame:
     """Read the parallel paths data set from a local file.
 
     Args:
@@ -151,7 +152,7 @@ def read_parallel_paths(config) -> pd.DataFrame:
     return df
 
 
-def read_intersecting_paths(config: dict) -> pd.DataFrame:
+def read_intersecting_paths(config: DictConfig) -> pd.DataFrame:
     """Read the intersecting paths data set.
 
     The intersecting paths dataset is created by combining the left-to-right and right-to-left
@@ -184,7 +185,7 @@ def read_intersecting_paths(config: dict) -> pd.DataFrame:
     return df
 
 
-def read_curved_paths_synthetic(config) -> pd.DataFrame:
+def read_curved_paths_synthetic(config: DictConfig) -> pd.DataFrame:
     """Read the synthetic curved paths data set.
 
     Args:
@@ -260,7 +261,7 @@ def read_curved_paths_synthetic(config) -> pd.DataFrame:
 #     return trajs
 
 
-def read_ehv_pf34_paths_geert(config: dict) -> pd.DataFrame:
+def read_ehv_pf34_paths_geert(config: DictConfig) -> pd.DataFrame:
     """Read the Eindhoven platform 3-4 paths data set from Geert.
 
     Args:
@@ -285,7 +286,7 @@ def filter_part_of_the_domain(df, xmin, xmax):
     return df
 
 
-def read_ehv_pf34_paths_local(config) -> pd.DataFrame:
+def read_ehv_pf34_paths_local(config: DictConfig) -> pd.DataFrame:
     """Read the Eindhoven platform 3-4 paths data set from a local file.
 
     Args:
@@ -321,7 +322,7 @@ ehv_pf34_path_reader = {
 }
 
 
-def read_eindhoven_pf34_paths(config) -> pd.DataFrame:
+def read_eindhoven_pf34_paths(config: DictConfig) -> pd.DataFrame:
     """Read the Eindhoven platform 3-4 paths data set.
 
     Args:
@@ -335,14 +336,14 @@ def read_eindhoven_pf34_paths(config) -> pd.DataFrame:
     return df
 
 
-def read_asdz_pf34_paths_local(config) -> pd.DataFrame:
+def read_asdz_pf34_paths_local(config: DictConfig) -> pd.DataFrame:
     trajectory_data_dir = Path(config.trajectory_data_dir)
     file_path = trajectory_data_dir / "Amsterdam Zuid - platform 3-4 - set1.csv"
     df = pd.read_csv(file_path)
     return df
 
 
-def read_asdz_pf34_paths_4tu(config) -> pd.DataFrame:
+def read_asdz_pf34_paths_4tu(config: DictConfig) -> pd.DataFrame:
     link = "https://data.4tu.nl/file/7d78a5e3-6142-49fe-be03-e4c707322863/40ea5cd9-95dc-4e3c-8760-7f4dd543eae7"
     bytestring = requests.get(link, timeout=10)
 
@@ -358,7 +359,7 @@ asdz_pf34_path_reader = {
 }
 
 
-def read_asdz_pf34_paths(config) -> pd.DataFrame:
+def read_asdz_pf34_paths(config: DictConfig) -> pd.DataFrame:
     df = asdz_pf34_path_reader[config.params.data_source](config)
     # Convert spatial coordinates from milimeters to meters
     df["x_pos"] /= 1000
@@ -366,7 +367,7 @@ def read_asdz_pf34_paths(config) -> pd.DataFrame:
     return df
 
 
-def read_utrecht_pf5_paths_4tu(config):
+def read_utrecht_pf5_paths_4tu(config: DictConfig):
     """Read the Utrecht Centraal platform 5 paths data set from 4TU.
 
     Args:
@@ -384,7 +385,7 @@ def read_utrecht_pf5_paths_4tu(config):
     return df
 
 
-def read_utrecht_pf5_paths_local(config):
+def read_utrecht_pf5_paths_local(config: DictConfig):
     """Read the Utrecht Centraal platform 5 paths data set from a local file.
 
     Args:
@@ -404,7 +405,7 @@ utrecht_pf5_path_reader = {
 }
 
 
-def read_utrecht_pf5_paths(config) -> pd.DataFrame:
+def read_utrecht_pf5_paths(config: DictConfig) -> pd.DataFrame:
     """Read the Utrecht Centraal platform 5 paths data set.
 
     The trajectories are read from local or remote sources based on the configuration.
@@ -428,7 +429,7 @@ def read_utrecht_pf5_paths(config) -> pd.DataFrame:
     return df
 
 
-def read_asdz_pf12_paths_4tu(config):
+def read_asdz_pf12_paths_4tu(config: DictConfig) -> pd.DataFrame:
     """Read the Amsterdam Zuid platform 1-2 paths data set from 4TU.
 
     Args:
@@ -447,7 +448,7 @@ def read_asdz_pf12_paths_4tu(config):
     return df
 
 
-def read_asdz_pf12_paths_local(config):
+def read_asdz_pf12_paths_local(config: DictConfig) -> pd.DataFrame:
     """Read the Amsterdam Zuid platform 1-2 paths data set from a local file.
 
     Args:
@@ -467,7 +468,7 @@ asdz_pf12_path_reader = {
 }
 
 
-def read_asdz_pf12_paths(config) -> pd.DataFrame:
+def read_asdz_pf12_paths(config: DictConfig) -> pd.DataFrame:
     """Read the Amsterdam Zuid platform 1-2 paths data set.
 
     The trajectories are read from local or remote sources based on the configuration.
