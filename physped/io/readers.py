@@ -348,9 +348,7 @@ def read_asdz_pf34_paths_4tu(config) -> pd.DataFrame:
 
     with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as zipped_file:
         with zipped_file.open("Amsterdam Zuid - platform 3-4 - set1.csv") as paths:
-            paths = paths.read().decode("utf-8")
-
-    df = pd.read_csv(io.StringIO(paths), sep=",")
+            df = pd.read_csv(paths)
     return df
 
 
@@ -382,9 +380,7 @@ def read_utrecht_pf5_paths_4tu(config):
 
     with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as zipped_file:
         with zipped_file.open("Utrecht Centraal - platform 5 - set99.csv") as paths:
-            paths = paths.read().decode("utf-8")
-
-    df = pd.read_csv(io.StringIO(paths), sep=",")
+            df = pd.read_csv(paths)
     return df
 
 
@@ -422,6 +418,9 @@ def read_utrecht_pf5_paths(config) -> pd.DataFrame:
     """
     path_reader = utrecht_pf5_path_reader[config.params.data_source]
     df = path_reader(config)
+
+    # Only keep the columns that are needed
+    df = df[["x_pos", "y_pos", "tracked_object", "timestampms"]]
 
     # Convert spatial coordinates from milimeters to meters
     df["x_pos"] /= 1000
