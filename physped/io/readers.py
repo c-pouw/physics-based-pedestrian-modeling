@@ -501,7 +501,7 @@ trajectory_reader = {
     "parallel_paths": read_parallel_paths,
     "intersecting_paths": read_intersecting_paths,
     "curved_paths_synthetic": read_curved_paths_synthetic,
-    "station_paths": read_eindhoven_pf34_paths,
+    "eindhoven_pf34": read_eindhoven_pf34_paths,
     "asdz_pf34": read_asdz_pf34_paths,
     "utrecht_pf5": read_utrecht_pf5_paths,
     "asdz_pf12": read_asdz_pf12_paths,
