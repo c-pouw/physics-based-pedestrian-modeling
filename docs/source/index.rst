@@ -10,6 +10,8 @@ Data-driven physics-based modeling of pedestrian dynamics
 
     <embed>
     <p align="center">
+        <a href="" alt="Repository">
+	   <img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white" /></a>
         <a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/testing.yml" alt="Unit Tests">
             <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/testing.yml/badge.svg"/>
         </a>
@@ -28,6 +30,8 @@ Data-driven physics-based modeling of pedestrian dynamics
         <a href="https://github.com/psf/black">
             <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"/>
         </a>
+	<a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_quick_start.ipynb">
+	    <img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
         <a href="https://arxiv.org/abs/2407.20794">
             <img src="https://img.shields.io/badge/arXiv-2407.20794-b31b1b.svg?style=flat" alt="arXiv"/>
         </a>
