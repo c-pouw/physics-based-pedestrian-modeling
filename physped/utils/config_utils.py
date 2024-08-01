@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 from hydra import compose, initialize
 from omegaconf import DictConfig
 
@@ -24,3 +25,14 @@ def initialize_hydra_config(env_name: str) -> DictConfig:
         )
         register_new_resolvers(replace=True)
     return config
+
+
+def set_plot_style(use_latex: bool = False) -> None:
+    """Function to set the plot style.
+
+    Args:
+        use_latex: Whether to use LaTeX for the plot style or not. Defaults to False.
+    """
+    get_style = {True: "science", False: "science_no_latex"}
+    style = get_style[use_latex]
+    plt.style.use(f"../physped/conf/{style}.mplstyle")
