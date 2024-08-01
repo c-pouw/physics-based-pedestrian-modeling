@@ -10,7 +10,7 @@ defaults:
   - learn_piece_of_potential_plot: default_learn_piece_of_potential_plot
   - _self_
 env_name: single_paths
-data_source: local
+data_source: 4tu
 fps: 15
 minimum_trajectory_length: 10
 velocity_window_length: 10

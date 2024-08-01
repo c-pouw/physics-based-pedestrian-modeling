@@ -10,7 +10,7 @@ defaults:
   - learn_piece_of_potential_plot: default_learn_piece_of_potential_plot
   - _self_
 env_name: asdz_pf34
-data_source: local
+data_source: 4tu
 fps: 10
 minimum_trajectory_length: 100
 velocity_window_length: 10
