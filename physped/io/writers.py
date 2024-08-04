@@ -7,8 +7,6 @@ import pandas as pd
 
 from physped.core.piecewise_potential import PiecewisePotential
 
-# from physped.utils.functions import ensure_folder_exists
-
 log = logging.getLogger(__name__)
 
 

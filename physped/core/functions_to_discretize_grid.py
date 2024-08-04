@@ -7,6 +7,7 @@ from typing import List
 
 import numpy as np
 import pandas as pd
+from omegaconf import DictConfig
 from scipy.stats import norm
 
 from physped.core.piecewise_potential import PiecewisePotential
@@ -33,7 +34,7 @@ log = logging.getLogger(__name__)
 #     return gridbins
 
 
-def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: dict) -> PiecewisePotential:
+def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: DictConfig) -> PiecewisePotential:
     """
     Convert trajectories to a grid of histograms and parameters.
 
@@ -78,7 +79,7 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: dict) 
     return piecewise_potential
 
 
-def calculate_curvature_of_the_potential(piecewise_potential: PiecewisePotential, config: dict) -> PiecewisePotential:
+def calculate_curvature_of_the_potential(piecewise_potential: PiecewisePotential, config: DictConfig) -> PiecewisePotential:
     var = config.params.model.sigma**2
     var_indices = [1, 3, 5, 7]
     variances = [piecewise_potential.fit_params[..., i] for i in var_indices]
@@ -93,7 +94,7 @@ def calculate_curvature_of_the_potential(piecewise_potential: PiecewisePotential
     return piecewise_potential
 
 
-def derive_potential_center(piecewise_potential: PiecewisePotential, config: dict) -> PiecewisePotential:
+def derive_potential_center(piecewise_potential: PiecewisePotential, config: DictConfig) -> PiecewisePotential:
     piecewise_potential.center_x = piecewise_potential.fit_params[..., 0]
     piecewise_potential.center_y = piecewise_potential.fit_params[..., 2]
     piecewise_potential.center_u = piecewise_potential.fit_params[..., 4]
@@ -111,7 +112,7 @@ def derive_potential_center(piecewise_potential: PiecewisePotential, config: dic
 #     return piecewise_potential
 
 
-def calculate_position_based_emperic_potential(histogram_slow, config):
+def calculate_position_based_emperic_potential(histogram_slow, config: DictConfig):
     position_counts = np.nansum(histogram_slow, axis=(2, 3, 4))
     position_counts = np.where(position_counts < config.params.model.minimum_fitting_threshold, np.nan, position_counts)
     A = 0.02  # TODO: Move to config
@@ -191,7 +192,7 @@ def digitize_trajectories_to_grid(grid_bins: dict, trajectories: pd.DataFrame) -
     return trajectories
 
 
-def fit_probability_distributions(group: pd.DataFrame, config: dict) -> list:
+def fit_probability_distributions(group: pd.DataFrame, config: DictConfig) -> list:
     """
     Fits normal distribution to a group of data points and returns fitting parameters.
 
@@ -211,7 +212,7 @@ def fit_probability_distributions(group: pd.DataFrame, config: dict) -> list:
     return params
 
 
-def fit_trajectories_on_grid(param_grid, trajectories: pd.DataFrame, config: dict):
+def fit_trajectories_on_grid(param_grid, trajectories: pd.DataFrame, config: DictConfig):
     """
     Fit trajectories to the parameter grid.
 
@@ -288,7 +289,7 @@ def get_grid_indices(potential_grid: PiecewisePotential, X: List[float]) -> np.n
     return indices
 
 
-def get_grid_index_single_value(value: float, bins: np.array) -> int:
+def get_grid_index_single_value(value: float, bins: np.ndarray) -> int:
     """
     Returns the index of the grid cell that corresponds to the given value.
     If a value is outside the grid, it is wrapped around to the other side.
@@ -405,8 +406,7 @@ def random_uniform_value_in_bin(values: np.ndarray, bins: np.ndarray) -> np.ndar
 
 
 def sample_from_ndarray(origin_histogram: np.ndarray, N_samples: int = 1) -> np.ndarray:
-    """
-    Sample origin positions from a heatmap with initial positions.
+    """Sample origin positions from a heatmap with initial positions.
 
     Parameters:
     - origin_histogram (np.ndarray): The initial position heatmap.
@@ -426,8 +426,7 @@ def sample_from_ndarray(origin_histogram: np.ndarray, N_samples: int = 1) -> np.
 
 
 def convert_grid_indices_to_coordinates(potential_grid: PiecewisePotential, X_0: np.ndarray) -> np.ndarray:
-    """
-    Convert grid indices to Cartesian coordinates.
+    """Convert grid indices to Cartesian coordinates.
 
     Parameters:
     - grids (Grids): The Grids object containing the grid definitions.

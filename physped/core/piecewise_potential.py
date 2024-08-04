@@ -1,4 +1,6 @@
-"""Discrete grid class"""
+"""Module for the PiecewisePotential class.
+
+"""
 
 import logging
 from pprint import pformat
@@ -14,24 +16,15 @@ from physped.utils.functions import get_bin_middle
 log = logging.getLogger(__name__)
 
 
+# ? Should this be a (data)class? Possibly just a numpy ndarray with some metadata?
 class PiecewisePotential:
-    # ? Should this be a (data)class? Possibly just a numpy ndarray with some metadata?
-    """
-    A class for creating a discrete grid based on a set of bin edges.
-
-    Attributes:
-    - bins (Dict[str, np.ndarray]): A dictionary of bin edges for each dimension of the grid.
-    - bin_centers (Dict[str, np.ndarray]): A dictionary of bin centers for each dimension of the grid.
-    - grid_shape (tuple): The shape of the grid.
-    - grid (np.ndarray): The grid of discrete values.
-    """
-
     def __init__(self, bins: Dict[str, np.ndarray]):
-        """
-        Initialize a piecewise potential object.
+        """A class for the piecewise potential.
 
-        Parameters:
-        - bins (Dict[str, np.ndarray]): A dictionary of bin edges for each dimension of the grid.
+        Creates the lattice to discretize the slow dynamics and fit the potential.
+
+        Args:
+            bins: A dictionary containing the bin edges for each dimension.
         """
         self.bins = bins
         self.bin_centers = {key: get_bin_middle(bins[key]) for key in bins}
@@ -50,18 +43,17 @@ class PiecewisePotential:
             "vmu",
             "vvar",
         ]
-        self.no_fit_params = len(self.fit_param_names)  # (mu, sigma) for ('x','y','u','v')
+        # self.no_fit_params = len(self.fit_param_names)  # (mu, sigma) for ('x','y','u','v')
         # Initialize potential grid
-        self.fit_params = np.zeros(self.grid_shape + (self.no_fit_params,)) * np.nan
+        shape_of_the_potential = self.grid_shape + (len(self.fit_param_names),)
+        self.fit_params = np.zeros(shape_of_the_potential) * np.nan
         self.cell_volume = self.compute_cell_volume()
 
     def __repr__(self):
         return f"PiecewisePotential(bins={pformat(self.bins)})"
 
     def compute_cell_volume(self) -> np.ndarray:
-        """
-        Compute the volume of each cell in the grid.
-        """
+        """Compute the volume of each cell in the lattice."""
         dx = np.diff(self.bins["x"])
         dy = np.diff(self.bins["y"])
         dr = np.diff(self.bins["r"])
