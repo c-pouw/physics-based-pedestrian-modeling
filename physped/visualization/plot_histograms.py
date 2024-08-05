@@ -9,7 +9,7 @@ import pandas as pd
 from matplotlib.axes import Axes
 from scipy.stats import entropy
 
-from physped.core.functions_to_discretize_grid import add_trajectories_to_histogram, digitize_trajectories_to_grid
+from physped.core.parametrize_potential import add_trajectories_to_histogram, digitize_trajectories_to_grid
 from physped.core.piecewise_potential import PiecewisePotential
 
 log = logging.getLogger(__name__)

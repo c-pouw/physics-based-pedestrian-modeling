@@ -7,6 +7,7 @@ from pprint import pformat
 from typing import Dict
 
 import numpy as np
+from omegaconf import OmegaConf
 
 from physped.utils.functions import get_bin_middle
 
@@ -33,24 +34,15 @@ class PiecewisePotential:
         self.histogram = np.zeros(self.grid_shape)
         self.histogram_slow = np.zeros(self.grid_shape)
         self.fit_dimensions = ("x", "y", "u", "v")
-        self.fit_param_names = [
-            "xmu",
-            "xvar",
-            "ymu",
-            "yvar",
-            "umu",
-            "uvar",
-            "vmu",
-            "vvar",
-        ]
-        # self.no_fit_params = len(self.fit_param_names)  # (mu, sigma) for ('x','y','u','v')
-        # Initialize potential grid
-        shape_of_the_potential = self.grid_shape + (len(self.fit_param_names),)
-        self.fit_params = np.zeros(shape_of_the_potential) * np.nan
+        self.parameters = ["mu", "sigma"]
+
+        # Initialize potential paramterization
+        shape_of_the_potential = self.grid_shape + (len(self.fit_dimensions), len(self.parameters))
+        self.parametrization = np.zeros(shape_of_the_potential) * np.nan
         self.cell_volume = self.compute_cell_volume()
 
     def __repr__(self):
-        return f"PiecewisePotential(bins={pformat(self.bins)})"
+        return f"PiecewisePotential(bins={pformat(OmegaConf.to_container(self.bins, resolve=True), depth=1)})"
 
     def compute_cell_volume(self) -> np.ndarray:
         """Compute the volume of each cell in the lattice."""

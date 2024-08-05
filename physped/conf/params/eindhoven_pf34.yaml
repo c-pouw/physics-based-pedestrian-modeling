@@ -9,7 +9,7 @@ defaults:
   - grid_plot: default_grid_plot
   - learn_piece_of_potential_plot: default_learn_piece_of_potential_plot
   - _self_
-env_name: station_paths
+env_name: eindhoven_pf34
 fps: 10
 minimum_trajectory_length: 30
 velocity_window_length: 10
@@ -52,6 +52,7 @@ plot_style: physped/conf/science.mplstyle
 default_xlims: [45, 74]
 default_ylims: [-12, 6]
 background:
+  bg_source: local
   imgpath: 'data/backgrounds/EHV.Perron2.1_multisensor_1.png'
   alpha: 1
   xmin: -6039

@@ -6,8 +6,8 @@ import pandas as pd
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from physped.core.functions_to_discretize_grid import convert_grid_indices_to_coordinates, get_grid_indices, sample_from_ndarray
 from physped.core.langevin_model import LangevinModel
+from physped.core.parametrize_potential import convert_grid_indices_to_coordinates, get_grid_indices, sample_from_ndarray
 from physped.core.piecewise_potential import PiecewisePotential
 from physped.io.readers import read_trajectories_from_path
 from physped.io.writers import save_trajectories
@@ -39,9 +39,9 @@ def potential_defined_at_slow_state(paths: pd.DataFrame, piecewise_potential: Pi
     # REQUIRED: Dataframe must have a column with the slow grid indices
     # TODO : Change the slow_grid_indices to lists rather than tuples
     indices = np.array(list(paths["slow_grid_indices"]))
-    potential_defined = np.where(np.isnan(piecewise_potential.fit_params), False, True)
+    potential_defined = np.where(np.isnan(piecewise_potential.parametrization), False, True)
     # All free parameters must be defined
-    potential_defined = np.all(potential_defined, axis=-1)
+    potential_defined = np.all(potential_defined, axis=(-2, -1))
     paths["potential_defined"] = potential_defined[indices[:, 0], indices[:, 1], indices[:, 2], indices[:, 3], indices[:, 4]]
     return paths
 
@@ -161,7 +161,7 @@ def simulate_trajectories(piecewise_potential: PiecewisePotential, config: dict,
             trajectory_pieces = pd.concat(trajectory_pieces)
             trajectories.append(trajectory_pieces)
 
-    trajectories = pd.concat(trajectories)
+    trajectories = pd.concat(trajectories).dropna()
     trajectories["rf"], trajectories["thetaf"] = cart2pol(trajectories.uf, trajectories.vf)
     trajectories["rs"], trajectories["thetas"] = cart2pol(trajectories.us, trajectories.vs)
     trajectories["thetaf"] = periodic_angular_conditions(trajectories["thetaf"], config.params.grid.bins["theta"])

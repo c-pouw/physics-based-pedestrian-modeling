@@ -5,7 +5,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from physped.core.functions_to_discretize_grid import digitize_trajectories_to_grid
+from physped.core.parametrize_potential import digitize_trajectories_to_grid
 from physped.core.piecewise_potential import PiecewisePotential
 from physped.visualization.plot_trajectories import (
     plot_position_trajectories_in_cartesian_coordinates,

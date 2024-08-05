@@ -1,14 +1,14 @@
 import logging
 from pathlib import Path
+from typing import List
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+from omegaconf import DictConfig
 
-from physped.core.functions_to_discretize_grid import (
-    calculate_position_based_emperic_potential,
-    get_slice_of_multidimensional_matrix,
-)
+from physped.core.parametrize_potential import calculate_position_based_emperic_potential, extract_submatrix
+from physped.core.piecewise_potential import PiecewisePotential
 from physped.visualization.plot_utils import (
     apply_polar_plot_style,
     apply_xy_plot_style,
@@ -19,13 +19,7 @@ from physped.visualization.plot_utils import (
 log = logging.getLogger(__name__)
 
 
-def get_position_based_emperic_potential_from_state(config, slices, piecewise_potential):
-    sliced_histogram = get_slice_of_multidimensional_matrix(piecewise_potential.histogram_slow, slices)
-    position_based_emperic_potential = calculate_position_based_emperic_potential(sliced_histogram, config)
-    return position_based_emperic_potential
-
-
-def plot_potential_at_slow_index(config, slow_indices, piecewise_potential):
+def plot_potential_at_slow_index(config: DictConfig, slow_indices: List, piecewise_potential: PiecewisePotential):
     params = config.params
     traj_plot_params = params.trajectory_plot
     fig = plt.figure(layout="constrained")
@@ -40,26 +34,28 @@ def plot_potential_at_slow_index(config, slow_indices, piecewise_potential):
     ybin_middle = (config.params.grid.bins.y[1:] + config.params.grid.bins.y[:-1]) / 2
     X, Y = np.meshgrid(xbin_middle, ybin_middle, indexing="ij")
 
-    slices = [
+    slicing_indices = [
         [0, len(config.params.grid.bins.x) - 1],
         [0, len(config.params.grid.bins.y) - 1],
         [slow_indices[2], slow_indices[2] + 1],
         [slow_indices[3], slow_indices[3] + 1],
         [slow_indices[4], slow_indices[4] + 1],
     ]
-    matrix_to_plot = get_position_based_emperic_potential_from_state(config, slices, piecewise_potential)
+    slow_subhistogram = extract_submatrix(piecewise_potential.histogram_slow, slicing_indices)
+    position_based_emperic_potential = calculate_position_based_emperic_potential(slow_subhistogram, config)
+    # matrix_to_plot = get_position_based_emperic_potential_from_state(config, slicing_indices, piecewise_potential)
     # X_indx = get_index_of_state(state, piecewise_potential)
 
-    sliced_fit_parameters = get_slice_of_multidimensional_matrix(piecewise_potential.fit_params, slices)
-    center_x = sliced_fit_parameters[:, :, 0, 0, 0, 0]
-    center_y = sliced_fit_parameters[:, :, 0, 0, 0, 2]
+    subparameterrization = extract_submatrix(piecewise_potential.parametrization, slicing_indices)
+    center_x = subparameterrization[:, :, 0, 0, 0, 0, 0]
+    center_y = subparameterrization[:, :, 0, 0, 0, 1, 0]
+    curvature_x = subparameterrization[:, :, 0, 0, 0, 0, 1]
+    curvature_y = subparameterrization[:, :, 0, 0, 0, 1, 1]
+
     # center_u = sliced_fit_parameters[:, :, 0, 0, 0, 4]
     # center_v = sliced_fit_parameters[:, :, 0, 0, 0, 6]
-
-    sliced_curvature_x = get_slice_of_multidimensional_matrix(piecewise_potential.curvature_x, slices)
-    curvature_x = sliced_curvature_x[:, :, 0, 0, 0]
-    sliced_curvature_y = get_slice_of_multidimensional_matrix(piecewise_potential.curvature_y, slices)
-    curvature_y = sliced_curvature_y[:, :, 0, 0, 0]
+    # sliced_curvature_x = get_slice_of_multidimensional_matrix(piecewise_potential.curvature_x, slices)
+    # sliced_curvature_y = get_slice_of_multidimensional_matrix(piecewise_potential.curvature_y, slices)
 
     curvature_scaling = 1
     curv_x = (curvature_x * (X - center_x)) / curvature_scaling
@@ -71,11 +67,11 @@ def plot_potential_at_slow_index(config, slow_indices, piecewise_potential):
     sparseness = plot_params.sparseness
     minimum_threshold = 1
 
-    sliced_histogram = get_slice_of_multidimensional_matrix(piecewise_potential.histogram_slow, slices)
-    plot_curv_x = np.where(sliced_histogram[:, :, 0, 0, 0] < minimum_threshold, np.nan, curv_x)
-    plot_curv_y = np.where(sliced_histogram[:, :, 0, 0, 0] < minimum_threshold, np.nan, curv_y)
+    # sliced_histogram = extract_submatrix(piecewise_potential.histogram_slow, slicing_indices)
+    plot_curv_x = np.where(slow_subhistogram[:, :, 0, 0, 0] < minimum_threshold, np.nan, curv_x)
+    plot_curv_y = np.where(slow_subhistogram[:, :, 0, 0, 0] < minimum_threshold, np.nan, curv_y)
 
-    ax.pcolormesh(X, Y, matrix_to_plot, cmap=cmap, shading="auto")  # , norm=norm)
+    ax.pcolormesh(X, Y, position_based_emperic_potential, cmap=cmap, shading="auto")  # , norm=norm)
     # ax = plot_colorbar(ax, cs)
 
     ax.quiver(

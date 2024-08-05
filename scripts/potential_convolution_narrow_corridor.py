@@ -8,12 +8,12 @@ import numpy as np
 from hydra import compose, initialize
 from omegaconf import OmegaConf
 
-from physped.core.functions_to_discretize_grid import learn_potential_from_trajectories
 from physped.core.functions_to_select_grid_piece import (
     evaluate_selection_point,
     evaluate_selection_range,
     get_index_of_the_enclosing_bin,
 )
+from physped.core.parametrize_potential import calculate_position_based_emperic_potential, learn_potential_from_trajectories
 from physped.io.readers import trajectory_reader
 from physped.preprocessing.trajectories import preprocess_trajectories, process_slow_modes
 from physped.utils.config_utils import register_new_resolvers
@@ -146,20 +146,22 @@ for y_index in range(len(ybins) - 1):
     # if np.sum(piecewise_potential.fit_params[*bin_index, :]) == 0:
     #     continue
 
-    offset = piecewise_potential.position_based_offset[bin_index[0], y_index]
+    position_based_emperic_potential = calculate_position_based_emperic_potential(piecewise_potential.histogram_slow, config)
+    offset = position_based_emperic_potential[bin_index[0], y_index]
+    # offset = piecewise_potential.position_based_offset[bin_index[0], y_index]
     length_outside_bin = dy
+    curvature_y = piecewise_potential.parametrization[bin_index[0], bin_index[1], bin_index[2], bin_index[3], bin_index[4], 1, 1]
+    mean_y = piecewise_potential.parametrization[bin_index[0], bin_index[1], bin_index[2], bin_index[3], bin_index[4], 1, 0]
     X_dashed = np.linspace(ybins[y_index] - length_outside_bin, ybins[y_index + 1] + length_outside_bin, 100)
-    Vy_dashed = calculate_potential(
-        piecewise_potential.curvature_y[*bin_index], piecewise_potential.center_y[*bin_index], offset, X_dashed
-    )
+    Vy_dashed = calculate_potential(curvature_y, mean_y, offset, X_dashed)
     color = cmap[y_index]
 
-    Vy_mid = calculate_potential(
-        piecewise_potential.curvature_y[*bin_index],
-        piecewise_potential.center_y[*bin_index],
-        offset,
-        middle_bins[y_index],
-    )
+    # Vy_mid = calculate_potential(
+    #     piecewise_potential.curvature_y[*bin_index],
+    #     piecewise_potential.center_y[*bin_index],
+    #     offset,
+    #     middle_bins[y_index],
+    # )
     # ax.plot(middle_bins[y_index], Vy_mid, color="w", marker="|", ms=3, zorder=20)
     ax = make_line_variable_width(X_dashed, Vy_dashed, color=color, ax=ax)
     # ax.add_collection(lc)
