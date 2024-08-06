@@ -53,7 +53,7 @@ jobs:
 
       - name: Build Docs
         run: |
-          sphinx-apidoc -f -o docs/source physped
+          sphinx-apidoc -f -o docs/source physped physped/conf/ physped/tests/
           make -C docs/ html
 
       # - uses: actions/upload-artifact@v4

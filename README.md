@@ -26,42 +26,67 @@ Python package to create physics-based pedestrian models from pedestrian traject
 
 Pouw, C. A. S., van der Vleuten, G., Corbetta, A., & Toschi, F. (2024). Data-driven physics-based modeling of pedestrian dynamics. Preprint, https://arxiv.org/abs/2407.20794
 
-
+<!-- index.rst homepage end -->
 ## Documentation
 
 * Documentation: https://c-pouw.github.io/physics-based-pedestrian-modeling.
 
+<!-- index.rst usage start -->
 
-## Usage Notebooks
+# Usage Notebooks
 <h2 align="left" style="vertical-align: middle;">
     <a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_quick_start.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a><sup><sub> - Quick-start notebook demonstrating the generalized pedestrian model. </sub></sup> <br>
 </h2>
 
-The notebook can be used to create a model for the following environments:
+This notebook can be used to create a model for all the environments that rely on public data sets without the need to locally install the package.
 
-- Walking paths in a narrow corridor.
-- Intersecting walking paths.
-- Walking paths on a train station platform.
+# Installation
 
-## Using the CLI
-
-Install the package from PyPI
+Alternatively, you can locally install the package from PyPI
 
 ```bash
 pip install --upgrade physics-based-pedestrian-modeling
 ```
 
-Run the main processing script for one of the available parameter files (listed below)
+# Using the CLI
+Run the main processing script for one of the available environments by overwriting the `params` variable with the configuration file name of the environment. The configuration file names associated to every environment are specified below. These parameter configurations are handled by Hydra, see their documentation for more details ![Hydra](https://github.com/facebookresearch/hydra).
 
 ```bash
-physped_cli params=PARAM_NAME
+physped_cli params=CONFIGURATION_FILE_NAME
 ```
 
-### Parameter Files
-Parameter configurations are handled by ![Hydra](https://github.com/facebookresearch/hydra). Default parameter files can be used by replacing PARAM_NAME with one of the following names:
-* **narrow_corridor:** Trajectories in a narrow corridor.
-* **intersecting_paths:** Trajectories intersecting in the origin.
-* **asdz_pf12:** Complex trajectories on the Amsterdam Zuid train platform 1 and 2.
+Similarly, we can overwrite all the other parameter directly from the command line. For instance, if we want to process the narrow corridor trajectories with a different noice intensity, e.g. sigma=0.7, we can simply run
+
+```bash
+physped_cli params=narrow_corridor params.model.sigma=0.7
+```
+
+Creating the model for multiple parameter values can be achieved by adding `-m` and listing the variables. For example
+
+```bash
+physped_cli -m params=narrow_corridor params.model.sigma=0.5,0.7,0.9
+```
+
+# Available environments
+
+The environments that rely on public data sets can be used by overwriting the 'params' variable with one of the following configuration file names:
+
+## Narrow corridor
+Trajectories of walking paths in a narrow corridor.
+
+Configuration file name: **narrow_corridor**
+
+## Intersecting walking paths
+Trajectories of intersecting walking paths.
+
+Configuration file name: **intersecting_paths**
+
+## Train station platform
+Trajectories of walking paths in the Amsterdam Zuid train station on platform 1 and 2.
+
+Configuration file name: **asdz_pf12**
+
+<!-- index.rst usage end -->
 
 # License
 * Free software: 3-clause BSD license
