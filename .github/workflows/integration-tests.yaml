@@ -55,7 +55,7 @@ jobs:
       - name: Test Integration
         run: |
           set -vxeuo pipefail
-          python physped/main.py params=single_paths root_dir=$GITHUB_WORKSPACE hydra.run.dir=${GITHUB_WORKSPACE}/outputs plot_style="${GITHUB_WORKSPACE}/physped/conf/science_no_latex.mplstyle" params.data_source=4tu
+          python physped/main.py params=narrow_corridor root_dir=$GITHUB_WORKSPACE hydra.run.dir=${GITHUB_WORKSPACE}/outputs plot_style="${GITHUB_WORKSPACE}/physped/conf/science_no_latex.mplstyle" params.data_source=4tu
 
       - uses: actions/upload-artifact@v4
         with:
@@ -64,6 +64,6 @@ jobs:
             outputs/preprocessed_trajectories.csv
             outputs/simulated_trajectories.csv
             outputs/piecewise_potential.pickle
-            outputs/recorded_trajectories_single_paths.pdf
-            outputs/simulated_trajectories_single_paths.pdf
-            outputs/histograms_single_paths.pdf
+            outputs/recorded_trajectories_narrow_corridor.pdf
+            outputs/simulated_trajectories_narrow_corridor.pdf
+            outputs/histograms_narrow_corridor.pdf

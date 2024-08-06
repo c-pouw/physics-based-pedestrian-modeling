@@ -31,8 +31,8 @@ plt.style.use(Path.cwd().parent / "physped/conf/science.mplstyle")
 
 # %%
 
-env_name = "single_paths"
-# env_name = "parallel_paths"
+env_name = "narrow_corridor"
+# env_name = "wide_corridor"
 # env_name = "curved_paths_synthetic"
 # env_name = "station_paths"
 # env_name = "asdz_pf34"

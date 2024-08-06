@@ -25,7 +25,7 @@ plt.style.use(Path.cwd().parent / "physped/conf/science.mplstyle")
 
 # %%
 
-env_name = "single_paths"
+env_name = "narrow_corridor"
 with initialize(version_base=None, config_path="../physped/conf", job_name="test_app"):
     config = compose(
         config_name="config",

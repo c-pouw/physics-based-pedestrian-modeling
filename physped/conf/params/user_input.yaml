@@ -9,7 +9,7 @@ defaults:
   - grid_plot: default_grid_plot
   - learn_piece_of_potential_plot: default_learn_piece_of_potential_plot
   - _self_
-env_name: single_paths
+env_name: narrow_corridor
 data_source: ???
 fps: ???
 minimum_trajectory_length: 5

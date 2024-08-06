@@ -19,7 +19,7 @@ plt.style.use(Path.cwd() / "../physped/conf/science.mplstyle")
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
-env_name = "parallel_paths"
+env_name = "wide_corridor"
 with initialize(version_base=None, config_path="../physped/conf", job_name="test_app"):
     cfg = compose(
         config_name="config",

@@ -59,7 +59,7 @@ physped_cli params=PARAM_NAME
 
 ### Parameter Files
 Parameter configurations are handled by ![Hydra](https://github.com/facebookresearch/hydra). Default parameter files can be used by replacing PARAM_NAME with one of the following names:
-* **single_paths:** Trajectories in a narrow corridor.
+* **narrow_corridor:** Trajectories in a narrow corridor.
 * **intersecting_paths:** Trajectories intersecting in the origin.
 * **asdz_pf12:** Complex trajectories on the Amsterdam Zuid train platform 1 and 2.
 
