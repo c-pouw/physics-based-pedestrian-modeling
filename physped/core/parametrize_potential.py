@@ -45,6 +45,7 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: DictCo
     Returns:
     - A dictionary of DiscreteGrid objects for storing histograms and parameters.
     """
+    # ! This code probably should not be a abstracted into a function
     grid_bins = dict(config.params.grid.bins)
     filepath = Path.cwd().parent / config.filename.piecewise_potential
     if config.read.simulated_trajectories:
@@ -66,40 +67,43 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: DictCo
     piecewise_potential.histogram_slow = add_trajectories_to_histogram(
         piecewise_potential.histogram_slow, trajectories, "slow_grid_indices"
     )
-    if config.params.simulation.sample_origins_from == "trajectories":
-        piecewise_potential.trajectory_origins = trajectories.groupby("Pid").apply(lambda g: g.iloc[0][["xf", "yf", "uf", "vf"]])
-    piecewise_potential.fit_params = fit_trajectories_on_grid(piecewise_potential.fit_params, trajectories, config)
-    log.info("Finished learning piecewise potential from trajectories.")
-    piecewise_potential = calculate_curvature_of_the_potential(piecewise_potential, config)
-    piecewise_potential = derive_potential_center(piecewise_potential, config)
-    piecewise_potential.position_based_offset = calculate_position_based_emperic_potential(
-        piecewise_potential.histogram_slow, config
+
+    piecewise_potential.parametrization = parameterize_trajectories_to_grid(
+        piecewise_potential.parametrization, trajectories, config
     )
+    log.info("Finished learning piecewise potential from trajectories.")
+    piecewise_potential = reparametrize_potential_to_curvature(piecewise_potential, config)
+    # piecewise_potential = derive_potential_center(piecewise_potential, config)
+    # piecewise_potential.position_based_offset = calculate_position_based_emperic_potential(
+    #     piecewise_potential.histogram_slow, config
+    # )
     # piecewise_potential = calculate_position_based_offset(piecewise_potential, config)
     return piecewise_potential
 
 
-def calculate_curvature_of_the_potential(piecewise_potential: PiecewisePotential, config: DictConfig) -> PiecewisePotential:
+def reparametrize_potential_to_curvature(piecewise_potential: PiecewisePotential, config: DictConfig) -> PiecewisePotential:
     var = config.params.model.sigma**2
-    var_indices = [1, 3, 5, 7]
-    variances = [piecewise_potential.fit_params[..., i] for i in var_indices]
+    xvar = piecewise_potential.parametrization[..., 0, 1]  # .copy()
+    yvar = piecewise_potential.parametrization[..., 1, 1]  # .copy()
+    uvar = piecewise_potential.parametrization[..., 2, 1]  # .copy()
+    vvar = piecewise_potential.parametrization[..., 3, 1]  # .copy()
 
     # xvar, yvar, uvar, vvar = [np.where(v == 0, np.nan, v) for v in variances]
-    xvar, yvar, uvar, vvar = variances
 
-    piecewise_potential.curvature_x = uvar / (2 * xvar)
-    piecewise_potential.curvature_y = vvar / (2 * yvar)
-    piecewise_potential.curvature_u = var / (4 * uvar)
-    piecewise_potential.curvature_v = var / (4 * vvar)
+    piecewise_potential.parametrization[..., 0, 1] = uvar / (2 * xvar)
+    piecewise_potential.parametrization[..., 1, 1] = vvar / (2 * yvar)
+    piecewise_potential.parametrization[..., 2, 1] = var / (4 * uvar)
+    piecewise_potential.parametrization[..., 3, 1] = var / (4 * vvar)
+    piecewise_potential.parameters = ["mu", "curvature"]
     return piecewise_potential
 
 
-def derive_potential_center(piecewise_potential: PiecewisePotential, config: DictConfig) -> PiecewisePotential:
-    piecewise_potential.center_x = piecewise_potential.fit_params[..., 0]
-    piecewise_potential.center_y = piecewise_potential.fit_params[..., 2]
-    piecewise_potential.center_u = piecewise_potential.fit_params[..., 4]
-    piecewise_potential.center_v = piecewise_potential.fit_params[..., 6]
-    return piecewise_potential
+# def derive_potential_center(piecewise_potential: PiecewisePotential, config: DictConfig) -> PiecewisePotential:
+#     piecewise_potential.center_x = piecewise_potential.fit_params[..., 0, 0]
+#     piecewise_potential.center_y = piecewise_potential.fit_params[..., 1, 0]
+#     piecewise_potential.center_u = piecewise_potential.fit_params[..., 2, 0]
+#     piecewise_potential.center_v = piecewise_potential.fit_params[..., 3, 0]
+#     return piecewise_potential
 
 
 # def calculate_position_based_offset(piecewise_potential: PiecewisePotential, config: dict) -> PiecewisePotential:
@@ -131,8 +135,8 @@ def accumulate_grids(cummulative_grids: PiecewisePotential, grids_to_add: Piecew
     Returns:
     - The updated cumulative grids.
     """
-
-    for p in range(cummulative_grids.no_fit_params):  # Loop over all fit parameters
+    # ! WARNING: This function needs to be tested. Seems to have a bug.
+    for p, _ in enumerate(cummulative_grids.fit_param_names):  # Loop over all fit parameters
         # accumulate fit parameters
         cummulative_grids.fit_params[:, :, :, :, :, p] = weighted_mean_of_two_matrices(
             first_matrix=copy.deepcopy(cummulative_grids.fit_params[:, :, :, :, :, p]),
@@ -146,7 +150,7 @@ def accumulate_grids(cummulative_grids: PiecewisePotential, grids_to_add: Piecew
     return cummulative_grids
 
 
-def get_slice_of_multidimensional_matrix(a: np.ndarray, slices: List[tuple]) -> np.ndarray:
+def extract_submatrix(matrix: np.ndarray, slicing_indices: List[tuple]) -> np.ndarray:
     """
     Get a slice of a multidimensional NumPy array with periodic boundary conditions.
 
@@ -157,16 +161,17 @@ def get_slice_of_multidimensional_matrix(a: np.ndarray, slices: List[tuple]) -> 
     Returns:
     - The sliced array.
     """
-    if any(slice[0] > slice[1] for slice in slices):
-        print("Slice values must be ascending.")
-    reshape_dimension = (-1,) + (1,) * (len(slices) - 1)
-    slices = [np.arange(*slice).reshape(np.roll(reshape_dimension, i)) % a.shape[i] for i, slice in enumerate(slices)]
-    return a[tuple(slices)]
+    if any(slice[0] > slice[1] for slice in slicing_indices):
+        print("Slicing indices must be ascending.")
+    reshape_dimension = (-1,) + (1,) * (len(slicing_indices) - 1)
+    slicing_indices = [
+        np.arange(*slice).reshape(np.roll(reshape_dimension, i)) % matrix.shape[i] for i, slice in enumerate(slicing_indices)
+    ]
+    return matrix[tuple(slicing_indices)]
 
 
 def digitize_trajectories_to_grid(grid_bins: dict, trajectories: pd.DataFrame) -> pd.DataFrame:
-    """
-    Digitize trajectories to a grid.
+    """Digitize trajectories to a grid.
 
     Parameters:
     - grid_bins (dict): The grid bins to digitize the trajectories to.
@@ -205,14 +210,14 @@ def fit_probability_distributions(group: pd.DataFrame, config: DictConfig) -> li
     if len(group) < config.params.model.minimum_fitting_threshold:
         return np.nan  # ? Can we do better if we have multiple files?
     fit_func = norm.fit  # * Other functions can be implemented here
-    params = []
-    for i in ["xf", "yf", "uf", "vf"]:
-        mu, std = fit_func(group[i])  # fit normal distribution to fast modes
-        params += [mu, std**2]  # store mean and variance of normal distribution
+    params = np.zeros((4, 2)) * np.nan
+    for i, variable in enumerate(["xf", "yf", "uf", "vf"]):
+        mu, std = fit_func(group[variable])  # fit normal distribution to fast modes
+        params[i, :] = [mu, std**2]  # store mean and variance of normal distribution
     return params
 
 
-def fit_trajectories_on_grid(param_grid, trajectories: pd.DataFrame, config: DictConfig):
+def parameterize_trajectories_to_grid(parametrization: np.ndarray, trajectories: pd.DataFrame, config: DictConfig):
     """
     Fit trajectories to the parameter grid.
 
@@ -223,10 +228,10 @@ def fit_trajectories_on_grid(param_grid, trajectories: pd.DataFrame, config: Dic
     Returns:
     - The grid with fit parameters.
     """
-    fit_params = trajectories.groupby("slow_grid_indices").apply(fit_probability_distributions, config=config).dropna().to_dict()
-    for key, value in fit_params.items():
-        param_grid[key] = value
-    return param_grid
+    fit_output = trajectories.groupby("slow_grid_indices").apply(fit_probability_distributions, config=config).dropna().to_dict()
+    for key, value in fit_output.items():
+        parametrization[key[0], key[1], key[2], key[3], key[4], :, :] = value
+    return parametrization
 
 
 def add_trajectories_to_histogram(histogram: np.ndarray, trajectories: pd.DataFrame, groupbyindex: str) -> np.ndarray:

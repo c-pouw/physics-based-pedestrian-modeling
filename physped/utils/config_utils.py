@@ -65,7 +65,7 @@ def initialize_hydra_config(env_name: str) -> DictConfig:
 
     Args:
         env_name: The name of the environment.
-            For example: 'single_paths', 'intersecting_paths', 'asdz_pf12', 'asdz_pf34', 'utrecht_pf5'.
+            For example: 'narrow_corridor', 'intersecting_paths', 'asdz_pf12', 'asdz_pf34', 'utrecht_pf5'.
 
     Returns:
         The Hydra configuration.

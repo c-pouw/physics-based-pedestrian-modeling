@@ -9,7 +9,7 @@ defaults:
   - grid_plot: default_grid_plot
   - learn_piece_of_potential_plot: default_learn_piece_of_potential_plot
   - _self_
-env_name: parallel_paths
+env_name: wide_corridor
 fps: 15
 minimum_trajectory_length: 10
 velocity_window_length: 10

@@ -1,5 +1,5 @@
 defaults:
-  - grid: single_paths
+  - grid: narrow_corridor
   - simulation: default_simulation_params
   - selection: default_selection
   - trajectory_plot: default_trajectory_plot_params

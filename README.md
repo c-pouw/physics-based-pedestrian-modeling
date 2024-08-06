@@ -33,10 +33,8 @@ Pouw, C. A. S., van der Vleuten, G., Corbetta, A., & Toschi, F. (2024). Data-dri
 
 
 ## Usage Notebooks
-We provide the following usage notebook on Google Colab:
-
 <h2 align="left" style="vertical-align: middle;">
-    <a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_quick_start.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a><sup><sub> - Quick-start notebook for the generalized pedestrian model. </sub></sup> <br>
+    <a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_quick_start.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a><sup><sub> - Quick-start notebook demonstrating the generalized pedestrian model. </sub></sup> <br>
 </h2>
 
 The notebook can be used to create a model for the following environments:
@@ -61,7 +59,7 @@ physped_cli params=PARAM_NAME
 
 ### Parameter Files
 Parameter configurations are handled by ![Hydra](https://github.com/facebookresearch/hydra). Default parameter files can be used by replacing PARAM_NAME with one of the following names:
-* **single_paths:** Trajectories in a narrow corridor.
+* **narrow_corridor:** Trajectories in a narrow corridor.
 * **intersecting_paths:** Trajectories intersecting in the origin.
 * **asdz_pf12:** Complex trajectories on the Amsterdam Zuid train platform 1 and 2.
 

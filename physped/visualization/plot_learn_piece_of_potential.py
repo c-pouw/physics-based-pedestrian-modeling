@@ -10,8 +10,8 @@ import numpy as np
 import pandas as pd
 from scipy.stats import norm
 
-from physped.core.functions_to_discretize_grid import digitize_trajectories_to_grid
 from physped.core.functions_to_select_grid_piece import evaluate_selection_range
+from physped.core.parametrize_potential import digitize_trajectories_to_grid
 from physped.core.piecewise_potential import PiecewisePotential
 
 # from physped.utils.config_utils import register_new_resolvers
@@ -40,12 +40,13 @@ def learn_piece_of_potential_plot(config: dict, preprocessed_trajectories: pd.Da
     # trajs = read_trajectories_from_path(Path.cwd().parent / "preprocessed_trajectories.csv")
     trajs = digitize_trajectories_to_grid(piecewise_potential.bins, preprocessed_trajectories)
 
-    fit_params = piecewise_potential.fit_params[
+    parametrization = piecewise_potential.parametrization[
         config.params.selection.range.x_indices[0],
         config.params.selection.range.y_indices[0],
         config.params.selection.range.r_indices[0],
         config.params.selection.range.theta_indices[0],
         config.params.selection.range.k_indices[0],
+        :,
         :,
     ]
 
@@ -57,8 +58,8 @@ def learn_piece_of_potential_plot(config: dict, preprocessed_trajectories: pd.Da
     #     grid_selection_by_indices[4],
     #     :,
     # ]
-    log.info("Fit parameters: %s", fit_params)
-    if np.sum(fit_params) == 0.0:
+    log.info("Fit parameters: %s", parametrization)
+    if np.nansum(parametrization) == 0.0:
         log.error("No data for this selection. Exiting.")
         return
 
@@ -78,7 +79,8 @@ def learn_piece_of_potential_plot(config: dict, preprocessed_trajectories: pd.Da
         ax = plt.subplot(2, 2, fit_dimension_index + 1)
 
         fit_param_index = fit_dimension_index * 2
-        mu, variance = fit_params[fit_param_index : (fit_param_index + 2)]
+        # ! This will break if the parametrization is not mu, sigma
+        mu, variance = parametrization[fit_param_index : (fit_param_index + 2)]
         sigma = np.sqrt(variance)
         x = np.linspace(mu - 3 * sigma, mu + 3 * sigma, 100)
         y = norm.pdf(x, mu, sigma)

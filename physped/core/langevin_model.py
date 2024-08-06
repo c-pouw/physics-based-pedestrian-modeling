@@ -5,7 +5,7 @@ import logging
 import numpy as np
 import sdeint
 
-from physped.core.functions_to_discretize_grid import get_grid_indices
+from physped.core.parametrize_potential import get_grid_indices
 from physped.core.piecewise_potential import PiecewisePotential
 from physped.preprocessing.trajectories import periodic_angular_conditions
 from physped.utils.functions import cart2pol
@@ -115,37 +115,19 @@ class LangevinModel:
         thetas = periodic_angular_conditions(thetas, self.params.grid.bins["theta"])
         slow_state = [xs, ys, rs, thetas, k]
         slow_state_index = get_grid_indices(self.potential, slow_state)
-        xmean, xvar, ymean, yvar, umean, uvar, vmean, vvar = self.potential.fit_params[
-            slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4], :
+
+        xmean, ymean, umean, vmean = self.potential.parametrization[
+            slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4], :, 0
+        ]
+        beta_x, beta_y, beta_u, beta_v = self.potential.parametrization[
+            slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4], :, 1
         ]
 
-        beta_x = self.potential.curvature_x[
-            slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4]
-        ]
-        beta_y = self.potential.curvature_y[
-            slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4]
-        ]
-        beta_u = self.potential.curvature_u[
-            slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4]
-        ]
-        beta_v = self.potential.curvature_v[
-            slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4]
-        ]
-
-        if np.all(np.isnan([xmean, ymean, umean, vmean, xvar, yvar, uvar, vvar])):
+        if np.all(np.isnan([xmean, ymean, umean, vmean, beta_x, beta_y, beta_u, beta_v])):
             # log.warning("Pid %s: reached hole in the potential at t = %.2f s", int(Pid), t)
             # TODO : Find a fix to handle holes in the potential e.g. coarse graining, closest neighbour
 
             return np.zeros(len(state)) * np.nan
-            # if slow_state_index[2] > 0:  # Reduce the speed
-            #     slow_state_index[2] = slow_state_index[2] - 1
-            #     xmean, xvar, ymean, yvar, umean, uvar, vmean, vvar = self.potential.fit_params[
-            #         slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4], :
-            #     ]
-            #     if np.all([np.isnan(x) for x in [xmean, ymean, umean, vmean, xvar, yvar, uvar, vvar]]):
-            #         return np.zeros(len(state)) * np.nan
-            #     else:
-            #         log.critical("Temporary fix! Continueing ...")
 
         V_x = beta_x * (xf - xmean)
         V_y = beta_y * (yf - ymean)

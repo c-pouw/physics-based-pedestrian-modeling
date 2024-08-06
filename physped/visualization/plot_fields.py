@@ -4,7 +4,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 
-from physped.core.functions_to_discretize_grid import get_slice_of_multidimensional_matrix, make_grid_selection
+from physped.core.parametrize_potential import extract_submatrix, make_grid_selection
 from physped.utils.functions import weighted_mean_of_matrix
 from physped.visualization.plot_trajectories import (  # create_grid_box_limits,
     apply_polar_plot_style,
@@ -148,9 +148,9 @@ def plot_force_field_of_selection(grids, params, selection):
     grid_selection = make_grid_selection(grids, selection)
     slices = [tuple(grid_selection[dim]["grid_ids"]) for dim in grids.dimensions]
 
-    sliced_histogram = get_slice_of_multidimensional_matrix(grids.histogram_slow, slices)
+    sliced_histogram = extract_submatrix(grids.histogram_slow, slices)
 
-    grids.selection = get_slice_of_multidimensional_matrix(grids.fit_params, slices)
+    grids.selection = extract_submatrix(grids.parametrization, slices)
 
     # Create force fields
     fields = create_force_fields(grids, sliced_histogram)

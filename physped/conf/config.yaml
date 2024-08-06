@@ -1,5 +1,5 @@
 defaults:
-  - params: single_paths
+  - params: narrow_corridor
   - override hydra/job_logging: colorlog
   - override hydra/hydra_logging: colorlog
   - _self_

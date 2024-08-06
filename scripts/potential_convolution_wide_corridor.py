@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from hydra import compose, initialize
 
-from physped.core.functions_to_discretize_grid import learn_potential_from_trajectories
 from physped.core.functions_to_select_grid_piece import get_index_of_the_enclosing_bin
+from physped.core.parametrize_potential import learn_potential_from_trajectories
 from physped.io.readers import trajectory_reader
 from physped.omegaconf_resolvers import register_new_resolvers
 from physped.preprocessing.trajectories import preprocess_trajectories, process_slow_modes
@@ -19,7 +19,7 @@ plt.style.use(Path.cwd() / "../physped/conf/science.mplstyle")
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
-env_name = "parallel_paths"
+env_name = "wide_corridor"
 with initialize(version_base=None, config_path="../physped/conf", job_name="test_app"):
     cfg = compose(
         config_name="config",

@@ -7,7 +7,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from physped.core.functions_to_discretize_grid import get_boundary_coordinates_of_selection, make_grid_selection, return_grid_ids
+from physped.core.parametrize_potential import get_boundary_coordinates_of_selection, make_grid_selection, return_grid_ids
 from physped.io.readers import read_piecewise_potential_from_file
 from physped.visualization.plot_utils import (  # apply_cartesian_velocity_plot_style,
     apply_polar_plot_style,

@@ -170,14 +170,14 @@ def read_narrow_corridor_paths(config: DictConfig) -> pd.DataFrame:
     return df
 
 
-def read_parallel_paths(config: DictConfig) -> pd.DataFrame:
-    """Read the parallel paths data set from a local file.
+def read_wide_corridor_paths(config: DictConfig) -> pd.DataFrame:
+    """Read the wide corridor data set from a local file.
 
     Args:
         config: configuration parameters
 
     Returns:
-        The trajectory dataset with parallel paths.
+        The trajectory dataset with paths in the wide corridor.
     """
     trajectory_data_dir = Path(config.trajectory_data_dir)
     file_path = trajectory_data_dir / "df_single_pedestrians_small.h5"
@@ -201,8 +201,9 @@ def read_curved_paths_synthetic(config: DictConfig) -> pd.DataFrame:
     Returns:
         The synthetic curved paths dataset.
     """
+    root_dir = Path(config.root_dir).parent
     trajectory_data_dir = Path(config.trajectory_data_dir)
-    file_path = trajectory_data_dir / "artificial_measurements_ellipse.parquet"
+    file_path = root_dir / trajectory_data_dir / "artificial_measurements_ellipse.parquet"
     df = pd.read_parquet(file_path)
     df = df.rename(columns={"x": "xf", "y": "yf", "xdot": "uf", "ydot": "vf"})
     return df
@@ -277,8 +278,9 @@ def read_ehv_pf34_paths_geert(config: DictConfig) -> pd.DataFrame:
     Returns:
         The trajectory dataset with Eindhoven platform 3-4 paths
     """
+    root_dir = Path(config.root_dir).parent
     trajectory_data_dir = Path(config.trajectory_data_dir)
-    file_path = trajectory_data_dir / "trajectories_EHV_platform_2_1_refined.parquet"
+    file_path = root_dir / trajectory_data_dir / "trajectories_EHV_platform_2_1_refined.parquet"
     df = pd.read_parquet(file_path)
     df = df[["date_time_utc", "Pid", "xf", "yf"]]
 
@@ -497,8 +499,8 @@ def read_asdz_pf12_paths(config: DictConfig) -> pd.DataFrame:
 
 
 trajectory_reader = {
-    "single_paths": read_narrow_corridor_paths,
-    "parallel_paths": read_parallel_paths,
+    "narrow_corridor": read_narrow_corridor_paths,
+    "wide_corridor": read_wide_corridor_paths,
     "intersecting_paths": read_intersecting_paths,
     "curved_paths_synthetic": read_curved_paths_synthetic,
     "eindhoven_pf34": read_eindhoven_pf34_paths,
