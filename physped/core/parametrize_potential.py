@@ -12,26 +12,11 @@ from scipy.stats import norm
 
 from physped.core.piecewise_potential import PiecewisePotential
 from physped.io.readers import read_piecewise_potential_from_file
-from physped.utils.functions import digitize_to_bins, polar_to_cartesian_coordinates, weighted_mean_of_two_matrices
+from physped.utils.functions import digitize_coordinates_to_lattice, polar_to_cartesian_coordinates, weighted_mean_of_two_matrices
 
 # from physped.core.functions_to_discretize_grid import digitize_trajectories_to_grid
 
 log = logging.getLogger(__name__)
-
-
-# def create_grid_bins_from_config(config: dict) -> dict:
-#     grid_conf = config.params.grid
-#     xbins = np.arange(grid_conf.x.min, grid_conf.x.max + 0.01, grid_conf.x.step)
-#     ybins = np.arange(grid_conf.y.min, grid_conf.y.max + 0.01, grid_conf.y.step)
-#     rbins = np.arange(grid_conf.r.min, grid_conf.r.max + 0.01, grid_conf.r.step)
-#     thetabins = np.linspace(
-#         grid_conf.theta.min, grid_conf.theta.min + 2 * np.pi + 0.0001, grid_conf.theta.segments + 1
-#     )
-#     kbins = np.array([0, 1, 10**10])
-#     gridbins = {"x": xbins, "y": ybins, "r": rbins, "theta": thetabins, "k": kbins}
-#     log.info("Bins succesfully created with limits: %s", grid_conf)
-#     log.debug("Grid bins: %s", gridbins)
-#     return gridbins
 
 
 def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: DictConfig) -> PiecewisePotential:
@@ -73,20 +58,15 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: DictCo
     )
     log.info("Finished learning piecewise potential from trajectories.")
     piecewise_potential = reparametrize_potential_to_curvature(piecewise_potential, config)
-    # piecewise_potential = derive_potential_center(piecewise_potential, config)
-    # piecewise_potential.position_based_offset = calculate_position_based_emperic_potential(
-    #     piecewise_potential.histogram_slow, config
-    # )
-    # piecewise_potential = calculate_position_based_offset(piecewise_potential, config)
     return piecewise_potential
 
 
 def reparametrize_potential_to_curvature(piecewise_potential: PiecewisePotential, config: DictConfig) -> PiecewisePotential:
     var = config.params.model.sigma**2
-    xvar = piecewise_potential.parametrization[..., 0, 1]  # .copy()
-    yvar = piecewise_potential.parametrization[..., 1, 1]  # .copy()
-    uvar = piecewise_potential.parametrization[..., 2, 1]  # .copy()
-    vvar = piecewise_potential.parametrization[..., 3, 1]  # .copy()
+    xvar = piecewise_potential.parametrization[..., 0, 1]
+    yvar = piecewise_potential.parametrization[..., 1, 1]
+    uvar = piecewise_potential.parametrization[..., 2, 1]
+    vvar = piecewise_potential.parametrization[..., 3, 1]
 
     # xvar, yvar, uvar, vvar = [np.where(v == 0, np.nan, v) for v in variances]
 
@@ -137,6 +117,8 @@ def accumulate_grids(cummulative_grids: PiecewisePotential, grids_to_add: Piecew
 def extract_submatrix(matrix: np.ndarray, slicing_indices: List[tuple]) -> np.ndarray:
     """Extract a submatrix from a nd-matrix using periodic boundary conditions.
 
+    Periodicity is needed for the angular dimension.
+
     Parameters:
     - matrix: The input nd-matrix to slice.
     - slicing_indices: A list of slice tuples for each dimension of the nd-matrix.
@@ -172,7 +154,7 @@ def digitize_trajectories_to_grid(grid_bins: dict, trajectories: pd.DataFrame) -
             dobs = obs
         else:
             dobs = obs + dynamics
-        inds = digitize_to_bins(trajectories[dobs], grid_bins[obs])
+        inds = digitize_coordinates_to_lattice(trajectories[dobs], grid_bins[obs])
         indices[dobs] = inds
 
     indices["thetaf"] = np.where(indices["rf"] == 0, 0, indices["thetaf"])
@@ -225,8 +207,8 @@ def add_trajectories_to_histogram(histogram: np.ndarray, trajectories: pd.DataFr
     Add trajectories to a histogram.
 
     Parameters:
-    - histogram (): The histogram to add the trajectories to.
-    - trajectories (pd.DataFrame): The trajectories to add to the histogram.
+    - histogram: The histogram to add the trajectories to.
+    - trajectories: The trajectories to add to the histogram.
 
     Returns:
     - The updated histogram.
@@ -234,28 +216,6 @@ def add_trajectories_to_histogram(histogram: np.ndarray, trajectories: pd.DataFr
     for grid_index, group in trajectories.groupby(groupbyindex):
         histogram[grid_index] += len(group)
     return histogram
-
-
-# def create_grid_bins(grid_vals: dict) -> dict:
-#     """
-#     Create bins for a grid.
-
-#     Parameters:
-#     - grid_vals (dict): The values of the grid.
-
-#     Returns:
-#     - A dictionary of bins for each dimension of the grid.
-#     """
-#     grid_bins = {}
-#     if "x" in grid_vals and "y" in grid_vals:
-#         grid_bins = {key: np.arange(*grid_vals[key]) for key in ["x", "y"]}
-#     if "r" in grid_vals:
-#         grid_bins["r"] = np.array(grid_vals["r"])
-#     if "theta" in grid_vals:
-#         grid_bins["theta"] = np.arange(-np.pi, np.pi + 0.01, grid_vals["theta"])
-#     if "k" in grid_vals:
-#         grid_bins["k"] = np.array(grid_vals["k"])
-#     return grid_bins
 
 
 def get_grid_indices(potential: PiecewisePotential, point: List[float]) -> np.ndarray:
@@ -278,66 +238,13 @@ def get_grid_indices(potential: PiecewisePotential, point: List[float]) -> np.nd
     indices = np.array([], dtype=int)
     for val, obs in zip(point, potential.dimensions):
         grid = potential.bins[obs]
-        indices = np.append(indices, digitize_to_bins(val, grid))
+        indices = np.append(indices, digitize_coordinates_to_lattice(val, grid))
 
     # For r = 0 all theta are 0
     if indices[2] == 0:
         indices[3] = 0  # merge grid cells for low r_s
 
     return indices
-
-
-def get_grid_index_single_value(value: float, bins: np.ndarray) -> int:
-    """
-    Returns the index of the grid cell that corresponds to the given value.
-    If a value is outside the grid, it is wrapped around to the other side.
-    Following a periodic boundary condition.
-
-    Parameters:
-    value: The value to be discretized.
-    bins: An array of bin edges defining the grid cells.
-
-    Returns:
-    int: The index of the grid cell that corresponds to the given value.
-    """
-    # ! This is very similar to functions.digitize_to_bins. Do we need periodic boundary cond?
-    if value > np.max(bins):
-        value -= np.max(bins) - np.min(bins)
-        grid_idx = np.digitize(value, bins)
-        grid_idx += len(bins) - 1
-    elif value < np.min(bins):
-        value += np.max(bins) - np.min(bins)
-        grid_idx = np.digitize(value, bins)
-        grid_idx -= len(bins) - 1
-    else:
-        grid_idx = np.digitize(value, bins)
-    return grid_idx
-
-
-def return_grid_ids(grid, value) -> dict:
-    """Return the grid indices of a given observable and value."""
-    # ! also very similar to function.digitize_to_bins.
-    # ! Do we need to be so flexible in the input value?
-    # ! Do we want to return a dict?
-    # grid = grids.bins[observable]  # TODO Change attribute to 1d Grid
-    # grid = self.grid_observable[observable]
-
-    if isinstance(value, int):
-        value = float(value)
-    if isinstance(value, float):
-        grid_id = get_grid_index_single_value(value, grid)
-        grid_idx = [grid_id - 1, grid_id]
-
-    elif (isinstance(value, list)) and (len(value) == 2):
-        grid_idx = [
-            get_grid_index_single_value(value[0], grid) - 1,
-            get_grid_index_single_value(value[1], grid),
-        ]
-    else:
-        grid_idx = [0, len(grid) - 1]
-    return {
-        "grid_idx": grid_idx,
-    }
 
 
 def get_boundary_coordinates_of_selection(bins, observable, values):
@@ -353,7 +260,7 @@ def get_boundary_coordinates_of_selection(bins, observable, values):
 
 
 def selection_to_bounds(bins, selection_coordinates, dimension):
-    selection_grid_indices = [get_grid_index_single_value(x, bins) for x in selection_coordinates]
+    selection_grid_indices = digitize_coordinates_to_lattice(selection_coordinates, bins)
     selection_boundary_coordinates = get_boundary_coordinates_of_selection(bins, dimension, selection_grid_indices)
     return selection_boundary_coordinates
 
@@ -378,7 +285,7 @@ def make_grid_selection(piecewise_potential, selection):
             value = [value, value]
 
         grid_selection[observable]["selection"] = value
-        grid_ids = return_grid_ids(grid_bins, value)["grid_idx"]
+        grid_ids = digitize_coordinates_to_lattice(value, grid_bins)
         grid_selection[observable]["grid_ids"] = grid_ids
         grid_boundaries = get_boundary_coordinates_of_selection(grid_bins, observable, grid_ids)
         grid_selection[observable]["bounds"] = grid_boundaries

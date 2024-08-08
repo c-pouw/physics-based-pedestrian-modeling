@@ -2,7 +2,6 @@ import logging
 from typing import Tuple
 
 import numpy as np
-import pandas as pd
 
 log = logging.getLogger(__name__)
 
@@ -156,27 +155,41 @@ def test_weighted_mean_of_two_matrices(first_matrix: np.ndarray, counts_first_ma
 #     return np.unravel_index(indices1d, origin_histogram.shape)
 
 
-def digitize_to_bins(values: pd.Series, bins: np.ndarray) -> np.ndarray:
-    """Digitizes the given values to the specified grid.
-
-    This function is 1-dimensional.
+def digitize_coordinates_to_lattice(coordinates: np.ndarray, lattice_bins: np.ndarray) -> np.ndarray:
+    """Digitizes the given coordinates to the specified lattice bins.
 
     Boundary conditions:
-    - values higher than the biggest bin get the index of the last bin.
-    - values lower that the lowest bin get index 0.
+    - Coordinates outside the lattice return -1.
 
     Args:
-        values: The values to be digitized.
-        bins: The bin edges defining the lattice cells.
+        coordinates: The coordinates in one dimension to be digitized.
+        lattice_bins: The bin edges in one dimension defining the lattice cells.
 
     Returns:
-        The digitized indices corresponding to the values.
+        The lattice indices corresponding to the coordinates.
     """
-    # ! Write a test for this function
-    indices = np.digitize(values, bins) - 1
-    indices = np.where(indices < 0, 0, indices)
-    indices = np.where(indices > len(bins) - 2, len(bins) - 2, indices)
+    indices = np.digitize(coordinates, lattice_bins) - 1
+    smallest_index = 0
+    biggest_index = len(lattice_bins) - 2
+    indices = np.where(indices < smallest_index, -1, indices)
+    indices = np.where(indices > biggest_index, -1, indices)
     return indices
+
+
+def periodic_angular_conditions(angle: np.ndarray, angular_bins: np.ndarray) -> np.ndarray:
+    """Apply periodic boundary conditions to a list of angular coordinates.
+
+    Args:
+        angle: A list of angular coordinates.
+        angular_bins: An array of bin edges defining the angular grid cells.
+
+    Returns:
+        The angular coordinates cast to the angular grid.
+    """
+    angle -= angular_bins[0]
+    angle = angle % (2 * np.pi)
+    angle += angular_bins[0]
+    return angle
 
 
 def weighted_mean_of_matrix(field: np.ndarray, histogram: np.ndarray, axes: Tuple = (2, 3, 4)) -> np.ndarray:

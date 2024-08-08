@@ -150,7 +150,7 @@ def simulate_trajectories(piecewise_potential: PiecewisePotential, config: dict,
                     : -n_frames_back - 1
                 ]  # strip frames from last trajectory piece
                 trajectory_pieces[-1] = last_trajectory_piece
-                frame_to_restart_from = int(restarting_state["k"])
+                frame_to_restart_from = int(restarting_state["k"])  # TODO : fix bug: can't convert inf to int
 
                 new_evaluation_time = evaluation_time[frame_to_restart_from:]
 

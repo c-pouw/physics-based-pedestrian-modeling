@@ -519,7 +519,7 @@ def get_local_background_image(config: DictConfig) -> np.ndarray:
     Returns:
         The background image as a numpy array.
     """
-    image = plt.imread(Path(config.root_dir) / config.params.background.imgpath)
+    image = plt.imread(Path(config.root_dir).parent / config.params.background.imgpath)
     return image
 
 

@@ -7,8 +7,9 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from physped.core.parametrize_potential import get_boundary_coordinates_of_selection, make_grid_selection, return_grid_ids
+from physped.core.parametrize_potential import get_boundary_coordinates_of_selection, make_grid_selection
 from physped.io.readers import read_piecewise_potential_from_file
+from physped.utils.functions import digitize_coordinates_to_lattice
 from physped.visualization.plot_utils import (  # apply_cartesian_velocity_plot_style,
     apply_polar_plot_style,
     apply_xy_plot_style,
@@ -212,7 +213,7 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
             potential_convolution_params = params.get("potential_convolution", {})
             value = potential_convolution_params[axis]
             bins = piecewise_potential.bins.get(axis)
-            idx = return_grid_ids(bins, value)["grid_idx"]
+            idx = digitize_coordinates_to_lattice(value, bins)
             obs_limits = get_boundary_coordinates_of_selection(bins, axis, idx)
             plot_limits.append(obs_limits)
 

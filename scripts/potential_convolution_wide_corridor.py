@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from hydra import compose, initialize
 
-from physped.core.functions_to_select_grid_piece import get_index_of_the_enclosing_bin
 from physped.core.parametrize_potential import learn_potential_from_trajectories
 from physped.io.readers import trajectory_reader
 from physped.preprocessing.trajectories import preprocess_trajectories, process_slow_modes
 from physped.utils.config_utils import register_new_resolvers
+from physped.utils.functions import digitize_coordinates_to_lattice
 
 plt.style.use(Path.cwd() / "../physped/conf/science.mplstyle")
 
@@ -66,7 +66,7 @@ def calculate_potential(curvature, center, offset, value):
 point = [0, -10, 1, 0, 3]
 bin_index = []
 for dim, value in zip(cfg.params.grid.bins, point):
-    bin_index.append(get_index_of_the_enclosing_bin(value, cfg.params.grid.bins[dim]))
+    bin_index.append(digitize_coordinates_to_lattice(value, cfg.params.grid.bins[dim]))
 # bin_index[3] = 3
 
 fig, ax = plt.subplots(figsize=(3.54, 1.5))

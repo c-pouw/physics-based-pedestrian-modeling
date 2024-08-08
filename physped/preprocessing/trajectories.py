@@ -9,6 +9,7 @@ from tqdm.contrib.logging import logging_redirect_tqdm
 
 from physped.io.readers import read_trajectories_from_path
 from physped.io.writers import save_trajectories
+from physped.utils.functions import periodic_angular_conditions
 
 log = logging.getLogger(__name__)
 
@@ -101,13 +102,6 @@ def process_slow_modes(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     df["xs"] = slow_position_algorithm(df, colname="xf", vel_col="us", tau=taux, dt=dt, window_length=window_length)
     df["ys"] = slow_position_algorithm(df, colname="yf", vel_col="vs", tau=taux, dt=dt, window_length=window_length)
     return df
-
-
-def periodic_angular_conditions(theta, thetabins):
-    theta -= thetabins[0]
-    theta = theta % (2 * np.pi)
-    theta += thetabins[0]
-    return theta
 
 
 def add_velocity_in_polar_coordinates(df: pd.DataFrame, mode: str = "f") -> pd.DataFrame:
