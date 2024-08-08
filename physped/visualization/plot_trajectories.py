@@ -212,7 +212,7 @@ def plot_trajectories(trajs: pd.DataFrame, config: dict, trajectory_type: str = 
             piecewise_potential = read_piecewise_potential_from_file(Path.cwd().parent / "piecewise_potential.pickle")
             potential_convolution_params = params.get("potential_convolution", {})
             value = potential_convolution_params[axis]
-            bins = piecewise_potential.bins.get(axis)
+            bins = piecewise_potential.lattice.bins.get(axis)
             idx = digitize_coordinates_to_lattice(value, bins)
             obs_limits = get_boundary_coordinates_of_selection(bins, axis, idx)
             plot_limits.append(obs_limits)

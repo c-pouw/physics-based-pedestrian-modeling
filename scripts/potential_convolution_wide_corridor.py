@@ -80,7 +80,7 @@ lw = 1
 
 for y_index in range(len(ybins) - 1)[::1]:
     bin_index[1] = y_index
-    xmu, xvar, ymu, yvar, umu, uvar, vmu, vvar = piecewise_potential.fit_params[
+    xmu, xvar, ymu, yvar, umu, uvar, vmu, vvar = piecewise_potential.parametrization[
         bin_index[0], bin_index[1], bin_index[2], bin_index[3], bin_index[4], :
     ]
 
@@ -190,7 +190,7 @@ plt.savefig("../figures/potential_convolution_wide_corridor.pdf")
 # %%
 
 fig, ax = plt.subplots()
-ymu = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
+ymu = piecewise_potential.parameterization[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
 dymu = np.where(ymu == 0, np.nan, ymu - middle_bins[:-1])
 # yvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 3]
 # vvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 7]
@@ -231,7 +231,7 @@ plt.savefig("../figures/potential_mean_wide_corridor.pdf")
 # %%
 
 fig, ax = plt.subplots()
-ymu = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
+ymu = piecewise_potential.parametrization[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
 dymu = np.where(ymu == 0, np.nan, ymu - middle_bins[:-1])
 # yvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 3]
 # vvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 7]
@@ -271,7 +271,7 @@ plt.savefig("../figures/potential_curvature_wide_corridor.pdf")
 
 # %%
 fig, ax = plt.subplots()
-ymu = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
+ymu = piecewise_potential.parametrization[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
 # dymu = np.where(ymu == 0, np.nan, ymu - middle_bins[:-1])
 # yvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 3]
 # vvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 7]

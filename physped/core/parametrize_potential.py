@@ -45,7 +45,7 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: DictCo
 
     log.info("Start learning the piecewise potential")
     piecewise_potential = PiecewisePotential(grid_bins)
-    trajectories = digitize_trajectories_to_grid(piecewise_potential.bins, trajectories)
+    trajectories = digitize_trajectories_to_grid(piecewise_potential.lattice.bins, trajectories)
     piecewise_potential.histogram = add_trajectories_to_histogram(
         piecewise_potential.histogram, trajectories, "fast_grid_indices"
     )
@@ -74,7 +74,7 @@ def reparametrize_potential_to_curvature(piecewise_potential: PiecewisePotential
     piecewise_potential.parametrization[..., 1, 1] = vvar / (2 * yvar)
     piecewise_potential.parametrization[..., 2, 1] = var / (4 * uvar)
     piecewise_potential.parametrization[..., 3, 1] = var / (4 * vvar)
-    piecewise_potential.parameters = ["mu", "curvature"]
+    piecewise_potential.dist_approximation.fit_parameters = ["mu", "curvature"]
     return piecewise_potential
 
 
@@ -218,7 +218,7 @@ def add_trajectories_to_histogram(histogram: np.ndarray, trajectories: pd.DataFr
     return histogram
 
 
-def get_grid_indices(potential: PiecewisePotential, point: List[float]) -> np.ndarray:
+def get_grid_indices(piecewise_potential: PiecewisePotential, point: List[float]) -> np.ndarray:
     """Given a point (xs, ys, thetas, rs), return the associated lattice indices.
 
     This function is 4-dimensional.
@@ -236,8 +236,8 @@ def get_grid_indices(potential: PiecewisePotential, point: List[float]) -> np.nd
     """
     # ! Write a test for this function
     indices = np.array([], dtype=int)
-    for val, obs in zip(point, potential.dimensions):
-        grid = potential.bins[obs]
+    for val, obs in zip(point, piecewise_potential.lattice.bins.keys()):
+        grid = piecewise_potential.lattice.bins[obs]
         indices = np.append(indices, digitize_coordinates_to_lattice(val, grid))
 
     # For r = 0 all theta are 0
@@ -274,7 +274,7 @@ def make_grid_selection(piecewise_potential, selection):
         # for observable, value in zip(["x", "y", "r", "theta"], [x, y, r, theta, k]):
         grid_selection[observable] = {}
         # grid = grid.grid_observable[observable]
-        grid_bins = piecewise_potential.bins.get(observable)
+        grid_bins = piecewise_potential.lattice.bins.get(observable)
         print(grid_bins)
 
         if not value:  # if None select full grid
