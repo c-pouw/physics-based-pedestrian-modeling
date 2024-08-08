@@ -1,65 +1,82 @@
+"""This module contains functions to select a single point or a range of values in the configuration file.
+
+The only purpose is to let the user make a selection along the discretization lattice.
+"""
+
 import logging
 from typing import List
 
 import numpy as np
-from omegaconf import OmegaConf
+from omegaconf import DictConfig, OmegaConf
 
 log = logging.getLogger(__name__)
 
 
-def apply_periodic_conditions_to_the_angle_theta(theta: float):
-    """
-    Apply periodic conditions to the angle theta.
+def apply_periodic_conditions_to_the_angle_theta(theta: float) -> float:
+    """Apply periodic conditions to the angle theta.
+
+    The output will be in the range [-pi, pi].
 
     Args:
-        theta (float): The angle theta.
+        theta: The angle theta.
 
     Returns:
-        float: The angle theta after applying the periodic conditions.
+        The angle theta in the range [-pi, pi].
     """
     theta += np.pi
     return theta % (2 * np.pi) - np.pi
 
 
-def is_selected_value_outside_bins(selected_value: float, bins: dict, grid_dimension: str) -> bool:
-    outside_bins = (selected_value < bins[grid_dimension][0]) or (selected_value > bins[grid_dimension][-1])
-    if outside_bins:
-        log.error(
-            "The selected %s value (%s) must be within the range of the bins [%s,%s].",
-            grid_dimension,
-            selected_value,
-            bins[grid_dimension][0],
-            bins[grid_dimension][-1],
-        )
-    return outside_bins
+# ! The functions below are used to select a single point in the configuration file
 
 
-def is_selected_point_within_grid(selected_point: OmegaConf, grid_bins: dict) -> None:
-    """
-    Validate the selection.
+def validate_value_within_lattice(selected_value: float, bins: dict, dimension: str) -> None:
+    """Check if the selected value is outside the lattice.
 
     Args:
-        selection (OmegaConf): The selection.
+        selected_value: The selected value in one of the dimensions.
+        bins: The bins of the lattice in all the dimensions.
+        dimension: The dimension of the given value.
 
-    Returns:
-        None
+    Raises:
+        ValueError: If the selected value is outside the lattice.
     """
-    x_value_outside_bins = is_selected_value_outside_bins(selected_point.x, grid_bins, "x")
-    y_value_outside_bins = is_selected_value_outside_bins(selected_point.y, grid_bins, "y")
-    r_value_outside_bins = is_selected_value_outside_bins(selected_point.r, grid_bins, "r")
-    theta_value_outside_bins = is_selected_value_outside_bins(selected_point.theta_periodic, grid_bins, "theta")
-    k_value_outside_bins = is_selected_value_outside_bins(selected_point.k, grid_bins, "k")
-    selected_point_outside_bins = [
-        x_value_outside_bins,
-        y_value_outside_bins,
-        r_value_outside_bins,
-        theta_value_outside_bins,
-        k_value_outside_bins,
-    ]
-    if any(selected_point_outside_bins):
-        raise ValueError("The selected point is not located within the grid.")
-    else:
-        log.info("The selectied point is located within the grid.")
+    left_bound = bins[dimension][0]
+    right_bound = bins[dimension][-1]
+    outside_lattice = (selected_value < left_bound) or (selected_value > right_bound)
+    if outside_lattice:
+        raise ValueError(
+            f"Selected {dimension} value ({selected_value}) is outside the lattice. "
+            f"Please select a value within the range [{left_bound},{right_bound}]."
+        )
+
+
+def validate_point_within_lattice(selected_point: DictConfig, grid_bins: dict) -> None:
+    """Validate the selection.
+
+    Args:
+        selected_point: The selected point.
+        grid_bins: The bins of the lattice in all the dimensions.
+    """
+    for dimension, value in selected_point.items():
+        validate_value_within_lattice(value, grid_bins, dimension)
+    log.info("The selected point is located within the grid.")
+
+    # validate_value_within_lattice(selected_point.x, grid_bins, "x")
+    # validate_value_within_lattice(selected_point.y, grid_bins, "y")
+    # validate_value_within_lattice(selected_point.r, grid_bins, "r")
+    # validate_value_within_lattice(selected_point.theta_periodic, grid_bins, "theta")
+    # validate_value_within_lattice(selected_point.k, grid_bins, "k")
+    # selected_point_outside_bins = [
+    #     x_value_outside_bins,
+    #     y_value_outside_bins,
+    #     r_value_outside_bins,
+    #     theta_value_outside_bins,
+    #     k_value_outside_bins,
+    # ]
+    # if any(selected_point_outside_bins):
+    #     raise ValueError("The selected point is not located within the grid.")
+    # else:
 
 
 def get_boundaries_that_enclose_the_selected_bin(bin_index: OmegaConf, bins: dict) -> dict:
@@ -69,15 +86,14 @@ def get_boundaries_that_enclose_the_selected_bin(bin_index: OmegaConf, bins: dic
 
 
 def get_index_of_the_enclosing_bin(selected_value: float, bins: np.ndarray) -> int:
-    """
-    Get the index of the bin that encloses the value.
+    """Get the index of the bin that encloses the value.
 
     Args:
-        selected_value (float): A single integer or float value.
-        bins (np.ndarray): An array of bin boundaries.
+        selected_value: A single integer or float value.
+        bins: An array of bin edges.
 
     Returns:
-        int: The index of the bin that encloses the value.
+        The index of the bin that encloses the value.
     """
     # ! Note that the value can be outside the range of the bins.
     # ! In this case it returns nan.
@@ -86,9 +102,7 @@ def get_index_of_the_enclosing_bin(selected_value: float, bins: np.ndarray) -> i
     if selected_value > bins[-1]:
         return np.nan
     shifted_bins = np.copy(bins) - bins[0]
-    # print(shifted_bins)
     selected_value = selected_value - bins[0]
-    # print(selected_value)
     return int(np.digitize(selected_value, shifted_bins, right=False) - 1)
 
 
@@ -98,7 +112,7 @@ def evaluate_selection_point(config):
     grid_bins = config.params.grid.bins
 
     selected_point.theta_periodic = apply_periodic_conditions_to_the_angle_theta(selected_point.theta)
-    is_selected_point_within_grid(selected_point, grid_bins)
+    validate_point_within_lattice(selected_point, grid_bins)
     selected_point.x_index = get_index_of_the_enclosing_bin(selected_point.x, grid_bins["x"])
     selected_point.y_index = get_index_of_the_enclosing_bin(selected_point.y, grid_bins["y"])
     selected_point.r_index = get_index_of_the_enclosing_bin(selected_point.r, grid_bins["r"])
@@ -108,14 +122,17 @@ def evaluate_selection_point(config):
     # log.info(f"Selection : {OmegaConf.to_yaml(selection)}")
 
 
+# ! The functions below are used to select a range of values in the configuration file
+
+
 def is_selected_range_within_grid(selected_range: OmegaConf, grid_bins: dict) -> None:
-    x_values_outside_bins = [is_selected_value_outside_bins(x, grid_bins, "x") for x in selected_range.x]
-    y_values_outside_bins = [is_selected_value_outside_bins(y, grid_bins, "y") for y in selected_range.y]
-    r_values_outside_bins = [is_selected_value_outside_bins(r, grid_bins, "r") for r in selected_range.r]
+    x_values_outside_bins = [validate_value_within_lattice(x, grid_bins, "x") for x in selected_range.x]
+    y_values_outside_bins = [validate_value_within_lattice(y, grid_bins, "y") for y in selected_range.y]
+    r_values_outside_bins = [validate_value_within_lattice(r, grid_bins, "r") for r in selected_range.r]
     theta_values_outside_bins = [
-        is_selected_value_outside_bins(theta, grid_bins, "theta") for theta in selected_range.theta_periodic
+        validate_value_within_lattice(theta, grid_bins, "theta") for theta in selected_range.theta_periodic
     ]
-    k_values_outside_bins = [is_selected_value_outside_bins(k, grid_bins, "k") for k in selected_range.k]
+    k_values_outside_bins = [validate_value_within_lattice(k, grid_bins, "k") for k in selected_range.k]
     selected_point_outside_bins = [
         x_values_outside_bins,
         y_values_outside_bins,

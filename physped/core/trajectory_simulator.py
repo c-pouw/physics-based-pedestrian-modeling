@@ -12,7 +12,7 @@ from physped.core.piecewise_potential import PiecewisePotential
 from physped.io.readers import read_trajectories_from_path
 from physped.io.writers import save_trajectories
 from physped.preprocessing.trajectories import periodic_angular_conditions
-from physped.utils.functions import cart2pol
+from physped.utils.functions import cartesian_to_polar_coordinates
 
 log = logging.getLogger(__name__)
 
@@ -162,8 +162,8 @@ def simulate_trajectories(piecewise_potential: PiecewisePotential, config: dict,
             trajectories.append(trajectory_pieces)
 
     trajectories = pd.concat(trajectories).dropna()
-    trajectories["rf"], trajectories["thetaf"] = cart2pol(trajectories.uf, trajectories.vf)
-    trajectories["rs"], trajectories["thetas"] = cart2pol(trajectories.us, trajectories.vs)
+    trajectories["rf"], trajectories["thetaf"] = cartesian_to_polar_coordinates(trajectories.uf, trajectories.vf)
+    trajectories["rs"], trajectories["thetas"] = cartesian_to_polar_coordinates(trajectories.us, trajectories.vs)
     trajectories["thetaf"] = periodic_angular_conditions(trajectories["thetaf"], config.params.grid.bins["theta"])
     trajectories["thetas"] = periodic_angular_conditions(trajectories["thetas"], config.params.grid.bins["theta"])
     if config.save.simulated_trajectories:

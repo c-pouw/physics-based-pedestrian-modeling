@@ -9,8 +9,8 @@ from hydra import compose, initialize
 from physped.core.functions_to_select_grid_piece import get_index_of_the_enclosing_bin
 from physped.core.parametrize_potential import learn_potential_from_trajectories
 from physped.io.readers import trajectory_reader
-from physped.omegaconf_resolvers import register_new_resolvers
 from physped.preprocessing.trajectories import preprocess_trajectories, process_slow_modes
+from physped.utils.config_utils import register_new_resolvers
 
 plt.style.use(Path.cwd() / "../physped/conf/science.mplstyle")
 

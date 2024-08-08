@@ -8,7 +8,7 @@ import sdeint
 from physped.core.parametrize_potential import get_grid_indices
 from physped.core.piecewise_potential import PiecewisePotential
 from physped.preprocessing.trajectories import periodic_angular_conditions
-from physped.utils.functions import cart2pol
+from physped.utils.functions import cartesian_to_polar_coordinates
 
 log = logging.getLogger(__name__)
 
@@ -111,7 +111,7 @@ class LangevinModel:
             log.info("Pid %s: left the grid at t = %.2f s", int(Pid), t)
             return np.repeat(np.inf, len(state))
 
-        rs, thetas = cart2pol(us, vs)
+        rs, thetas = cartesian_to_polar_coordinates(us, vs)
         thetas = periodic_angular_conditions(thetas, self.params.grid.bins["theta"])
         slow_state = [xs, ys, rs, thetas, k]
         slow_state_index = get_grid_indices(self.potential, slow_state)

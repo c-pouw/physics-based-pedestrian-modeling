@@ -12,7 +12,7 @@ from scipy.stats import norm
 
 from physped.core.piecewise_potential import PiecewisePotential
 from physped.io.readers import read_piecewise_potential_from_file
-from physped.utils.functions import digitize_values_to_grid, pol2cart, weighted_mean_of_two_matrices
+from physped.utils.functions import digitize_to_bins, polar_to_cartesian_coordinates, weighted_mean_of_two_matrices
 
 # from physped.core.functions_to_discretize_grid import digitize_trajectories_to_grid
 
@@ -98,24 +98,6 @@ def reparametrize_potential_to_curvature(piecewise_potential: PiecewisePotential
     return piecewise_potential
 
 
-# def derive_potential_center(piecewise_potential: PiecewisePotential, config: DictConfig) -> PiecewisePotential:
-#     piecewise_potential.center_x = piecewise_potential.fit_params[..., 0, 0]
-#     piecewise_potential.center_y = piecewise_potential.fit_params[..., 1, 0]
-#     piecewise_potential.center_u = piecewise_potential.fit_params[..., 2, 0]
-#     piecewise_potential.center_v = piecewise_potential.fit_params[..., 3, 0]
-#     return piecewise_potential
-
-
-# def calculate_position_based_offset(piecewise_potential: PiecewisePotential, config: dict) -> PiecewisePotential:
-#     position_counts = np.nansum(piecewise_potential.histogram_slow, axis=(2, 3, 4))
-#     position_counts = np.where(position_counts == 0, np.nan, position_counts)
-#     A = 0.01  # TODO: Move to config
-#     piecewise_potential.position_based_offset = A * (
-#         -np.log(position_counts) + np.log(np.nansum(piecewise_potential.histogram_slow))
-#     )
-#     return piecewise_potential
-
-
 def calculate_position_based_emperic_potential(histogram_slow, config: DictConfig):
     position_counts = np.nansum(histogram_slow, axis=(2, 3, 4))
     position_counts = np.where(position_counts < config.params.model.minimum_fitting_threshold, np.nan, position_counts)
@@ -125,8 +107,9 @@ def calculate_position_based_emperic_potential(histogram_slow, config: DictConfi
 
 
 def accumulate_grids(cummulative_grids: PiecewisePotential, grids_to_add: PiecewisePotential) -> PiecewisePotential:
-    """
-    Accumulate grids by taking a weighted mean of the fit parameters.
+    """Accumulate grids by taking a weighted mean of the fit parameters.
+
+    The goal of this function is to sum PiecewisePotential objects.
 
     Parameters:
     - cummulative_grids (DiscreteGrid): The cumulative grids to add to.
@@ -136,6 +119,7 @@ def accumulate_grids(cummulative_grids: PiecewisePotential, grids_to_add: Piecew
     - The updated cumulative grids.
     """
     # ! WARNING: This function needs to be tested. Seems to have a bug.
+    # ! Perhaps this needs to be a dunder class method i.e. __add__
     for p, _ in enumerate(cummulative_grids.fit_param_names):  # Loop over all fit parameters
         # accumulate fit parameters
         cummulative_grids.fit_params[:, :, :, :, :, p] = weighted_mean_of_two_matrices(
@@ -151,18 +135,18 @@ def accumulate_grids(cummulative_grids: PiecewisePotential, grids_to_add: Piecew
 
 
 def extract_submatrix(matrix: np.ndarray, slicing_indices: List[tuple]) -> np.ndarray:
-    """
-    Get a slice of a multidimensional NumPy array with periodic boundary conditions.
+    """Extract a submatrix from a nd-matrix using periodic boundary conditions.
 
     Parameters:
-    - a (np.ndarray): The input array to slice.
-    - slices (List[Tuple[int, int]]): A list of slice ranges for each dimension of the array.
+    - matrix: The input nd-matrix to slice.
+    - slicing_indices: A list of slice tuples for each dimension of the nd-matrix.
 
     Returns:
-    - The sliced array.
+    - The submatrix.
     """
     if any(slice[0] > slice[1] for slice in slicing_indices):
-        print("Slicing indices must be ascending.")
+        raise ValueError("Slicing indices must be ascending.")
+
     reshape_dimension = (-1,) + (1,) * (len(slicing_indices) - 1)
     slicing_indices = [
         np.arange(*slice).reshape(np.roll(reshape_dimension, i)) % matrix.shape[i] for i, slice in enumerate(slicing_indices)
@@ -171,14 +155,16 @@ def extract_submatrix(matrix: np.ndarray, slicing_indices: List[tuple]) -> np.nd
 
 
 def digitize_trajectories_to_grid(grid_bins: dict, trajectories: pd.DataFrame) -> pd.DataFrame:
-    """Digitize trajectories to a grid.
+    """Digitize trajectories to a lattice.
+
+    Adds a column to the dataframe with the trajectories that contains the slow indices
 
     Parameters:
-    - grid_bins (dict): The grid bins to digitize the trajectories to.
-    - trajectories (pd.DataFrame): The trajectories to digitize.
+    - grid_bins: The bins which define the lattice.
+    - trajectories: The trajectories to digitize.
 
     Returns:
-    - pd.DataFrame: The trajectories with the digitized grid indices.
+    - The trajectories with an extra column for the slow indices.
     """
     indices = {}
     for obs, dynamics in [(obs, dynamics) for obs in grid_bins.keys() for dynamics in ["f", "s"]]:
@@ -186,7 +172,7 @@ def digitize_trajectories_to_grid(grid_bins: dict, trajectories: pd.DataFrame) -
             dobs = obs
         else:
             dobs = obs + dynamics
-        inds = digitize_values_to_grid(trajectories[dobs], grid_bins[obs])
+        inds = digitize_to_bins(trajectories[dobs], grid_bins[obs])
         indices[dobs] = inds
 
     indices["thetaf"] = np.where(indices["rf"] == 0, 0, indices["thetaf"])
@@ -197,24 +183,24 @@ def digitize_trajectories_to_grid(grid_bins: dict, trajectories: pd.DataFrame) -
     return trajectories
 
 
-def fit_probability_distributions(group: pd.DataFrame, config: DictConfig) -> list:
-    """
-    Fits normal distribution to a group of data points and returns fitting parameters.
+def fit_probability_distributions(group: pd.DataFrame, config: DictConfig) -> np.ndarray:
+    """Fits a group of data points and returns the fit parameters.
 
     Parameters:
-    - group (pd.DataFrame): The group of data points to fit the normal distribution to.
+    - group: The group of data points to fit the normal distribution to.
+    - config: The configuration parameters.
 
     Returns:
-    - A list of fitting parameters.
+    - A marix containing the fit parameters.
     """
     if len(group) < config.params.model.minimum_fitting_threshold:
         return np.nan  # ? Can we do better if we have multiple files?
     fit_func = norm.fit  # * Other functions can be implemented here
-    params = np.zeros((4, 2)) * np.nan
+    fit_parameters = np.zeros((4, 2)) * np.nan
     for i, variable in enumerate(["xf", "yf", "uf", "vf"]):
         mu, std = fit_func(group[variable])  # fit normal distribution to fast modes
-        params[i, :] = [mu, std**2]  # store mean and variance of normal distribution
-    return params
+        fit_parameters[i, :] = [mu, std**2]  # store mean and variance of normal distribution
+    return fit_parameters
 
 
 def parameterize_trajectories_to_grid(parametrization: np.ndarray, trajectories: pd.DataFrame, config: DictConfig):
@@ -272,22 +258,29 @@ def add_trajectories_to_histogram(histogram: np.ndarray, trajectories: pd.DataFr
 #     return grid_bins
 
 
-def get_grid_indices(potential_grid: PiecewisePotential, X: List[float]) -> np.ndarray:
-    """
-    Given a point (xs, ys, thetas, rs), returns the grid index of the point.
+def get_grid_indices(potential: PiecewisePotential, point: List[float]) -> np.ndarray:
+    """Given a point (xs, ys, thetas, rs), return the associated lattice indices.
+
+    This function is 4-dimensional.
+
+    If the radial velocity is in the lowest bin, the angular velocity is automatically
+    also added to the lowest bin. In other words, the angular velocities are not
+    discretized for low radial velocity.
 
     Parameters:
-    - grid (Grids): The Grids object containing the grid definitions.
-    - X (List[float]): A list of Cartesian and polar coordinates.
+    - potential: The piecewise potential.
+    - point: A list with slow positions and velocities (xs, ys, thetas, rs).
 
     Returns:
     - A tuple of grid indices.
     """
+    # ! Write a test for this function
     indices = np.array([], dtype=int)
-    for val, obs in zip(X, potential_grid.dimensions):
-        grid = potential_grid.bins[obs]
-        indices = np.append(indices, digitize_values_to_grid(val, grid))
+    for val, obs in zip(point, potential.dimensions):
+        grid = potential.bins[obs]
+        indices = np.append(indices, digitize_to_bins(val, grid))
 
+    # For r = 0 all theta are 0
     if indices[2] == 0:
         indices[3] = 0  # merge grid cells for low r_s
 
@@ -301,13 +294,13 @@ def get_grid_index_single_value(value: float, bins: np.ndarray) -> int:
     Following a periodic boundary condition.
 
     Parameters:
-    value (float): The value to be discretized.
-    bins (np.array): An array of bin edges defining the grid cells.
+    value: The value to be discretized.
+    bins: An array of bin edges defining the grid cells.
 
     Returns:
     int: The index of the grid cell that corresponds to the given value.
     """
-
+    # ! This is very similar to functions.digitize_to_bins. Do we need periodic boundary cond?
     if value > np.max(bins):
         value -= np.max(bins) - np.min(bins)
         grid_idx = np.digitize(value, bins)
@@ -321,8 +314,11 @@ def get_grid_index_single_value(value: float, bins: np.ndarray) -> int:
     return grid_idx
 
 
-def return_grid_ids(grid, value):
+def return_grid_ids(grid, value) -> dict:
     """Return the grid indices of a given observable and value."""
+    # ! also very similar to function.digitize_to_bins.
+    # ! Do we need to be so flexible in the input value?
+    # ! Do we want to return a dict?
     # grid = grids.bins[observable]  # TODO Change attribute to 1d Grid
     # grid = self.grid_observable[observable]
 
@@ -395,27 +391,14 @@ def make_grid_selection(piecewise_potential, selection):
     return grid_selection
 
 
-def random_uniform_value_in_bin(values: np.ndarray, bins: np.ndarray) -> np.ndarray:
-    """Generate random uniform values within each bin.
-
-    Args:
-        values (np.ndarray): Array of bin indices.
-        bins (np.ndarray): Array of bin edges.
-
-    Returns:
-        np.ndarray: Array of random uniform values within each bin.
-    """
-    left = bins[values]
-    right = bins[values + 1]
-    return np.random.uniform(left, right)
-
-
 def sample_from_ndarray(origin_histogram: np.ndarray, N_samples: int = 1) -> np.ndarray:
     """Sample origin positions from a heatmap with initial positions.
 
+    ! Used for simulation purposes
+
     Parameters:
-    - origin_histogram (np.ndarray): The initial position heatmap.
-    - N_samples (int): The number of samples to generate. Default is 1.
+    - origin_histogram: The initial position heatmap.
+    - N_samples: The number of samples to generate. Default is 1.
 
     Returns:
     - A tuple of NumPy arrays representing the sampled origin positions.
@@ -430,8 +413,34 @@ def sample_from_ndarray(origin_histogram: np.ndarray, N_samples: int = 1) -> np.
     return np.array(np.unravel_index(indices1d, origin_histogram.shape)).T
 
 
+def random_uniform_value_in_bin(lattice_indices: List[int], bins: np.ndarray) -> np.ndarray:
+    """Generate random uniform values within each bin.
+
+    ! Used for simulation purposes
+
+    This function is used to sample origins from a histogram. Given the index of the
+    sampled lattice cell the function will return a real-world variable.
+
+    For example:
+    with bins v_r = [0,0.5,1] and lattice_indices [1] the function returns a random uniformly
+    sampled value between 0.5 and 1.
+
+    Args:
+        lattice_indices: A list with lattice indices.
+        bins: Array of bin edges.
+
+    Returns:
+        Array of random uniform values within each bin.
+    """
+    left = bins[lattice_indices]
+    right = bins[lattice_indices + 1]
+    return np.random.uniform(left, right)
+
+
 def convert_grid_indices_to_coordinates(potential_grid: PiecewisePotential, X_0: np.ndarray) -> np.ndarray:
     """Convert grid indices to Cartesian coordinates.
+
+    ! Used for simulation purposes
 
     Parameters:
     - grids (Grids): The Grids object containing the grid definitions.
@@ -448,5 +457,5 @@ def convert_grid_indices_to_coordinates(potential_grid: PiecewisePotential, X_0:
     thetaf = random_uniform_value_in_bin(X_0[:, 3], potential_grid.bins["theta"])
     k = potential_grid.bins["k"][X_0[:, 4]]
 
-    uf, vf = pol2cart(rf, thetaf)
+    uf, vf = polar_to_cartesian_coordinates(rf, thetaf)
     return np.array([xf, yf, uf, vf, k]).T

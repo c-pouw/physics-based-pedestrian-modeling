@@ -17,7 +17,9 @@ from physped.utils.functions import get_bin_middle
 log = logging.getLogger(__name__)
 
 
-# ? Should this be a (data)class? Possibly just a numpy ndarray with some metadata?
+# TODO: Devide this class into two classes: one for the potential and one for the lattice
+
+
 class PiecewisePotential:
     def __init__(self, bins: Dict[str, np.ndarray]):
         """A class for the piecewise potential.
