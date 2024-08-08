@@ -130,7 +130,6 @@ def model(config):
 
 def main():
     register_new_resolvers()
-    print("Resolvers registered")
     model()
 
 

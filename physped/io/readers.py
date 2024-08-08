@@ -58,7 +58,7 @@ def read_narrow_corridor_paths_local(config: DictConfig) -> Tuple[pd.DataFrame, 
 
 
     Args:
-        config: configuration parameters
+        config: The configuration parameters.
 
     Returns:
         A tuple containing two DataFrames:
@@ -88,7 +88,7 @@ def read_narrow_corridor_paths_4tu(config: DictConfig) -> Tuple[pd.DataFrame, pd
     - right-to-left.ssv: paths of pedestrians walking from right to left.
 
     Args:
-        config: configuration parameters
+        config: The configuration parameters.
 
     Returns:
         A tuple containing two DataFrames:
@@ -116,7 +116,7 @@ def read_intersecting_paths(config: DictConfig) -> pd.DataFrame:
     by 90 degrees to create intersecting paths.
 
     Args:
-        config: configuration parameters
+        config: The configuration parameters.
 
     Returns:
         The trajectory dataset with intersecting paths.
@@ -151,7 +151,7 @@ def read_narrow_corridor_paths(config: DictConfig) -> pd.DataFrame:
     The trajectories are read from local or remote sources based on the configuration.
 
     Args:
-        config: configuration parameters
+        config: The configuration parameters.
 
     Returns:
         The trajectory dataset with single paths.
@@ -174,7 +174,7 @@ def read_wide_corridor_paths(config: DictConfig) -> pd.DataFrame:
     """Read the wide corridor data set from a local file.
 
     Args:
-        config: configuration parameters
+        config: The configuration parameters.
 
     Returns:
         The trajectory dataset with paths in the wide corridor.
@@ -196,7 +196,7 @@ def read_curved_paths_synthetic(config: DictConfig) -> pd.DataFrame:
     """Read the synthetic curved paths data set.
 
     Args:
-        config: configuration parameters
+        config: The configuration parameters.
 
     Returns:
         The synthetic curved paths dataset.
@@ -273,7 +273,7 @@ def read_ehv_pf34_paths_geert(config: DictConfig) -> pd.DataFrame:
     """Read the Eindhoven platform 3-4 paths data set from Geert.
 
     Args:
-        config: configuration parameters
+        config: The configuration parameters.
 
     Returns:
         The trajectory dataset with Eindhoven platform 3-4 paths
@@ -299,7 +299,7 @@ def read_ehv_pf34_paths_local(config: DictConfig) -> pd.DataFrame:
     """Read the Eindhoven platform 3-4 paths data set from a local file.
 
     Args:
-        config: configuration parameters
+        config: The configuration parameters.
 
     Returns:
         The trajectory dataset with Eindhoven platform 3-4 paths
@@ -335,7 +335,7 @@ def read_eindhoven_pf34_paths(config: DictConfig) -> pd.DataFrame:
     """Read the Eindhoven platform 3-4 paths data set.
 
     Args:
-        config: configuration parameters
+        config: The configuration parameters.
 
     Returns:
         The trajectory dataset with Eindhoven platform 3-4 paths.
@@ -380,7 +380,7 @@ def read_utrecht_pf5_paths_4tu(config: DictConfig):
     """Read the Utrecht Centraal platform 5 paths data set from 4TU.
 
     Args:
-        config: configuration parameters
+        config: The configuration parameters.
 
     Returns:
         The trajectory dataset with Utrecht Centraal platform 5 paths
@@ -398,7 +398,7 @@ def read_utrecht_pf5_paths_local(config: DictConfig):
     """Read the Utrecht Centraal platform 5 paths data set from a local file.
 
     Args:
-        config: configuration parameters
+        config: The configuration parameters.
 
     Returns:
         The trajectory dataset with Utrecht Centraal platform 5 paths.
@@ -421,7 +421,7 @@ def read_utrecht_pf5_paths(config: DictConfig) -> pd.DataFrame:
     The spatial coordinates of the trajectories are converted from milimeters to meters.
 
     Args:
-        config: configuration parameters
+        config: The configuration parameters.
 
     Returns:
         The trajectory dataset with Utrecht Centraal platform 5 paths.
@@ -442,7 +442,7 @@ def read_asdz_pf12_paths_4tu(config: DictConfig) -> pd.DataFrame:
     """Read the Amsterdam Zuid platform 1-2 paths data set from 4TU.
 
     Args:
-        config: configuration parameters
+        config: The configuration parameters.
 
     Returns:
         The trajectory dataset with Amsterdam Zuid platform 1-2 paths
@@ -461,7 +461,7 @@ def read_asdz_pf12_paths_local(config: DictConfig) -> pd.DataFrame:
     """Read the Amsterdam Zuid platform 1-2 paths data set from a local file.
 
     Args:
-        config: configuration parameters
+        config: The configuration parameters.
 
     Returns:
         The trajectory dataset with Amsterdam Zuid platform 1-2 paths
@@ -484,7 +484,7 @@ def read_asdz_pf12_paths(config: DictConfig) -> pd.DataFrame:
     The spatial coordinates of the trajectories are converted from milimeters to meters.
 
     Args:
-        config: configuration parameters
+        config: The configuration parameters.
 
     Returns:
         The trajectory dataset with Amsterdam Zuid platform 1-2 paths.
@@ -514,7 +514,7 @@ def get_local_background_image(config: DictConfig) -> np.ndarray:
     """Read the background image from a local file.
 
     Args:
-        config: configuration parameters.
+        config: The configuration parameters.
 
     Returns:
         The background image as a numpy array.
@@ -527,7 +527,7 @@ def get_background_image_from_remote_zip(config: DictConfig) -> np.ndarray:
     """Read the background image from a remote archive.
 
     Args:
-        config: configuration parameters.
+        config: The configuration parameters.
 
     Returns:
         The background image as a numpy array.

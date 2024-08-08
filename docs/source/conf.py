@@ -20,7 +20,7 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath("../..c"))
+sys.path.insert(0, os.path.abspath("../.."))
 
 
 # -- General configuration ------------------------------------------------
@@ -45,12 +45,15 @@ extensions = [
     "matplotlib.sphinxext.plot_directive",
     "numpydoc",
     "sphinx_copybutton",
+    "sphinxcontrib.jquery",
+    "sphinx.ext.mathjax",
+    "myst_parser",
 ]
 
 # Configuration options for plot_directive. See:
 # https://github.com/matplotlib/matplotlib/blob/f3ed922d935751e08494e5fb5311d3050a3b637b/lib/matplotlib/sphinxext/plot_directive.py#L81
-plot_html_show_source_link = False
-plot_html_show_formats = False
+plot_html_show_source_link = True
+plot_html_show_formats = True
 
 # Generate the API documentation when building
 autosummary_generate = True
@@ -61,9 +64,10 @@ templates_path = ["_templates"]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
-#
-source_suffix = [".rst", ".md"]
-# source_suffix = ".rst"
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
 
 # The master toctree document.
 master_doc = "index"
@@ -140,7 +144,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "physped"
+htmlhelp_basename = "API documentation"
 
 
 # -- Options for LaTeX output ---------------------------------------------

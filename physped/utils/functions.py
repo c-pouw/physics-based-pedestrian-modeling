@@ -7,29 +7,30 @@ import pandas as pd
 log = logging.getLogger(__name__)
 
 
-def cart2pol(x: float, y: float) -> tuple:
-    """
-    Convert cartesian coordinates to polar coordinates.
+def cartesian_to_polar_coordinates(x: float, y: float) -> tuple:
+    """Convert cartesian coordinates to polar coordinates.
 
     Parameters:
-    x (float): The x-coordinate in cartesian coordinates.
-    y (float): The y-coordinate in cartesian coordinates.
+    - x: The x-coordinate.
+    - y: The y-coordinate.
+
+    Returns:
+    - A tuple with the polar coordinates
     """
     rho = np.sqrt(x**2 + y**2)
     phi = np.arctan2(y, x)
     return (rho, phi)
 
 
-def pol2cart(rho: float, phi: float) -> tuple:
-    """
-    Convert polar coordinates to cartesian coordinates.
+def polar_to_cartesian_coordinates(rho: float, phi: float) -> tuple:
+    """Convert polar coordinates to cartesian coordinates.
 
     Parameters:
-    rho (float): The radial distance from the origin to the point.
-    phi (float): The angle in radians between the reference axis and the line segment from the origin to the point.
+    rho: The radial distance from the origin to the point.
+    phi: The angle in radians.
 
     Returns:
-    tuple: A tuple containing the x and y coordinates in the cartesian system.
+    - A tuple containing the cartesian coordinate.s
     """
     x = rho * np.cos(phi)
     y = rho * np.sin(phi)
@@ -66,14 +67,14 @@ def get_slice_of_multidimensional_matrix(
     return a[sl0, sl1, sl2, sl3]
 
 
-def get_bin_middle(bins):
+def get_bin_middle(bins: np.ndarray) -> np.ndarray:
     """Return the middle of the input bins.
 
     Args:
-        bins (array-like): The input bins.
+        bins: The input bins.
 
     Returns:
-        array-like: The middle of the input bins.
+        The middle of the input bins.
 
     """
     return (bins[1:] + bins[:-1]) / 2
@@ -124,10 +125,8 @@ def test_weighted_mean_of_two_matrices(first_matrix: np.ndarray, counts_first_ma
     Parameters:
     first_matrix (numpy.ndarray): The first input matrix.
     counts_first_matrix (numpy.ndarray): The counts matrix corresponding to the first input matrix.
-
-    Returns:
-    None
     """
+    # ! Move this ot tests
     out = weighted_mean_of_two_matrices(first_matrix, counts_first_matrix, first_matrix, counts_first_matrix)
     assert np.array_equal(out, first_matrix, equal_nan=True)
     print("Test passed.")
@@ -157,20 +156,26 @@ def test_weighted_mean_of_two_matrices(first_matrix: np.ndarray, counts_first_ma
 #     return np.unravel_index(indices1d, origin_histogram.shape)
 
 
-def digitize_values_to_grid(values: pd.Series, grid: np.ndarray) -> np.ndarray:
-    """
-    Digitizes the given values to the specified grid.
+def digitize_to_bins(values: pd.Series, bins: np.ndarray) -> np.ndarray:
+    """Digitizes the given values to the specified grid.
+
+    This function is 1-dimensional.
+
+    Boundary conditions:
+    - values higher than the biggest bin get the index of the last bin.
+    - values lower that the lowest bin get index 0.
 
     Args:
-        values (pd.Series): The values to be digitized.
-        grid (np.ndarray): The grid to which the values will be digitized.
+        values: The values to be digitized.
+        bins: The bin edges defining the lattice cells.
 
     Returns:
-        np.ndarray: The digitized indices corresponding to the values.
+        The digitized indices corresponding to the values.
     """
-    indices = np.digitize(values, grid) - 1
+    # ! Write a test for this function
+    indices = np.digitize(values, bins) - 1
     indices = np.where(indices < 0, 0, indices)
-    indices = np.where(indices > len(grid) - 2, len(grid) - 2, indices)
+    indices = np.where(indices > len(bins) - 2, len(bins) - 2, indices)
     return indices
 
 
