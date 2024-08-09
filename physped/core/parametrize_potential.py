@@ -10,9 +10,10 @@ import pandas as pd
 from omegaconf import DictConfig
 from scipy.stats import norm
 
+from physped.core.digitizers import digitize_coordinates_to_lattice
 from physped.core.piecewise_potential import PiecewisePotential
 from physped.io.readers import read_piecewise_potential_from_file
-from physped.utils.functions import digitize_coordinates_to_lattice, weighted_mean_of_two_matrices
+from physped.utils.functions import weighted_mean_of_two_matrices
 
 # from physped.core.functions_to_discretize_grid import digitize_trajectories_to_grid
 
@@ -53,28 +54,9 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: DictCo
         piecewise_potential.histogram_slow, trajectories, "slow_grid_indices"
     )
 
-    piecewise_potential.parametrization = parameterize_trajectories_to_grid(
-        piecewise_potential.parametrization, trajectories, config
-    )
+    piecewise_potential.parametrization = parameterize_trajectories(piecewise_potential.parametrization, trajectories, config)
     log.info("Finished learning piecewise potential from trajectories.")
-    piecewise_potential = reparametrize_potential_to_curvature(piecewise_potential, config)
-    return piecewise_potential
-
-
-def reparametrize_potential_to_curvature(piecewise_potential: PiecewisePotential, config: DictConfig) -> PiecewisePotential:
-    var = config.params.model.sigma**2
-    xvar = piecewise_potential.parametrization[..., 0, 1]
-    yvar = piecewise_potential.parametrization[..., 1, 1]
-    uvar = piecewise_potential.parametrization[..., 2, 1]
-    vvar = piecewise_potential.parametrization[..., 3, 1]
-
-    # xvar, yvar, uvar, vvar = [np.where(v == 0, np.nan, v) for v in variances]
-
-    piecewise_potential.parametrization[..., 0, 1] = uvar / (2 * xvar)
-    piecewise_potential.parametrization[..., 1, 1] = vvar / (2 * yvar)
-    piecewise_potential.parametrization[..., 2, 1] = var / (4 * uvar)
-    piecewise_potential.parametrization[..., 3, 1] = var / (4 * vvar)
-    piecewise_potential.dist_approximation.fit_parameters = ["mu", "curvature"]
+    piecewise_potential.reparametrize_to_curvature(config)
     return piecewise_potential
 
 
@@ -185,16 +167,18 @@ def fit_probability_distributions(group: pd.DataFrame, config: DictConfig) -> np
     return fit_parameters
 
 
-def parameterize_trajectories_to_grid(parametrization: np.ndarray, trajectories: pd.DataFrame, config: DictConfig):
-    """
-    Fit trajectories to the parameter grid.
+def parameterize_trajectories(parametrization: np.ndarray, trajectories: pd.DataFrame, config: DictConfig):
+    """Fit trajectories to the lattice.
+
+    Fit the fast dynamics conditioned to the slow dynamics.
 
     Parameters:
-    - param_grid (): The parameter grid to fit the trajectories on.
-    - trajectories (pd.DataFrame): The trajectories to fit.
+    - parametrization: The initialized, empty, parametrization matrix.
+    - trajectories: The trajectories to fit.
+    - config: The configuration parameters.
 
     Returns:
-    - The grid with fit parameters.
+    - The updated parametrization matrix.
     """
     fit_output = trajectories.groupby("slow_grid_indices").apply(fit_probability_distributions, config=config).dropna().to_dict()
     for key, value in fit_output.items():
@@ -203,8 +187,7 @@ def parameterize_trajectories_to_grid(parametrization: np.ndarray, trajectories:
 
 
 def add_trajectories_to_histogram(histogram: np.ndarray, trajectories: pd.DataFrame, groupbyindex: str) -> np.ndarray:
-    """
-    Add trajectories to a histogram.
+    """Add trajectories to a histogram.
 
     Parameters:
     - histogram: The histogram to add the trajectories to.

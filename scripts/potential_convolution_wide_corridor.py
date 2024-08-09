@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from hydra import compose, initialize
 
+from physped.core.digitizers import digitize_coordinates_to_lattice
 from physped.core.parametrize_potential import learn_potential_from_trajectories
 from physped.io.readers import trajectory_reader
 from physped.preprocessing.trajectories import preprocess_trajectories, process_slow_modes
 from physped.utils.config_utils import register_new_resolvers
-from physped.utils.functions import digitize_coordinates_to_lattice
 
 plt.style.use(Path.cwd() / "../physped/conf/science.mplstyle")
 

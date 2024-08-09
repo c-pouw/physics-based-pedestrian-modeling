@@ -8,14 +8,12 @@ import numpy as np
 from hydra import compose, initialize
 from omegaconf import OmegaConf
 
-from physped.core.functions_to_select_grid_piece import (  # get_index_of_the_enclosing_bin,; evaluate_selection_point,
-    evaluate_selection_range,
-)
+from physped.core.digitizers import digitize_coordinates_to_lattice
+from physped.core.lattice_selection import evaluate_selection_range  # get_index_of_the_enclosing_bin,; evaluate_selection_point,
 from physped.core.parametrize_potential import calculate_position_based_emperic_potential, learn_potential_from_trajectories
 from physped.io.readers import trajectory_reader
 from physped.preprocessing.trajectories import preprocess_trajectories, process_slow_modes
 from physped.utils.config_utils import register_new_resolvers
-from physped.utils.functions import digitize_coordinates_to_lattice
 from physped.visualization.plot_discrete_grid import plot_discrete_grid
 from physped.visualization.plot_potential_at_slow_index import plot_potential_at_slow_index
 from physped.visualization.plot_trajectories import plot_trajectories

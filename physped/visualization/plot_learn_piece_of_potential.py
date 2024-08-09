@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import norm
 
-from physped.core.functions_to_select_grid_piece import evaluate_selection_range
+from physped.core.lattice_selection import evaluate_selection_range
 from physped.core.parametrize_potential import digitize_trajectories_to_grid
 from physped.core.piecewise_potential import PiecewisePotential
 

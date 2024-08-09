@@ -7,7 +7,7 @@ import logging
 import numpy as np
 from omegaconf import DictConfig
 
-from physped.core.distribtution_approximator import GaussianApproximation
+from physped.core.distribution_approximator import GaussianApproximation
 from physped.core.lattice import Lattice
 
 log = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ class PiecewisePotential:
         self.dist_approximation = GaussianApproximation()
         self.histogram = np.zeros(self.lattice.shape)
         self.histogram_slow = np.zeros(self.lattice.shape)
-        self.parametrization = self.initialize_parametrization()
+        self.initialize_parametrization()
 
     def __repr__(self):
         return (
@@ -36,9 +36,39 @@ class PiecewisePotential:
         )
 
     def initialize_parametrization(self):
-        """Initialize the potential parametrization."""
+        """Initialize the potential parametrization.
+
+        to initialize the potential parametrization with the following shape:
+        (lattice_shape, len(fit_dimensions), len(fit_parameters))
+        """
         shape_of_the_potential = self.lattice.shape + (
             len(self.dist_approximation.fit_dimensions),
             len(self.dist_approximation.fit_parameters),
         )
-        return np.zeros(shape_of_the_potential) * np.nan
+        self.parametrization = np.zeros(shape_of_the_potential) * np.nan
+
+    def reparametrize_to_curvature(self, config: DictConfig):
+        """Reparametrize the potential.
+
+        From (mu, var) to (mu, curvature).
+
+        Args:
+            config: The configuration.
+
+        Raises:
+            ValueError: If the fit parameters are not mu and sigma
+        """
+        if self.dist_approximation.fit_parameters != ["mu", "sigma"]:
+            raise ValueError("The fit parameters should be mu and sigma.")
+
+        var = config.params.model.sigma**2
+        xvar = self.parametrization[..., 0, 1]
+        yvar = self.parametrization[..., 1, 1]
+        uvar = self.parametrization[..., 2, 1]
+        vvar = self.parametrization[..., 3, 1]
+
+        self.parametrization[..., 0, 1] = uvar / (2 * xvar)
+        self.parametrization[..., 1, 1] = vvar / (2 * yvar)
+        self.parametrization[..., 2, 1] = var / (4 * uvar)
+        self.parametrization[..., 3, 1] = var / (4 * vvar)
+        self.dist_approximation.fit_parameters = ["mu", "curvature"]

@@ -155,27 +155,6 @@ def test_weighted_mean_of_two_matrices(first_matrix: np.ndarray, counts_first_ma
 #     return np.unravel_index(indices1d, origin_histogram.shape)
 
 
-def digitize_coordinates_to_lattice(coordinates: np.ndarray, lattice_bins: np.ndarray) -> np.ndarray:
-    """Digitizes the given coordinates to the specified lattice bins.
-
-    Boundary conditions:
-    - Coordinates outside the lattice return -1.
-
-    Args:
-        coordinates: The coordinates in one dimension to be digitized.
-        lattice_bins: The bin edges in one dimension defining the lattice cells.
-
-    Returns:
-        The lattice indices corresponding to the coordinates.
-    """
-    indices = np.digitize(coordinates, lattice_bins) - 1
-    smallest_index = 0
-    biggest_index = len(lattice_bins) - 2
-    indices = np.where(indices < smallest_index, -1, indices)
-    indices = np.where(indices > biggest_index, -1, indices)
-    return indices
-
-
 def periodic_angular_conditions(angle: np.ndarray, angular_bins: np.ndarray) -> np.ndarray:
     """Apply periodic boundary conditions to a list of angular coordinates.
 

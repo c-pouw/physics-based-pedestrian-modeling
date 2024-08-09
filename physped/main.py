@@ -8,7 +8,7 @@ import hydra
 import matplotlib.pyplot as plt
 from omegaconf import OmegaConf
 
-from physped.core.functions_to_select_grid_piece import evaluate_selection_range
+from physped.core.lattice_selection import evaluate_selection_range
 from physped.core.parametrize_potential import learn_potential_from_trajectories
 from physped.core.trajectory_simulator import simulate_trajectories
 from physped.io.readers import trajectory_reader

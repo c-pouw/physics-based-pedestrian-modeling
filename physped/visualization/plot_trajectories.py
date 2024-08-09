@@ -7,9 +7,9 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
 
+from physped.core.digitizers import digitize_coordinates_to_lattice
 from physped.core.parametrize_potential import get_boundary_coordinates_of_selection, make_grid_selection
 from physped.io.readers import read_piecewise_potential_from_file
-from physped.utils.functions import digitize_coordinates_to_lattice
 from physped.visualization.plot_utils import (  # apply_cartesian_velocity_plot_style,
     apply_polar_plot_style,
     apply_xy_plot_style,
