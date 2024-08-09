@@ -8,7 +8,8 @@ import logging
 import numpy as np
 from omegaconf import DictConfig, OmegaConf
 
-from physped.utils.functions import digitize_coordinates_to_lattice, periodic_angular_conditions
+from physped.core.digitizers import digitize_coordinates_to_lattice
+from physped.utils.functions import periodic_angular_conditions
 
 log = logging.getLogger(__name__)
 
@@ -75,7 +76,8 @@ def evaluate_selection_point(config: DictConfig) -> DictConfig:
 
 def is_selected_range_within_grid(selected_range: OmegaConf, grid_bins: dict) -> None:
     for dimension in ["x", "y", "r", "theta", "k"]:
-        [validate_value_within_lattice(x, grid_bins, dimension) for x in selected_range[dimension]]
+        for value in selected_range[dimension]:
+            validate_value_within_lattice(value, grid_bins, dimension)
     log.info("The selected range is located within the grid.")
 
 
