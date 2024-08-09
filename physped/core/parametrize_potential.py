@@ -12,7 +12,7 @@ from scipy.stats import norm
 
 from physped.core.piecewise_potential import PiecewisePotential
 from physped.io.readers import read_piecewise_potential_from_file
-from physped.utils.functions import digitize_coordinates_to_lattice, polar_to_cartesian_coordinates, weighted_mean_of_two_matrices
+from physped.utils.functions import digitize_coordinates_to_lattice, weighted_mean_of_two_matrices
 
 # from physped.core.functions_to_discretize_grid import digitize_trajectories_to_grid
 
@@ -296,73 +296,3 @@ def make_grid_selection(piecewise_potential, selection):
 
         grid_selection[observable]["periodic_bounds"] = grid_boundaries
     return grid_selection
-
-
-def sample_from_ndarray(origin_histogram: np.ndarray, N_samples: int = 1) -> np.ndarray:
-    """Sample origin positions from a heatmap with initial positions.
-
-    ! Used for simulation purposes
-
-    Parameters:
-    - origin_histogram: The initial position heatmap.
-    - N_samples: The number of samples to generate. Default is 1.
-
-    Returns:
-    - A tuple of NumPy arrays representing the sampled origin positions.
-    """
-    flat_origin_histogram = origin_histogram.ravel()
-    indices1d = np.random.choice(
-        a=range(len(flat_origin_histogram)),
-        size=N_samples,
-        replace=True,
-        p=flat_origin_histogram / np.sum(flat_origin_histogram),
-    )
-    return np.array(np.unravel_index(indices1d, origin_histogram.shape)).T
-
-
-def random_uniform_value_in_bin(lattice_indices: List[int], bins: np.ndarray) -> np.ndarray:
-    """Generate random uniform values within each bin.
-
-    ! Used for simulation purposes
-
-    This function is used to sample origins from a histogram. Given the index of the
-    sampled lattice cell the function will return a real-world variable.
-
-    For example:
-    with bins v_r = [0,0.5,1] and lattice_indices [1] the function returns a random uniformly
-    sampled value between 0.5 and 1.
-
-    Args:
-        lattice_indices: A list with lattice indices.
-        bins: Array of bin edges.
-
-    Returns:
-        Array of random uniform values within each bin.
-    """
-    left = bins[lattice_indices]
-    right = bins[lattice_indices + 1]
-    return np.random.uniform(left, right)
-
-
-def convert_grid_indices_to_coordinates(potential_grid: PiecewisePotential, X_0: np.ndarray) -> np.ndarray:
-    """Convert grid indices to Cartesian coordinates.
-
-    ! Used for simulation purposes
-
-    Parameters:
-    - grids (Grids): The Grids object containing the grid definitions.
-    - X_0 (List[int]): A list of grid indices.
-
-    Returns:
-    - A list of Cartesian coordinates.
-    """
-    # TODO: Add some noise within the bin.
-    # xf, yf, rf, thetaf, k = (grids.bins[dim][X_0[:,i]] for i, dim in enumerate(grids.dimensions))
-    xf = random_uniform_value_in_bin(X_0[:, 0], potential_grid.bins["x"])
-    yf = random_uniform_value_in_bin(X_0[:, 1], potential_grid.bins["y"])
-    rf = random_uniform_value_in_bin(X_0[:, 2], potential_grid.bins["r"])
-    thetaf = random_uniform_value_in_bin(X_0[:, 3], potential_grid.bins["theta"])
-    k = potential_grid.bins["k"][X_0[:, 4]]
-
-    uf, vf = polar_to_cartesian_coordinates(rf, thetaf)
-    return np.array([xf, yf, uf, vf, k]).T
