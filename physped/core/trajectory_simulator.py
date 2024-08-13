@@ -15,8 +15,7 @@ from physped.core.pedestrian_initializer import (
 from physped.core.piecewise_potential import PiecewisePotential
 from physped.io.readers import read_trajectories_from_path
 from physped.io.writers import save_trajectories
-from physped.preprocessing.trajectories import periodic_angular_conditions
-from physped.utils.functions import cartesian_to_polar_coordinates
+from physped.utils.functions import cartesian_to_polar_coordinates, periodic_angular_conditions
 
 log = logging.getLogger(__name__)
 

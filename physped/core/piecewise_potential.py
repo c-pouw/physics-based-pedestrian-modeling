@@ -58,7 +58,7 @@ class PiecewisePotential:
         Raises:
             ValueError: If the fit parameters are not mu and sigma
         """
-        if self.dist_approximation.fit_parameters != ["mu", "sigma"]:
+        if self.dist_approximation.fit_parameters != ("mu", "sigma"):
             raise ValueError("The fit parameters should be mu and sigma.")
 
         var = config.params.model.sigma**2
