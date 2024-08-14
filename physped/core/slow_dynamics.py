@@ -1,16 +1,15 @@
 import logging
+from functools import reduce
+from typing import Any, Callable
 
 import numpy as np
 import pandas as pd
+from omegaconf import DictConfig
 from scipy.signal import savgol_filter
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from physped.preprocessing.trajectories import transform_velocity_to_polar_coordinates
-from physped.utils.functions import periodic_angular_conditions
-
-# from omegaconf import DictConfig
-
+from physped.preprocessing.trajectories import apply_periodic_angular_conditions, transform_slow_velocity_to_polar_coordinates
 
 log = logging.getLogger(__name__)
 
@@ -86,20 +85,83 @@ def get_slow_algorithm(name: str):
     return SLOW_ALGORITHMS.get(name)
 
 
-def process_slow_modes(df: pd.DataFrame, config: dict) -> pd.DataFrame:
-    dt = config.params.model["dt"]
-    tauu = config.params.model["tauu"]
-    window_length = config.params.minimum_trajectory_length
+def compute_slow_velocity(df: pd.DataFrame, config: DictConfig) -> pd.DataFrame:
     slow_velocity_algorithm = get_slow_algorithm(config.params.model.slow_velocities_algorithm)
     log.info("Slow velocity algorithm: %s", slow_velocity_algorithm)
-    df["us"] = slow_velocity_algorithm(df, colname="uf", tau=tauu, dt=dt, window_length=window_length)
-    df["vs"] = slow_velocity_algorithm(df, colname="vf", tau=tauu, dt=dt, window_length=window_length)
-    df = transform_velocity_to_polar_coordinates(df, config, dynamics="s")
-    df["thetas"] = periodic_angular_conditions(df["thetas"], config.params.grid.bins["theta"])
 
-    taux = config.params.model["taux"]
+    df["us"] = slow_velocity_algorithm(
+        df,
+        colname="uf",
+        tau=config.params.model["tauu"],
+        dt=config.params.model["dt"],
+        window_length=config.params.minimum_trajectory_length,
+    )
+    df["vs"] = slow_velocity_algorithm(
+        df,
+        colname="vf",
+        tau=config.params.model["tauu"],
+        dt=config.params.model["dt"],
+        window_length=config.params.minimum_trajectory_length,
+    )
+    return df
+
+
+def compute_slow_position(df: pd.DataFrame, config: DictConfig) -> pd.DataFrame:
     slow_position_algorithm = get_slow_algorithm(config.params.model.slow_positions_algorithm)
     log.info("Slow position algorithm: %s", slow_position_algorithm)
-    df["xs"] = slow_position_algorithm(df, colname="xf", vel_col="us", tau=taux, dt=dt, window_length=window_length)
-    df["ys"] = slow_position_algorithm(df, colname="yf", vel_col="vs", tau=taux, dt=dt, window_length=window_length)
+
+    df["xs"] = slow_position_algorithm(
+        df,
+        colname="xf",
+        vel_col="us",
+        tau=config.params.model["taux"],
+        dt=config.params.model["dt"],
+        window_length=config.params.minimum_trajectory_length,
+    )
+    df["ys"] = slow_position_algorithm(
+        df,
+        colname="yf",
+        vel_col="vs",
+        tau=config.params.model["taux"],
+        dt=config.params.model["dt"],
+        window_length=config.params.minimum_trajectory_length,
+    )
     return df
+
+
+Composable = Callable[[Any], Any]
+
+
+def compose(*functions: Composable) -> Composable:
+    return lambda x, **kwargs: reduce(lambda df, fn: fn(df, **kwargs), functions, x)
+
+
+functions_to_compute_slow_dynamics = [
+    compute_slow_velocity,
+    transform_slow_velocity_to_polar_coordinates,
+    apply_periodic_angular_conditions,
+    compute_slow_position,
+]
+
+compute_slow_dynamics = compose(*functions_to_compute_slow_dynamics)
+
+
+# def compute_slow_dynamics(df: pd.DataFrame, config: dict) -> pd.DataFrame:
+#     dt = config.params.model["dt"]
+#     tauu = config.params.model["tauu"]
+#     window_length = config.params.minimum_trajectory_length
+#     slow_velocity_algorithm = get_slow_algorithm(config.params.model.slow_velocities_algorithm)
+#     log.info("Slow velocity algorithm: %s", slow_velocity_algorithm)
+
+#     df["us"] = slow_velocity_algorithm(df, colname="uf", tau=tauu, dt=dt, window_length=window_length)
+#     df["vs"] = slow_velocity_algorithm(df, colname="vf", tau=tauu, dt=dt, window_length=window_length)
+#     df = transform_slow_velocity_to_polar_coordinates(df, config)
+#     df["thetas"] = periodic_angular_conditions(df["thetas"], config.params.grid.bins["theta"])
+
+#     taux = config.params.model["taux"]
+#     slow_position_algorithm = get_slow_algorithm(config.params.model.slow_positions_algorithm)
+#     log.info("Slow position algorithm: %s", slow_position_algorithm)
+
+#     df["xs"] = slow_position_algorithm(df, colname="xf", vel_col="us", tau=taux, dt=dt, window_length=window_length)
+#     df["ys"] = slow_position_algorithm(df, colname="yf", vel_col="vs", tau=taux, dt=dt, window_length=window_length)
+#     return df

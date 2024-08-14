@@ -2,7 +2,6 @@ import logging
 import pickle
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 from physped.core.piecewise_potential import PiecewisePotential
@@ -11,15 +10,13 @@ log = logging.getLogger(__name__)
 
 
 def save_piecewise_potential(grid: PiecewisePotential, folderpath: Path, filename: str = "piecewise_potential.pickle") -> None:
-    """
-    Save a PiecewisePotential object to a file using pickle.
+    """Save piecewise potential
 
-    :param grid: The PiecewisePotential object to save.
-    :type grid: PiecewisePotential
-    :param folderpath: The path to the folder to save the file in.
-    :type folderpath: Path
-
-    :return: None
+    Args:
+        grid: The piecewise potential to save.
+        folderpath: The folder to save the piecewise potential in.
+        filename: The filenam to save the piecewise potential in.
+        Defaults to "piecewise_potential.pickle".
     """
     filepath = folderpath / filename
     with open(filepath, "wb") as f:
@@ -28,31 +25,13 @@ def save_piecewise_potential(grid: PiecewisePotential, folderpath: Path, filenam
 
 
 def save_trajectories(trajectories: pd.DataFrame, folderpath: Path, filename: str) -> None:
-    """
-    Save trajectories to a CSV file.
+    """Save trajectories
 
-    :param trajectories: The DataFrame containing the trajectories to save.
-    :type trajectories: pd.DataFrame
-    :param folderpath: The path to the folder to save the file in.
-    :type folderpath: Path
-
-    :return: None
+    Args:
+        trajectories: The trajectories to save.
+        folderpath: The folder to save the trajectories in.
+        filename: The name of the file to save the trajectories in.
     """
-    # ensure_folder_exists(folderpath)
     filepath = folderpath / filename
     trajectories.to_csv(filepath)
     log.info("Trajectories saved as %s.", filename)
-
-
-def save_grid_bins(gridbins: dict, gridname: str) -> None:
-    filename = f"{gridname}.npz"
-    filepath = Path.cwd().parent / filename
-    np.savez(
-        file=filepath,
-        x=gridbins["x"],
-        y=gridbins["y"],
-        r=gridbins["r"],
-        theta=gridbins["theta"],
-        k=gridbins["k"],
-    )
-    log.info("Grid bins saved as %s", filename)

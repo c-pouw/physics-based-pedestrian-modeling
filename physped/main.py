@@ -10,7 +10,7 @@ from omegaconf import OmegaConf
 
 from physped.core.lattice_selection import evaluate_selection_range
 from physped.core.parametrize_potential import learn_potential_from_trajectories
-from physped.core.slow_dynamics import process_slow_modes
+from physped.core.slow_dynamics import compute_slow_dynamics
 from physped.core.trajectory_simulator import simulate_trajectories
 from physped.io.readers import trajectory_reader
 from physped.io.writers import save_piecewise_potential
@@ -50,7 +50,7 @@ def model(config):
     logging.info("MODELING PARAMETERS: \n%s", pformat(OmegaConf.to_container(config.params.model, resolve=True), depth=1))
 
     log.info("PROCESSING SLOW MODES")
-    preprocessed_trajectories = process_slow_modes(preprocessed_trajectories, config)
+    preprocessed_trajectories = compute_slow_dynamics(preprocessed_trajectories, config=config)
 
     log.info("LEARNING POTENTIAL")
     piecewise_potential = learn_potential_from_trajectories(preprocessed_trajectories, config)

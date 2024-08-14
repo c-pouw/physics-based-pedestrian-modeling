@@ -34,6 +34,19 @@ def read_trajectories_from_path(filepath: Path) -> pd.DataFrame:
     return pd.read_csv(filepath)
 
 
+def read_preprocessed_trajectories_from_file(config: DictConfig, **kwargs) -> pd.DataFrame:
+    filepath = Path.cwd().parent / config.filename.preprocessed_trajectories
+    # if config.read.preprocessed_trajectories:
+    #     log.debug("Configuration 'read.preprocessed_trajectories' is set to True.")
+    try:
+        preprocessed_trajectories = read_trajectories_from_path(filepath)
+        log.warning("Preprocessed trajectories read from file.")
+        # log.debug("Filepath %s", filepath.relative_to(config.root_dir))
+        return preprocessed_trajectories
+    except FileNotFoundError as e:
+        log.error("Preprocessed trajectories not found: %s", e)
+
+
 def read_piecewise_potential_from_file(filepath: Path) -> PiecewisePotential:
     """Read piecewise potential from file.
 
@@ -108,6 +121,12 @@ def read_narrow_corridor_paths_4tu(config: DictConfig) -> Tuple[pd.DataFrame, pd
     return df_ltr, df_rtl
 
 
+narrow_corridor_path_reader = {
+    "local": read_narrow_corridor_paths_local,
+    "4tu": read_narrow_corridor_paths_4tu,
+}
+
+
 def read_intersecting_paths(config: DictConfig) -> pd.DataFrame:
     """Read the intersecting paths data set.
 
@@ -137,12 +156,6 @@ def read_intersecting_paths(config: DictConfig) -> pd.DataFrame:
 
     log.info("Finished reading single paths data set.")
     return df
-
-
-narrow_corridor_path_reader = {
-    "local": read_narrow_corridor_paths_local,
-    "4tu": read_narrow_corridor_paths_4tu,
-}
 
 
 def read_narrow_corridor_paths(config: DictConfig) -> pd.DataFrame:
@@ -489,8 +502,7 @@ def read_asdz_pf12_paths(config: DictConfig) -> pd.DataFrame:
     Returns:
         The trajectory dataset with Amsterdam Zuid platform 1-2 paths.
     """
-    path_reader = asdz_pf12_path_reader[config.params.data_source]
-    df = path_reader(config)
+    df = asdz_pf12_path_reader[config.params.data_source](config)
 
     # Convert spatial coordinates from milimeters to meters
     df["x_pos"] /= 1000
@@ -510,7 +522,7 @@ trajectory_reader = {
 }
 
 
-def get_local_background_image(config: DictConfig) -> np.ndarray:
+def get_background_image_local(config: DictConfig) -> np.ndarray:
     """Read the background image from a local file.
 
     Args:
@@ -547,6 +559,6 @@ def get_background_image_from_remote_zip(config: DictConfig) -> np.ndarray:
 
 
 read_background_image = {
-    "local": get_local_background_image,
+    "local": get_background_image_local,
     "4tu": get_background_image_from_remote_zip,
 }

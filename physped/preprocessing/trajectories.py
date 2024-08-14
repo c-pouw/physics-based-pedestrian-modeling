@@ -1,5 +1,6 @@
 import logging
 from functools import reduce
+from pathlib import Path
 from typing import Any, Callable
 
 import numpy as np
@@ -7,7 +8,9 @@ import pandas as pd
 from omegaconf import DictConfig
 from scipy.signal import savgol_filter
 
-from physped.utils.functions import cartesian_to_polar_coordinates
+# from physped.io.readers import read_preprocessed_trajectories_from_file
+from physped.io.writers import save_trajectories
+from physped.utils.functions import cartesian_to_polar_coordinates, periodic_angular_conditions
 
 log = logging.getLogger(__name__)
 
@@ -17,12 +20,13 @@ def rename_columns(df: pd.DataFrame, config: DictConfig) -> pd.DataFrame:
     Rename columns of a DataFrame.
 
     Args:
-    - df: The DataFrame to rename the columns of.
-    - colnames: A dictionary with the old column names as keys and the new column names as values.
+        df: The DataFrame to rename the columns of.
+        colnames: A dictionary with the old column names as keys and the new column names as values.
 
     Returns:
-    - The DataFrame with the columns renamed.
+        The DataFrame with the columns renamed.
     """
+    # TODO : Use columnnames from parameters instead of renaming
     colnames = config.params.get("colnames", {})
     inverted_colnames = {v: k for k, v in colnames.items()}
     df.rename(columns=inverted_colnames, inplace=True)
@@ -53,11 +57,11 @@ def add_trajectory_index(df: pd.DataFrame, config: DictConfig) -> pd.DataFrame:
     """Add a column with the observation/step numbers of each trajectory.
 
     Args:
-    - df: The DataFrame to add the trajectory step/observation to.
-    - config: The configuration object.
+        df: The DataFrame to add the trajectory step/observation to.
+        config: The configuration object.
 
     Returns:
-    - The DataFrame with the trajectory step/observation added.
+        The DataFrame with the trajectory step/observation added.
     """
     # pid_col, time_col = params.colnames.Pid, params.colnames.time
     pid_col, time_col = "Pid", "time"
@@ -72,10 +76,10 @@ def compute_velocity_from_positions(df: pd.DataFrame, config: DictConfig) -> pd.
 
     This function calculates the velocity of each pedestrian in the input DataFrame
     based on their position data. The velocity is calculated using the Savitzky-Golay
-    filter with a window size of 49 and a polynomial order of 1.
+    filter with a polynomial order of 1.
 
     Args:
-        df: The input DataFrame with the trajectories
+        df: The input DataFrame with the trajectories.
 
     Returns:
         The trajectories DataFrame with velocity columns added.
@@ -101,25 +105,44 @@ def compute_velocity_from_positions(df: pd.DataFrame, config: DictConfig) -> pd.
     return df
 
 
-def transform_velocity_to_polar_coordinates(df: pd.DataFrame, config: DictConfig, dynamics: str = "f") -> pd.DataFrame:
+def transform_fast_velocity_to_polar_coordinates(df: pd.DataFrame, config: DictConfig) -> pd.DataFrame:
     """Add columns with the velocity in polar coordinates to the DataFrame.
 
-    Requires the columns 'u' and 'v' for the velocity in x and y direction, respectively.
+    Requires the columns 'uf' and 'vf' for the velocity in x and y direction, respectively.
 
     Args:
-    - df: The DataFrame to add polar coordinates to.
-    - dynamics: The dynamics to add polar coordinates for 'f' for fast or 's' for slow dynamics.
-        defauls to fast dynamics.
+        df: The trajectory DataFrame to add polar coordinates to.
 
     Returns:
-    - The DataFrame with additional columns for the velocity in polar coordinates.
+        The DataFrame with additional columns 'rf' and 'thetaf' for the fast velocity in polar coordinates.
     """
-    ucol = "u" + dynamics
-    vcol = "v" + dynamics
-    rcol = "r" + dynamics
-    thetacol = "theta" + dynamics
-    df[rcol], df[thetacol] = cartesian_to_polar_coordinates(df[ucol], df[vcol])
-    log.info("Velocity in polar coordinates 'r' and 'theta' added for dynamics %s.", dynamics)
+    df["rf"], df["thetaf"] = cartesian_to_polar_coordinates(df["uf"], df["vf"])
+    log.info("Velocity in polar coordinates 'rf' and 'thetaf' added")
+    return df
+
+
+def transform_slow_velocity_to_polar_coordinates(df: pd.DataFrame, config: DictConfig) -> pd.DataFrame:
+    """Add columns with the velocity in polar coordinates to the DataFrame.
+
+    Requires the columns 'us' and 'vs' for the velocity in x and y direction, respectively.
+
+    Args:
+        df: The trajectory DataFrame to add polar coordinates to.
+
+    Returns:
+        The DataFrame with additional columns 'rs' and 'thetas' for the slow velocity in polar coordinates.
+    """
+    df["rs"], df["thetas"] = cartesian_to_polar_coordinates(df["us"], df["vs"])
+    log.info("Velocity in polar coordinates 'rs' and 'thetas' added")
+    return df
+
+
+def apply_periodic_angular_conditions(df: pd.DataFrame, config: DictConfig) -> pd.DataFrame:
+
+    theta_cols = [col for col in df.columns if "theta" in col]
+    for col in theta_cols:
+        df[col] = periodic_angular_conditions(df[col], config.params.grid.bins["theta"])
+    log.info("Periodic angular conditions applied to columns %s", theta_cols)
     return df
 
 
@@ -137,6 +160,25 @@ def transform_velocity_to_polar_coordinates(df: pd.DataFrame, config: DictConfig
 #         )
 #     return df
 
+
+def save_preprocessed_trajectories(df: pd.DataFrame, config: DictConfig) -> None:
+    """Save the preprocessed trajectories to a file.
+
+    The file is saved if the configuration object has the key 'save.preprocessed_trajectories' set to True.
+
+    Args:
+        df: The DataFrame with the preprocessed trajectories.
+        config: The configuration object.
+
+    Returns:
+        The DataFrame with the preprocessed trajectories.
+    """
+    if config.save.preprocessed_trajectories:
+        log.debug("Configuration 'save.preprocessed_trajectories' is set to True.")
+        save_trajectories(df, Path.cwd().parent, config.filename.preprocessed_trajectories)
+    return df
+
+
 Composable = Callable[[Any], Any]
 
 
@@ -149,55 +191,14 @@ preprocessing_functions = [
     prune_short_trajectories,
     add_trajectory_index,
     compute_velocity_from_positions,
-    transform_velocity_to_polar_coordinates,
+    transform_fast_velocity_to_polar_coordinates,
+    apply_periodic_angular_conditions,
+    save_preprocessed_trajectories,
 ]
 
 preprocess_trajectories = compose(*preprocessing_functions)
 
-# def preprocess_trajectories(df: pd.DataFrame, config: DictConfig) -> pd.DataFrame:
-#     filepath = Path.cwd().parent / config.filename.preprocessed_trajectories
-
-#     # TODO : Move to separate function
-#     if config.read.preprocessed_trajectories:
-#         log.debug("Configuration 'read.preprocessed_trajectories' is set to True.")
-#         try:
-#             preprocessed_trajectories = read_trajectories_from_path(filepath)
-#             log.warning("Preprocessed trajectories read from file.")
-#             # log.debug("Filepath %s", filepath.relative_to(config.root_dir))
-#             return preprocessed_trajectories
-#         except FileNotFoundError as e:
-#             log.error("Preprocessed trajectories not found: %s", e)
-
-#     log.info("Start preprocessing of the recorded trajectories.")
-#     # TODO : Use columnnames from parameters instead of renaming
-#     df = rename_columns(df, config)
-
-#     df = prune_short_trajectories(df, config)
-
-#     df = add_trajectory_index(df, config)
-
-#     df = add_velocity(df, config)
-
-#     # axf = parameters.colnames.get("axf", None)
-#     # ayf = parameters.colnames.get("ayf", None)
-#     # if axf is None or ayf is None:
-#     #     log.warning("Columns for acceleration not found in parameters. Calculating acceleration.")
-#     #     df = add_acceleration(df, parameters)
-#     #     log.info("Acceleration added.")
-
-#     df = transform_velocity_to_polar_coordinates(df, dynamics="f")
-
-#     # if parameters.intermediate_save.preprocessed_trajectories:
-#     if config.save.preprocessed_trajectories:
-#         log.debug("Configuration 'save.preprocessed_trajectories' is set to True.")
-#         save_trajectories(df, Path.cwd().parent, config.filename.preprocessed_trajectories)
-#     return df
-
-
-# def filter_trajectories_by_velocity(df: pd.DataFrame) -> pd.DataFrame:
-#     """Filter trajectories by their average velocity."""
-#     log.info("Start filtering trajectories by velocity.")
-#     umin = 0.2
-#     df = df[df.groupby("Pid")["uf"].transform("mean") > umin]
-#     log.info("Trajectories filtered by velocity.")
-#     return df
+# get_preprocessed_trajectories = {
+#     "compute": preprocess_trajectories,
+#     "read": read_preprocessed_trajectories_from_file,
+# }
