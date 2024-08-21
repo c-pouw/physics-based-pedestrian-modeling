@@ -805,6 +805,17 @@ files = [
 ]
 
 [[package]]
+name = "defusedxml"
+version = "0.7.1"
+description = "XML bomb protection for Python stdlib modules"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+files = [
+    {file = "defusedxml-0.7.1-py2.py3-none-any.whl", hash = "sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61"},
+    {file = "defusedxml-0.7.1.tar.gz", hash = "sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69"},
+]
+
+[[package]]
 name = "distlib"
 version = "0.3.8"
 description = "Distribution utilities"
@@ -985,6 +996,7 @@ files = [
     {file = "fastparquet-2024.5.0-cp312-cp312-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:5626fc72204001b7e82fedb4b02174ecb4e2d4143b38b4ea8d2f9eb65f6b000e"},
     {file = "fastparquet-2024.5.0-cp312-cp312-musllinux_1_2_i686.whl", hash = "sha256:c8b2e86fe6488cce0e3d41263bb0296ef9bbb875a2fca09d67d7685640017a66"},
     {file = "fastparquet-2024.5.0-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:2a951106782d51e5ab110beaad29c4aa0537f045711bb0bf146f65aeaed14174"},
+    {file = "fastparquet-2024.5.0-cp312-cp312-win_amd64.whl", hash = "sha256:cd3473d3e299bfb04c0ac7726cca5d13ee450cc2387ee7fd70587ca150647315"},
     {file = "fastparquet-2024.5.0-cp39-cp39-macosx_10_9_universal2.whl", hash = "sha256:47695037fdc534ef4247f25ccf17dcbd8825be6ecb70c54ca54d588a794f4a6d"},
     {file = "fastparquet-2024.5.0-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:fc3d35ff8341cd65baecac71062e9d73393d7afda207b3421709c1d3f4baa194"},
     {file = "fastparquet-2024.5.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:691348cc85890663dd3c0bb02544d38d4c07a0c3d68837324dc01007301150b5"},
@@ -1141,6 +1153,29 @@ test = ["aiohttp (!=4.0.0a0,!=4.0.0a1)", "numpy", "pytest", "pytest-asyncio (!=0
 test-downstream = ["aiobotocore (>=2.5.4,<3.0.0)", "dask-expr", "dask[dataframe,test]", "moto[server] (>4,<5)", "pytest-timeout", "xarray"]
 test-full = ["adlfs", "aiohttp (!=4.0.0a0,!=4.0.0a1)", "cloudpickle", "dask", "distributed", "dropbox", "dropboxdrivefs", "fastparquet", "fusepy", "gcsfs", "jinja2", "kerchunk", "libarchive-c", "lz4", "notebook", "numpy", "ocifs", "pandas", "panel", "paramiko", "pyarrow", "pyarrow (>=1)", "pyftpdlib", "pygit2", "pytest", "pytest-asyncio (!=0.22.0)", "pytest-benchmark", "pytest-cov", "pytest-mock", "pytest-recording", "pytest-rerunfailures", "python-snappy", "requests", "smbprotocol", "tqdm", "urllib3", "zarr", "zstandard"]
 tqdm = ["tqdm"]
+
+[[package]]
+name = "genbadge"
+version = "1.1.1"
+description = "Generate badges for tools that do not provide one."
+optional = false
+python-versions = "*"
+files = [
+    {file = "genbadge-1.1.1-py2.py3-none-any.whl", hash = "sha256:c8b67ccdad2867434cdc0be7c4bd3f6af6003c466d8ff5013b8b5842ca8730de"},
+    {file = "genbadge-1.1.1.tar.gz", hash = "sha256:12cdaaacbc9e0ea3164bf580cfb87ec61ff17ae0728f09a7f0102f8ab3112f4c"},
+]
+
+[package.dependencies]
+click = ">7.0"
+pillow = "*"
+requests = "*"
+setuptools = "*"
+
+[package.extras]
+all = ["defusedxml", "flake8-html"]
+coverage = ["defusedxml"]
+flake8 = ["flake8-html"]
+tests = ["defusedxml"]
 
 [[package]]
 name = "hydra-colorlog"
@@ -2622,6 +2657,43 @@ tomli = {version = ">=1", markers = "python_version < \"3.11\""}
 dev = ["argcomplete", "attrs (>=19.2)", "hypothesis (>=3.56)", "mock", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
 
 [[package]]
+name = "pytest-html"
+version = "4.1.1"
+description = "pytest plugin for generating HTML reports"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pytest_html-4.1.1-py3-none-any.whl", hash = "sha256:c8152cea03bd4e9bee6d525573b67bbc6622967b72b9628dda0ea3e2a0b5dd71"},
+    {file = "pytest_html-4.1.1.tar.gz", hash = "sha256:70a01e8ae5800f4a074b56a4cb1025c8f4f9b038bba5fe31e3c98eb996686f07"},
+]
+
+[package.dependencies]
+jinja2 = ">=3.0.0"
+pytest = ">=7.0.0"
+pytest-metadata = ">=2.0.0"
+
+[package.extras]
+docs = ["pip-tools (>=6.13.0)"]
+test = ["assertpy (>=1.1)", "beautifulsoup4 (>=4.11.1)", "black (>=22.1.0)", "flake8 (>=4.0.1)", "pre-commit (>=2.17.0)", "pytest-mock (>=3.7.0)", "pytest-rerunfailures (>=11.1.2)", "pytest-xdist (>=2.4.0)", "selenium (>=4.3.0)", "tox (>=3.24.5)"]
+
+[[package]]
+name = "pytest-metadata"
+version = "3.1.1"
+description = "pytest plugin for test session metadata"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pytest_metadata-3.1.1-py3-none-any.whl", hash = "sha256:c8e0844db684ee1c798cfa38908d20d67d0463ecb6137c72e91f418558dd5f4b"},
+    {file = "pytest_metadata-3.1.1.tar.gz", hash = "sha256:d2a29b0355fbc03f168aa96d41ff88b1a3b44a3b02acbe491801c98a048017c8"},
+]
+
+[package.dependencies]
+pytest = ">=7.0.0"
+
+[package.extras]
+test = ["black (>=22.1.0)", "flake8 (>=4.0.1)", "pre-commit (>=2.17.0)", "tox (>=3.24.5)"]
+
+[[package]]
 name = "python-dateutil"
 version = "2.9.0.post0"
 description = "Extensions to the standard Python datetime module"
@@ -3209,6 +3281,22 @@ cryptography = ">=2.0"
 jeepney = ">=0.6"
 
 [[package]]
+name = "setuptools"
+version = "72.2.0"
+description = "Easily download, build, install, upgrade, and uninstall Python packages"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "setuptools-72.2.0-py3-none-any.whl", hash = "sha256:f11dd94b7bae3a156a95ec151f24e4637fb4fa19c878e4d191bfb8b2d82728c4"},
+    {file = "setuptools-72.2.0.tar.gz", hash = "sha256:80aacbf633704e9c8bfa1d99fa5dd4dc59573efcf9e4042c13d3bcef91ac2ef9"},
+]
+
+[package.extras]
+core = ["importlib-metadata (>=6)", "importlib-resources (>=5.10.2)", "jaraco.text (>=3.7)", "more-itertools (>=8.8)", "ordered-set (>=3.1.1)", "packaging (>=24)", "platformdirs (>=2.6.2)", "tomli (>=2.0.1)", "wheel (>=0.43.0)"]
+doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "pygments-github-lexers (==0.0.5)", "pyproject-hooks (!=1.1)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-favicon", "sphinx-inline-tabs", "sphinx-lint", "sphinx-notfound-page (>=1,<2)", "sphinx-reredirects", "sphinxcontrib-towncrier", "towncrier (<24.7)"]
+test = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "importlib-metadata", "ini2toml[lite] (>=0.14)", "jaraco.develop (>=7.21)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "jaraco.test", "mypy (==1.11.*)", "packaging (>=23.2)", "pip (>=19.1)", "pyproject-hooks (!=1.1)", "pytest (>=6,!=8.1.*)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-home (>=0.5)", "pytest-mypy", "pytest-perf", "pytest-ruff (<0.4)", "pytest-ruff (>=0.2.1)", "pytest-ruff (>=0.3.2)", "pytest-subprocess", "pytest-timeout", "pytest-xdist (>=3)", "tomli", "tomli-w (>=1.0.0)", "virtualenv (>=13.0.0)", "wheel"]
+
+[[package]]
 name = "shellingham"
 version = "1.5.4"
 description = "Tool to Detect Surrounding Shell"
@@ -3741,4 +3829,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "18a0df8545e9797cb4552e12e83e5181b223016fffa4999734275a5bf3e7310e"
+content-hash = "58020888368ae97e6cd106776ec3355d0fc7e6fc7b0cb477828b7fe084eebeb7"

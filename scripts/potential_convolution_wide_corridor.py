@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from hydra import compose, initialize
 
-from physped.core.functions_to_select_grid_piece import get_index_of_the_enclosing_bin
+from physped.core.digitizers import digitize_coordinates_to_lattice
 from physped.core.parametrize_potential import learn_potential_from_trajectories
 from physped.io.readers import trajectory_reader
 from physped.preprocessing.trajectories import preprocess_trajectories, process_slow_modes
@@ -66,7 +66,7 @@ def calculate_potential(curvature, center, offset, value):
 point = [0, -10, 1, 0, 3]
 bin_index = []
 for dim, value in zip(cfg.params.grid.bins, point):
-    bin_index.append(get_index_of_the_enclosing_bin(value, cfg.params.grid.bins[dim]))
+    bin_index.append(digitize_coordinates_to_lattice(value, cfg.params.grid.bins[dim]))
 # bin_index[3] = 3
 
 fig, ax = plt.subplots(figsize=(3.54, 1.5))
@@ -80,7 +80,7 @@ lw = 1
 
 for y_index in range(len(ybins) - 1)[::1]:
     bin_index[1] = y_index
-    xmu, xvar, ymu, yvar, umu, uvar, vmu, vvar = piecewise_potential.fit_params[
+    xmu, xvar, ymu, yvar, umu, uvar, vmu, vvar = piecewise_potential.parametrization[
         bin_index[0], bin_index[1], bin_index[2], bin_index[3], bin_index[4], :
     ]
 
@@ -190,7 +190,7 @@ plt.savefig("../figures/potential_convolution_wide_corridor.pdf")
 # %%
 
 fig, ax = plt.subplots()
-ymu = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
+ymu = piecewise_potential.parameterization[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
 dymu = np.where(ymu == 0, np.nan, ymu - middle_bins[:-1])
 # yvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 3]
 # vvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 7]
@@ -231,7 +231,7 @@ plt.savefig("../figures/potential_mean_wide_corridor.pdf")
 # %%
 
 fig, ax = plt.subplots()
-ymu = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
+ymu = piecewise_potential.parametrization[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
 dymu = np.where(ymu == 0, np.nan, ymu - middle_bins[:-1])
 # yvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 3]
 # vvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 7]
@@ -271,7 +271,7 @@ plt.savefig("../figures/potential_curvature_wide_corridor.pdf")
 
 # %%
 fig, ax = plt.subplots()
-ymu = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
+ymu = piecewise_potential.parametrization[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
 # dymu = np.where(ymu == 0, np.nan, ymu - middle_bins[:-1])
 # yvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 3]
 # vvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 7]

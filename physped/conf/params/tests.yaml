@@ -1,0 +1,29 @@
+env_name: tests
+data_source: ???
+fps: 1
+minimum_trajectory_length: 2
+velocity_window_length: 2
+input_ntrajs: ???
+grid:
+  theta:
+    min: 0
+    segments: 2
+  bins:
+    x: ${cast_numpy_array:[-10, 0, 10]}
+    y: ${cast_numpy_array:[-10, 0, 10]}
+    r: ${cast_numpy_array:[0, 1, 2]}
+    theta: ${generate_angular_bins:${params.grid.theta.min},${params.grid.theta.segments}}
+    k: ${cast_numpy_array:[0,1,100000000000]}
+colnames:
+  xf: xpos
+  yf: ypos
+  Pid: pid
+  time: tstep
+model:
+  dt: ${inv_prop:${params.fps}}
+  sigma: 1
+  slow_positions_algorithm: 'low_pass_filter'
+  slow_velocities_algorithm: 'low_pass_filter'
+  tauu: 0.5
+  taux: ${params.model.tauu}
+  minimum_fitting_threshold: 1

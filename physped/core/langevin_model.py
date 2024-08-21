@@ -7,8 +7,7 @@ import sdeint
 
 from physped.core.parametrize_potential import get_grid_indices
 from physped.core.piecewise_potential import PiecewisePotential
-from physped.preprocessing.trajectories import periodic_angular_conditions
-from physped.utils.functions import cartesian_to_polar_coordinates
+from physped.utils.functions import cartesian_to_polar_coordinates, periodic_angular_conditions
 
 log = logging.getLogger(__name__)
 

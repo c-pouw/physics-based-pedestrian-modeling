@@ -7,23 +7,16 @@ from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from physped.core.langevin_model import LangevinModel
-from physped.core.parametrize_potential import convert_grid_indices_to_coordinates, get_grid_indices, sample_from_ndarray
+from physped.core.parametrize_potential import get_grid_indices
+from physped.core.pedestrian_initializer import (
+    sample_trajectory_origins_from_heatmap,
+    sample_trajectory_origins_from_trajectory_state_n,
+)
 from physped.core.piecewise_potential import PiecewisePotential
-from physped.io.readers import read_trajectories_from_path
 from physped.io.writers import save_trajectories
-from physped.preprocessing.trajectories import periodic_angular_conditions
-from physped.utils.functions import cartesian_to_polar_coordinates
+from physped.utils.functions import cartesian_to_polar_coordinates, periodic_angular_conditions
 
 log = logging.getLogger(__name__)
-
-
-def sample_trajectory_origins_from_heatmap(piecewise_potential: PiecewisePotential, parameters: dict) -> np.ndarray:
-    sampled_origins = sample_from_ndarray(piecewise_potential.histogram[..., 0], parameters.simulation.ntrajs)
-    sampled_origins = np.hstack((sampled_origins, np.zeros((sampled_origins.shape[0], 1), dtype=int)))
-    sampled_origins = convert_grid_indices_to_coordinates(piecewise_potential, sampled_origins)
-    sampled_origins = np.hstack((sampled_origins, sampled_origins))
-    sampled_origins = np.delete(sampled_origins, 4, axis=1)
-    return sampled_origins
 
 
 # def sample_trajectory_origins_from_trajectories(piecewise_potential: PiecewisePotential, parameters: dict) -> np.ndarray:
@@ -35,42 +28,11 @@ def sample_trajectory_origins_from_heatmap(piecewise_potential: PiecewisePotenti
 #     return sampled_origins
 
 
-def potential_defined_at_slow_state(paths: pd.DataFrame, piecewise_potential: PiecewisePotential) -> pd.DataFrame:
-    # REQUIRED: Dataframe must have a column with the slow grid indices
-    # TODO : Change the slow_grid_indices to lists rather than tuples
-    indices = np.array(list(paths["slow_grid_indices"]))
-    potential_defined = np.where(np.isnan(piecewise_potential.parametrization), False, True)
-    # All free parameters must be defined
-    potential_defined = np.all(potential_defined, axis=(-2, -1))
-    paths["potential_defined"] = potential_defined[indices[:, 0], indices[:, 1], indices[:, 2], indices[:, 3], indices[:, 4]]
-    return paths
-
-
-def sample_trajectory_origins_from_trajectory_state_n(
-    parameters: dict, measured_trajectories: pd.DataFrame, state_n, piecewise_potential: PiecewisePotential
-) -> np.ndarray:
-    ntrajs = parameters.simulation.ntrajs
-
-    if state_n == -1:
-        # Sample from random point along each path
-        states_to_sample_from = measured_trajectories.groupby("Pid").apply(lambda x: x.sample(1)).reset_index(drop=True)
-    elif state_n >= 0:
-        # Sample from state n along each path
-        states_to_sample_from = measured_trajectories[measured_trajectories["k"] == state_n].copy()
-
-    # Make sure that the potential is defined for the states we sample
-    states_to_sample_from = potential_defined_at_slow_state(states_to_sample_from, piecewise_potential)
-    states_to_sample_from = states_to_sample_from[states_to_sample_from["potential_defined"]].copy()
-    sampled_states = states_to_sample_from[["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs"]].sample(n=ntrajs, replace=True)
-    log.info("Sampled %d origins from the input trajectories.", ntrajs)
-    return sampled_states.to_numpy()
-
-
 def read_simulated_trajectories_from_file(config):
     log.debug("Configuration 'read.simulated_trajectories' is set to True.")
     filepath = Path.cwd().parent / config.filename.simulated_trajectories
     try:
-        simulated_trajectories = read_trajectories_from_path(filepath)
+        simulated_trajectories = pd.read_csv(filepath)
         log.warning("Simulated trajectories read from file")
         # log.debug("Filepath %s", filepath.relative_to(config.root_dir))
         return simulated_trajectories
@@ -79,15 +41,14 @@ def read_simulated_trajectories_from_file(config):
 
 
 def heatmap_zero_at_slow_state(piecewise_potential: PiecewisePotential, slow_state) -> bool:
-    """
-    Check if the heatmap is zero at the given position.
+    """Check if the heatmap is zero at the given position.
 
     Parameters:
-        piecewise_potential (PiecewisePotential): The piecewise potential object.
-        position (np.ndarray): The position to check.
+        piecewise_potential: The piecewise potential object.
+        position: The position to check.
 
     Returns:
-        bool: True if the heatmap is zero at the given position, False otherwise.
+        True if the heatmap is zero at the given position, False otherwise.
     """
     heatmap = np.sum(piecewise_potential.histogram, axis=(2, 3, 4))
     slow_state_index = get_grid_indices(piecewise_potential, slow_state)
@@ -150,7 +111,7 @@ def simulate_trajectories(piecewise_potential: PiecewisePotential, config: dict,
                     : -n_frames_back - 1
                 ]  # strip frames from last trajectory piece
                 trajectory_pieces[-1] = last_trajectory_piece
-                frame_to_restart_from = int(restarting_state["k"])
+                frame_to_restart_from = int(restarting_state["k"])  # TODO : fix bug: can't convert inf to int
 
                 new_evaluation_time = evaluation_time[frame_to_restart_from:]
 

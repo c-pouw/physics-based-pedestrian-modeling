@@ -1,10 +1,16 @@
 import logging
-from typing import Tuple
+from functools import reduce
+from typing import Any, Callable, Tuple
 
 import numpy as np
-import pandas as pd
 
 log = logging.getLogger(__name__)
+
+Composable = Callable[[Any], Any]
+
+
+def compose_functions(*functions: Composable) -> Composable:
+    return lambda x, **kwargs: reduce(lambda df, fn: fn(df, **kwargs), functions, x)
 
 
 def cartesian_to_polar_coordinates(x: float, y: float) -> tuple:
@@ -156,27 +162,20 @@ def test_weighted_mean_of_two_matrices(first_matrix: np.ndarray, counts_first_ma
 #     return np.unravel_index(indices1d, origin_histogram.shape)
 
 
-def digitize_to_bins(values: pd.Series, bins: np.ndarray) -> np.ndarray:
-    """Digitizes the given values to the specified grid.
-
-    This function is 1-dimensional.
-
-    Boundary conditions:
-    - values higher than the biggest bin get the index of the last bin.
-    - values lower that the lowest bin get index 0.
+def periodic_angular_conditions(angle: np.ndarray, angular_bins: np.ndarray) -> np.ndarray:
+    """Apply periodic boundary conditions to a list of angular coordinates.
 
     Args:
-        values: The values to be digitized.
-        bins: The bin edges defining the lattice cells.
+        angle: A list of angular coordinates.
+        angular_bins: An array of bin edges defining the angular grid cells.
 
     Returns:
-        The digitized indices corresponding to the values.
+        The angular coordinates cast to the angular grid.
     """
-    # ! Write a test for this function
-    indices = np.digitize(values, bins) - 1
-    indices = np.where(indices < 0, 0, indices)
-    indices = np.where(indices > len(bins) - 2, len(bins) - 2, indices)
-    return indices
+    angle -= angular_bins[0]
+    angle = angle % (2 * np.pi)
+    angle += angular_bins[0]
+    return angle
 
 
 def weighted_mean_of_matrix(field: np.ndarray, histogram: np.ndarray, axes: Tuple = (2, 3, 4)) -> np.ndarray:

@@ -8,11 +8,8 @@ import numpy as np
 from hydra import compose, initialize
 from omegaconf import OmegaConf
 
-from physped.core.functions_to_select_grid_piece import (
-    evaluate_selection_point,
-    evaluate_selection_range,
-    get_index_of_the_enclosing_bin,
-)
+from physped.core.digitizers import digitize_coordinates_to_lattice
+from physped.core.lattice_selection import evaluate_selection_range  # get_index_of_the_enclosing_bin,; evaluate_selection_point,
 from physped.core.parametrize_potential import calculate_position_based_emperic_potential, learn_potential_from_trajectories
 from physped.io.readers import trajectory_reader
 from physped.preprocessing.trajectories import preprocess_trajectories, process_slow_modes
@@ -49,7 +46,7 @@ logging.info("GRID PARAMETERS: \n%s", pformat(OmegaConf.to_container(config.para
 # %%
 
 config = evaluate_selection_range(config)
-config = evaluate_selection_point(config)
+# config = evaluate_selection_point(config)
 logging.info(pformat(dict(config.params.selection.range)))
 
 # %%
@@ -130,7 +127,7 @@ parabolic_potential = beta * (yrange - y_cent) ** 2 + pot0
 point = [0, -10, 1.3, 0, 3]
 bin_index = []
 for dim, value in zip(config.params.grid.bins, point):
-    bin_index.append(get_index_of_the_enclosing_bin(value, config.params.grid.bins[dim]))
+    bin_index.append(digitize_coordinates_to_lattice(value, config.params.grid.bins[dim]))
 # bin_index[3] = 0
 
 cmap = ["C2", "C1", "C3", "C0"] * 100
@@ -229,7 +226,7 @@ plt.savefig("../figures/potential_convolution_narrow_corridor.pdf")
 # %%
 
 fig, ax = plt.subplots()
-ymu = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
+ymu = piecewise_potential.parametrization[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
 dymu = np.where(ymu == 0, np.nan, ymu - middle_bins[:-1])
 # yvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 3]
 # vvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 7]
@@ -270,7 +267,7 @@ plt.savefig("../figures/potential_mean_narrow_corridor.pdf")
 
 # %%
 fig, ax = plt.subplots()
-ymu = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
+ymu = piecewise_potential.parametrization[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
 dymu = np.where(ymu == 0, np.nan, ymu - middle_bins[:-1])
 # yvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 3]
 # vvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 7]
@@ -310,7 +307,7 @@ plt.savefig("../figures/potential_curvature_narrow_corridor.pdf")
 
 # %%
 fig, ax = plt.subplots()
-ymu = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
+ymu = piecewise_potential.parametrization[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 2]
 # dymu = np.where(ymu == 0, np.nan, ymu - middle_bins[:-1])
 # yvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 3]
 # vvar = piecewise_potential.fit_params[bin_index[0], :, bin_index[2], bin_index[3], bin_index[4], 7]
