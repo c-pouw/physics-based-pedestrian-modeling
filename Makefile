@@ -23,7 +23,7 @@ help:
 	@echo "  all-reports      Generate both test and coverage reports"
 	@echo "  build            Build the project using Poetry"
 	@echo "  publish          Publish the project using Poetry"
-	# @echo "  clean            Clean the build directory"
+	@echo "  clean            Clean the build directory"
 
 .PHONY: apidocs
 apidocs:
@@ -40,7 +40,7 @@ html: apidocs
 .PHONY: test-report
 test-report:
 	@echo "Running tests and generating reports..."
-	pytest $(MODULE)/tests/ --junitxml=$(JUNIT_REPORT)/junit.xml --html=$(JUNIT_REPORT)/report.html
+	coverage run -m pytest $(MODULE)/tests/ --junitxml=$(JUNIT_REPORT)/junit.xml --html=$(JUNIT_REPORT)/report.html
 	genbadge tests -v -n "Unit tests" -i $(JUNIT_REPORT)/junit.xml -o $(JUNIT_REPORT)/tests-badge.svg
 	@echo "Test reports and badge generated in $(JUNIT_REPORT)"
 
@@ -70,9 +70,10 @@ publish:
 	poetry publish
 	@echo "Publish complete."
 
-# .PHONY: clean
-# clean:
-# 	@echo "Cleaning up..."
-# 	rm -rf $(SPHINX_BUILD)
-# 	rm -rf $(REPORTS_DIR)
-# 	@echo "Build and reports directories cleaned"
+.PHONY: clean
+clean:
+	@echo "Cleaning up..."
+	rm -rf $(SPHINX_BUILD)
+	rm -rf $(REPORTS_DIR)
+	rm README.html
+	@echo "Build and reports directories cleaned"

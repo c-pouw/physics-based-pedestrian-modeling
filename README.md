@@ -6,10 +6,10 @@
 	   <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/pages/pages-build-deployment/badge.svg" /></a>
 	<!-- <a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml" alt="Integration Tests"> -->
     <!--    <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml/badge.svg" /></a> -->
-    <a href="./reports/junit/report.html">
-	   <img src="./reports/junit/tests-badge.svg?dummy=8484744" alt="tests" /></a>
-    <a href="./reports/coverage/index.html">
-	   <img src="./reports/coverage/coverage-badge.svg?dummy=8484744" alt="coverage" /></a>
+    <a href="https://c-pouw.github.io/physics-based-pedestrian-modeling/reports/junit/report.html?sort=result">
+	   <img src="https://c-pouw.github.io/physics-based-pedestrian-modeling/reports/junit/tests-badge.svg?dummy=8484744" alt="tests" /></a>
+    <a href="https://c-pouw.github.io/physics-based-pedestrian-modeling/reports/coverage/index.html?">
+	   <img src="https://c-pouw.github.io/physics-based-pedestrian-modeling/reports/coverage/coverage-badge.svg?dummy=8484744" alt="coverage" /></a>
     <a href="https://pypi.python.org/pypi/physics-based-pedestrian-modeling" alt="pypi version">
        <img src="https://img.shields.io/pypi/v/physics-based-pedestrian-modeling.svg" /></a>
     <a href="#">
