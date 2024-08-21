@@ -40,7 +40,7 @@ html: apidocs
 .PHONY: test-report
 test-report:
 	@echo "Running tests and generating reports..."
-	pytest $(MODULE)/tests/ --junitxml=$(JUNIT_REPORT)/junit.xml --html=$(JUNIT_REPORT)/report.html
+	coverage run -m pytest $(MODULE)/tests/ --junitxml=$(JUNIT_REPORT)/junit.xml --html=$(JUNIT_REPORT)/report.html
 	genbadge tests -v -n "Unit tests" -i $(JUNIT_REPORT)/junit.xml -o $(JUNIT_REPORT)/tests-badge.svg
 	@echo "Test reports and badge generated in $(JUNIT_REPORT)"
 

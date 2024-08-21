@@ -1,4 +1,4 @@
-import warnings
+# import warnings
 
 import numpy as np
 import pandas as pd
@@ -43,4 +43,4 @@ def test_digitize_trajectories_to_grid():
     # print(df)
     assert "fast_grid_indices" in df.columns
     assert "slow_grid_indices" in df.columns
-    warnings.warn(UserWarning("This test needs improvements"))
+    # warnings.warn(UserWarning("This test needs improvements"))
