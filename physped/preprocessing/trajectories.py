@@ -1,7 +1,5 @@
 import logging
-from functools import reduce
 from pathlib import Path
-from typing import Any, Callable
 
 import numpy as np
 import pandas as pd
@@ -10,14 +8,13 @@ from scipy.signal import savgol_filter
 
 # from physped.io.readers import read_preprocessed_trajectories_from_file
 from physped.io.writers import save_trajectories
-from physped.utils.functions import cartesian_to_polar_coordinates, periodic_angular_conditions
+from physped.utils.functions import cartesian_to_polar_coordinates, compose_functions
 
 log = logging.getLogger(__name__)
 
 
 def rename_columns(df: pd.DataFrame, config: DictConfig) -> pd.DataFrame:
-    """
-    Rename columns of a DataFrame.
+    """Rename columns of a DataFrame.
 
     Args:
         df: The DataFrame to rename the columns of.
@@ -31,6 +28,27 @@ def rename_columns(df: pd.DataFrame, config: DictConfig) -> pd.DataFrame:
     inverted_colnames = {v: k for k, v in colnames.items()}
     df.rename(columns=inverted_colnames, inplace=True)
     log.info("Columns renamed to %s", list(df.columns))
+    return df
+
+
+def cast_types(df: pd.DataFrame, config: DictConfig) -> pd.DataFrame:
+    """Cast the types of the columns of the DataFrame.
+
+    Args:
+        df: The DataFrame to cast the types of.
+        config: The configuration object.
+
+    Returns:
+        The DataFrame with the columns casted to the correct types.
+    """
+    type_mapping = {
+        "xf": float,
+        "yf": float,
+        "Pid": int,
+        "time": int,
+    }
+    df = df.astype(type_mapping)
+    log.info("Columns casted to %s", type_mapping)
     return df
 
 
@@ -137,15 +155,6 @@ def transform_slow_velocity_to_polar_coordinates(df: pd.DataFrame, config: DictC
     return df
 
 
-def apply_periodic_angular_conditions(df: pd.DataFrame, config: DictConfig) -> pd.DataFrame:
-
-    theta_cols = [col for col in df.columns if "theta" in col]
-    for col in theta_cols:
-        df[col] = periodic_angular_conditions(df[col], config.params.grid.bins["theta"])
-    log.info("Periodic angular conditions applied to columns %s", theta_cols)
-    return df
-
-
 # def add_acceleration(df: pd.DataFrame, parameters: dict) -> pd.DataFrame:
 #     framerate = parameters.fps
 #     groupby = "Pid"
@@ -179,24 +188,28 @@ def save_preprocessed_trajectories(df: pd.DataFrame, config: DictConfig) -> None
     return df
 
 
-Composable = Callable[[Any], Any]
+def preprocess_trajectories(trajectories: pd.DataFrame, config: DictConfig) -> pd.DataFrame:
+    """Preprocess trajectories.
 
+    Args:
+        trajectories: The DataFrame with the trajectories.
 
-def compose(*functions: Composable) -> Composable:
-    return lambda x, **kwargs: reduce(lambda df, fn: fn(df, **kwargs), functions, x)
+    Keyword Args:
+        config: The configuration object.
 
+    Returns:
+        The preprocessed DataFrame with the trajectories.
+    """
+    preprocessing_pipeline = compose_functions(
+        rename_columns,
+        prune_short_trajectories,
+        add_trajectory_index,
+        compute_velocity_from_positions,
+        transform_fast_velocity_to_polar_coordinates,
+        save_preprocessed_trajectories,
+    )
+    return preprocessing_pipeline(trajectories, config=config)
 
-preprocessing_functions = [
-    rename_columns,
-    prune_short_trajectories,
-    add_trajectory_index,
-    compute_velocity_from_positions,
-    transform_fast_velocity_to_polar_coordinates,
-    apply_periodic_angular_conditions,
-    save_preprocessed_trajectories,
-]
-
-preprocess_trajectories = compose(*preprocessing_functions)
 
 # get_preprocessed_trajectories = {
 #     "compute": preprocess_trajectories,

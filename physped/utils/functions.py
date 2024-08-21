@@ -1,9 +1,16 @@
 import logging
-from typing import Tuple
+from functools import reduce
+from typing import Any, Callable, Tuple
 
 import numpy as np
 
 log = logging.getLogger(__name__)
+
+Composable = Callable[[Any], Any]
+
+
+def compose_functions(*functions: Composable) -> Composable:
+    return lambda x, **kwargs: reduce(lambda df, fn: fn(df, **kwargs), functions, x)
 
 
 def cartesian_to_polar_coordinates(x: float, y: float) -> tuple:

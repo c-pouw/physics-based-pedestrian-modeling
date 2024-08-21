@@ -7,14 +7,14 @@ import logging
 import numpy as np
 from omegaconf import DictConfig
 
-from physped.core.distribution_approximator import GaussianApproximation
+from physped.core.distribution_approximator import DistApproximation
 from physped.core.lattice import Lattice
 
 log = logging.getLogger(__name__)
 
 
 class PiecewisePotential:
-    def __init__(self, bins: DictConfig):
+    def __init__(self, lattice: Lattice, dist_approximation: DistApproximation):
         """A class for the piecewise potential.
 
         Creates the lattice to discretize the slow dynamics and fit the potential.
@@ -22,8 +22,8 @@ class PiecewisePotential:
         Args:
             bins: A dictionary containing the bin edges for each dimension.
         """
-        self.lattice = Lattice(bins)
-        self.dist_approximation = GaussianApproximation()
+        self.lattice = lattice
+        self.dist_approximation = dist_approximation
         self.histogram = np.zeros(self.lattice.shape)
         self.histogram_slow = np.zeros(self.lattice.shape)
         self.initialize_parametrization()

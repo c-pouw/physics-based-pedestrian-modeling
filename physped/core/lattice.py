@@ -25,7 +25,7 @@ class Lattice:
         self.dimensions = tuple(bins.keys())
         self.bin_centers = self.get_bin_centers()
         self.shape = self.get_lattice_shape()
-        self.cell_volume = self.compute_cell_volume()
+        # self.cell_volume = self.compute_cell_volume()
 
     def __repr__(self):
         return f"Lattice(bins={pformat(OmegaConf.to_container(self.bins, resolve=True), depth=1)})"

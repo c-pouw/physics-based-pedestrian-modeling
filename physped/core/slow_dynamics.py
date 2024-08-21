@@ -1,6 +1,4 @@
 import logging
-from functools import reduce
-from typing import Any, Callable
 
 import numpy as np
 import pandas as pd
@@ -9,7 +7,8 @@ from scipy.signal import savgol_filter
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
-from physped.preprocessing.trajectories import apply_periodic_angular_conditions, transform_slow_velocity_to_polar_coordinates
+from physped.preprocessing.trajectories import transform_slow_velocity_to_polar_coordinates
+from physped.utils.functions import compose_functions
 
 log = logging.getLogger(__name__)
 
@@ -129,21 +128,14 @@ def compute_slow_position(df: pd.DataFrame, config: DictConfig) -> pd.DataFrame:
     return df
 
 
-Composable = Callable[[Any], Any]
-
-
-def compose(*functions: Composable) -> Composable:
-    return lambda x, **kwargs: reduce(lambda df, fn: fn(df, **kwargs), functions, x)
-
-
 functions_to_compute_slow_dynamics = [
     compute_slow_velocity,
     transform_slow_velocity_to_polar_coordinates,
-    apply_periodic_angular_conditions,
+    # apply_periodic_angular_conditions,
     compute_slow_position,
 ]
 
-compute_slow_dynamics = compose(*functions_to_compute_slow_dynamics)
+compute_slow_dynamics = compose_functions(*functions_to_compute_slow_dynamics)
 
 
 # def compute_slow_dynamics(df: pd.DataFrame, config: dict) -> pd.DataFrame:

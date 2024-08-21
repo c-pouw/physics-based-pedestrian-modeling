@@ -36,8 +36,8 @@ def learn_piece_of_potential_plot(config: dict, preprocessed_trajectories: pd.Da
     # log.info("Grid selection by indices: %s", grid_selection_by_indices)
 
     # filepath = Path.cwd().parent / config.filename.preprocessed_trajectories
-    # preprocessed_trajectories = read_trajectories_from_path(filepath)
-    # trajs = read_trajectories_from_path(Path.cwd().parent / "preprocessed_trajectories.csv")
+    # preprocessed_trajectories = pd.read_csv(filepath)
+    # trajs = pd.read_csv(Path.cwd().parent / "preprocessed_trajectories.csv")
     trajs = digitize_trajectories_to_grid(piecewise_potential.lattice.bins, preprocessed_trajectories)
 
     parametrization = piecewise_potential.parametrization[

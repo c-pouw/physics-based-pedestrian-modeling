@@ -2,12 +2,14 @@
 <p align="center">
     <a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/" alt="Repository">
 	   <img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white" /></a>
-    <a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/testing.yml" alt="Unit Tests">
-       <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/testing.yml/badge.svg" /></a>
-	<a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml" alt="Integration Tests">
-       <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml/badge.svg" /></a>
-	<a href="https://c-pouw.github.io/physics-based-pedestrian-modeling" alt="read-the-docs">
+    <a href="https://c-pouw.github.io/physics-based-pedestrian-modeling" alt="read-the-docs">
 	   <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/pages/pages-build-deployment/badge.svg" /></a>
+	<!-- <a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml" alt="Integration Tests"> -->
+    <!--    <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml/badge.svg" /></a> -->
+    <a href="./reports/junit/report.html">
+	   <img src="./reports/junit/tests-badge.svg?dummy=8484744" alt="tests" /></a>
+    <a href="./reports/coverage/index.html">
+	   <img src="./reports/coverage/coverage-badge.svg?dummy=8484744" alt="coverage" /></a>
     <a href="https://pypi.python.org/pypi/physics-based-pedestrian-modeling" alt="pypi version">
        <img src="https://img.shields.io/pypi/v/physics-based-pedestrian-modeling.svg" /></a>
     <a href="#">
@@ -19,6 +21,7 @@
 	<a href="https://arxiv.org/abs/2407.20794">
 	   <img src="https://img.shields.io/badge/arXiv-2407.20794-b31b1b.svg?style=flat" alt="arXiv" /></a>
 </p>
+
 
 # Project Overview
 

@@ -13,7 +13,6 @@ from physped.core.pedestrian_initializer import (
     sample_trajectory_origins_from_trajectory_state_n,
 )
 from physped.core.piecewise_potential import PiecewisePotential
-from physped.io.readers import read_trajectories_from_path
 from physped.io.writers import save_trajectories
 from physped.utils.functions import cartesian_to_polar_coordinates, periodic_angular_conditions
 
@@ -33,7 +32,7 @@ def read_simulated_trajectories_from_file(config):
     log.debug("Configuration 'read.simulated_trajectories' is set to True.")
     filepath = Path.cwd().parent / config.filename.simulated_trajectories
     try:
-        simulated_trajectories = read_trajectories_from_path(filepath)
+        simulated_trajectories = pd.read_csv(filepath)
         log.warning("Simulated trajectories read from file")
         # log.debug("Filepath %s", filepath.relative_to(config.root_dir))
         return simulated_trajectories

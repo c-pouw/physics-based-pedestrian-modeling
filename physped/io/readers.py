@@ -20,31 +20,40 @@ from physped.core.piecewise_potential import PiecewisePotential
 log = logging.getLogger(__name__)
 
 
-def read_trajectories_from_path(filepath: Path) -> pd.DataFrame:
-    """Read trajectories from a csv file.
+def read_preprocessed_trajectories_from_file(config: DictConfig, **kwargs) -> pd.DataFrame:
+    """Read preprocessed trajectories from a csv file.
 
     Mainly used to read intermediate outputs.
 
     Args:
-        filepath: Path to the csv file containing the trajectories.
+        config: The configuration parameters.
 
     Returns:
-        The trajectory dataset.
+        The preprocessed trajectory dataset.
     """
-    return pd.read_csv(filepath)
-
-
-def read_preprocessed_trajectories_from_file(config: DictConfig, **kwargs) -> pd.DataFrame:
     filepath = Path.cwd().parent / config.filename.preprocessed_trajectories
     # if config.read.preprocessed_trajectories:
     #     log.debug("Configuration 'read.preprocessed_trajectories' is set to True.")
     try:
-        preprocessed_trajectories = read_trajectories_from_path(filepath)
+        preprocessed_trajectories = pd.read_csv(filepath)
         log.warning("Preprocessed trajectories read from file.")
         # log.debug("Filepath %s", filepath.relative_to(config.root_dir))
         return preprocessed_trajectories
     except FileNotFoundError as e:
         log.error("Preprocessed trajectories not found: %s", e)
+
+
+def read_piecewise_potential(config: DictConfig) -> PiecewisePotential:
+    filepath = Path.cwd().parent / config.filename.piecewise_potential
+    if config.read.piecewise_potential:
+        log.debug("Configuration 'read.simulated_trajectories' is set to True.")
+        try:
+            piecewise_potential = read_piecewise_potential_from_file(filepath)
+            log.warning("Piecewise potential read from file")
+            # log.debug("Filepath %s", filepath.relative_to(config.root_dir))
+            return piecewise_potential
+        except FileNotFoundError as e:
+            log.error("Piecewise potential not found: %s", e)
 
 
 def read_piecewise_potential_from_file(filepath: Path) -> PiecewisePotential:
