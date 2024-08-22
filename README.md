@@ -14,6 +14,8 @@
        <img src="https://img.shields.io/pypi/v/physics-based-pedestrian-modeling.svg" /></a>
     <a href="#">
        <img src="https://img.shields.io/pypi/pyversions/physics-based-pedestrian-modeling" alt="PyPI - Python Version" /></a>
+    <a href="https://opensource.org/licenses/BSD-3-Clause">
+       <img src="https://img.shields.io/badge/License-BSD%203--Clause-orange.svg" alt="Licence" /></a>
     <a href="https://github.com/psf/black">
        <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black" /></a>
 	<a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_quick_start.ipynb">
@@ -21,7 +23,6 @@
 	<a href="https://arxiv.org/abs/2407.20794">
 	   <img src="https://img.shields.io/badge/arXiv-2407.20794-b31b1b.svg?style=flat" alt="arXiv" /></a>
 </p>
-
 
 # Project Overview
 
