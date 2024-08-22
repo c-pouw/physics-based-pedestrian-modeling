@@ -20,6 +20,8 @@
        <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black" /></a>
 	<a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_quick_start.ipynb">
 	   <img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+	<a href="https://doi.org/10.5281/zenodo.13362271">
+	   <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.13362271.svg" alt="DOI"></a>
 	<a href="https://arxiv.org/abs/2407.20794">
 	   <img src="https://img.shields.io/badge/arXiv-2407.20794-b31b1b.svg?style=flat" alt="arXiv" /></a>
 </p>

@@ -15,5 +15,8 @@ authors:
 title: "Data-driven physics-based modeling of pedestrian dynamics"
 version: 0.3.1
 date-released: 2024-08-22
+identifiers:
+  - doi
+  - 10.5281/zenodo.13362270
 license: BSD-3-Clause
 repository-code: "https://github.com/c-pouw/physics-based-pedestrian-modeling"
