@@ -13,8 +13,8 @@ authors:
     given-names: Federico
     orcid: https://orcid.org/0000-0001-5935-2332
 title: "Data-driven physics-based modeling of pedestrian dynamics"
-version: 0.3.1
-date-released: 2024-08-22
+version: 0.3.2
+date-released: 2024-08-23
 identifiers:
   - doi
   - 10.5281/zenodo.13362270
