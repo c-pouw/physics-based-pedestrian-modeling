@@ -5,6 +5,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
 
+from physped.core.distribution_approximator import GaussianApproximation
+from physped.core.lattice import Lattice
 from physped.core.parametrize_potential import digitize_trajectories_to_grid
 from physped.core.piecewise_potential import PiecewisePotential
 from physped.visualization.plot_trajectories import (
@@ -26,13 +28,14 @@ log = logging.getLogger(__name__)
 
 def plot_discrete_grid(config: dict, slow_indices: tuple, trajectories: pd.DataFrame = pd.DataFrame()):
     params = config.params
-    grid_bins = dict(config.params.grid.bins)
-    piecewise_potential = PiecewisePotential(grid_bins)
+    lattice = Lattice(config.params.grid.bins)
+    dist_approximation = GaussianApproximation()
+    piecewise_potential = PiecewisePotential(lattice, dist_approximation)
 
     plot_params = config.params.grid_plot
     if plot_params.plot_trajs:
         try:
-            trajectories = digitize_trajectories_to_grid(piecewise_potential.lattice.bins, trajectories)
+            trajectories = digitize_trajectories_to_grid(trajectories, piecewise_potential.lattice)
             trajs_conditioned_to_slow_mode = trajectories[trajectories.slow_grid_indices == slow_indices].copy()
             pids_to_plot = trajs_conditioned_to_slow_mode.Pid.drop_duplicates().sample(plot_params.N_trajs)
             plot_trajs = trajs_conditioned_to_slow_mode[trajs_conditioned_to_slow_mode.Pid.isin(pids_to_plot)]

@@ -62,7 +62,7 @@ def compute_joint_kl_divergence(
 ) -> float:
     # We compare the probability distributions of the actual dynamics for measurements and simulations
     recorded_paths_histogram = piecewise_potential.histogram
-    simulated_paths = digitize_trajectories_to_grid(piecewise_potential.lattice.bins, simulated_paths)
+    simulated_paths = digitize_trajectories_to_grid(simulated_paths, piecewise_potential.lattice)
     simulated_paths_histogram = np.zeros_like(recorded_paths_histogram)
     simulated_paths_histogram = add_trajectories_to_histogram(simulated_paths_histogram, simulated_paths, "fast_grid_indices")
     recorded_paths_histogram = np.where(recorded_paths_histogram == 0, np.nan, recorded_paths_histogram)
@@ -78,7 +78,7 @@ def compute_joint_kl_divergence_with_volume(
     histogram_measurements = piecewise_potential.histogram
     cell_volume = piecewise_potential.lattice.cell_volume
 
-    simulated_paths = digitize_trajectories_to_grid(piecewise_potential.lattice.bins, simulated_paths)
+    simulated_paths = digitize_trajectories_to_grid(simulated_paths, piecewise_potential.lattice)
     histogram_simulations = np.zeros_like(histogram_measurements)
     histogram_simulations = add_trajectories_to_histogram(histogram_simulations, simulated_paths, "fast_grid_indices")
     histogram_simulations = np.where(histogram_simulations == 0, np.nan, histogram_simulations)
