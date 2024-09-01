@@ -85,7 +85,7 @@ def simulate_trajectories(piecewise_potential: PiecewisePotential, config: dict,
     trajectories = []
 
     model = LangevinModel(piecewise_potential, parameters)
-    n_frames_back = config.params.fps  # Go 1 seconds back
+    n_frames_back = config.params.fps  # Go 1 second back
     with logging_redirect_tqdm():
         for starting_state in tqdm(
             origins[:, :11], desc="Simulating trajectories", unit="trajs", total=origins.shape[0], miniters=1
@@ -111,7 +111,7 @@ def simulate_trajectories(piecewise_potential: PiecewisePotential, config: dict,
                     : -n_frames_back - 1
                 ]  # strip frames from last trajectory piece
                 trajectory_pieces[-1] = last_trajectory_piece
-                frame_to_restart_from = int(restarting_state["k"])  # TODO : fix bug: can't convert inf to int
+                frame_to_restart_from = int(restarting_state["k"])
 
                 new_evaluation_time = evaluation_time[frame_to_restart_from:]
 
@@ -166,6 +166,8 @@ def simulate_trajectory_piece(
 ) -> pd.DataFrame:
     integration_output = model.simulate(starting_state[:11], evaluation_time)
     columns = ["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs", "t", "k", "Pid"]
-    trajectory_piece = pd.DataFrame(integration_output, columns=columns).dropna()
+    trajectory_piece = pd.DataFrame(integration_output, columns=columns)
+    trajectory_piece.replace([np.inf, -np.inf], np.nan, inplace=True)
+    trajectory_piece.dropna(inplace=True)
     trajectory_piece["piece_id"] = no_traj_piece
     return trajectory_piece

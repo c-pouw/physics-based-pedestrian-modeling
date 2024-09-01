@@ -75,5 +75,5 @@ clean:
 	@echo "Cleaning up..."
 	rm -rf $(SPHINX_BUILD)
 	rm -rf $(REPORTS_DIR)
-	rm README.html
+	rm -rf README.html
 	@echo "Build and reports directories cleaned"

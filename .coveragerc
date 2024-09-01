@@ -8,6 +8,9 @@ omit =
     # ignore _version.py and versioneer.py
     .*version.*
     *_version.py
+    physped/tests/*
+    physped/visualization/*
+    physped/io/*
 
 exclude_lines =
     if __name__ == '__main__':

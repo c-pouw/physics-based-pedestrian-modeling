@@ -14,14 +14,17 @@
        <img src="https://img.shields.io/pypi/v/physics-based-pedestrian-modeling.svg" /></a>
     <a href="#">
        <img src="https://img.shields.io/pypi/pyversions/physics-based-pedestrian-modeling" alt="PyPI - Python Version" /></a>
+    <a href="https://opensource.org/licenses/BSD-3-Clause">
+       <img src="https://img.shields.io/badge/License-BSD%203--Clause-orange.svg" alt="Licence" /></a>
     <a href="https://github.com/psf/black">
        <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black" /></a>
 	<a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_quick_start.ipynb">
 	   <img src="https://colab.research.google.com/assets/colab-badge.svg"></a>
+	<a href="https://doi.org/10.5281/zenodo.13362271">
+	   <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.13362271.svg" alt="DOI"></a>
 	<a href="https://arxiv.org/abs/2407.20794">
 	   <img src="https://img.shields.io/badge/arXiv-2407.20794-b31b1b.svg?style=flat" alt="arXiv" /></a>
 </p>
-
 
 # Project Overview
 
@@ -41,14 +44,14 @@ Pouw, C. A. S., van der Vleuten, G., Corbetta, A., & Toschi, F. (2024). Data-dri
     <a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_quick_start.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a><sup><sub> - Quick-start notebook demonstrating the generalized pedestrian model. </sub></sup> <br>
 </h2>
 
-This notebook can be used to create a model for all the environments that rely on public data sets without the need to locally install the package.
+This notebook can be used to create models for all the environments discussed in the paper that rely ona public data set without the need to install anything locally.
 
 # Installation
 
-Alternatively, you can locally install the package from PyPI
+You can install the package from PyPI
 
 ```bash
-pip install --upgrade physics-based-pedestrian-modeling
+pip install physics-based-pedestrian-modeling
 ```
 
 # Using the CLI
@@ -72,7 +75,7 @@ physped_cli -m params=narrow_corridor params.model.sigma=0.5,0.7,0.9
 
 # Available environments
 
-The environments that rely on public data sets can be used by overwriting the 'params' variable with one of the following configuration file names:
+Every environment discussed in the paper that relies a on public data set can be modeled using the cli by overwriting the 'params' variable with one of the following configuration file names:
 
 ## Narrow corridor
 Trajectories of walking paths in a narrow corridor.
