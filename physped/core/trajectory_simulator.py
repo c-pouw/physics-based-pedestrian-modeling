@@ -85,7 +85,7 @@ def simulate_trajectories(piecewise_potential: PiecewisePotential, config: dict,
     trajectories = []
 
     model = LangevinModel(piecewise_potential, parameters)
-    n_frames_back = config.params.fps  # Go 1 second back
+    n_frames_back = config.params.fps // 2  # Go 0.5 second back
     with logging_redirect_tqdm():
         for starting_state in tqdm(
             origins[:, :11], desc="Simulating trajectories", unit="trajs", total=origins.shape[0], miniters=1
@@ -100,7 +100,7 @@ def simulate_trajectories(piecewise_potential: PiecewisePotential, config: dict,
                 restarting_state = last_trajectory_piece.iloc[-n_frames_back]
                 restarting_time = restarting_state["t"]
                 log.info(
-                    "Pid %s piece %s: Removing %s frames. Restarting at t = %.2f.",
+                    "Pid %s piece %s: Reverting %s frames -> t = %.2f.",
                     int(pid),
                     no_last_trajectory_piece,
                     n_frames_back,
@@ -137,25 +137,25 @@ def check_restarting_conditions(traj, n_frames_back, piecewise_potential):
     # traj is the last trajectory_piece
     last_trajectory_piece_too_short = len(traj) < n_frames_back
     if last_trajectory_piece_too_short:
-        log.warning("Last trajectory piece has only %s frames. Not restarting.", len(traj))
+        log.warning("Last trajectory piece has only %s frames. Not reverting.", len(traj))
         return False
 
     trajectory_already_left_the_measurement_domain = heatmap_zero_at_slow_state(
         piecewise_potential, traj.iloc[-1][["xs", "ys", "us", "vs", "k"]]
     )
     if trajectory_already_left_the_measurement_domain:
-        log.warning("Last trajectory piece already left the measurement domain. Not restarting.")
+        log.warning("Last trajectory piece already left the measurement domain. Not reverting.")
         return False
 
     particle_left_the_lattice = np.all(np.isinf(traj.iloc[-1]))
     if particle_left_the_lattice:
-        log.warning("Last trajectory piece already left the lattice. Not restarting.")
+        log.warning("Last trajectory piece already left the lattice. Not reverting.")
         return False
 
-    max_restarts = 4
+    max_restarts = 2
     simulation_already_restarted_too_often = traj["piece_id"].iloc[0] > max_restarts
     if simulation_already_restarted_too_often:
-        log.warning("Simulation already restarted %s times. Not restarting.", max_restarts)
+        log.warning("Simulation already restarted %s times. Not reverting.", max_restarts)
         return False
 
     return True

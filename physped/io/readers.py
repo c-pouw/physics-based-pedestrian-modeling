@@ -5,14 +5,17 @@ import io
 import logging
 import pickle
 import zipfile
+from fnmatch import fnmatch
+from io import BytesIO
 from pathlib import Path
-from typing import Tuple
+from typing import List, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import requests
 from omegaconf import DictConfig
+from PIL import Image
 from tqdm import tqdm
 
 from physped.core.piecewise_potential import PiecewisePotential
@@ -311,9 +314,9 @@ def read_ehv_pf34_paths_geert(config: DictConfig) -> pd.DataFrame:
     return df
 
 
-def filter_part_of_the_domain(df, xmin, xmax):
-    df = df[df["x_pos"] > xmin].copy()
-    df = df[df["x_pos"] < xmax].copy()
+def filter_part_of_the_domain(df, xmin, xmax, xcol="x_pos", ycol="y_pos"):
+    df = df[df[xcol] > xmin].copy()
+    df = df[df[ycol] < xmax].copy()
     return df
 
 
@@ -347,9 +350,87 @@ def read_ehv_pf34_paths_local(config: DictConfig) -> pd.DataFrame:
     return df
 
 
+def get_zenodo_data(url: str) -> BytesIO:
+    """Download data from Zenodo URL into memory"""
+    response = requests.get(url, timeout=10)
+    response.raise_for_status()
+    return BytesIO(response.content)
+
+
+def list_zenodo_files(config: DictConfig, pattern: str = None) -> List[dict]:
+    """List all files in a Zenodo record, optionally filtered by pattern
+
+    Args:
+        config: The configuration parameters.
+
+    Returns:
+        List of file information dictionaries
+    """
+    zenodo_repo_url = config.params.data_url
+    data_record_id = config.params.data_record_id
+    url = f"{zenodo_repo_url}/{data_record_id}"
+    response = requests.get(url, timeout=10)
+    response.raise_for_status()
+
+    files = response.json()["files"]
+
+    if pattern:
+        files = [f for f in files if fnmatch(f["key"], pattern)]
+
+    return files
+
+
+def read_parquet_from_zenodo(config: DictConfig) -> pd.DataFrame:
+    """Read parquet file from Zenodo using Pandas
+
+    Args:
+        config: The configuration parameters.
+
+    Returns:
+        DataFrame from Pandas
+    """
+    # Get file information
+    files = list_zenodo_files(config, "*.parquet")
+    if not files:
+        raise ValueError(f"No matching files found in record {config.params.record_id}")
+
+    # Use first matching file if filename not specified
+    file_info = files[0]  # TODO Reader for other files in the zenodo repo
+    file_url = file_info["links"]["self"]
+
+    # Get data into memory
+    data = get_zenodo_data(file_url)
+
+    # Read with specified library
+    return pd.read_parquet(data, engine="pyarrow")
+
+
+def read_ehv_pf34_paths_zenodo(config: DictConfig) -> pd.DataFrame:
+    """Read the Eindhoven platform 3-4 paths data set from a local file.
+
+    Args:
+        config: The configuration parameters.
+
+    Returns:
+        The trajectory dataset with Eindhoven platform 3-4 paths
+    """
+    df = read_parquet_from_zenodo(config)
+    df = df.reset_index(drop=True).head(10000000)  # TODO: Fix memory issues in a better way
+
+    # Convert spatial coordinates from milimeters to meters
+    xcol = config.params.colnames.xf
+    ycol = config.params.colnames.yf
+    df[xcol] /= 1000
+    df[ycol] /= 1000
+
+    df = filter_part_of_the_domain(df, xmin=50, xmax=70, xcol=xcol, ycol=ycol)
+    return df
+
+
 ehv_pf34_path_reader = {
     "geert": read_ehv_pf34_paths_geert,
     "local": read_ehv_pf34_paths_local,
+    "zenodo": read_ehv_pf34_paths_zenodo,
 }
 
 
@@ -531,27 +612,27 @@ trajectory_reader = {
 }
 
 
-def get_background_image_local(config: DictConfig) -> np.ndarray:
+def get_background_image_local(config: DictConfig) -> Image.Image:
     """Read the background image from a local file.
 
     Args:
         config: The configuration parameters.
 
     Returns:
-        The background image as a numpy array.
+        The background image as a PIL Image object.
     """
     image = plt.imread(Path(config.root_dir).parent / config.params.background.imgpath)
     return image
 
 
-def get_background_image_from_remote_zip(config: DictConfig) -> np.ndarray:
+def get_background_image_from_remote_zip(config: DictConfig) -> Image.Image:
     """Read the background image from a remote archive.
 
     Args:
         config: The configuration parameters.
 
     Returns:
-        The background image as a numpy array.
+        The background image as a PIL Image object.
     """
     link = config.params.background.img_link_4tu
     bytestring = requests.get(link, timeout=10)
@@ -567,7 +648,35 @@ def get_background_image_from_remote_zip(config: DictConfig) -> np.ndarray:
     return image
 
 
+def get_background_image_from_zenodo(config: DictConfig, filename: str = None) -> Image.Image:
+    """Read image file from Zenodo using PIL
+
+    Args:
+        config: The configuration parameters.
+        filename: Name of file to read. If None, will read first image file found
+
+    Returns:
+        PIL Image object
+    """
+    # Get file information
+    pattern = filename if filename else "*.png"  # Can be extended to support other formats
+    files = list_zenodo_files(config, pattern)
+    if not files:
+        raise ValueError(f"No matching image files found in record {config.params.data_record_id}")
+
+    # Use first matching file if filename not specified
+    file_info = files[0]
+    file_url = file_info["links"]["self"]
+
+    # Get data into memory
+    data = get_zenodo_data(file_url)
+
+    # Read image using PIL
+    return Image.open(data)
+
+
 read_background_image = {
     "local": get_background_image_local,
     "4tu": get_background_image_from_remote_zip,
+    "zenodo": get_background_image_from_zenodo,
 }

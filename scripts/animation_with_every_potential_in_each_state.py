@@ -20,9 +20,10 @@ from physped.core.parametrize_potential import (
     get_grid_indices,
     learn_potential_from_trajectories,
 )
+from physped.core.slow_dynamics import compute_slow_dynamics
 from physped.core.trajectory_simulator import simulate_trajectories
 from physped.io.readers import trajectory_reader
-from physped.preprocessing.trajectories import preprocess_trajectories, process_slow_modes
+from physped.preprocessing.trajectories import preprocess_trajectories
 from physped.utils.config_utils import register_new_resolvers
 from physped.visualization.plot_trajectories import plot_station_background, plot_trajectories
 from physped.visualization.plot_utils import apply_xy_plot_style
@@ -75,7 +76,7 @@ trajectories.head()
 # %%
 
 preprocessed_trajectories = preprocess_trajectories(trajectories, config=config)
-preprocessed_trajectories = process_slow_modes(preprocessed_trajectories, config)
+preprocessed_trajectories = compute_slow_dynamics(preprocessed_trajectories, config=config)
 
 # %%
 # preprocessed_trajectories = preprocess_trajectories(trajectories, config=config)
