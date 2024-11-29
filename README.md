@@ -1,3 +1,13 @@
+# TGF Linktree
+
+<h2 align="left" style="vertical-align: middle;">
+	<a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/" alt="Repository"><img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white" /></a><sup><sub> - Github repository with the software. </sub></sup> <br>
+</h2>
+
+<h2 align="left" style="vertical-align: middle;">
+    <a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_quick_start.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a><sup><sub> - Quick-start notebook demonstrating the generalized pedestrian model. </sub></sup> <br>
+</h2>
+
 # Data-driven physics-based modeling of pedestrian dynamics
 <p align="center">
     <a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/" alt="Repository">
