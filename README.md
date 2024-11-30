@@ -14,7 +14,7 @@ interplay between the deterministic movements and stochastic
 fluctuations associated with walking.
 
 <h3 align="left" style="vertical-align: middle;">
-	<a href=https://journals.aps.org/pre/accepted/ec075Ra2H081202d17c11029a2e965c33e4471521">
+	<a href="https://journals.aps.org/pre/accepted/ec075Ra2H081202d17c11029a2e965c33e4471521">
 	   <img src="https://img.shields.io/badge/PRE-Manuscript-blue?style=for-the-badge" alt="PRE" /></a>
 	<a href="https://arxiv.org/abs/2407.20794">
 	   <img src="https://img.shields.io/badge/arXiv-Preprint-b31b1b.svg?style=for-the-badge" alt="arXiv" /></a>
@@ -27,7 +27,7 @@ fluctuations associated with walking.
 If you have any questions or would like to discuss the work further, please feel free to reach out!
 
 <p align="left">
-	<a href="c.a.s.pouw@tue.nl" alt="Email">
+	<a href="mailto:c.a.s.pouw@tue.nl" alt="Email">
 	<img src="https://img.shields.io/badge/Email-%230008a1?style=for-the-badge&logo=gmail&logoColor=white" /></a>
     <a href="https://www.linkedin.com/in/caspouw/" alt="LinkedIn">
 	   <img src="https://img.shields.io/badge/LinkedIn-0A66C2?logo=linkedin&logoColor=fff&style=for-the-badge" /></a>
