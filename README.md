@@ -1,4 +1,4 @@
-## Resource hub: Data-driven physics-based modeling of pedestrian dynamics
+# Resource hub
 Welcome to the resource hub for the work:
 
 > Pouw, C. A. S., van der Vleuten, G., Corbetta, A., & Toschi, F. (2024). Data-driven physics-based modeling of pedestrian dynamics. Physical Review E. [Accepted manuscript](https://journals.aps.org/pre/accepted/ec075Ra2H081202d17c11029a2e965c33e4471521)
