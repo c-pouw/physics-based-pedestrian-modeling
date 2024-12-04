@@ -33,7 +33,7 @@ fluctuations associated with walking.
 
 <h3 align="left" style="vertical-align: middle;">
 	<a href="https://journals.aps.org/pre/accepted/ec075Ra2H081202d17c11029a2e965c33e4471521">
-	   <img src="https://img.shields.io/badge/PRE-Manuscript--b31b1b?style=for-the-badge" alt="PRE" /></a>
+	   <img src="https://img.shields.io/badge/PRE-Manuscript-b31b1b?style=for-the-badge" alt="PRE" /></a>
 	<a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/" alt="Repository"><img src="https://img.shields.io/badge/Github-Software-%23181717?style=for-the-badge" /></a>
     <a href="https://doi.org/10.5281/zenodo.13784588">
 	   <img src="https://img.shields.io/badge/Zenodo-Dataset-%231682D4?style=for-the-badge" alt="Zenodo dataset"></a>
