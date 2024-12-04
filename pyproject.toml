@@ -18,10 +18,11 @@ include = [{path = "physped/conf", format = ["sdist", "wheel"]}]
 physped_cli = "physped.main:main"
 
 [tool.poetry.urls]
-"arXiv" = "https://arxiv.org/abs/2407.20794"
+"Manuscript Physical Review E" = "https://doi.org/10.1103/PhysRevE.110.064102"
+"Dataset Zenodo" = "https://doi.org/10.5281/zenodo.13784588"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "~3.11"
 pandas = "2.1.4"
 numpy = "^1.26.4"
 scipy = "^1.13.0"
