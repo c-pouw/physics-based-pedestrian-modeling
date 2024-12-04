@@ -49,7 +49,7 @@ fluctuations associated with walking.
 
 # Usage Notebooks
 <h2 align="left" style="vertical-align: middle;">
-    <a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_quick_start.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg"></a><sup><sub> - Quick-start notebook demonstrating the generalized pedestrian model. </sub></sup> <br>
+<a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_quick_start.ipynb"><img src="https://img.shields.io/badge/Google_Colab-Demonstration-%23F9AB00?style=for-the-badge"></a><sup><sub> - Demonstration notebook for the generalized pedestrian model. </sub></sup> <br>
 </h2>
 
 This notebook can be used to create models for all the environments discussed in the paper that rely ona public data set without the need to install anything locally.
@@ -107,8 +107,10 @@ Configuration file name: **asdz_pf12**
 
 # Contact
 <p align="left">
+	<a href="https://github.com/c-pouw" alt="Github-profile">
+		<img src="https://img.shields.io/badge/Github-Software-%23181717?style=for-the-badge" /></a>
 	<a href="mailto:c.a.s.pouw@tue.nl" alt="Email">
-	<img src="https://img.shields.io/badge/Email-%230008a1?style=for-the-badge&logo=gmail&logoColor=white" /></a>
+		<img src="https://img.shields.io/badge/Email-%230008a1?style=for-the-badge&logo=gmail&logoColor=white" /></a>
     <a href="https://www.linkedin.com/in/caspouw/" alt="LinkedIn">
 	   <img src="https://img.shields.io/badge/LinkedIn-0A66C2?logo=linkedin&logoColor=fff&style=for-the-badge" /></a>
     <a href="https://scholar.google.com/citations?user=JoBuJXgAAAAJ&hl=nl&oi=ao" alt="Google Scholar Badge">
