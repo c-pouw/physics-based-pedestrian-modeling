@@ -108,7 +108,7 @@ Configuration file name: **asdz_pf12**
 # Contact
 <p align="left">
 	<a href="https://github.com/c-pouw" alt="Github-profile">
-		<img src="https://img.shields.io/badge/Github-Software-%23181717?style=for-the-badge" /></a>
+		<img src="https://img.shields.io/badge/Github-black?style=for-the-badge&logo=github&logoColor=white"/></a>
 	<a href="mailto:c.a.s.pouw@tue.nl" alt="Email">
 		<img src="https://img.shields.io/badge/Email-%230008a1?style=for-the-badge&logo=gmail&logoColor=white" /></a>
     <a href="https://www.linkedin.com/in/caspouw/" alt="LinkedIn">
