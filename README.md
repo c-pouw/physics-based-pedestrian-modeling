@@ -20,7 +20,6 @@
        <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black" /></a>
 </p>
 
-# Project Overview
 Python package to create physics-based pedestrian models from pedestrian trajectory measurements. This package is an implementation of the data-driven generalized pedestrian model presented in:
 
 > Pouw, C. A. S., van der Vleuten, G., Corbetta, A., & Toschi, F. (2024). Data-driven physics-based modeling of pedestrian dynamics. Physical Review E. [Accepted manuscript](https://journals.aps.org/pre/accepted/ec075Ra2H081202d17c11029a2e965c33e4471521)
@@ -121,4 +120,3 @@ Configuration file name: **asdz_pf12**
     <a href="https://orcid.org/0000-0002-3041-4533" alt="ORCID">
 	   <img src="https://img.shields.io/badge/ORCID-A6CE39?logo=orcid&logoColor=fff&style=for-the-badge" /></a>
 </p>
-
