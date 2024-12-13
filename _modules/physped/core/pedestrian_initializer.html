@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.core.pedestrian_initializer &mdash; Data-driven physics-based modeling of pedestrian dynamics 0.post314+gb65fc8d documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=ca38ec92"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0.post314+gb65fc8d
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Notebooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#using-the-cli">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#available-environments">Available environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">physped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">physped.core.pedestrian_initializer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for physped.core.pedestrian_initializer</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">physped.core.piecewise_potential</span> <span class="kn">import</span> <span class="n">PiecewisePotential</span>
+<span class="kn">from</span> <span class="nn">physped.utils.functions</span> <span class="kn">import</span> <span class="n">polar_to_cartesian_coordinates</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="sample_trajectory_origins_from_trajectory_state_n">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.pedestrian_initializer.sample_trajectory_origins_from_trajectory_state_n">[docs]</a>
+<span class="k">def</span> <span class="nf">sample_trajectory_origins_from_trajectory_state_n</span><span class="p">(</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">measured_trajectories</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">state_n</span><span class="p">,</span> <span class="n">piecewise_potential</span><span class="p">:</span> <span class="n">PiecewisePotential</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="n">ntrajs</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">ntrajs</span>
+
+    <span class="k">if</span> <span class="n">state_n</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># Sample from random point along each path</span>
+        <span class="n">states_to_sample_from</span> <span class="o">=</span> <span class="n">measured_trajectories</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;Pid&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">state_n</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Sample from state n along each path</span>
+        <span class="n">states_to_sample_from</span> <span class="o">=</span> <span class="n">measured_trajectories</span><span class="p">[</span><span class="n">measured_trajectories</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">state_n</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># Make sure that the potential is defined for the states we sample</span>
+    <span class="n">states_to_sample_from</span> <span class="o">=</span> <span class="n">potential_defined_at_slow_state</span><span class="p">(</span><span class="n">states_to_sample_from</span><span class="p">,</span> <span class="n">piecewise_potential</span><span class="p">)</span>
+    <span class="n">states_to_sample_from</span> <span class="o">=</span> <span class="n">states_to_sample_from</span><span class="p">[</span><span class="n">states_to_sample_from</span><span class="p">[</span><span class="s2">&quot;potential_defined&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">sampled_states</span> <span class="o">=</span> <span class="n">states_to_sample_from</span><span class="p">[[</span><span class="s2">&quot;xf&quot;</span><span class="p">,</span> <span class="s2">&quot;yf&quot;</span><span class="p">,</span> <span class="s2">&quot;uf&quot;</span><span class="p">,</span> <span class="s2">&quot;vf&quot;</span><span class="p">,</span> <span class="s2">&quot;xs&quot;</span><span class="p">,</span> <span class="s2">&quot;ys&quot;</span><span class="p">,</span> <span class="s2">&quot;us&quot;</span><span class="p">,</span> <span class="s2">&quot;vs&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">ntrajs</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Sampled </span><span class="si">%d</span><span class="s2"> origins from the input trajectories.&quot;</span><span class="p">,</span> <span class="n">ntrajs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sampled_states</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="potential_defined_at_slow_state">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.pedestrian_initializer.potential_defined_at_slow_state">[docs]</a>
+<span class="k">def</span> <span class="nf">potential_defined_at_slow_state</span><span class="p">(</span><span class="n">paths</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">piecewise_potential</span><span class="p">:</span> <span class="n">PiecewisePotential</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="c1"># REQUIRED: Dataframe must have a column with the slow grid indices</span>
+    <span class="c1"># TODO : Move this function to another module. Change the slow_grid_indices to lists rather than tuples</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">paths</span><span class="p">[</span><span class="s2">&quot;slow_grid_indices&quot;</span><span class="p">]))</span>
+    <span class="n">potential_defined</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">piecewise_potential</span><span class="o">.</span><span class="n">parametrization</span><span class="p">),</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># All free parameters must be defined</span>
+    <span class="n">potential_defined</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">potential_defined</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">paths</span><span class="p">[</span><span class="s2">&quot;potential_defined&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">potential_defined</span><span class="p">[</span><span class="n">indices</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">indices</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">indices</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">indices</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">indices</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">paths</span></div>
+
+
+
+<div class="viewcode-block" id="sample_trajectory_origins_from_heatmap">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.pedestrian_initializer.sample_trajectory_origins_from_heatmap">[docs]</a>
+<span class="k">def</span> <span class="nf">sample_trajectory_origins_from_heatmap</span><span class="p">(</span><span class="n">piecewise_potential</span><span class="p">:</span> <span class="n">PiecewisePotential</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="n">sampled_origins</span> <span class="o">=</span> <span class="n">sample_from_ndarray</span><span class="p">(</span><span class="n">piecewise_potential</span><span class="o">.</span><span class="n">histogram</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">parameters</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">ntrajs</span><span class="p">)</span>
+    <span class="n">sampled_origins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">sampled_origins</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">sampled_origins</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)))</span>
+    <span class="n">sampled_origins</span> <span class="o">=</span> <span class="n">convert_grid_indices_to_coordinates</span><span class="p">(</span><span class="n">piecewise_potential</span><span class="p">,</span> <span class="n">sampled_origins</span><span class="p">)</span>
+    <span class="n">sampled_origins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">sampled_origins</span><span class="p">,</span> <span class="n">sampled_origins</span><span class="p">))</span>
+    <span class="n">sampled_origins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">sampled_origins</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sampled_origins</span></div>
+
+
+
+<div class="viewcode-block" id="sample_from_ndarray">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.pedestrian_initializer.sample_from_ndarray">[docs]</a>
+<span class="k">def</span> <span class="nf">sample_from_ndarray</span><span class="p">(</span><span class="n">origin_histogram</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">N_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sample origin positions from a heatmap with initial positions.</span>
+
+<span class="sd">    ! Used for simulation purposes</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - origin_histogram: The initial position heatmap.</span>
+<span class="sd">    - N_samples: The number of samples to generate. Default is 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - A tuple of NumPy arrays representing the sampled origin positions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">flat_origin_histogram</span> <span class="o">=</span> <span class="n">origin_histogram</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+    <span class="n">indices1d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+        <span class="n">a</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">flat_origin_histogram</span><span class="p">)),</span>
+        <span class="n">size</span><span class="o">=</span><span class="n">N_samples</span><span class="p">,</span>
+        <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">p</span><span class="o">=</span><span class="n">flat_origin_histogram</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">flat_origin_histogram</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">indices1d</span><span class="p">,</span> <span class="n">origin_histogram</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span><span class="o">.</span><span class="n">T</span></div>
+
+
+
+<div class="viewcode-block" id="random_uniform_value_in_bin">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.pedestrian_initializer.random_uniform_value_in_bin">[docs]</a>
+<span class="k">def</span> <span class="nf">random_uniform_value_in_bin</span><span class="p">(</span><span class="n">lattice_indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">bins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate random uniform values within each bin.</span>
+
+<span class="sd">    ! Used for simulation purposes</span>
+
+<span class="sd">    This function is used to sample origins from a histogram. Given the index of the</span>
+<span class="sd">    sampled lattice cell the function will return a real-world variable.</span>
+
+<span class="sd">    For example:</span>
+<span class="sd">    with bins v_r = [0,0.5,1] and lattice_indices [1] the function returns a random uniformly</span>
+<span class="sd">    sampled value between 0.5 and 1.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        lattice_indices: A list with lattice indices.</span>
+<span class="sd">        bins: Array of bin edges.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Array of random uniform values within each bin.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">left</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[</span><span class="n">lattice_indices</span><span class="p">]</span>
+    <span class="n">right</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[</span><span class="n">lattice_indices</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="convert_grid_indices_to_coordinates">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.pedestrian_initializer.convert_grid_indices_to_coordinates">[docs]</a>
+<span class="k">def</span> <span class="nf">convert_grid_indices_to_coordinates</span><span class="p">(</span><span class="n">potential_grid</span><span class="p">:</span> <span class="n">PiecewisePotential</span><span class="p">,</span> <span class="n">X_0</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert grid indices to Cartesian coordinates.</span>
+
+<span class="sd">    ! Used for simulation purposes</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - grids (Grids): The Grids object containing the grid definitions.</span>
+<span class="sd">    - X_0 (List[int]): A list of grid indices.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - A list of Cartesian coordinates.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: Add some noise within the bin.</span>
+    <span class="c1"># xf, yf, rf, thetaf, k = (grids.bins[dim][X_0[:,i]] for i, dim in enumerate(grids.dimensions))</span>
+    <span class="n">xf</span> <span class="o">=</span> <span class="n">random_uniform_value_in_bin</span><span class="p">(</span><span class="n">X_0</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">potential_grid</span><span class="o">.</span><span class="n">bins</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span>
+    <span class="n">yf</span> <span class="o">=</span> <span class="n">random_uniform_value_in_bin</span><span class="p">(</span><span class="n">X_0</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">potential_grid</span><span class="o">.</span><span class="n">bins</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">])</span>
+    <span class="n">rf</span> <span class="o">=</span> <span class="n">random_uniform_value_in_bin</span><span class="p">(</span><span class="n">X_0</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">potential_grid</span><span class="o">.</span><span class="n">bins</span><span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">])</span>
+    <span class="n">thetaf</span> <span class="o">=</span> <span class="n">random_uniform_value_in_bin</span><span class="p">(</span><span class="n">X_0</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">potential_grid</span><span class="o">.</span><span class="n">bins</span><span class="p">[</span><span class="s2">&quot;theta&quot;</span><span class="p">])</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">potential_grid</span><span class="o">.</span><span class="n">bins</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">][</span><span class="n">X_0</span><span class="p">[:,</span> <span class="mi">4</span><span class="p">]]</span>
+
+    <span class="n">uf</span><span class="p">,</span> <span class="n">vf</span> <span class="o">=</span> <span class="n">polar_to_cartesian_coordinates</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">thetaf</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">xf</span><span class="p">,</span> <span class="n">yf</span><span class="p">,</span> <span class="n">uf</span><span class="p">,</span> <span class="n">vf</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span><span class="o">.</span><span class="n">T</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
