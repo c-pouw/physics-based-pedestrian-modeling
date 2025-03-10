@@ -63,7 +63,7 @@ pip install physics-based-pedestrian-modeling
 ```
 
 # Using the CLI
-Run the main processing script for one of the available environments by overwriting the `params` variable with the configuration file name of the environment. The configuration file names associated to every environment are specified below. These parameter configurations are handled by Hydra, see their documentation for more details ![Hydra](https://github.com/facebookresearch/hydra).
+Run the main processing script for one of the available environments by overwriting the `params` variable with the configuration filename of the environment. The configuration filenames associated to every environment are specified below. These parameter configurations are handled by Hydra, see their documentation for more details ![Hydra](https://github.com/facebookresearch/hydra).
 
 ```bash
 physped_cli params=CONFIGURATION_FILE_NAME
@@ -83,22 +83,24 @@ physped_cli -m params=narrow_corridor params.model.sigma=0.5,0.7,0.9
 
 # Available environments
 
-Every environment discussed in the paper that relies a on public data set can be modeled using the cli by overwriting the 'params' variable with one of the following configuration file names:
+Every environment discussed in the paper that relies a on public data set can be modeled using the cli by overwriting the 'params' variable with one of the following configuration filenames:
 
 ## Narrow corridor
-Trajectories of walking paths in a narrow corridor.
+The dynamics of a single pedestrian walking undisturbed through a narrow corridor is possibly one of the simplest conceivable dynamics; an almost one-dimensional movement solely confined by two parallel corridor walls.
 
-Configuration file name: **narrow_corridor**
+Configuration filename: **narrow_corridor**
 
 ## Intersecting walking paths
-Trajectories of intersecting walking paths.
+Trajectories of intersecting walking paths. We synthesize these from the narrow corridor trajectory data set for which half of the trajectories are rotated by 90 degrees. Note that these trajectories were measured in the dilute limit, consequently there is no interaction between them.
 
-Configuration file name: **intersecting_paths**
+Configuration filename: **intersecting_paths**
 
-## Train station platform
-Trajectories of walking paths in the Amsterdam Zuid train station on platform 1 and 2.
+## Train station platforms
+Complex dynamics of pedestrians walking across real-life train platforms.
 
-Configuration file name: **asdz_pf12**
+Amsterdam Zuid train station platform 1 and 2. Configuration filename: **asdz_pf12**.
+
+Eindhoven train station platform 3 and 4. Configuration filename: **Eindhoven_pf34**.
 
 <!-- index.rst usage end -->
 
