@@ -98,12 +98,12 @@ Configuration filename: **intersecting_paths**
 ## Train station platforms
 Complex dynamics of pedestrians walking across real-life train platforms.
 
-### Eindhoven train station track 3-4. 
+### Eindhoven train station track 3-4.
 Configuration filename: **eindhoven_pf34**.
 
 To model this environment we use the public pedestrian trajectory dataset: [Data-driven physics-based modeling of pedestrian dynamics - dataset: Pedestrian trajectories at Eindhoven train station](https://doi.org/10.5281/zenodo.13784587)
 
-### Amsterdam Zuid train station track 1-2. 
+### Amsterdam Zuid train station track 1-2.
 Configuration filename: **asdz_pf12**.
 
 To model this environment we use the public pedestrian trajectory dataset: [Trajectory data Amsterdam Zuid (track 1-2) underlying the PhD-thesis: Mind your passenger! The passenger capacity of platforms at railway stations in the Netherlands](https://doi.org/10.4121/20683062)
