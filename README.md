@@ -31,7 +31,7 @@ data is available. Our model effectively captures the complex
 interplay between the deterministic movements and stochastic
 fluctuations associated with walking.
 
-<h3 align="left" style="vertical-align: middle;">
+<h3 align="center" style="vertical-align: middle;">
 	<a href="https://journals.aps.org/pre/accepted/ec075Ra2H081202d17c11029a2e965c33e4471521">
 	   <img src="https://img.shields.io/badge/PRE-Manuscript-b31b1b?style=for-the-badge" alt="PRE" /></a>
 	<a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/" alt="Repository"><img src="https://img.shields.io/badge/Github-Software-%23181717?style=for-the-badge" /></a>
@@ -47,12 +47,10 @@ fluctuations associated with walking.
 
 <!-- index.rst usage start -->
 
-# Usage Notebooks
-<h2 align="left" style="vertical-align: middle;">
-<a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_quick_start.ipynb"><img src="https://img.shields.io/badge/Google_Colab-Demonstration-%23F9AB00?style=for-the-badge"></a><sup><sub> - Demonstration notebook for the generalized pedestrian model. </sub></sup> <br>
-</h2>
+# Usage Notebook
+This Goolge Colab notebook can be used to create pedestrians models without the need to install the package or download any data. The notebook can be used with all the environments discussed below, or can be easily adapted for any other data set.
 
-This notebook can be used to create models for all the environments discussed in the paper that rely ona public data set without the need to install anything locally.
+* Notebook: https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_quick_start.ipynb
 
 # Installation
 
@@ -88,6 +86,8 @@ Every environment discussed in the paper that relies a on public data set can be
 ## Narrow corridor
 The dynamics of a single pedestrian walking undisturbed through a narrow corridor is possibly one of the simplest conceivable dynamics; an almost one-dimensional movement solely confined by two parallel corridor walls.
 
+To model this environment we use the public pedestrian trajectory dataset: [Crowdflow – diluted pedestrian dynamics in the Metaforum building of Eindhoven University of Technology](https://data.4tu.nl/datasets/b8e30f8c-3931-4604-842a-77c7fb8ac3fc/1).
+
 Configuration filename: **narrow_corridor**
 
 ## Intersecting walking paths
@@ -98,9 +98,15 @@ Configuration filename: **intersecting_paths**
 ## Train station platforms
 Complex dynamics of pedestrians walking across real-life train platforms.
 
-Amsterdam Zuid train station platform 1 and 2. Configuration filename: **asdz_pf12**.
+### Eindhoven train station platform 3 and 4. 
+Configuration filename: **eindhoven_pf34**.
 
-Eindhoven train station platform 3 and 4. Configuration filename: **Eindhoven_pf34**.
+To model this environment we use the public pedestrian trajectory dataset: [Data-driven physics-based modeling of pedestrian dynamics - dataset: Pedestrian trajectories at Eindhoven train station](https://doi.org/10.5281/zenodo.13784587)
+
+### Amsterdam Zuid train station platform 1 and 2. 
+Configuration filename: **asdz_pf12**.
+
+To model this environment we use the public pedestrian trajectory dataset: [Trajectory data Amsterdam Zuid (track 1-2) underlying the PhD-thesis: Mind your passenger! The passenger capacity of platforms at railway stations in the Netherlands](https://doi.org/10.4121/20683062)
 
 <!-- index.rst usage end -->
 
