@@ -22,7 +22,7 @@
 
 Python package to create physics-based pedestrian models from pedestrian trajectory measurements. This package is an implementation of the data-driven generalized pedestrian model presented in:
 
-> Pouw, C. A. S., van der Vleuten, G., Corbetta, A., & Toschi, F. (2024). Data-driven physics-based modeling of pedestrian dynamics. Physical Review E. [Accepted manuscript](https://journals.aps.org/pre/accepted/ec075Ra2H081202d17c11029a2e965c33e4471521)
+> Pouw, C. A. S., van der Vleuten, G., Corbetta, A., & Toschi, F. (2024). Data-driven physics-based modeling of pedestrian dynamics. Phys. Rev. E 110 (6 Dec. 2024), p. 064102. DOI: [10.1103/PhysRevE.110.064102](https://doi.org/10.1103/PhysRevE.110.064102).
 
 **Abstract.** We introduce a data-driven physics-based generalized
 Langevin model that allows robust and generic modeling of pedestrian
