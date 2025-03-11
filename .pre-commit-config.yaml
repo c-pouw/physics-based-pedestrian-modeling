@@ -32,10 +32,10 @@ repos:
     -   id: poetry-check
     -   id: poetry-lock
         args: ["--no-cache"]
-  - repo: local
-    hooks:
-      - id: poetry-export
-        name: poetry-export
-        entry: bash -c "poetry export -f requirements.txt --output requirements.txt && poetry export --with dev -f requirements.txt -o requirements-dev.txt"
-        language: system
-        always_run: true
+  # - repo: local
+  #   hooks:
+  #     - id: poetry-export
+  #       name: poetry-export
+  #       entry: bash -c "poetry export -f requirements.txt --output requirements.txt && poetry export --with dev -f requirements.txt -o requirements-dev.txt"
+  #       language: system
+  #       always_run: true
