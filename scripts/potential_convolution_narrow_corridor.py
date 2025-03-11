@@ -11,8 +11,9 @@ from omegaconf import OmegaConf
 from physped.core.digitizers import digitize_coordinates_to_lattice
 from physped.core.lattice_selection import evaluate_selection_range  # get_index_of_the_enclosing_bin,; evaluate_selection_point,
 from physped.core.parametrize_potential import calculate_position_based_emperic_potential, learn_potential_from_trajectories
+from physped.core.slow_dynamics import compute_slow_dynamics
 from physped.io.readers import trajectory_reader
-from physped.preprocessing.trajectories import preprocess_trajectories, process_slow_modes
+from physped.preprocessing.trajectories import preprocess_trajectories
 from physped.utils.config_utils import register_new_resolvers
 from physped.visualization.plot_discrete_grid import plot_discrete_grid
 from physped.visualization.plot_potential_at_slow_index import plot_potential_at_slow_index
@@ -55,7 +56,7 @@ trajectories = trajectory_reader[env_name](config)
 
 # %%
 preprocessed_trajectories = preprocess_trajectories(trajectories, config=config)
-preprocessed_trajectories = process_slow_modes(preprocessed_trajectories, config)
+preprocessed_trajectories = compute_slow_dynamics(preprocessed_trajectories, config=config)
 piecewise_potential = learn_potential_from_trajectories(preprocessed_trajectories, config)
 
 # %%
