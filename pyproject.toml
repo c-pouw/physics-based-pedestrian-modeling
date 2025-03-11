@@ -21,6 +21,9 @@ physped_cli = "physped.main:main"
 "Manuscript Physical Review E" = "https://doi.org/10.1103/PhysRevE.110.064102"
 "Dataset Zenodo" = "https://doi.org/10.5281/zenodo.13784588"
 
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.8"
+
 [tool.poetry.dependencies]
 python = "~3.11"
 pandas = "2.1.4"
@@ -54,7 +57,6 @@ polars = "^0.20.19"
 fastparquet = "^2024.2.0"
 ipython = "^8.25.0"
 tables = "^3.9.2"
-poetry-plugin-export = "^1.7.1"
 myst-parser = "^4.0.0"
 genbadge = "^1.1.1"
 defusedxml = "^0.7.1"
