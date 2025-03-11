@@ -22,8 +22,9 @@ class PiecewisePotential:
         """
         self.lattice = lattice
         self.dist_approximation = dist_approximation
-        self.histogram = np.zeros(self.lattice.shape)
-        self.histogram_slow = np.zeros(self.lattice.shape)
+        # TODO: Initialize histograms with int64 instead
+        self.histogram = np.zeros(self.lattice.shape, dtype=np.float64)
+        self.histogram_slow = np.zeros(self.lattice.shape, dtype=np.float64)
         self.initialize_parametrization()
 
     def __repr__(self):
@@ -36,8 +37,10 @@ class PiecewisePotential:
     def initialize_parametrization(self):
         """Initialize the potential parametrization.
 
-        to initialize the potential parametrization with the following shape:
+        We initialize the parametrization with the following shape:
         (lattice_shape, len(fit_dimensions), len(fit_parameters))
+        Such that the potential is parameterized in each lattice site
+        for every fit dimension by the number of free fit parameters.
         """
         shape_of_the_potential = self.lattice.shape + (
             len(self.dist_approximation.fit_dimensions),
@@ -49,6 +52,7 @@ class PiecewisePotential:
         """Reparametrize the potential.
 
         From (mu, var) to (mu, curvature).
+        Implements equations 15 and 16 from the paper.
 
         Args:
             config: The configuration.
