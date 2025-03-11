@@ -6,7 +6,7 @@ def digitize_coordinates_to_lattice(coordinates: np.ndarray[float], lattice_bins
 
     Boundary conditions:
     - Coordinates outside the lattice return -1.
-    Note: we can not return nan because the output is an array of integers.
+    Note: it is not possible to return nan because the output is an array of integers.
 
     Args:
         coordinates: The coordinates in one dimension to be digitized.

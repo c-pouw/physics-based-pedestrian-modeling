@@ -31,27 +31,6 @@ def rename_columns(df: pd.DataFrame, config: DictConfig) -> pd.DataFrame:
     return df
 
 
-def cast_types(df: pd.DataFrame, config: DictConfig) -> pd.DataFrame:
-    """Cast the types of the columns of the DataFrame.
-
-    Args:
-        df: The DataFrame to cast the types of.
-        config: The configuration object.
-
-    Returns:
-        The DataFrame with the columns casted to the correct types.
-    """
-    type_mapping = {
-        "xf": float,
-        "yf": float,
-        "Pid": int,
-        "time": int,
-    }
-    df = df.astype(type_mapping)
-    log.info("Columns casted to %s", type_mapping)
-    return df
-
-
 def prune_short_trajectories(trajectories: pd.DataFrame, config: DictConfig) -> pd.DataFrame:
     """Remove short trajectories that are most likely noise.
 

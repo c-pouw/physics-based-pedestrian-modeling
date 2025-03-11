@@ -1,6 +1,4 @@
-"""Module for a with distribution approximation classes.
-
-"""
+"""Module for a with distribution approximation classes."""
 
 import logging
 from dataclasses import dataclass

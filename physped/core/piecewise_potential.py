@@ -1,6 +1,4 @@
-"""Module for the PiecewisePotential class.
-
-"""
+"""Module for the PiecewisePotential class."""
 
 import logging
 

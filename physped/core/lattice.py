@@ -1,6 +1,4 @@
-"""Module for the Latice class.
-
-"""
+"""Module for the Latice class."""
 
 import logging
 from pprint import pformat
