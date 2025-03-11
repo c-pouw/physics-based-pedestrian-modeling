@@ -43,6 +43,9 @@ def read_simulated_trajectories_from_file(config):
 def heatmap_zero_at_slow_state(piecewise_potential: PiecewisePotential, slow_state) -> bool:
     """Check if the heatmap is zero at the given position.
 
+    If the heatmap is zero it indicates that the spatial position was never visited
+    by a pedestrian in the input data.
+
     Parameters:
         piecewise_potential: The piecewise potential object.
         position: The position to check.
@@ -63,6 +66,7 @@ def simulate_trajectories(piecewise_potential: PiecewisePotential, config: dict,
 
     log.info("Simulate trajectories using the piecewise potential")
     # TODO : Can we create a dictionary with these functions if they have different function arguments?
+    # TODO : Add option to input list of origins
     match config.params.simulation.sample_origins_from:
         case "heatmap":
             log.warning("Trajectory origins will be sampled from a heatmap.")
@@ -73,6 +77,10 @@ def simulate_trajectories(piecewise_potential: PiecewisePotential, config: dict,
             origins = sample_trajectory_origins_from_trajectory_state_n(
                 parameters, measured_trajectories, sample_state, piecewise_potential
             )
+        case "input_origins":
+            log.warning("Simulation origins will be sampled from input origins.")
+            origins = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            origins = np.tile(origins, (parameters.simulation.ntrajs, 1))
     # Add t=0 to the end of the origins array
     start_time = np.zeros((origins.shape[0], 1))
     origins = np.hstack((origins, start_time))
