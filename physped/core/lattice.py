@@ -67,4 +67,4 @@ class Lattice:
         )
 
         # return the volume for each cell using broadcasting
-        return dx[i] * dy[j] * r[k] * dr[k] * dtheta[l] * dk[m]
+        return dx[i] * dy[j] * dr[k] * r[k] * dtheta[l] * dk[m]
