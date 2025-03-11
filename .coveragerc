@@ -11,6 +11,13 @@ omit =
     physped/tests/*
     physped/visualization/*
     physped/io/*
+    physped/main.py
+skip_empty = true
 
-exclude_lines =
+exclude_also =
     if __name__ == '__main__':
+    def __repr__
+
+    ; Don't complain if tests don't hit defensive assertion code:
+    raise AssertionError
+    raise NotImplementedError

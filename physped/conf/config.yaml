@@ -8,9 +8,9 @@ read:
   piecewise_potential: False
   simulated_trajectories: False
 save:
-  preprocessed_trajectories: False
-  piecewise_potential: False
-  simulated_trajectories: False
+  preprocessed_trajectories: True
+  piecewise_potential: True
+  simulated_trajectories: True
 filename:
   preprocessed_trajectories: preprocessed_trajectories_with_tau${params.model.taux}.csv
   piecewise_potential: piecewise_potential_with_${params.grid.name}.pickle

@@ -29,6 +29,7 @@ from physped.visualization.plot_trajectories import plot_trajectories
 log = logging.getLogger(__name__)
 
 
+# TODO: Convert main loop to a pipeline
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def model(config):
     env_name = config.params.env_name
