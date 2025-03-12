@@ -18,7 +18,7 @@ jobs:
           - "3.11"
       fail-fast: false
 
-      steps:
+    steps:
       - uses: actions/checkout@v4
 
       - name: Install uv
@@ -30,5 +30,4 @@ jobs:
         run: uv sync --all-extras --dev
 
       - name: Run tests
-        # For example, using `pytest`
         run: uv run pytest physped/tests
