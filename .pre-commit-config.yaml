@@ -26,16 +26,9 @@ repos:
     rev: 0.8.1
     hooks:
       - id: nbstripout
-  # - repo: https://github.com/python-poetry/poetry
-  #   rev: '2.1.1'
-  #   hooks:
-  #   -   id: poetry-check
-  #   -   id: poetry-lock
-  #       args: ["--no-cache"]
-  # - repo: local
-  #   hooks:
-  #     - id: poetry-export
-  #       name: poetry-export
-  #       entry: bash -c "poetry export -f requirements.txt --output requirements.txt && poetry export --with dev -f requirements.txt -o requirements-dev.txt"
-  #       language: system
-  #       always_run: true
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    # uv version.
+    rev: 0.6.6
+    hooks:
+      - id: uv-lock
+      - id: uv-export
