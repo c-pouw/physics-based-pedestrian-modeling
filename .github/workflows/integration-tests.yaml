@@ -29,7 +29,7 @@ jobs:
 
       - name: Test Integration
         run: |
-          uv run physpec_cli params=narrow_corridor root_dir=$GITHUB_WORKSPACE hydra.run.dir=${GITHUB_WORKSPACE}/outputs plot_style="${GITHUB_WORKSPACE}/physped/conf/science_no_latex.mplstyle" params.data_source=4tu params.simulation.ntrajs=5
+          uv run physped_cli params=narrow_corridor root_dir=$GITHUB_WORKSPACE hydra.run.dir=${GITHUB_WORKSPACE}/outputs plot_style="${GITHUB_WORKSPACE}/physped/conf/science_no_latex.mplstyle" params.data_source=4tu params.simulation.ntrajs=5
 
       - uses: actions/upload-artifact@v4
         with:
