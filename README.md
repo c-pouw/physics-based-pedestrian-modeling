@@ -2,8 +2,8 @@
 <p align="center">
     <a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/" alt="Repository">
 	   <img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white" /></a>
-	<!-- <a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml" alt="Integration Tests"> -->
-    <!--    <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml/badge.svg" /></a> -->
+	<a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml" alt="Integration Tests">
+	   <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml/badge.svg" /></a>
     <a href="https://c-pouw.github.io/physics-based-pedestrian-modeling/reports/junit/report.html?sort=result">
 	   <img src="https://c-pouw.github.io/physics-based-pedestrian-modeling/reports/junit/tests-badge.svg?dummy=8484744" alt="tests" /></a>
     <a href="https://c-pouw.github.io/physics-based-pedestrian-modeling/reports/coverage/index.html?">
@@ -20,12 +20,12 @@
 
 
 <p align="center">
-    <a href="https://c-pouw.github.io/physics-based-pedestrian-modeling" alt="read-the-docs">
+    <a href="https://c-pouw.github.io/physics-based-pedestrian-modeling" alt="docs">
 		<img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/pages/pages-build-deployment/badge.svg" /></a>
-	<a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml" alt="CI">
-		<img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/workflows/CI/badge.svg"> /></a>
-	<a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml" alt="Integration Tests">
-		<img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml/badge.svg" /></a>
+	<a href="https://c-pouw.github.io/physics-based-pedestrian-modeling" alt="docs">
+		<img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/pages/docs/badge.svg" /></a>
+	<a href="https://c-pouw.github.io/physics-based-pedestrian-modeling" alt="docs">
+		<img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/docs.yaml/badge.svg" /></a>
 </p>
 
 

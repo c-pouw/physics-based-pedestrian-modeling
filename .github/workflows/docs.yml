@@ -1,5 +1,5 @@
 # build sphix api docs and push to gh-pages branch
-name: Build Documentation
+name: Docs
 
 on:
   push:
