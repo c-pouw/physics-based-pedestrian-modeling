@@ -58,7 +58,7 @@ blosc2==3.2.0 ; python_version == "3.11" \
 certifi==2025.1.31 ; python_version == "3.11" \
     --hash=sha256:3d5da6925056f6f18f119200434a4780a94263f10d1c21d032a6f6b2baa20651 \
     --hash=sha256:ca78db4565a652026a4db2bcdf68f2fb589ea80d0be70e03929ed730746b84fe
-cffi==1.17.1 ; sys_platform == "linux" and platform_python_implementation != "PyPy" and python_version == "3.11" \
+cffi==1.17.1 ; python_version == "3.11" and sys_platform == "linux" and platform_python_implementation != "PyPy" \
     --hash=sha256:045d61c734659cc045141be4bae381a41d89b741f795af1dd018bfb532fd0df8 \
     --hash=sha256:0984a4925a435b1da406122d4d7968dd861c1385afe3b45ba82b750f229811e2 \
     --hash=sha256:0e2b1fac190ae3ebfe37b979cc1ce69c81f4e4fe5746bb401dca63a9062cdaf1 \
@@ -228,7 +228,7 @@ click==8.1.8 ; python_version == "3.11" \
 codecov==2.1.13 ; python_version == "3.11" \
     --hash=sha256:2362b685633caeaf45b9951a9b76ce359cd3581dd515b430c6c3f5dfb4d92a8c \
     --hash=sha256:c2ca5e51bba9ebb43644c43d0690148a55086f7f5e6fd36170858fa4206744d5
-colorama==0.4.6 ; (platform_system == "Windows" or sys_platform == "win32") and python_version == "3.11" \
+colorama==0.4.6 ; python_version == "3.11" and (platform_system == "Windows" or sys_platform == "win32") \
     --hash=sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44 \
     --hash=sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6
 colorlog==6.9.0 ; python_version == "3.11" \
@@ -645,7 +645,7 @@ jaraco-functools==4.1.0 ; python_version == "3.11" \
 jedi==0.19.2 ; python_version == "3.11" \
     --hash=sha256:4770dc3de41bde3966b02eb84fbcf557fb33cce26ad23da12c742fb50ecb11f0 \
     --hash=sha256:a8ef22bde8490f57fe5c7681a3c83cb58874daf72b4784de3cce5b6ef6edb5b9
-jeepney==0.9.0 ; python_version == "3.11" and sys_platform == "linux" \
+jeepney==0.9.0 ; sys_platform == "linux" and python_version == "3.11" \
     --hash=sha256:97e5714520c16fc0a45695e5365a2e11b81ea79bba796e26f9f1d178cb182683 \
     --hash=sha256:cf0e9e845622b81e4a28df94c40345400256ec608d0e55bb8a3feaa9163f5732
 jinja2==3.1.6 ; python_version == "3.11" \
@@ -1131,7 +1131,7 @@ parso==0.8.4 ; python_version == "3.11" \
 pathspec==0.12.1 ; python_version == "3.11" \
     --hash=sha256:a0d503e138a4c123b27490a4f7beda6a01c6f288df0e4a8b79c7eb0dc7b4cc08 \
     --hash=sha256:a482d51503a1ab33b1c67a6c3813a26953dbdc71c31dacaef9a838c4e29f5712
-pexpect==4.9.0 ; python_version == "3.11" and sys_platform != "win32" and sys_platform != "emscripten" \
+pexpect==4.9.0 ; sys_platform != "win32" and sys_platform != "emscripten" and python_version == "3.11" \
     --hash=sha256:7236d1e080e4936be2dc3e326cec0af72acf9212a7e1d060210e70a47e253523 \
     --hash=sha256:ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f
 pillow==11.1.0 ; python_version == "3.11" \
@@ -1231,7 +1231,7 @@ pre-commit==3.8.0 ; python_version == "3.11" \
 prompt-toolkit==3.0.50 ; python_version == "3.11" \
     --hash=sha256:544748f3860a2623ca5cd6d2795e7a14f3d0e1c3c9728359013f79877fc89bab \
     --hash=sha256:9b6427eb19e479d98acff65196a307c555eb567989e6d88ebbb1b509d9779198
-ptyprocess==0.7.0 ; python_version == "3.11" and sys_platform != "win32" and sys_platform != "emscripten" \
+ptyprocess==0.7.0 ; sys_platform != "win32" and sys_platform != "emscripten" and python_version == "3.11" \
     --hash=sha256:4b41f3967fce3af57cc7e94b888626c18bf37a083e3651ca8feeb66d492fef35 \
     --hash=sha256:5c5d0a3b48ceee0b48485e0c26037c0acd7d29765ca3fbb5cb3831d347423220
 pure-eval==0.2.3 ; python_version == "3.11" \
@@ -1243,7 +1243,7 @@ py-cpuinfo==9.0.0 ; python_version == "3.11" \
 pycodestyle==2.12.1 ; python_version == "3.11" \
     --hash=sha256:46f0fb92069a7c28ab7bb558f05bfc0110dac69a0cd23c61ea0040283a9d78b3 \
     --hash=sha256:6838eae08bbce4f6accd5d5572075c63626a15ee3e6f842df996bf62f6d73521
-pycparser==2.22 ; sys_platform == "linux" and platform_python_implementation != "PyPy" and python_version == "3.11" \
+pycparser==2.22 ; python_version == "3.11" and sys_platform == "linux" and platform_python_implementation != "PyPy" \
     --hash=sha256:491c8be9c040f5390f5bf44a5b07752bd07f56edf992381b05c701439eec10f6 \
     --hash=sha256:c3702b6d3dd8c7abc1afa565d7e63d53a1d0bd86cdc24edd75470f4de499cfcc
 pyflakes==3.2.0 ; python_version == "3.11" \
@@ -1270,7 +1270,7 @@ python-dateutil==2.9.0.post0 ; python_version == "3.11" \
 pytz==2025.1 ; python_version == "3.11" \
     --hash=sha256:89dd22dca55b46eac6eda23b2d72721bf1bdfef212645d81513ef5d03038de57 \
     --hash=sha256:c2db42be2a2518b28e65f9207c4d05e6ff547d1efa4086469ef855e4ab70178e
-pywin32-ctypes==0.2.3 ; python_version == "3.11" and sys_platform == "win32" \
+pywin32-ctypes==0.2.3 ; sys_platform == "win32" and python_version == "3.11" \
     --hash=sha256:8a1513379d709975552d202d942d9837758905c8d01eb82b8bcc30918929e7b8 \
     --hash=sha256:d162dc04946d704503b2edc4d55f3dba5c1d539ead017afa00142c38b9885755
 pywin32==309 ; sys_platform == "win32" and platform_python_implementation != "PyPy" and python_version == "3.11" \
@@ -1466,7 +1466,7 @@ rpds-py==0.23.1 ; python_version == "3.11" \
     --hash=sha256:fad784a31869747df4ac968a351e070c06ca377549e4ace94775aaa3ab33ee06 \
     --hash=sha256:fc869af5cba24d45fb0399b0cfdbcefcf6910bf4dee5d74036a57cf5264b3ff4 \
     --hash=sha256:fee513135b5a58f3bb6d89e48326cd5aa308e4bcdf2f7d59f67c861ada482bf8
-ruamel-yaml-clib==0.2.12 ; python_version == "3.11" and platform_python_implementation == "CPython" \
+ruamel-yaml-clib==0.2.12 ; platform_python_implementation == "CPython" and python_version == "3.11" \
     --hash=sha256:040ae85536960525ea62868b642bdb0c2cc6021c9f9d507810c0c604e66f5a7b \
     --hash=sha256:0467c5965282c62203273b838ae77c0d29d7638c8a4e3a1c8bdd3602c10904e4 \
     --hash=sha256:0b7e75b4965e1d4690e93021adfcecccbca7d61c7bddd8e22406ef2ff20d74ef \
@@ -1565,7 +1565,7 @@ scipy==1.15.2 ; python_version == "3.11" \
     --hash=sha256:fe8a9eb875d430d81755472c5ba75e84acc980e4a8f6204d402849234d3017db
 sdeint==0.3.0 ; python_version == "3.11" \
     --hash=sha256:edee046344abc9350518cc4421e0cd983967cae150d382518bfd84e0306ca64a
-secretstorage==3.3.3 ; python_version == "3.11" and sys_platform == "linux" \
+secretstorage==3.3.3 ; sys_platform == "linux" and python_version == "3.11" \
     --hash=sha256:2403533ef369eca6d2ba81718576c5e0f564d5cca1b58f73a8b23e7d4eeebd77 \
     --hash=sha256:f356e6628222568e3af06f2eba8df495efa13b3b63081dafd4f7d9a7b7bc9f99
 setuptools==76.0.0 ; python_version == "3.11" \
