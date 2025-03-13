@@ -17,10 +17,13 @@ def mock_config():
 
 @pytest.fixture
 def mock_piecewise_potential_from_file():
-    test_piecewise_potential_path = (
-        Path.cwd() / "physped/tests/data/piecewise_potential_with_dxy0.2_r-0-5-10-15-20-25-30_ntheta8.pickle"
+    test_piecewise_potential_path = Path.cwd() / (
+        "physped/tests/data/"
+        "piecewise_potential_with_dxy0.2_r-0-5-10-15-20-25-30_ntheta8.pickle"
     )
-    piecewise_potential = read_piecewise_potential_from_file(test_piecewise_potential_path)
+    piecewise_potential = read_piecewise_potential_from_file(
+        test_piecewise_potential_path
+    )
     return piecewise_potential
 
 
@@ -43,10 +46,14 @@ def mock_trajectories():
     return trajectories
 
 
-def test_simulate_trajectories(mock_config, mock_piecewise_potential_from_file, mock_trajectories):
+def test_simulate_trajectories(
+    mock_config, mock_piecewise_potential_from_file, mock_trajectories
+):
     mock_config.params.simulation.sample_origins_from = "input_origins"
     mock_config.params.simulation.ntrajs = 1
-    simulated_trajectories = simulate_trajectories(mock_piecewise_potential_from_file, mock_config, mock_trajectories)
+    simulated_trajectories = simulate_trajectories(
+        mock_piecewise_potential_from_file, mock_config, mock_trajectories
+    )
     assert simulated_trajectories is not None
     assert isinstance(simulated_trajectories, pd.DataFrame)
     expected_columns = set(

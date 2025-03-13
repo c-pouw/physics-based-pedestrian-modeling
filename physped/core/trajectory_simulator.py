@@ -14,12 +14,16 @@ from physped.core.pedestrian_initializer import (
 )
 from physped.core.piecewise_potential import PiecewisePotential
 from physped.io.writers import save_trajectories
-from physped.utils.functions import cartesian_to_polar_coordinates, periodic_angular_conditions
+from physped.utils.functions import (
+    cartesian_to_polar_coordinates,
+    periodic_angular_conditions,
+)
 
 log = logging.getLogger(__name__)
 
 
-# def sample_trajectory_origins_from_trajectories(piecewise_potential: PiecewisePotential, parameters: dict) -> np.ndarray:
+# def sample_trajectory_origins_from_trajectories(piecewise_potential:
+# PiecewisePotential, parameters: dict) -> np.ndarray:
 #     ntrajs = np.min([parameters.simulation.ntrajs, parameters.input_ntrajs])
 #     sampled_origins = piecewise_potential.trajectory_origins.sample(n=ntrajs)
 #     # Stacking to go from [x,y,u,v] to [x,y,u,v,xs,ys,us,vs]
@@ -40,11 +44,13 @@ def read_simulated_trajectories_from_file(config):
         log.error("Preprocessed trajectories not found: %s", e)
 
 
-def heatmap_zero_at_slow_state(piecewise_potential: PiecewisePotential, slow_state) -> bool:
+def heatmap_zero_at_slow_state(
+    piecewise_potential: PiecewisePotential, slow_state
+) -> bool:
     """Check if the heatmap is zero at the given position.
 
-    If the heatmap is zero it indicates that the spatial position was never visited
-    by a pedestrian in the input data.
+    If the heatmap is zero it indicates that the spatial position was never
+    visited by a pedestrian in the input data.
 
     Parameters:
         piecewise_potential: The piecewise potential object.
@@ -58,27 +64,43 @@ def heatmap_zero_at_slow_state(piecewise_potential: PiecewisePotential, slow_sta
     return heatmap[slow_state_index[0], slow_state_index[1]] == 0
 
 
-def simulate_trajectories(piecewise_potential: PiecewisePotential, config: dict, measured_trajectories: None) -> pd.DataFrame:
+def simulate_trajectories(
+    piecewise_potential: PiecewisePotential,
+    config: dict,
+    measured_trajectories: None,
+) -> pd.DataFrame:
     parameters = config.params
 
     if config.read.simulated_trajectories:
         return read_simulated_trajectories_from_file(config)
 
     log.info("Simulate trajectories using the piecewise potential")
-    # TODO : Can we create a dictionary with these functions if they have different function arguments?
+    # TODO : Can we create a dictionary with these functions if they have
+    # different function arguments?
     # TODO : Add option to input list of origins
     match config.params.simulation.sample_origins_from:
         case "heatmap":
             log.warning("Trajectory origins will be sampled from a heatmap.")
-            origins = sample_trajectory_origins_from_heatmap(piecewise_potential, parameters)
+            origins = sample_trajectory_origins_from_heatmap(
+                piecewise_potential, parameters
+            )
         case "trajectories":
             sample_state = config.params.simulation.sample_state
-            log.warning("Simulation origins will be sampled from measured trajectories at state %s", sample_state)
+            log.warning(
+                "Simulation origins will be sampled from measured "
+                "trajectories at state %s",
+                sample_state,
+            )
             origins = sample_trajectory_origins_from_trajectory_state_n(
-                parameters, measured_trajectories, sample_state, piecewise_potential
+                parameters,
+                measured_trajectories,
+                sample_state,
+                piecewise_potential,
             )
         case "input_origins":
-            log.warning("Simulation origins will be sampled from input origins.")
+            log.warning(
+                "Simulation origins will be sampled from input origins."
+            )
             origins = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
             origins = np.tile(origins, (parameters.simulation.ntrajs, 1))
     # Add t=0 to the end of the origins array
@@ -89,22 +111,36 @@ def simulate_trajectories(piecewise_potential: PiecewisePotential, config: dict,
     Pids = np.arange(origins.shape[0])
     origins = np.hstack((origins, Pids[:, None]))
 
-    evaluation_time = np.arange(parameters.simulation.start, parameters.simulation.end, parameters.simulation.step)
+    evaluation_time = np.arange(
+        parameters.simulation.start,
+        parameters.simulation.end,
+        parameters.simulation.step,
+    )
     trajectories = []
 
     model = LangevinModel(piecewise_potential, parameters)
     n_frames_back = config.params.fps // 2  # Go 0.5 second back
     with logging_redirect_tqdm():
         for starting_state in tqdm(
-            origins[:, :11], desc="Simulating trajectories", unit="trajs", total=origins.shape[0], miniters=1
+            origins[:, :11],
+            desc="Simulating trajectories",
+            unit="trajs",
+            total=origins.shape[0],
+            miniters=1,
         ):
-            first_trajectory_piece = simulate_trajectory_piece(model, starting_state, evaluation_time, 0)
+            first_trajectory_piece = simulate_trajectory_piece(
+                model, starting_state, evaluation_time, 0
+            )
             pid = int(first_trajectory_piece.iloc[0]["Pid"])
             trajectory_pieces = [first_trajectory_piece]
 
-            while check_restarting_conditions(trajectory_pieces[-1], n_frames_back, piecewise_potential):
+            while check_restarting_conditions(
+                trajectory_pieces[-1], n_frames_back, piecewise_potential
+            ):
                 last_trajectory_piece = trajectory_pieces[-1]
-                no_last_trajectory_piece = int(last_trajectory_piece.iloc[0]["piece_id"])
+                no_last_trajectory_piece = int(
+                    last_trajectory_piece.iloc[0]["piece_id"]
+                )
                 restarting_state = last_trajectory_piece.iloc[-n_frames_back]
                 restarting_time = restarting_state["t"]
                 log.info(
@@ -124,20 +160,39 @@ def simulate_trajectories(piecewise_potential: PiecewisePotential, config: dict,
                 new_evaluation_time = evaluation_time[frame_to_restart_from:]
 
                 no_new_traj_piece = no_last_trajectory_piece + 1
-                new_trajectory_piece = simulate_trajectory_piece(model, restarting_state, new_evaluation_time, no_new_traj_piece)
+                new_trajectory_piece = simulate_trajectory_piece(
+                    model,
+                    restarting_state,
+                    new_evaluation_time,
+                    no_new_traj_piece,
+                )
                 trajectory_pieces.append(new_trajectory_piece)
 
             trajectory_pieces = pd.concat(trajectory_pieces)
             trajectories.append(trajectory_pieces)
 
     trajectories = pd.concat(trajectories).dropna()
-    trajectories["rf"], trajectories["thetaf"] = cartesian_to_polar_coordinates(trajectories.uf, trajectories.vf)
-    trajectories["rs"], trajectories["thetas"] = cartesian_to_polar_coordinates(trajectories.us, trajectories.vs)
-    trajectories["thetaf"] = periodic_angular_conditions(trajectories["thetaf"], config.params.grid.bins["theta"])
-    trajectories["thetas"] = periodic_angular_conditions(trajectories["thetas"], config.params.grid.bins["theta"])
+    trajectories["rf"], trajectories["thetaf"] = (
+        cartesian_to_polar_coordinates(trajectories.uf, trajectories.vf)
+    )
+    trajectories["rs"], trajectories["thetas"] = (
+        cartesian_to_polar_coordinates(trajectories.us, trajectories.vs)
+    )
+    trajectories["thetaf"] = periodic_angular_conditions(
+        trajectories["thetaf"], config.params.grid.bins["theta"]
+    )
+    trajectories["thetas"] = periodic_angular_conditions(
+        trajectories["thetas"], config.params.grid.bins["theta"]
+    )
     if config.save.simulated_trajectories:
-        log.debug("Configuration 'save.simulated_trajectories' is set to True.")
-        save_trajectories(trajectories, Path.cwd().parent, config.filename.simulated_trajectories)
+        log.debug(
+            "Configuration 'save.simulated_trajectories' is set to True."
+        )
+        save_trajectories(
+            trajectories,
+            Path.cwd().parent,
+            config.filename.simulated_trajectories,
+        )
     return trajectories
 
 
@@ -145,32 +200,50 @@ def check_restarting_conditions(traj, n_frames_back, piecewise_potential):
     # traj is the last trajectory_piece
     last_trajectory_piece_too_short = len(traj) < n_frames_back
     if last_trajectory_piece_too_short:
-        log.warning("Last trajectory piece has only %s frames. Not reverting.", len(traj))
+        log.warning(
+            "Last trajectory piece has only %s frames. Not reverting.",
+            len(traj),
+        )
         return False
 
-    trajectory_already_left_the_measurement_domain = heatmap_zero_at_slow_state(
-        piecewise_potential, traj.iloc[-1][["xs", "ys", "us", "vs", "k"]]
+    trajectory_already_left_the_measurement_domain = (
+        heatmap_zero_at_slow_state(
+            piecewise_potential, traj.iloc[-1][["xs", "ys", "us", "vs", "k"]]
+        )
     )
     if trajectory_already_left_the_measurement_domain:
-        log.warning("Last trajectory piece already left the measurement domain. Not reverting.")
+        log.warning(
+            "Last trajectory piece already left the measurement domain. "
+            "Not reverting."
+        )
         return False
 
     particle_left_the_lattice = np.all(np.isinf(traj.iloc[-1]))
     if particle_left_the_lattice:
-        log.warning("Last trajectory piece already left the lattice. Not reverting.")
+        log.warning(
+            "Last trajectory piece already left the lattice. Not reverting."
+        )
         return False
 
     max_restarts = 2
-    simulation_already_restarted_too_often = traj["piece_id"].iloc[0] > max_restarts
+    simulation_already_restarted_too_often = (
+        traj["piece_id"].iloc[0] > max_restarts
+    )
     if simulation_already_restarted_too_often:
-        log.warning("Simulation already restarted %s times. Not reverting.", max_restarts)
+        log.warning(
+            "Simulation already restarted %s times. Not reverting.",
+            max_restarts,
+        )
         return False
 
     return True
 
 
 def simulate_trajectory_piece(
-    model: LangevinModel, starting_state: np.ndarray, evaluation_time: np.ndarray, no_traj_piece: int
+    model: LangevinModel,
+    starting_state: np.ndarray,
+    evaluation_time: np.ndarray,
+    no_traj_piece: int,
 ) -> pd.DataFrame:
     integration_output = model.simulate(starting_state[:11], evaluation_time)
     columns = ["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs", "t", "k", "Pid"]

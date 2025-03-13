@@ -32,20 +32,39 @@ def test_piecewise_potential_histograms(mock_piecewise_potential):
     ), "Not all elements are of type np.float64"
     assert mock_piecewise_potential.histogram_slow.shape == (2, 2, 2, 2, 2)
     assert np.all(
-        isinstance(x, np.float64) for x in mock_piecewise_potential.histogram_slow
+        isinstance(x, np.float64)
+        for x in mock_piecewise_potential.histogram_slow
     ), "Not all elements are of type np.float64"
 
 
 def test_piecewise_potential_parametrization(mock_piecewise_potential):
-    assert mock_piecewise_potential.parametrization.shape == (2, 2, 2, 2, 2, 4, 2)
+    assert mock_piecewise_potential.parametrization.shape == (
+        2,
+        2,
+        2,
+        2,
+        2,
+        4,
+        2,
+    )
     assert np.all(
-        isinstance(x, np.float64) for x in mock_piecewise_potential.parametrization
+        isinstance(x, np.float64)
+        for x in mock_piecewise_potential.parametrization
     ), "Not all elements are of type np.float64"
 
 
 def test_reparametrize_potential(mock_config, mock_piecewise_potential):
     mock_piecewise_potential.reparametrize_to_curvature(mock_config)
-    assert mock_piecewise_potential.parametrization.shape == (2, 2, 2, 2, 2, 4, 2)
+    assert mock_piecewise_potential.parametrization.shape == (
+        2,
+        2,
+        2,
+        2,
+        2,
+        4,
+        2,
+    )
     assert np.all(
-        isinstance(x, np.float64) for x in mock_piecewise_potential.parametrization
+        isinstance(x, np.float64)
+        for x in mock_piecewise_potential.parametrization
     ), "Not all elements are of type np.float64"

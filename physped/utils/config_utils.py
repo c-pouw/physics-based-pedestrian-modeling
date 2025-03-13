@@ -35,7 +35,8 @@ def set_plot_style(config: DictConfig, use_latex: bool = False) -> None:
     """Function to set the plot style.
 
     Args:
-        use_latex: Whether to use LaTeX for the plot style or not. Defaults to False.
+        use_latex: Whether to use LaTeX for the plot style or not.
+        Defaults to False.
     """
     get_style = {True: "science", False: "science_no_latex"}
     style = get_style[use_latex]
@@ -43,21 +44,39 @@ def set_plot_style(config: DictConfig, use_latex: bool = False) -> None:
 
 
 def register_new_resolvers(replace=False):
-    OmegaConf.register_new_resolver("get_root_dir", lambda: ROOT_DIR, replace=replace)
-    OmegaConf.register_new_resolver("parse_pi", lambda a: a * np.pi, replace=replace)
     OmegaConf.register_new_resolver(
-        "generate_linear_bins", lambda min, max, step: np.arange(min, max + 0.01, step), replace=replace
+        "get_root_dir", lambda: ROOT_DIR, replace=replace
     )
     OmegaConf.register_new_resolver(
-        "generate_angular_bins", lambda min, segments: np.linspace(min, min + 2 * np.pi, segments + 1), replace=replace
+        "parse_pi", lambda a: a * np.pi, replace=replace
     )
-    OmegaConf.register_new_resolver("cast_numpy_array", np.array, replace=replace)
     OmegaConf.register_new_resolver(
-        "apply_periodic_conditions_to_the_angle_theta", apply_periodic_conditions_to_the_angle_theta, replace=replace
+        "generate_linear_bins",
+        lambda min, max, step: np.arange(min, max + 0.01, step),
+        replace=replace,
     )
-    OmegaConf.register_new_resolver("inv_prop", lambda x: 1 / x, replace=replace)
-    OmegaConf.register_new_resolver("create_grid_name", create_grid_name, replace=replace)
-    OmegaConf.register_new_resolver("set_plot_style", set_plot_style, replace=replace)
+    OmegaConf.register_new_resolver(
+        "generate_angular_bins",
+        lambda min, segments: np.linspace(min, min + 2 * np.pi, segments + 1),
+        replace=replace,
+    )
+    OmegaConf.register_new_resolver(
+        "cast_numpy_array", np.array, replace=replace
+    )
+    OmegaConf.register_new_resolver(
+        "apply_periodic_conditions_to_the_angle_theta",
+        apply_periodic_conditions_to_the_angle_theta,
+        replace=replace,
+    )
+    OmegaConf.register_new_resolver(
+        "inv_prop", lambda x: 1 / x, replace=replace
+    )
+    OmegaConf.register_new_resolver(
+        "create_grid_name", create_grid_name, replace=replace
+    )
+    OmegaConf.register_new_resolver(
+        "set_plot_style", set_plot_style, replace=replace
+    )
 
 
 def initialize_hydra_config(env_name: str) -> DictConfig:
@@ -65,7 +84,8 @@ def initialize_hydra_config(env_name: str) -> DictConfig:
 
     Args:
         env_name: The name of the environment.
-            For example: 'narrow_corridor', 'intersecting_paths', 'asdz_pf12', 'asdz_pf34', 'utrecht_pf5'.
+            For example: 'narrow_corridor', 'intersecting_paths',
+            'asdz_pf12', 'asdz_pf34', 'utrecht_pf5'.
 
     Returns:
         The Hydra configuration.

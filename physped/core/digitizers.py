@@ -1,19 +1,24 @@
 import numpy as np
 
 
-def digitize_coordinates_to_lattice(coordinates: np.ndarray[float], lattice_bins: np.ndarray[float]) -> np.ndarray[np.int_]:
+def digitize_coordinates_to_lattice(
+    coordinates: np.ndarray[float], lattice_bins: np.ndarray[float]
+) -> np.ndarray[np.int_]:
     """Digitizes the given coordinates to the specified lattice bins.
 
     Boundary conditions:
     - Coordinates outside the lattice return -1.
-    Note: it is not possible to return nan because the output is an array of integers.
+    Note: it is not possible to return nan because the output is an
+    array of integers.
 
     Args:
         coordinates: The coordinates in one dimension to be digitized.
-        lattice_bins: The bin edges in one dimension defining the lattice cells.
+        lattice_bins: The bin edges in one dimension defining the
+        lattice cells.
 
     Returns:
-        The array with integer lattice indices associated with the coordinates.
+        The array with integer lattice indices associated with the
+        coordinates.
     """
     indices = np.digitize(coordinates, lattice_bins) - 1
     smallest_index = 0

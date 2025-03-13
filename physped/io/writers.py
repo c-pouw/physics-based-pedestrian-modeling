@@ -9,7 +9,11 @@ from physped.core.piecewise_potential import PiecewisePotential
 log = logging.getLogger(__name__)
 
 
-def save_piecewise_potential(grid: PiecewisePotential, folderpath: Path, filename: str = "piecewise_potential.pickle") -> None:
+def save_piecewise_potential(
+    grid: PiecewisePotential,
+    folderpath: Path,
+    filename: str = "piecewise_potential.pickle",
+) -> None:
     """Save piecewise potential
 
     Args:
@@ -24,7 +28,9 @@ def save_piecewise_potential(grid: PiecewisePotential, folderpath: Path, filenam
     log.info("Piecewise potential saved as %s.", filename)
 
 
-def save_trajectories(trajectories: pd.DataFrame, folderpath: Path, filename: str) -> None:
+def save_trajectories(
+    trajectories: pd.DataFrame, folderpath: Path, filename: str
+) -> None:
     """Save trajectories
 
     Args:

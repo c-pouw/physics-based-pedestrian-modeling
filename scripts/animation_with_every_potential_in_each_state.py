@@ -25,7 +25,10 @@ from physped.core.trajectory_simulator import simulate_trajectories
 from physped.io.readers import trajectory_reader
 from physped.preprocessing.trajectories import preprocess_trajectories
 from physped.utils.config_utils import register_new_resolvers
-from physped.visualization.plot_trajectories import plot_station_background, plot_trajectories
+from physped.visualization.plot_trajectories import (
+    plot_station_background,
+    plot_trajectories,
+)
 from physped.visualization.plot_utils import apply_xy_plot_style
 
 plt.style.use(Path.cwd().parent / "physped/conf/science.mplstyle")
@@ -37,7 +40,9 @@ env_name = "narrow_corridor"
 # env_name = "curved_paths_synthetic"
 # env_name = "station_paths"
 # env_name = "asdz_pf34"
-with initialize(version_base=None, config_path="../physped/conf", job_name="test_app"):
+with initialize(
+    version_base=None, config_path="../physped/conf", job_name="test_app"
+):
     config = compose(
         config_name="config",
         return_hydra_config=True,
@@ -65,8 +70,16 @@ logging.basicConfig(level=logging.INFO)
 
 # %%
 
-logging.info("MODELING PARAMETERS: \n%s", pformat(OmegaConf.to_container(config.params.model, resolve=True), depth=1))
-logging.info("GRID PARAMETERS: \n%s", pformat(OmegaConf.to_container(config.params.grid, resolve=True), depth=2))
+logging.info(
+    "MODELING PARAMETERS: \n%s",
+    pformat(
+        OmegaConf.to_container(config.params.model, resolve=True), depth=1
+    ),
+)
+logging.info(
+    "GRID PARAMETERS: \n%s",
+    pformat(OmegaConf.to_container(config.params.grid, resolve=True), depth=2),
+)
 
 # %%
 
@@ -75,35 +88,50 @@ trajectories.head()
 
 # %%
 
-preprocessed_trajectories = preprocess_trajectories(trajectories, config=config)
-preprocessed_trajectories = compute_slow_dynamics(preprocessed_trajectories, config=config)
+preprocessed_trajectories = preprocess_trajectories(
+    trajectories, config=config
+)
+preprocessed_trajectories = compute_slow_dynamics(
+    preprocessed_trajectories, config=config
+)
 
 # %%
-# preprocessed_trajectories = preprocess_trajectories(trajectories, config=config)
-# preprocessed_trajectories = process_slow_modes(preprocessed_trajectories, config)
+# preprocessed_trajectories = preprocess_trajectories(trajectories,
+# config=config)
+# preprocessed_trajectories = process_slow_modes(preprocessed_trajectories,
+# config)
 
 # %%
 
-piecewise_potential = learn_potential_from_trajectories(preprocessed_trajectories, config)
+piecewise_potential = learn_potential_from_trajectories(
+    preprocessed_trajectories, config
+)
 
 # %%
 
 # config.params.simulation.sample_state = 0
 config.params.simulation.ntrajs = 1
 config.params.input_ntrajs = len(preprocessed_trajectories.Pid.unique())
-simulated_trajectories = simulate_trajectories(piecewise_potential, config, preprocessed_trajectories)
+simulated_trajectories = simulate_trajectories(
+    piecewise_potential, config, preprocessed_trajectories
+)
 
 # %%
 
 # plot_trajectories(preprocessed_trajectories, config, "recorded")
-# plot_trajectories(preprocessed_trajectories, config, "recorded", traj_type="s")
+# plot_trajectories(preprocessed_trajectories, config, "recorded",
+# traj_type="s")
 plot_trajectories(simulated_trajectories, config, "simulated")
 plot_trajectories(simulated_trajectories, config, "simulated", traj_type="s")
 
 # %%
 
 traj_pid = simulated_trajectories[simulated_trajectories["Pid"] == 0].copy()
-traj_pid.dropna(subset=["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs"], inplace=True, how="all")
+traj_pid.dropna(
+    subset=["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs"],
+    inplace=True,
+    how="all",
+)
 last_state = traj_pid.iloc[-1]
 plot_trajectories(traj_pid, config, "simulated", traj_type="f")
 
@@ -126,34 +154,68 @@ for piece_id, traj in traj_pid.groupby("piece_id"):
 
 
 def get_curvature_point(config, state):
-    xf, yf, uf, vf, xs, ys, us, vs, rs, thetas = state[["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs", "rs", "thetas"]]
+    xf, yf, uf, vf, xs, ys, us, vs, rs, thetas = state[
+        ["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs", "rs", "thetas"]
+    ]
     k = 2
     X_vals = [xs, ys, rs, thetas, k]
     slow_state_index = get_grid_indices(piecewise_potential, X_vals)
 
     xmean, ymean, umean, vmean = piecewise_potential.parametrization[
-        slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4], :, 0
+        slow_state_index[0],
+        slow_state_index[1],
+        slow_state_index[2],
+        slow_state_index[3],
+        slow_state_index[4],
+        :,
+        0,
     ]
     beta_x, beta_y, beta_u, beta_v = piecewise_potential.parametrization[
-        slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4], :, 1
+        slow_state_index[0],
+        slow_state_index[1],
+        slow_state_index[2],
+        slow_state_index[3],
+        slow_state_index[4],
+        :,
+        1,
     ]
 
-    # xmean, xvar, ymean, yvar, umean, uvar, vmean, vvar = piecewise_potential.fit_params[
+    # xmean, xvar, ymean, yvar, umean, uvar, vmean, vvar =
+    # piecewise_potential.fit_params[
     #     X_indx[0], X_indx[1], X_indx[2], X_indx[3], X_indx[4], :
     # ]
 
     # # determine potential energy contributions
-    # betax = piecewise_potential.curvature_x[X_indx[0], X_indx[1], X_indx[2], X_indx[3], X_indx[4]]
-    # betay = piecewise_potential.curvature_y[X_indx[0], X_indx[1], X_indx[2], X_indx[3], X_indx[4]]
-    # betau = piecewise_potential.curvature_u[X_indx[0], X_indx[1], X_indx[2], X_indx[3], X_indx[4]]
-    # betav = piecewise_potential.curvature_v[X_indx[0], X_indx[1], X_indx[2], X_indx[3], X_indx[4]]
+    # betax = piecewise_potential.curvature_x[X_indx[0], X_indx[1], X_indx[2],
+    #  X_indx[3], X_indx[4]]
+    # betay = piecewise_potential.curvature_y[X_indx[0], X_indx[1], X_indx[2],
+    #  X_indx[3], X_indx[4]]
+    # betau = piecewise_potential.curvature_u[X_indx[0], X_indx[1], X_indx[2],
+    #  X_indx[3], X_indx[4]]
+    # betav = piecewise_potential.curvature_v[X_indx[0], X_indx[1], X_indx[2],
+    #  X_indx[3], X_indx[4]]
 
     V_x = beta_x * (xf - xmean)
     V_y = beta_y * (yf - ymean)
     V_u = beta_u * (uf - umean)
     V_v = beta_v * (vf - vmean)
 
-    return [xmean, ymean, umean, vmean, beta_x, beta_y, beta_u, beta_v, -V_x, -V_y, -V_u, -V_v, -V_x - V_u, -V_y - V_v]
+    return [
+        xmean,
+        ymean,
+        umean,
+        vmean,
+        beta_x,
+        beta_y,
+        beta_u,
+        beta_v,
+        -V_x,
+        -V_y,
+        -V_u,
+        -V_v,
+        -V_x - V_u,
+        -V_y - V_v,
+    ]
 
 
 force = []
@@ -161,9 +223,25 @@ for k in tqdm(traj_pid["k"][::1]):
     state = traj_pid[traj_pid["k"] == k].iloc[0]
     force.append(get_curvature_point(config, state))
 
-traj_pid.loc[:, ["xmean", "ymean", "umean", "vmean", "betax", "betay", "betau", "betav", "Vx", "Vy", "Vu", "Vv", "fx", "fy"]] = (
-    force
-)
+traj_pid.loc[
+    :,
+    [
+        "xmean",
+        "ymean",
+        "umean",
+        "vmean",
+        "betax",
+        "betay",
+        "betau",
+        "betav",
+        "Vx",
+        "Vy",
+        "Vu",
+        "Vv",
+        "fx",
+        "fy",
+    ],
+] = force
 
 # %%
 
@@ -193,10 +271,17 @@ traj_pid["k"] = traj_pid["k"].astype(int)
 width_single_panel = 1.7
 height_single_panel = 1.2
 subplot_grid = [3, 4]
-fig = plt.figure(figsize=(width_single_panel * subplot_grid[1], height_single_panel * subplot_grid[0]))
+fig = plt.figure(
+    figsize=(
+        width_single_panel * subplot_grid[1],
+        height_single_panel * subplot_grid[0],
+    )
+)
 
 ymax = 2
-spec = mpl.gridspec.GridSpec(ncols=4, nrows=3, wspace=0.5, hspace=0.5, figure=fig)
+spec = mpl.gridspec.GridSpec(
+    ncols=4, nrows=3, wspace=0.5, hspace=0.5, figure=fig
+)
 ax1 = fig.add_subplot(spec[0, 0])
 ax2 = fig.add_subplot(spec[0, 1])
 ax3 = fig.add_subplot(spec[0, 2])
@@ -206,13 +291,22 @@ ax6 = fig.add_subplot(spec[1:, 2:])
 axs = [ax1, ax2, ax3, ax4, ax5, ax6]
 
 cmap = "YlOrRd"
-xbin_middle = (config.params.grid.bins.x[1:] + config.params.grid.bins.x[:-1]) / 2
-ybin_middle = (config.params.grid.bins.y[1:] + config.params.grid.bins.y[:-1]) / 2
+xbin_middle = (
+    config.params.grid.bins.x[1:] + config.params.grid.bins.x[:-1]
+) / 2
+ybin_middle = (
+    config.params.grid.bins.y[1:] + config.params.grid.bins.y[:-1]
+) / 2
 X, Y = np.meshgrid(xbin_middle, ybin_middle, indexing="ij")
 
 n_frames = 50
 plot_traj = traj_pid[traj_pid["k"] > (traj_pid["k"].max() - n_frames)].copy()
-for _, state in tqdm(plot_traj.iterrows(), total=len(plot_traj), desc="Plotting potentials", ascii=True):
+for _, state in tqdm(
+    plot_traj.iterrows(),
+    total=len(plot_traj),
+    desc="Plotting potentials",
+    ascii=True,
+):
     timestep = state["k"]
 
     ax = axs[0]
@@ -245,11 +339,14 @@ for _, state in tqdm(plot_traj.iterrows(), total=len(plot_traj), desc="Plotting 
 
     ax = axs[4]
 
-    xf, yf, uf, vf, xs, ys, us, vs, rs, thetas = state[["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs", "rs", "thetas"]]
+    xf, yf, uf, vf, xs, ys, us, vs, rs, thetas = state[
+        ["xf", "yf", "uf", "vf", "xs", "ys", "us", "vs", "rs", "thetas"]
+    ]
     k = 2
     X_vals = [xs, ys, rs, thetas, k]
     slow_indices = get_grid_indices(piecewise_potential, X_vals)
-    # slow_indices = [0, 0, 0, 0, 1] # ! Slow indices zero becuase curved paths not discretized in velocity
+    # slow_indices = [0, 0, 0, 0, 1]
+    # # ! Slow indices zero becuase curved paths not discretized in velocity
     slicing_indices = [
         [0, len(config.params.grid.bins.x) - 1],
         [0, len(config.params.grid.bins.y) - 1],
@@ -257,29 +354,41 @@ for _, state in tqdm(plot_traj.iterrows(), total=len(plot_traj), desc="Plotting 
         [slow_indices[3], slow_indices[3] + 1],
         [slow_indices[4], slow_indices[4] + 1],
     ]
-    slow_subhistogram = extract_submatrix(piecewise_potential.histogram_slow, slicing_indices)
-    position_based_emperic_potential = calculate_position_based_emperic_potential(slow_subhistogram, config)
-    # matrix_to_plot = get_position_based_emperic_potential_from_state(config, slicing_indices, piecewise_potential)
+    slow_subhistogram = extract_submatrix(
+        piecewise_potential.histogram_slow, slicing_indices
+    )
+    position_based_emperic_potential = (
+        calculate_position_based_emperic_potential(slow_subhistogram, config)
+    )
+    # matrix_to_plot = get_position_based_emperic_potential_from_state(config,
+    # slicing_indices, piecewise_potential)
 
-    subparametrization = extract_submatrix(piecewise_potential.parametrization, slicing_indices)
+    subparametrization = extract_submatrix(
+        piecewise_potential.parametrization, slicing_indices
+    )
     center_x = subparametrization[:, :, 0, 0, 0, 0, 0]
     center_y = subparametrization[:, :, 0, 0, 0, 1, 0]
     curvature_x = subparametrization[:, :, 0, 0, 0, 0, 1]
     curvature_y = subparametrization[:, :, 0, 0, 0, 1, 1]
 
-    # sliced_fit_parameters = get_slice_of_multidimensional_matrix(piecewise_potential.fit_params, slices)
+    # sliced_fit_parameters = get_slice_of_multidimensional_matrix(
+    # piecewise_potential.fit_params, slices)
     # center_x = sliced_fit_parameters[:, :, 0, 0, 0, 0]
     # center_y = sliced_fit_parameters[:, :, 0, 0, 0, 2]
 
-    # sliced_curvature_x = get_slice_of_multidimensional_matrix(piecewise_potential.curvature_x, slices)
+    # sliced_curvature_x = get_slice_of_multidimensional_matrix(
+    # piecewise_potential.curvature_x, slices)
     # curvature_x = sliced_curvature_x[:, :, 0, 0, 0]
-    # sliced_curvature_y = get_slice_of_multidimensional_matrix(piecewise_potential.curvature_y, slices)
+    # sliced_curvature_y = get_slice_of_multidimensional_matrix(
+    # piecewise_potential.curvature_y, slices)
     # curvature_y = sliced_curvature_y[:, :, 0, 0, 0]
 
     curv_x = curvature_x * (X - center_x)
     curv_y = curvature_y * (Y - center_y)
 
-    ax.pcolormesh(X, Y, position_based_emperic_potential, cmap=cmap, shading="auto")  # , norm=norm)
+    ax.pcolormesh(
+        X, Y, position_based_emperic_potential, cmap=cmap, shading="auto"
+    )  # , norm=norm)
     # ax = plot_colorbar(ax, cs)
 
     scale = 50  # plot_params.scale
@@ -293,7 +402,8 @@ for _, state in tqdm(plot_traj.iterrows(), total=len(plot_traj), desc="Plotting 
         pivot="mid",
         width=0.0015,
         #     labelpos="E",
-        #     label="Vectors: $f^{\\prime }(x)=-{\\frac {x-\\mu }{\\sigma ^{2}}}f(x)$",
+        #     label="Vectors: $f^{\\prime }(x)=
+        # -{\\frac {x-\\mu }{\\sigma ^{2}}}f(x)$",
     )
 
     tail_window = 15
@@ -315,11 +425,18 @@ for _, state in tqdm(plot_traj.iterrows(), total=len(plot_traj), desc="Plotting 
     traj_plot_params = config.params.trajectory_plot
     textstr = (
         f"$\\Delta t=\\,${config.params.model.dt:.3f} s\n"
-        f"$\\sigma=\\,${config.params.model.sigma} ms$^{{\\mathdefault{{-3/2}}}}$\n"
+        f"$\\sigma=\\,${config.params.model.sigma} "
+        f"ms$^{{\\mathdefault{{-3/2}}}}$\n"
         f"$\\tau=\\,${config.params.model.tauu} s\n"
         f"$k=\\,${int(timestep)}"
     )
-    props = {"boxstyle": "round", "facecolor": "white", "alpha": 1, "edgecolor": "black", "lw": 0.5}
+    props = {
+        "boxstyle": "round",
+        "facecolor": "white",
+        "alpha": 1,
+        "edgecolor": "black",
+        "lw": 0.5,
+    }
     plt.figtext(
         0.5,
         0.6,
@@ -344,11 +461,54 @@ for _, state in tqdm(plot_traj.iterrows(), total=len(plot_traj), desc="Plotting 
     ax.plot(state[upos], state[vpos], "bx", ms=5, zorder=-20)
 
     scale = 5
-    ax.quiver([state[upos]], [state[vpos]], [state.Vx], [0], color="C0", scale=scale, zorder=10, width=0.01)
-    ax.quiver([state[upos]], [state[vpos]], [0], [state.Vy], color="C1", scale=scale, zorder=10, width=0.01)
-    ax.quiver([state[upos]], [state[vpos]], [state.Vu], [0], color="C2", scale=scale, zorder=0, width=0.015)
-    ax.quiver([state[upos]], [state[vpos]], [0], [state.Vv], color="C3", scale=scale, zorder=0, width=0.015)
-    ax.quiver([state[upos]], [state[vpos]], [state.fx], [state.fy], color="k", scale=scale)
+    ax.quiver(
+        [state[upos]],
+        [state[vpos]],
+        [state.Vx],
+        [0],
+        color="C0",
+        scale=scale,
+        zorder=10,
+        width=0.01,
+    )
+    ax.quiver(
+        [state[upos]],
+        [state[vpos]],
+        [0],
+        [state.Vy],
+        color="C1",
+        scale=scale,
+        zorder=10,
+        width=0.01,
+    )
+    ax.quiver(
+        [state[upos]],
+        [state[vpos]],
+        [state.Vu],
+        [0],
+        color="C2",
+        scale=scale,
+        zorder=0,
+        width=0.015,
+    )
+    ax.quiver(
+        [state[upos]],
+        [state[vpos]],
+        [0],
+        [state.Vv],
+        color="C3",
+        scale=scale,
+        zorder=0,
+        width=0.015,
+    )
+    ax.quiver(
+        [state[upos]],
+        [state[vpos]],
+        [state.fx],
+        [state.fy],
+        color="k",
+        scale=scale,
+    )
     vel_lim = 1.5
     ax.set_ylim(-vel_lim, vel_lim)
     ax.set_xlim(-2, 2)
@@ -356,7 +516,11 @@ for _, state in tqdm(plot_traj.iterrows(), total=len(plot_traj), desc="Plotting 
     ax.set_xlabel("u [m/s]")
     ax.set_aspect("equal")
 
-    filename = Path.cwd() / "frames_with_potential_in_each_state/frames" / f"potential_at_slow_index_{int(timestep):05}.png"
+    filename = (
+        Path.cwd()
+        / "frames_with_potential_in_each_state/frames"
+        / f"potential_at_slow_index_{int(timestep):05}.png"
+    )
     plt.savefig(filename)
     for ax in axs:
         ax.cla()

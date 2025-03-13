@@ -38,7 +38,9 @@ def plot_quiver(ax, params, fields):
         X=0.2,
         Y=1.1,
         U=50,
-        label="Vectors: $f^{\\prime }(x)=-{\\frac {x-\\mu }{\\sigma ^{2}}}f(x)$",
+        label=(
+            "Vectors: $f^{\\prime }(x)=-{\\frac {x-\\mu }{\\sigma ^{2}}}f(x)$"
+        ),
         labelpos="E",
     )
     ax.set_aspect("equal")

@@ -64,13 +64,27 @@ def test_transform_fast_velocity_to_polar_coordinates():
     assert "rf" in df.columns
     assert "thetaf" in df.columns
     np.testing.assert_allclose(df.rf.tolist(), np.repeat(np.sqrt(2), 9))
-    np.testing.assert_allclose(df.thetaf.tolist(), np.append(np.repeat(np.pi / 4, 5), (np.repeat(-np.pi / 4, 4))))
+    np.testing.assert_allclose(
+        df.thetaf.tolist(),
+        np.append(np.repeat(np.pi / 4, 5), (np.repeat(-np.pi / 4, 4))),
+    )
 
 
 def test_preprocess_trajectories():
     """Test the full preprocessing pipeline."""
     df = pd.DataFrame(test_trajectories)
     df = preprocess_trajectories(df, config=test_config)
-    columns = ["xf", "yf", "Pid", "time", "traj_len", "k", "uf", "vf", "rf", "thetaf"]
+    columns = [
+        "xf",
+        "yf",
+        "Pid",
+        "time",
+        "traj_len",
+        "k",
+        "uf",
+        "vf",
+        "rf",
+        "thetaf",
+    ]
     for col in columns:
         assert col in df.columns

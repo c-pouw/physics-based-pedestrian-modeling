@@ -26,7 +26,10 @@ class Lattice:
         # self.cell_volume = self.compute_cell_volume()
 
     def __repr__(self):
-        return f"Lattice(bins={pformat(OmegaConf.to_container(self.bins, resolve=True), depth=1)})"
+        formatted_output = pformat(
+            OmegaConf.to_container(self.bins, resolve=True), depth=1
+        )
+        return f"Lattice(bins={formatted_output})"
 
     def get_bin_centers(self) -> Dict[str, np.ndarray]:
         """Return the middle of the input bins.

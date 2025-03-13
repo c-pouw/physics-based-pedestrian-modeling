@@ -20,5 +20,9 @@ class DistApproximation:
 
 class GaussianApproximation(DistApproximation):
     def __init__(self):
-        predefined_kwargs = {"fit_dimensions": ("x", "y", "u", "v"), "fit_parameters": ("mu", "sigma"), "function": norm.fit}
+        predefined_kwargs = {
+            "fit_dimensions": ("x", "y", "u", "v"),
+            "fit_parameters": ("mu", "sigma"),
+            "function": norm.fit,
+        }
         super().__init__(**predefined_kwargs)

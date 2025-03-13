@@ -26,7 +26,11 @@ from physped.visualization.plot_utils import (
 log = logging.getLogger(__name__)
 
 
-def plot_discrete_grid(config: dict, slow_indices: tuple, trajectories: pd.DataFrame = pd.DataFrame()):
+def plot_discrete_grid(
+    config: dict,
+    slow_indices: tuple,
+    trajectories: pd.DataFrame = pd.DataFrame(),
+):
     params = config.params
     lattice = Lattice(config.params.grid.bins)
     dist_approximation = GaussianApproximation()
@@ -35,17 +39,32 @@ def plot_discrete_grid(config: dict, slow_indices: tuple, trajectories: pd.DataF
     plot_params = config.params.grid_plot
     if plot_params.plot_trajs:
         try:
-            trajectories = digitize_trajectories_to_grid(trajectories, piecewise_potential.lattice)
-            trajs_conditioned_to_slow_mode = trajectories[trajectories.slow_grid_indices == slow_indices].copy()
-            pids_to_plot = trajs_conditioned_to_slow_mode.Pid.drop_duplicates().sample(plot_params.N_trajs)
-            plot_trajs = trajs_conditioned_to_slow_mode[trajs_conditioned_to_slow_mode.Pid.isin(pids_to_plot)]
+            trajectories = digitize_trajectories_to_grid(
+                trajectories, piecewise_potential.lattice
+            )
+            trajs_conditioned_to_slow_mode = trajectories[
+                trajectories.slow_grid_indices == slow_indices
+            ].copy()
+            pids_to_plot = (
+                trajs_conditioned_to_slow_mode.Pid.drop_duplicates().sample(
+                    plot_params.N_trajs
+                )
+            )
+            plot_trajs = trajs_conditioned_to_slow_mode[
+                trajs_conditioned_to_slow_mode.Pid.isin(pids_to_plot)
+            ]
         except ValueError:
             log.warning("Not enough trajectories to plot.")
             plot_params.plot_trajs = False
 
     fig = plt.figure(layout="constrained")
     spec = mpl.gridspec.GridSpec(
-        ncols=2, nrows=1, width_ratios=plot_params.subplot_width_ratio, wspace=0.1, hspace=0.1, figure=fig
+        ncols=2,
+        nrows=1,
+        width_ratios=plot_params.subplot_width_ratio,
+        wspace=0.1,
+        hspace=0.1,
+        figure=fig,
     )
 
     # * Subplot left: spatial grid
@@ -53,7 +72,9 @@ def plot_discrete_grid(config: dict, slow_indices: tuple, trajectories: pd.DataF
     ax1 = apply_xy_plot_style(ax1, params)
     ax1 = plot_cartesian_spatial_grid(ax1, params.grid)
     if plot_params.plot_trajs:
-        ax1 = plot_position_trajectories_in_cartesian_coordinates(ax1, plot_trajs, alpha=1, traj_type="f")
+        ax1 = plot_position_trajectories_in_cartesian_coordinates(
+            ax1, plot_trajs, alpha=1, traj_type="f"
+        )
     ax1.set_xlabel(plot_params.position.xlabel)
     ax1.set_ylabel(plot_params.position.ylabel)
     ax1.set_xlim(params.grid.bins.x[0], params.grid.bins.x[-1])
@@ -71,7 +92,9 @@ def plot_discrete_grid(config: dict, slow_indices: tuple, trajectories: pd.DataF
     ax2 = plot_polar_velocity_grid(ax2, params.grid)
     ax2 = plot_polar_labels(ax2, params.grid)
     if plot_params.plot_trajs:
-        ax2 = plot_velocity_trajectories_in_polar_coordinates(ax2, plot_trajs, alpha=1, traj_type="f")
+        ax2 = plot_velocity_trajectories_in_polar_coordinates(
+            ax2, plot_trajs, alpha=1, traj_type="f"
+        )
     ax2.grid(False)
     ax2.set_title(plot_params.title.velocity, y=1)
 
@@ -82,4 +105,5 @@ def plot_discrete_grid(config: dict, slow_indices: tuple, trajectories: pd.DataF
     fig.suptitle(plot_params.title.figure, y=0.9)
     filepath = Path.cwd() / (params.grid.name + ".pdf")
     plt.savefig(filepath, bbox_inches="tight")
-    # log.info("Saving plot of the grid to %s.", filepath.relative_to(config.root_dir))
+    # log.info("Saving plot of the grid to %s.",
+    # filepath.relative_to(config.root_dir))

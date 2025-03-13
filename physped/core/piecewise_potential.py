@@ -12,10 +12,13 @@ log = logging.getLogger(__name__)
 
 
 class PiecewisePotential:
-    def __init__(self, lattice: Lattice, dist_approximation: DistApproximation):
+    def __init__(
+        self, lattice: Lattice, dist_approximation: DistApproximation
+    ):
         """A class for the piecewise potential.
 
-        Creates the lattice to discretize the slow dynamics and fit the potential.
+        Creates the lattice to discretize the slow dynamics and fit the
+        potential.
 
         Args:
             bins: A dictionary containing the bin edges for each dimension.

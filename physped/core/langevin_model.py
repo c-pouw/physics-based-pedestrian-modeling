@@ -7,7 +7,10 @@ import sdeint
 
 from physped.core.parametrize_potential import get_grid_indices
 from physped.core.piecewise_potential import PiecewisePotential
-from physped.utils.functions import cartesian_to_polar_coordinates, periodic_angular_conditions
+from physped.utils.functions import (
+    cartesian_to_polar_coordinates,
+    periodic_angular_conditions,
+)
 
 log = logging.getLogger(__name__)
 
@@ -51,11 +54,13 @@ def get_slow_derivative(name: str):
 class LangevinModel:
     """Langevin model class.
 
-    This class represents a Langevin model used for simulating pedestrian trajectories.
-    It contains methods for initializing the model, simulating trajectories, and defining stopping conditions.
+    This class represents a Langevin model used for simulating pedestrian
+    trajectories. It contains methods for initializing the model, simulating
+    trajectories, and defining stopping conditions.
 
     Attributes:
-        potential (PiecewisePotential): The piecewise potential object used for modeling.
+        potential (PiecewisePotential): The piecewise potential object used
+        for modeling.
         params (dict): A dictionary containing the model parameters.
 
     """
@@ -64,22 +69,28 @@ class LangevinModel:
         """Initialize Langevin model with parameters.
 
         Args:
-            potential (PiecewisePotential): The piecewise potential object used for modeling.
+            potential (PiecewisePotential): The piecewise potential object
+            used for modeling.
             params (dict): A dictionary containing the model parameters.
 
         """
         self.potential = potential
         self.params = params
         # self.grid_counts = np.sum(potential.histogram, axis=(2, 3, 4))
-        # self.heatmap = np.sum(potential.histogram, axis=(2, 3, 4)) / np.sum(potential.histogram)
+        # self.heatmap = np.sum(
+        # potential.histogram, axis=(2, 3, 4)
+        # ) / np.sum(potential.histogram)
 
-    def simulate(self, X_0: np.ndarray, t_eval: np.ndarray = np.arange(0, 10, 0.1)) -> np.ndarray:
+    def simulate(
+        self, X_0: np.ndarray, t_eval: np.ndarray = np.arange(0, 10, 0.1)
+    ) -> np.ndarray:
         """
         Simulates the Langevin model.
 
         Parameters:
         - X_0: Initial state of the system as a numpy array.
-        - t_eval: Time points at which to evaluate the solution. Defaults to np.arange(0, 10, 0.1).
+        - t_eval: Time points at which to evaluate the solution.
+        Defaults to np.arange(0, 10, 0.1).
 
         Returns:
         - The simulated trajectory of the system as a numpy array.
@@ -88,13 +99,16 @@ class LangevinModel:
 
     def modelxy(self, state: np.ndarray, t) -> np.ndarray:
         """
-        Calculate the derivatives of the Langevin model for the given state variables.
+        Calculate the derivatives of the Langevin model for the given state
+        variables.
 
         Args:
-            X_0 (np.ndarray): Array of initial state variables [xf, yf, uf, vf, xs, ys, us, vs].
+            X_0 (np.ndarray): Array of initial state variables
+            [xf, yf, uf, vf, xs, ys, us, vs].
 
         Returns:
-            np.ndarray: Array of derivatives [xfdot, yfdot, ufdot, vfdot, xsdot, ysdot, usdot, vsdot].
+            np.ndarray: Array of derivatives
+            [xfdot, yfdot, ufdot, vfdot, xsdot, ysdot, usdot, vsdot].
         """
         xf, yf, uf, vf, xs, ys, us, vs, t, k, Pid = state
         xfdot = uf
@@ -111,20 +125,40 @@ class LangevinModel:
             return np.repeat(np.inf, len(state))
 
         rs, thetas = cartesian_to_polar_coordinates(us, vs)
-        thetas = periodic_angular_conditions(thetas, self.params.grid.bins["theta"])
+        thetas = periodic_angular_conditions(
+            thetas, self.params.grid.bins["theta"]
+        )
         slow_state = [xs, ys, rs, thetas, k]
         slow_state_index = get_grid_indices(self.potential, slow_state)
 
         xmean, ymean, umean, vmean = self.potential.parametrization[
-            slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4], :, 0
+            slow_state_index[0],
+            slow_state_index[1],
+            slow_state_index[2],
+            slow_state_index[3],
+            slow_state_index[4],
+            :,
+            0,
         ]
         beta_x, beta_y, beta_u, beta_v = self.potential.parametrization[
-            slow_state_index[0], slow_state_index[1], slow_state_index[2], slow_state_index[3], slow_state_index[4], :, 1
+            slow_state_index[0],
+            slow_state_index[1],
+            slow_state_index[2],
+            slow_state_index[3],
+            slow_state_index[4],
+            :,
+            1,
         ]
 
-        if np.all(np.isnan([xmean, ymean, umean, vmean, beta_x, beta_y, beta_u, beta_v])):
-            # log.warning("Pid %s: reached hole in the potential at t = %.2f s", int(Pid), t)
-            # TODO : Find a fix to handle holes in the potential e.g. coarse graining, closest neighbour
+        if np.all(
+            np.isnan(
+                [xmean, ymean, umean, vmean, beta_x, beta_y, beta_u, beta_v]
+            )
+        ):
+            # log.warning("Pid %s: reached hole in the potential
+            # at t = %.2f s", int(Pid), t)
+            # TODO : Find a fix to handle holes in the potential e.g.
+            # coarse graining, closest neighbour
 
             return np.zeros(len(state)) * np.nan
 
@@ -138,33 +172,60 @@ class LangevinModel:
         ufdot = -V_x - V_u
         vfdot = -V_y - V_v
 
-        slow_position_derivative_algorithm = get_slow_derivative(self.params.model.slow_positions_algorithm)
-        slow_velocity_derivative_algorithm = get_slow_derivative(self.params.model.slow_velocities_algorithm)
+        slow_position_derivative_algorithm = get_slow_derivative(
+            self.params.model.slow_positions_algorithm
+        )
+        slow_velocity_derivative_algorithm = get_slow_derivative(
+            self.params.model.slow_velocities_algorithm
+        )
         xsdot = slow_position_derivative_algorithm(
-            tau=self.params.model.taux, slow=xs, fast=xf, slowdot=us, fastdot=uf, dt=self.params.model.dt
+            tau=self.params.model.taux,
+            slow=xs,
+            fast=xf,
+            slowdot=us,
+            fastdot=uf,
+            dt=self.params.model.dt,
         )
         ysdot = slow_position_derivative_algorithm(
-            tau=self.params.model.taux, slow=ys, fast=yf, slowdot=vs, fastdot=vf, dt=self.params.model.dt
+            tau=self.params.model.taux,
+            slow=ys,
+            fast=yf,
+            slowdot=vs,
+            fastdot=vf,
+            dt=self.params.model.dt,
         )
         usdot = slow_velocity_derivative_algorithm(
-            tau=self.params.model.tauu, slow=us, fast=uf, fastdot=ufdot, dt=self.params.model.dt
+            tau=self.params.model.tauu,
+            slow=us,
+            fast=uf,
+            fastdot=ufdot,
+            dt=self.params.model.dt,
         )
         vsdot = slow_velocity_derivative_algorithm(
-            tau=self.params.model.tauu, slow=vs, fast=vf, fastdot=vfdot, dt=self.params.model.dt
+            tau=self.params.model.tauu,
+            slow=vs,
+            fast=vf,
+            fastdot=vfdot,
+            dt=self.params.model.dt,
         )
 
-        return np.array([xfdot, yfdot, ufdot, vfdot, xsdot, ysdot, usdot, vsdot, dt, dk, 0])
+        return np.array(
+            [xfdot, yfdot, ufdot, vfdot, xsdot, ysdot, usdot, vsdot, dt, dk, 0]
+        )
 
     def noise(self, X_0, t) -> np.ndarray:
         """Return noise matrix.
 
         Returns:
-            numpy.ndarray: A diagonal matrix representing the noise matrix. The diagonal elements
-            correspond to the independent driving Wiener processes.
+            numpy.ndarray: A diagonal matrix representing the noise matrix.
+            The diagonal elements correspond to the independent driving Wiener
+            processes.
 
         """
         noise = self.params.model.sigma
-        return np.diag([0.0, 0.0, noise, noise, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+        return np.diag(
+            [0.0, 0.0, noise, noise, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        )
 
     def particle_outside_grid(self, xf: float, yf: float) -> bool:
         """Check if particle is outside the grid.

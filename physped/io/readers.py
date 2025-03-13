@@ -23,7 +23,9 @@ from physped.core.piecewise_potential import PiecewisePotential
 log = logging.getLogger(__name__)
 
 
-def read_preprocessed_trajectories_from_file(config: DictConfig, **kwargs) -> pd.DataFrame:
+def read_preprocessed_trajectories_from_file(
+    config: DictConfig, **kwargs
+) -> pd.DataFrame:
     """Read preprocessed trajectories from a csv file.
 
     Mainly used to read intermediate outputs.
@@ -36,7 +38,8 @@ def read_preprocessed_trajectories_from_file(config: DictConfig, **kwargs) -> pd
     """
     filepath = Path.cwd().parent / config.filename.preprocessed_trajectories
     # if config.read.preprocessed_trajectories:
-    #     log.debug("Configuration 'read.preprocessed_trajectories' is set to True.")
+    #     log.debug("Configuration 'read.preprocessed_trajectories'
+    # is set to True.")
     try:
         preprocessed_trajectories = pd.read_csv(filepath)
         log.warning("Preprocessed trajectories read from file.")
@@ -49,7 +52,9 @@ def read_preprocessed_trajectories_from_file(config: DictConfig, **kwargs) -> pd
 def read_piecewise_potential(config: DictConfig) -> PiecewisePotential:
     filepath = Path.cwd().parent / config.filename.piecewise_potential
     if config.read.piecewise_potential:
-        log.debug("Configuration 'read.simulated_trajectories' is set to True.")
+        log.debug(
+            "Configuration 'read.simulated_trajectories' is set to True."
+        )
         try:
             piecewise_potential = read_piecewise_potential_from_file(filepath)
             log.warning("Piecewise potential read from file")
@@ -73,7 +78,9 @@ def read_piecewise_potential_from_file(filepath: Path) -> PiecewisePotential:
     return piecewise_potential
 
 
-def read_narrow_corridor_paths_local(config: DictConfig) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def read_narrow_corridor_paths_local(
+    config: DictConfig,
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Read the narrow corridor paths archive from a local zip.
 
     The archive contains two files:
@@ -87,8 +94,10 @@ def read_narrow_corridor_paths_local(config: DictConfig) -> Tuple[pd.DataFrame, 
 
     Returns:
         A tuple containing two DataFrames:
-        - df_ltr: DataFrame for paths of pedestrians walking from left to right.
-        - df_rtl: DataFrame for paths of pedestrians walking from right to left.
+        - df_ltr: DataFrame for paths of pedestrians walking from
+        left to right.
+        - df_rtl: DataFrame for paths of pedestrians walking from
+        right to left.
     """
     trajectory_data_dir = Path(config.trajectory_data_dir)
     log.info("Start reading single paths data set.")
@@ -104,7 +113,9 @@ def read_narrow_corridor_paths_local(config: DictConfig) -> Tuple[pd.DataFrame, 
     return df_ltr, df_rtl
 
 
-def read_narrow_corridor_paths_4tu(config: DictConfig) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def read_narrow_corridor_paths_4tu(
+    config: DictConfig,
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Read the narrow corridor paths archive from 4TU remote repository.
 
     The archive contains two files:
@@ -117,10 +128,15 @@ def read_narrow_corridor_paths_4tu(config: DictConfig) -> Tuple[pd.DataFrame, pd
 
     Returns:
         A tuple containing two DataFrames:
-        - df_ltr: DataFrame for paths of pedestrians walking from left to right.
-        - df_rtl: DataFrame for paths of pedestrians walking from right to left.
+        - df_ltr: DataFrame for paths of pedestrians walking from
+        left to right.
+        - df_rtl: DataFrame for paths of pedestrians walking from
+        right to left.
     """
-    link = "https://data.4tu.nl/ndownloader/items/b8e30f8c-3931-4604-842a-77c7fb8ac3fc/versions/1"
+    link = (
+        "https://data.4tu.nl/ndownloader/items/"
+        "b8e30f8c-3931-4604-842a-77c7fb8ac3fc/versions/1"
+    )
     bytestring = requests.get(link, timeout=10)
     with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as outerzip:
         with zipfile.ZipFile(outerzip.open("data.zip")) as innerzip:
@@ -142,9 +158,10 @@ narrow_corridor_path_reader = {
 def read_intersecting_paths(config: DictConfig) -> pd.DataFrame:
     """Read the intersecting paths data set.
 
-    The intersecting paths dataset is created by combining the left-to-right and right-to-left
-    paths from the narrow corridor dataset. The paths from the right-to-left dataset are rotated
-    by 90 degrees to create intersecting paths.
+    The intersecting paths dataset is created by combining the left-to-right
+    and right-to-left paths from the narrow corridor dataset. The paths from
+    the right-to-left dataset are rotated by 90 degrees to create intersecting
+    paths.
 
     Args:
         config: The configuration parameters.
@@ -162,7 +179,17 @@ def read_intersecting_paths(config: DictConfig) -> pd.DataFrame:
     df_rtl["Y_SG"] = df_rtl["Y_SG"] - 0.05
 
     # swap x and y coordinates to rotate by 90 degrees
-    df_rtl.rename(columns={"X": "Y", "Y": "X", "X_SG": "Y_SG", "Y_SG": "X_SG", "U_SG": "V_SG", "V_SG": "U_SG"}, inplace=True)
+    df_rtl.rename(
+        columns={
+            "X": "Y",
+            "Y": "X",
+            "X_SG": "Y_SG",
+            "Y_SG": "X_SG",
+            "U_SG": "V_SG",
+            "V_SG": "U_SG",
+        },
+        inplace=True,
+    )
 
     df = pd.concat([df_ltr, df_rtl], ignore_index=True)
 
@@ -173,7 +200,8 @@ def read_intersecting_paths(config: DictConfig) -> pd.DataFrame:
 def read_narrow_corridor_paths(config: DictConfig) -> pd.DataFrame:
     """Read the narrow corridor data set.
 
-    The trajectories are read from local or remote sources based on the configuration.
+    The trajectories are read from local or remote sources based on the
+    configuration.
 
     Args:
         config: The configuration parameters.
@@ -207,7 +235,10 @@ def read_wide_corridor_paths(config: DictConfig) -> pd.DataFrame:
     trajectory_data_dir = Path(config.trajectory_data_dir)
     file_path = trajectory_data_dir / "df_single_pedestrians_small.h5"
     df = pd.read_hdf(file_path)
-    df.rename(columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"}, inplace=True)
+    df.rename(
+        columns={"X_SG": "xf", "Y_SG": "yf", "U_SG": "uf", "V_SG": "vf"},
+        inplace=True,
+    )
     df["xf"] = df["xf"] - 0.4
     df["yf"] = df["yf"] + 0.3
     df["Pid"] = df.groupby(["Pid", "day_id"]).ngroup()
@@ -228,7 +259,11 @@ def read_curved_paths_synthetic(config: DictConfig) -> pd.DataFrame:
     """
     root_dir = Path(config.root_dir).parent
     trajectory_data_dir = Path(config.trajectory_data_dir)
-    file_path = root_dir / trajectory_data_dir / "artificial_measurements_ellipse.parquet"
+    file_path = (
+        root_dir
+        / trajectory_data_dir
+        / "artificial_measurements_ellipse.parquet"
+    )
     df = pd.read_parquet(file_path)
     df = df.rename(columns={"x": "xf", "y": "yf", "xdot": "uf", "ydot": "vf"})
     return df
@@ -239,14 +274,18 @@ def read_curved_paths_synthetic(config: DictConfig) -> pd.DataFrame:
 #     df = df.sort_values(["particle", "time"])
 #     df = df.groupby("particle").filter(lambda x: len(x) > 52)
 
-#     f_df = df.groupby(df["particle"]).apply(lambda x: pd.DataFrame(signal.filtfilt(b, a, x[["x", "y"]].values, axis=0)))
+#     f_df = df.groupby(df["particle"]).apply(
+# lambda x: pd.DataFrame(
+# signal.filtfilt(b, a, x[["x", "y"]].values, axis=0)))
 #     df[["x", "y"]] = f_df.set_index(df.index)
 #     return df
 
 
-# def savgol_smoothing(df: pd.DataFrame, smooth_colname, groupby_colname="Pid"):
+# def savgol_smoothing(df: pd.DataFrame, smooth_colname,
+# groupby_colname="Pid"):
 #     slow = df.groupby(groupby_colname)[smooth_colname].transform(
-#         lambda x: signal.savgol_filter(x, window_length=9, polyorder=1, deriv=0, mode="interp")
+#         lambda x: signal.savgol_filter(x, window_length=9,
+# polyorder=1, deriv=0, mode="interp")
 #     )
 #     return slow
 
@@ -282,14 +321,18 @@ def read_curved_paths_synthetic(config: DictConfig) -> pd.DataFrame:
 #     # trajs["v_x_m"] = trajs["v_x_m"].replace(-99, np.nan).interpolate()
 #     # trajs["v_y_m"] = trajs["v_y_m"].replace(-99, np.nan).interpolate()
 
-#     trajs["traj_len"] = trajs.groupby([pid_column])[pid_column].transform("size")
+#     trajs["traj_len"] =
+# trajs.groupby([pid_column])[pid_column].transform("size")
 #     trajs = trajs[trajs.traj_len > 10].copy()
 #     trajs.sort_values(by=[pid_column, time_column], inplace=True)
-#     trajs["k"] = trajs.groupby(pid_column)[pid_column].transform(lambda x: np.arange(x.size))
+#     trajs["k"] = trajs.groupby(pid_column)[pid_column].transform(
+# lambda x: np.arange(x.size))
 #     # trajs["kp"] = trajs["k"] // 320
-#     # trajs["new_pid"] = trajs.apply(lambda x: int(f"{x[pid_column]:06}{x['kp']:04}"), axis=1)
+#     # trajs["new_pid"] = trajs.apply(lambda x:
+# int(f"{x[pid_column]:06}{x['kp']:04}"), axis=1)
 #     # trajs["new_pid"] = trajs[pid_column] * 100000 + trajs["kp"] + 100
-#     trajs["x"] = savgol_smoothing(trajs, "x", pid_column)  # Smooth the noisy trajectories to get reasonable velocities
+#     trajs["x"] = savgol_smoothing(trajs, "x", pid_column)
+# # Smooth the noisy trajectories to get reasonable velocities
 #     trajs["y"] = savgol_smoothing(trajs, "y", pid_column)
 #     return trajs
 
@@ -305,12 +348,18 @@ def read_ehv_pf34_paths_geert(config: DictConfig) -> pd.DataFrame:
     """
     root_dir = Path(config.root_dir).parent
     trajectory_data_dir = Path(config.trajectory_data_dir)
-    file_path = root_dir / trajectory_data_dir / "trajectories_EHV_platform_2_1_refined.parquet"
+    file_path = (
+        root_dir
+        / trajectory_data_dir
+        / "trajectories_EHV_platform_2_1_refined.parquet"
+    )
     df = pd.read_parquet(file_path)
     df = df[["date_time_utc", "Pid", "xf", "yf"]]
 
     # Rotate the domain
-    df.rename({"xf": "yf", "yf": "xf", "uf": "vf", "vf": "uf"}, axis=1, inplace=True)
+    df.rename(
+        {"xf": "yf", "yf": "xf", "uf": "vf", "vf": "uf"}, axis=1, inplace=True
+    )
     return df
 
 
@@ -392,7 +441,9 @@ def read_parquet_from_zenodo(config: DictConfig) -> pd.DataFrame:
     # Get file information
     files = list_zenodo_files(config, "*.parquet")
     if not files:
-        raise ValueError(f"No matching files found in record {config.params.record_id}")
+        raise ValueError(
+            f"No matching files found in record {config.params.record_id}"
+        )
 
     # Use first matching file if filename not specified
     file_info = files[0]  # TODO Reader for other files in the zenodo repo
@@ -415,7 +466,9 @@ def read_ehv_pf34_paths_zenodo(config: DictConfig) -> pd.DataFrame:
         The trajectory dataset with Eindhoven platform 3-4 paths
     """
     df = read_parquet_from_zenodo(config)
-    df = df.reset_index(drop=True).head(10000000)  # TODO: Fix memory issues in a better way
+    df = df.reset_index(drop=True).head(
+        10000000
+    )  # TODO: Fix memory issues in a better way
 
     # Convert spatial coordinates from milimeters to meters
     xcol = config.params.colnames.xf
@@ -450,17 +503,24 @@ def read_eindhoven_pf34_paths(config: DictConfig) -> pd.DataFrame:
 
 def read_asdz_pf34_paths_local(config: DictConfig) -> pd.DataFrame:
     trajectory_data_dir = Path(config.trajectory_data_dir)
-    file_path = trajectory_data_dir / "Amsterdam Zuid - platform 3-4 - set1.csv"
+    file_path = (
+        trajectory_data_dir / "Amsterdam Zuid - platform 3-4 - set1.csv"
+    )
     df = pd.read_csv(file_path)
     return df
 
 
 def read_asdz_pf34_paths_4tu(config: DictConfig) -> pd.DataFrame:
-    link = "https://data.4tu.nl/file/7d78a5e3-6142-49fe-be03-e4c707322863/40ea5cd9-95dc-4e3c-8760-7f4dd543eae7"
+    link = (
+        "https://data.4tu.nl/file/7d78a5e3-6142-49fe-be03-e4c707322863/"
+        "40ea5cd9-95dc-4e3c-8760-7f4dd543eae7"
+    )
     bytestring = requests.get(link, timeout=10)
 
     with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as zipped_file:
-        with zipped_file.open("Amsterdam Zuid - platform 3-4 - set1.csv") as paths:
+        with zipped_file.open(
+            "Amsterdam Zuid - platform 3-4 - set1.csv"
+        ) as paths:
             df = pd.read_csv(paths)
     return df
 
@@ -488,11 +548,16 @@ def read_utrecht_pf5_paths_4tu(config: DictConfig):
     Returns:
         The trajectory dataset with Utrecht Centraal platform 5 paths
     """
-    link = "https://data.4tu.nl/file/d4d548c6-d198-49b3-986c-e22319970a5e/a58041fb-0318-4bee-9b2c-934bd8e5df83"
+    link = (
+        "https://data.4tu.nl/file/d4d548c6-d198-49b3-986c-e22319970a5e/"
+        "a58041fb-0318-4bee-9b2c-934bd8e5df83"
+    )
     bytestring = requests.get(link, timeout=10)
 
     with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as zipped_file:
-        with zipped_file.open("Utrecht Centraal - platform 5 - set99.csv") as paths:
+        with zipped_file.open(
+            "Utrecht Centraal - platform 5 - set99.csv"
+        ) as paths:
             df = pd.read_csv(paths)
     return df
 
@@ -520,8 +585,9 @@ utrecht_pf5_path_reader = {
 def read_utrecht_pf5_paths(config: DictConfig) -> pd.DataFrame:
     """Read the Utrecht Centraal platform 5 paths data set.
 
-    The trajectories are read from local or remote sources based on the configuration.
-    The spatial coordinates of the trajectories are converted from milimeters to meters.
+    The trajectories are read from local or remote sources based on the
+    configuration. The spatial coordinates of the trajectories are converted
+    from milimeters to meters.
 
     Args:
         config: The configuration parameters.
@@ -550,11 +616,16 @@ def read_asdz_pf12_paths_4tu(config: DictConfig) -> pd.DataFrame:
     Returns:
         The trajectory dataset with Amsterdam Zuid platform 1-2 paths
     """
-    link = "https://data.4tu.nl/file/af4ef093-69ef-4e1c-8fbc-c40c447c618c/ca88bfc5-5a79-496a-8c90-433fa40929b9"
+    link = (
+        "https://data.4tu.nl/file/af4ef093-69ef-4e1c-8fbc-c40c447c618c/"
+        "ca88bfc5-5a79-496a-8c90-433fa40929b9"
+    )
     bytestring = requests.get(link, timeout=10)
 
     with zipfile.ZipFile(io.BytesIO(bytestring.content), "r") as zipped_file:
-        with zipped_file.open("Amsterdam Zuid - platform 1-2 - set10.csv") as paths:
+        with zipped_file.open(
+            "Amsterdam Zuid - platform 1-2 - set10.csv"
+        ) as paths:
             df = pd.read_csv(paths)
 
     return df
@@ -569,7 +640,9 @@ def read_asdz_pf12_paths_local(config: DictConfig) -> pd.DataFrame:
     Returns:
         The trajectory dataset with Amsterdam Zuid platform 1-2 paths
     """
-    file_list = glob.glob(config.trajectory_data_dir + "/Amsterdam*Zuid*1-2*.csv")
+    file_list = glob.glob(
+        config.trajectory_data_dir + "/Amsterdam*Zuid*1-2*.csv"
+    )
     file_path = file_list[0]
     return pd.read_csv(file_path)
 
@@ -583,8 +656,9 @@ asdz_pf12_path_reader = {
 def read_asdz_pf12_paths(config: DictConfig) -> pd.DataFrame:
     """Read the Amsterdam Zuid platform 1-2 paths data set.
 
-    The trajectories are read from local or remote sources based on the configuration.
-    The spatial coordinates of the trajectories are converted from milimeters to meters.
+    The trajectories are read from local or remote sources based on the
+    configuration. The spatial coordinates of the trajectories are converted
+    from milimeters to meters.
 
     Args:
         config: The configuration parameters.
@@ -621,7 +695,9 @@ def get_background_image_local(config: DictConfig) -> Image.Image:
     Returns:
         The background image as a PIL Image object.
     """
-    image = plt.imread(Path(config.root_dir).parent / config.params.background.imgpath)
+    image = plt.imread(
+        Path(config.root_dir).parent / config.params.background.imgpath
+    )
     return image
 
 
@@ -648,21 +724,29 @@ def get_background_image_from_remote_zip(config: DictConfig) -> Image.Image:
     return image
 
 
-def get_background_image_from_zenodo(config: DictConfig, filename: str = None) -> Image.Image:
+def get_background_image_from_zenodo(
+    config: DictConfig, filename: str = None
+) -> Image.Image:
     """Read image file from Zenodo using PIL
 
     Args:
         config: The configuration parameters.
-        filename: Name of file to read. If None, will read first image file found
+        filename: Name of file to read. If None, will read first image file
+        found
 
     Returns:
         PIL Image object
     """
     # Get file information
-    pattern = filename if filename else "*.png"  # Can be extended to support other formats
+    pattern = (
+        filename if filename else "*.png"
+    )  # Can be extended to support other formats
     files = list_zenodo_files(config, pattern)
     if not files:
-        raise ValueError(f"No matching image files found in record {config.params.data_record_id}")
+        raise ValueError(
+            "No matching image files found in record "
+            f"{config.params.data_record_id}"
+        )
 
     # Use first matching file if filename not specified
     file_info = files[0]

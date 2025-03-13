@@ -37,7 +37,8 @@ def apply_polar_plot_style(ax: plt.Axes, params: DictConfig) -> plt.Axes:
 
     Parameters:
     - ax: The axes object to apply the polar plot style to.
-    - params: A dictionary containing parameters for customizing the plot style.
+    - params: A dictionary containing parameters for customizing the
+    plot style.
 
     Returns:
     - The modified axes object.
@@ -53,7 +54,8 @@ def apply_polar_plot_style(ax: plt.Axes, params: DictConfig) -> plt.Axes:
     return ax
 
 
-# def plot_polar_grid(ax: plt.Axes, r_grid: np.ndarray, theta_grid: np.ndarray) -> plt.Axes:
+# def plot_polar_grid(ax: plt.Axes, r_grid: np.ndarray,
+# theta_grid: np.ndarray) -> plt.Axes:
 #     """
 #     Plot polar grid lines on a given axes object.
 
@@ -71,7 +73,8 @@ def apply_polar_plot_style(ax: plt.Axes, params: DictConfig) -> plt.Axes:
 #     for r in r_grid:
 #         if r == 0:
 #             continue
-#         ax.plot(theta_range, np.ones(100) * r, color="k", linestyle=linestyle, lw=0.6)
+#         ax.plot(theta_range, np.ones(100) * r, color="k",
+# linestyle=linestyle, lw=0.6)
 #         ax.text(
 #             np.pi / 2,
 #             r + 0.2,
@@ -84,32 +87,38 @@ def apply_polar_plot_style(ax: plt.Axes, params: DictConfig) -> plt.Axes:
 #         )
 
 #     for _, th in enumerate(theta_grid[:-1]):
-#         ax.plot(np.ones(100) * th, r_range, color="k", linestyle=linestyle, lw=0.6)
-#         ax.text(th, r_grid[-1] * 1.3, f"{th/np.pi:.1f}$\\pi$", ha="center", va="center")
+#         ax.plot(np.ones(100) * th, r_range, color="k",
+# linestyle=linestyle, lw=0.6)
+#         ax.text(th, r_grid[-1] * 1.3, f"{th/np.pi:.1f}$\\pi$",
+# ha="center", va="center")
 #     ax.set_ylim(0, r_grid[-1])
 #     return ax
 
 
 # def plot_polar_grid_on_cartesian_plot(ax, r_grid, theta_grid):
 #     for radius in r_grid:
-#         circle = plt.Circle((0, 0), radius, color="k", linestyle="dashed", fill=False, lw=0.5, alpha=0.8)
+#         circle = plt.Circle((0, 0), radius, color="k",
+# linestyle="dashed", fill=False, lw=0.5, alpha=0.8)
 #         ax.add_patch(circle)
 #     for angle in theta_grid:
 #         x1 = np.cos(angle) * 0.4
 #         x2 = np.cos(angle) * 10
 #         y1 = np.sin(angle) * 0.4
 #         y2 = np.sin(angle) * 10
-#         ax.plot([x1, x2], [y1, y2], color="k", linestyle="dashed", lw=0.5, alpha=0.8)
+#         ax.plot([x1, x2], [y1, y2], color="k", linestyle="dashed",
+# lw=0.5, alpha=0.8)
 #     return ax
 
 
-# def apply_cartesian_velocity_plot_style(ax: plt.Axes, params: dict) -> plt.Axes:
+# def apply_cartesian_velocity_plot_style(ax: plt.Axes,
+# params: dict) -> plt.Axes:
 #     """
 #     Applies a polar plot style to the given axes object.
 
 #     Parameters:
 #     - ax: The axes object to apply the polar plot style to.
-#     - params: A dictionary containing parameters for customizing the plot style.
+#     - params: A dictionary containing parameters for customizing
+# the plot style.
 
 #     Returns:
 #     - The modified axes object.
@@ -190,7 +199,9 @@ def plot_station_background(ax: plt.Axes, config: DictConfig) -> plt.Axes:
     return ax
 
 
-def plot_cartesian_spatial_grid(ax: plt.Axes, grid_params: DictConfig, alpha: float = 0.8) -> plt.Axes:
+def plot_cartesian_spatial_grid(
+    ax: plt.Axes, grid_params: DictConfig, alpha: float = 0.8
+) -> plt.Axes:
     xbins = grid_params.bins.x
     ybins = grid_params.bins.y
     linestyle = "dashed"
@@ -217,7 +228,9 @@ def plot_cartesian_spatial_grid(ax: plt.Axes, grid_params: DictConfig, alpha: fl
     return ax
 
 
-def plot_polar_velocity_grid(ax: plt.Axes, grid_params: DictConfig) -> plt.Axes:
+def plot_polar_velocity_grid(
+    ax: plt.Axes, grid_params: DictConfig
+) -> plt.Axes:
     rbins = grid_params.bins.r
     thetabins = grid_params.bins.theta
     linestyle = "dashed"
@@ -262,20 +275,45 @@ def plot_polar_labels(ax: plt.Axes, grid_params: DictConfig) -> plt.Axes:
             va="center",
             fontsize=5,
             rotation=convert_rad_to_deg(textangle - np.pi / 2),
-            bbox=dict(facecolor="white", alpha=1, edgecolor="none", boxstyle="round", pad=0.1),
+            bbox=dict(
+                facecolor="white",
+                alpha=1,
+                edgecolor="none",
+                boxstyle="round",
+                pad=0.1,
+            ),
         )
 
     winddirections = {
-        1: zip([np.pi / 2, 0, -np.pi / 2, np.pi], ["N", "E", "S", "W"], [5, 5, 5, 5]),
-        4: zip([np.pi / 2, 0, -np.pi / 2, np.pi], ["N", "E", "S", "W"], [5, 5, 5, 5]),
+        1: zip(
+            [np.pi / 2, 0, -np.pi / 2, np.pi],
+            ["N", "E", "S", "W"],
+            [5, 5, 5, 5],
+        ),
+        4: zip(
+            [np.pi / 2, 0, -np.pi / 2, np.pi],
+            ["N", "E", "S", "W"],
+            [5, 5, 5, 5],
+        ),
         8: zip(
-            [np.pi / 2, np.pi / 4, 0, -np.pi / 4, -np.pi / 2, -3 * np.pi / 4, np.pi, 3 * np.pi / 4],
+            [
+                np.pi / 2,
+                np.pi / 4,
+                0,
+                -np.pi / 4,
+                -np.pi / 2,
+                -3 * np.pi / 4,
+                np.pi,
+                3 * np.pi / 4,
+            ],
             ["N", "NE", "E", "SE", "S", "SW", "W", "NW"],
             [5, 3, 5, 3, 5, 3, 5, 3],
         ),
     }
     if grid_params.theta.segments in winddirections:
-        for theta, winddirection, fontsize in winddirections[grid_params.theta.segments]:
+        for theta, winddirection, fontsize in winddirections[
+            grid_params.theta.segments
+        ]:
             ax.text(
                 theta,
                 rbins[-1],
@@ -283,7 +321,13 @@ def plot_polar_labels(ax: plt.Axes, grid_params: DictConfig) -> plt.Axes:
                 ha="center",
                 va="center",
                 fontsize=fontsize,
-                bbox=dict(facecolor="white", alpha=1, edgecolor="k", boxstyle="circle,pad=0.4", lw=0.4),
+                bbox=dict(
+                    facecolor="white",
+                    alpha=1,
+                    edgecolor="k",
+                    boxstyle="circle,pad=0.4",
+                    lw=0.4,
+                ),
             )
 
     return ax

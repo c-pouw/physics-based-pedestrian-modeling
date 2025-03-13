@@ -4,7 +4,10 @@ import numpy as np
 import pandas as pd
 
 from physped.core.lattice import Lattice
-from physped.core.parametrize_potential import apply_periodic_angular_conditions, digitize_trajectories_to_grid
+from physped.core.parametrize_potential import (
+    apply_periodic_angular_conditions,
+    digitize_trajectories_to_grid,
+)
 from physped.core.slow_dynamics import compute_slow_dynamics
 from physped.preprocessing.trajectories import preprocess_trajectories
 from physped.utils.config_utils import initialize_hydra_config

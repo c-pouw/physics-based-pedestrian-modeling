@@ -17,12 +17,18 @@ from physped.core.lattice import Lattice
 from physped.core.piecewise_potential import PiecewisePotential
 
 # from physped.io.readers import read_piecewise_potential_from_file
-from physped.utils.functions import compose_functions, periodic_angular_conditions, weighted_mean_of_two_matrices
+from physped.utils.functions import (
+    compose_functions,
+    periodic_angular_conditions,
+    weighted_mean_of_two_matrices,
+)
 
 log = logging.getLogger(__name__)
 
 
-def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: DictConfig) -> PiecewisePotential:
+def learn_potential_from_trajectories(
+    trajectories: pd.DataFrame, config: DictConfig
+) -> PiecewisePotential:
     """
     Convert trajectories to a grid of histograms and parameters.
 
@@ -31,14 +37,17 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: DictCo
         grid_bins: A dictionary of grid values for each dimension.
 
     Returns:
-        A dictionary of DiscreteGrid objects for storing histograms and parameters.
+        A dictionary of DiscreteGrid objects for storing histograms and
+        parameters.
     """
     log.info("Start learning the piecewise potential")
     lattice = Lattice(config.params.grid.bins)
     dist_approximation = GaussianApproximation()
     piecewise_potential = PiecewisePotential(lattice, dist_approximation)
 
-    trajectories = prepare_trajectories_for_lattice_parametrization(trajectories, lattice=lattice)
+    trajectories = prepare_trajectories_for_lattice_parametrization(
+        trajectories, lattice=lattice
+    )
 
     piecewise_potential.histogram = add_trajectories_to_histogram(
         piecewise_potential.histogram, trajectories, "fast_grid_indices"
@@ -47,16 +56,21 @@ def learn_potential_from_trajectories(trajectories: pd.DataFrame, config: DictCo
         piecewise_potential.histogram_slow, trajectories, "slow_grid_indices"
     )
 
-    piecewise_potential.parametrization = parameterize_trajectories(piecewise_potential.parametrization, trajectories, config)
+    piecewise_potential.parametrization = parameterize_trajectories(
+        piecewise_potential.parametrization, trajectories, config
+    )
 
     piecewise_potential.reparametrize_to_curvature(config)
     return piecewise_potential
 
 
-def apply_periodic_angular_conditions(trajectories: pd.DataFrame, lattice: Lattice) -> pd.DataFrame:
+def apply_periodic_angular_conditions(
+    trajectories: pd.DataFrame, lattice: Lattice
+) -> pd.DataFrame:
     """Apply periodic angular conditions to the trajectories.
 
-    This function makes sure that the angles are within the range of the angular lattice bins.
+    This function makes sure that the angles are within the range of the
+    angular lattice bins.
 
     Args:
         trajectories: the trajectory data set.
@@ -67,15 +81,20 @@ def apply_periodic_angular_conditions(trajectories: pd.DataFrame, lattice: Latti
     """
     theta_cols = [col for col in trajectories.columns if "theta" in col]
     for col in theta_cols:
-        trajectories[col] = periodic_angular_conditions(trajectories[col], lattice.bins["theta"])
+        trajectories[col] = periodic_angular_conditions(
+            trajectories[col], lattice.bins["theta"]
+        )
     log.info("Periodic angular conditions applied to columns %s", theta_cols)
     return trajectories
 
 
-def digitize_trajectories_to_grid(trajectories: pd.DataFrame, lattice: Lattice) -> pd.DataFrame:
+def digitize_trajectories_to_grid(
+    trajectories: pd.DataFrame, lattice: Lattice
+) -> pd.DataFrame:
     """Digitize trajectories to a lattice.
 
-    Adds a column to the dataframe with the trajectories that contains the slow indices
+    Adds a column to the dataframe with the trajectories that contains
+    the slow indices
 
     Args:
         grid_bins: The bins which define the lattice.
@@ -85,19 +104,41 @@ def digitize_trajectories_to_grid(trajectories: pd.DataFrame, lattice: Lattice) 
         The trajectories with an extra column for the slow indices.
     """
     indices = {}
-    for obs, dynamics in [(obs, dynamics) for obs in lattice.bins.keys() for dynamics in ["f", "s"]]:
+    for obs, dynamics in [
+        (obs, dynamics)
+        for obs in lattice.bins.keys()
+        for dynamics in ["f", "s"]
+    ]:
         if obs == "k":
             dobs = obs
         else:
             dobs = obs + dynamics
-        inds = digitize_coordinates_to_lattice(trajectories[dobs], lattice.bins[obs])
+        inds = digitize_coordinates_to_lattice(
+            trajectories[dobs], lattice.bins[obs]
+        )
         indices[dobs] = inds
 
     indices["thetaf"] = np.where(indices["rf"] == 0, 0, indices["thetaf"])
     indices["thetas"] = np.where(indices["rs"] == 0, 0, indices["thetas"])
 
-    trajectories["fast_grid_indices"] = list(zip(indices["xf"], indices["yf"], indices["rf"], indices["thetaf"], indices["k"]))
-    trajectories["slow_grid_indices"] = list(zip(indices["xs"], indices["ys"], indices["rs"], indices["thetas"], indices["k"]))
+    trajectories["fast_grid_indices"] = list(
+        zip(
+            indices["xf"],
+            indices["yf"],
+            indices["rf"],
+            indices["thetaf"],
+            indices["k"],
+        )
+    )
+    trajectories["slow_grid_indices"] = list(
+        zip(
+            indices["xs"],
+            indices["ys"],
+            indices["rs"],
+            indices["thetas"],
+            indices["k"],
+        )
+    )
     return trajectories
 
 
@@ -106,7 +147,9 @@ prepare_trajectories_for_lattice_parametrization = compose_functions(
 )
 
 
-def add_trajectories_to_histogram(histogram: np.ndarray, trajectories: pd.DataFrame, groupbyindex: str) -> np.ndarray:
+def add_trajectories_to_histogram(
+    histogram: np.ndarray, trajectories: pd.DataFrame, groupbyindex: str
+) -> np.ndarray:
     """Add trajectories to a histogram.
 
     Args:
@@ -121,7 +164,9 @@ def add_trajectories_to_histogram(histogram: np.ndarray, trajectories: pd.DataFr
     return histogram
 
 
-def parameterize_trajectories(parametrization: np.ndarray, trajectories: pd.DataFrame, config: DictConfig):
+def parameterize_trajectories(
+    parametrization: np.ndarray, trajectories: pd.DataFrame, config: DictConfig
+):
     """Fit trajectories to the lattice.
 
     Fit the fast dynamics conditioned to the slow dynamics.
@@ -134,22 +179,37 @@ def parameterize_trajectories(parametrization: np.ndarray, trajectories: pd.Data
     Returns:
         The updated parametrization matrix.
     """
-    fit_output = trajectories.groupby("slow_grid_indices").apply(fit_probability_distributions, config=config).dropna().to_dict()
+    fit_output = (
+        trajectories.groupby("slow_grid_indices")
+        .apply(fit_probability_distributions, config=config)
+        .dropna()
+        .to_dict()
+    )
     for key, value in fit_output.items():
         parametrization[key[0], key[1], key[2], key[3], key[4], :, :] = value
     log.info("Finished learning piecewise potential from trajectories.")
     return parametrization
 
 
-def calculate_position_based_emperic_potential(histogram_slow, config: DictConfig):
+def calculate_position_based_emperic_potential(
+    histogram_slow, config: DictConfig
+):
     position_counts = np.nansum(histogram_slow, axis=(2, 3, 4))
-    position_counts = np.where(position_counts < config.params.model.minimum_fitting_threshold, np.nan, position_counts)
+    position_counts = np.where(
+        position_counts < config.params.model.minimum_fitting_threshold,
+        np.nan,
+        position_counts,
+    )
     A = 0.02  # TODO: Move to config
-    position_based_emperic_potential = A * (-np.log(position_counts) + np.log(np.nansum(histogram_slow)))
+    position_based_emperic_potential = A * (
+        -np.log(position_counts) + np.log(np.nansum(histogram_slow))
+    )
     return position_based_emperic_potential
 
 
-def accumulate_grids(cummulative_grids: PiecewisePotential, grids_to_add: PiecewisePotential) -> PiecewisePotential:
+def accumulate_grids(
+    cummulative_grids: PiecewisePotential, grids_to_add: PiecewisePotential
+) -> PiecewisePotential:
     """Accumulate grids by taking a weighted mean of the fit parameters.
 
     The goal of this function is to sum PiecewisePotential objects.
@@ -163,13 +223,21 @@ def accumulate_grids(cummulative_grids: PiecewisePotential, grids_to_add: Piecew
     """
     # ! WARNING: This function needs to be tested. Seems to have a bug.
     # ! Perhaps this needs to be a dunder class method i.e. __add__
-    for p, _ in enumerate(cummulative_grids.fit_param_names):  # Loop over all fit parameters
+    for p, _ in enumerate(
+        cummulative_grids.fit_param_names
+    ):  # Loop over all fit parameters
         # accumulate fit parameters
-        cummulative_grids.fit_params[:, :, :, :, :, p] = weighted_mean_of_two_matrices(
-            first_matrix=copy.deepcopy(cummulative_grids.fit_params[:, :, :, :, :, p]),
-            counts_first_matrix=copy.deepcopy(cummulative_grids.histogram),
-            second_matrix=copy.deepcopy(grids_to_add.fit_params[:, :, :, :, :, p]),
-            counts_second_matrix=copy.deepcopy(grids_to_add.histogram),
+        cummulative_grids.fit_params[:, :, :, :, :, p] = (
+            weighted_mean_of_two_matrices(
+                first_matrix=copy.deepcopy(
+                    cummulative_grids.fit_params[:, :, :, :, :, p]
+                ),
+                counts_first_matrix=copy.deepcopy(cummulative_grids.histogram),
+                second_matrix=copy.deepcopy(
+                    grids_to_add.fit_params[:, :, :, :, :, p]
+                ),
+                counts_second_matrix=copy.deepcopy(grids_to_add.histogram),
+            )
         )
     # accumlate histogram
     cummulative_grids.histogram += grids_to_add.histogram
@@ -177,14 +245,17 @@ def accumulate_grids(cummulative_grids: PiecewisePotential, grids_to_add: Piecew
     return cummulative_grids
 
 
-def extract_submatrix(matrix: np.ndarray, slicing_indices: List[tuple]) -> np.ndarray:
+def extract_submatrix(
+    matrix: np.ndarray, slicing_indices: List[tuple]
+) -> np.ndarray:
     """Extract a submatrix from a nd-matrix using periodic boundary conditions.
 
     Periodicity is needed for the angular dimension.
 
     Args:
         matrix: The input nd-matrix to slice.
-        slicing_indices: A list of slice tuples for each dimension of the nd-matrix.
+        slicing_indices: A list of slice tuples for each dimension of the
+        nd-matrix.
 
     Returns:
         The submatrix.
@@ -194,12 +265,16 @@ def extract_submatrix(matrix: np.ndarray, slicing_indices: List[tuple]) -> np.nd
 
     reshape_dimension = (-1,) + (1,) * (len(slicing_indices) - 1)
     slicing_indices = [
-        np.arange(*slice).reshape(np.roll(reshape_dimension, i)) % matrix.shape[i] for i, slice in enumerate(slicing_indices)
+        np.arange(*slice).reshape(np.roll(reshape_dimension, i))
+        % matrix.shape[i]
+        for i, slice in enumerate(slicing_indices)
     ]
     return matrix[tuple(slicing_indices)]
 
 
-def fit_probability_distributions(group: pd.DataFrame, config: DictConfig) -> np.ndarray:
+def fit_probability_distributions(
+    group: pd.DataFrame, config: DictConfig
+) -> np.ndarray:
     """Fits a group of data points and returns the fit parameters.
 
     Args:
@@ -214,19 +289,27 @@ def fit_probability_distributions(group: pd.DataFrame, config: DictConfig) -> np
     fit_func = norm.fit  # * Other functions can be implemented here
     fit_parameters = np.zeros((4, 2)) * np.nan
     for i, variable in enumerate(["xf", "yf", "uf", "vf"]):
-        mu, std = fit_func(group[variable])  # fit normal distribution to fast modes
-        fit_parameters[i, :] = [mu, std**2]  # store mean and variance of normal distribution
+        mu, std = fit_func(
+            group[variable]
+        )  # fit normal distribution to fast modes
+        fit_parameters[i, :] = [
+            mu,
+            std**2,
+        ]  # store mean and variance of normal distribution
     return fit_parameters
 
 
-def get_grid_indices(piecewise_potential: PiecewisePotential, point: List[float]) -> np.ndarray:
-    """Given a point (xs, ys, thetas, rs), return the associated lattice indices.
+def get_grid_indices(
+    piecewise_potential: PiecewisePotential, point: List[float]
+) -> np.ndarray:
+    """Given a point (xs, ys, thetas, rs), return the associated lattice
+    indices.
 
     This function is 4-dimensional.
 
-    If the radial velocity is in the lowest bin, the angular velocity is automatically
-    also added to the lowest bin. In other words, the angular velocities are not
-    discretized for low radial velocity.
+    If the radial velocity is in the lowest bin, the angular velocity is
+    automatically also added to the lowest bin. In other words, the angular
+    velocities are not discretized for low radial velocity.
 
     Args:
         potential: The piecewise potential.
@@ -239,7 +322,9 @@ def get_grid_indices(piecewise_potential: PiecewisePotential, point: List[float]
     indices = np.array([], dtype=int)
     for val, obs in zip(point, piecewise_potential.lattice.bins.keys()):
         grid = piecewise_potential.lattice.bins[obs]
-        indices = np.append(indices, digitize_coordinates_to_lattice(val, grid))
+        indices = np.append(
+            indices, digitize_coordinates_to_lattice(val, grid)
+        )
 
     # For r = 0 all theta are 0
     if indices[2] == 0:
@@ -261,8 +346,12 @@ def get_boundary_coordinates_of_selection(bins, observable, values):
 
 
 def selection_to_bounds(bins, selection_coordinates, dimension):
-    selection_grid_indices = digitize_coordinates_to_lattice(selection_coordinates, bins)
-    selection_boundary_coordinates = get_boundary_coordinates_of_selection(bins, dimension, selection_grid_indices)
+    selection_grid_indices = digitize_coordinates_to_lattice(
+        selection_coordinates, bins
+    )
+    selection_boundary_coordinates = get_boundary_coordinates_of_selection(
+        bins, dimension, selection_grid_indices
+    )
     return selection_boundary_coordinates
 
 
@@ -272,7 +361,8 @@ def make_grid_selection(piecewise_potential, selection):
     grid_selection = {}
     for observable, value in selection.items():
         print(observable, value)
-        # for observable, value in zip(["x", "y", "r", "theta"], [x, y, r, theta, k]):
+        # for observable, value in zip(["x", "y", "r", "theta"],
+        # [x, y, r, theta, k]):
         grid_selection[observable] = {}
         # grid = grid.grid_observable[observable]
         grid_bins = piecewise_potential.lattice.bins.get(observable)
@@ -288,7 +378,9 @@ def make_grid_selection(piecewise_potential, selection):
         grid_selection[observable]["selection"] = value
         grid_ids = digitize_coordinates_to_lattice(value, grid_bins)
         grid_selection[observable]["grid_ids"] = grid_ids
-        grid_boundaries = get_boundary_coordinates_of_selection(grid_bins, observable, grid_ids)
+        grid_boundaries = get_boundary_coordinates_of_selection(
+            grid_bins, observable, grid_ids
+        )
         grid_selection[observable]["bounds"] = grid_boundaries
 
         if observable == "theta":
