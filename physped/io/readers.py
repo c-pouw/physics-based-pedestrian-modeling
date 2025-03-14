@@ -110,18 +110,13 @@ def read_narrow_corridor_paths_4tu(
 
     The archive contains two files:
 
-    - left-to-right.ssv: paths of pedestrians walking from left to right.
-    - right-to-left.ssv: paths of pedestrians walking from right to left.
-
     Args:
         config: The configuration parameters.
 
     Returns:
         A tuple containing two DataFrames:
-        - df_ltr: DataFrame for paths of pedestrians walking from
-        left to right.
-        - df_rtl: DataFrame for paths of pedestrians walking from
-        right to left.
+        - df_ltr: Paths of pedestrians walking from left to right.
+        - df_rtl: Paths of pedestrians walking from right to left.
     """
     link = (
         "https://data.4tu.nl/ndownloader/items/"
