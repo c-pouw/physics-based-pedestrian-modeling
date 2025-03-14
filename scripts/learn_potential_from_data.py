@@ -25,22 +25,23 @@ def learn_potential_from_data(config):
     preprocessed_trajectories = read_preprocessed_trajectories_from_file(
         config
     )
-
     preprocessed_trajectories = compute_slow_dynamics(
         preprocessed_trajectories, config=config
     )
-
-    log.info("LEARNING POTENTIAL")
     piecewise_potential = learn_potential_from_trajectories(
         preprocessed_trajectories, config
     )
     save_piecewise_potential(
         piecewise_potential,
-        Path.cwd().parent,
+        Path.cwd() / "potentials",
         config.filename.piecewise_potential,
     )
 
 
-if __name__ == "__main__":
+def main():
     register_new_resolvers()
     learn_potential_from_data()
+
+
+if __name__ == "__main__":
+    main()
