@@ -25,11 +25,15 @@ def read_and_preprocess_data(config):
     )
     save_trajectories(
         preprocessed_trajectories,
-        folderpath=Path.cwd().parent,
+        folderpath=Path.cwd(),
         filename=config.filename.preprocessed_trajectories,
     )
 
 
-if __name__ == "__main__":
+def main():
     register_new_resolvers()
     read_and_preprocess_data()
+
+
+if __name__ == "__main__":
+    main()
