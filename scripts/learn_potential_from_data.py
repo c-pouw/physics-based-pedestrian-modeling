@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 @hydra.main(
     version_base=None, config_path="../physped/conf", config_name="config"
 )
-def read_and_preprocess_data(config):
+def learn_potential_from_data(config):
     log_configuration(config)
     preprocessed_trajectories = read_preprocessed_trajectories_from_file(
         config
@@ -43,4 +43,4 @@ def read_and_preprocess_data(config):
 
 if __name__ == "__main__":
     register_new_resolvers()
-    read_and_preprocess_data()
+    learn_potential_from_data()
