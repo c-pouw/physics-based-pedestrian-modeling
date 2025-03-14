@@ -73,21 +73,15 @@ def read_narrow_corridor_paths_local(
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Read the narrow corridor paths archive from a local zip.
 
-    The archive contains two files:
-
-    - left-to-right.ssv: paths of pedestrians walking from left to right.
-    - right-to-left.ssv: paths of pedestrians walking from right to left.
-
-
     Args:
         config: The configuration parameters.
 
     Returns:
         A tuple containing two DataFrames:
-        - df_ltr: DataFrame for paths of pedestrians walking from
-        left to right.
-        - df_rtl: DataFrame for paths of pedestrians walking from
-        right to left.
+
+        - df_ltr: Paths of pedestrians walking from left to right.
+        - df_rtl: Paths of pedestrians walking from right to left.
+
     """
     trajectory_data_dir = Path(config.trajectory_data_dir)
     log.info("Start reading narrow corridor data set.")
@@ -108,13 +102,12 @@ def read_narrow_corridor_paths_4tu(
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Read the narrow corridor paths archive from 4TU remote repository.
 
-    The archive contains two files:
-
     Args:
         config: The configuration parameters.
 
     Returns:
         A tuple containing two DataFrames:
+
         - df_ltr: Paths of pedestrians walking from left to right.
         - df_rtl: Paths of pedestrians walking from right to left.
     """
