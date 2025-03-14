@@ -20,8 +20,8 @@ from physped.core.parametrize_potential import (
     get_grid_indices,
     learn_potential_from_trajectories,
 )
+from physped.core.pedestrian_simulator import simulate_pedestrians
 from physped.core.slow_dynamics import compute_slow_dynamics
-from physped.core.trajectory_simulator import simulate_trajectories
 from physped.io.readers import trajectory_reader
 from physped.preprocessing.trajectories import preprocess_trajectories
 from physped.utils.config_utils import register_new_resolvers
@@ -112,7 +112,7 @@ piecewise_potential = learn_potential_from_trajectories(
 # config.params.simulation.sample_state = 0
 config.params.simulation.ntrajs = 1
 config.params.input_ntrajs = len(preprocessed_trajectories.Pid.unique())
-simulated_trajectories = simulate_trajectories(
+simulated_trajectories = simulate_pedestrians(
     piecewise_potential, config, preprocessed_trajectories
 )
 

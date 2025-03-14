@@ -12,8 +12,8 @@ from physped.core.lattice_selection import evaluate_selection_range
 from physped.core.parametrize_potential import (
     learn_potential_from_trajectories,
 )
+from physped.core.pedestrian_simulator import simulate_pedestrians
 from physped.core.slow_dynamics import compute_slow_dynamics
-from physped.core.trajectory_simulator import simulate_trajectories
 from physped.io.readers import trajectory_reader
 from physped.io.writers import save_piecewise_potential
 from physped.preprocessing.trajectories import preprocess_trajectories
@@ -52,7 +52,7 @@ def model(config):
     )
 
     # TODO Check if input_ntrajs is still needed
-    config.params.input_ntrajs = len(preprocessed_trajectories.Pid.unique())
+    # config.params.input_ntrajs = len(preprocessed_trajectories.Pid.unique())
 
     logging.info(
         "MODELING PARAMETERS: \n%s",
@@ -78,7 +78,7 @@ def model(config):
         )
 
     log.info("SIMULATING TRAJECTORIES")
-    simulated_trajectories = simulate_trajectories(
+    simulated_trajectories = simulate_pedestrians(
         piecewise_potential, config, preprocessed_trajectories
     )
 
