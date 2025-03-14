@@ -36,7 +36,7 @@ def read_preprocessed_trajectories_from_file(
     Returns:
         The preprocessed trajectory dataset.
     """
-    filepath = Path.cwd().parent / config.filename.preprocessed_trajectories
+    filepath = Path.cwd() / config.filename.preprocessed_trajectories
     # if config.read.preprocessed_trajectories:
     #     log.debug("Configuration 'read.preprocessed_trajectories'
     # is set to True.")
@@ -46,7 +46,8 @@ def read_preprocessed_trajectories_from_file(
         # log.debug("Filepath %s", filepath.relative_to(config.root_dir))
         return preprocessed_trajectories
     except FileNotFoundError as e:
-        log.error("Preprocessed trajectories not found: %s", e)
+        raise e
+        # log.error("Preprocessed trajectories not found: %s", e)
 
 
 def read_piecewise_potential(config: DictConfig) -> PiecewisePotential:
@@ -100,7 +101,7 @@ def read_narrow_corridor_paths_local(
         right to left.
     """
     trajectory_data_dir = Path(config.trajectory_data_dir)
-    log.info("Start reading single paths data set.")
+    log.info("Start reading narrow corridor data set.")
     archive = zipfile.ZipFile(trajectory_data_dir / "data.zip")
 
     with archive.open("left-to-right.ssv") as paths_ltr:
@@ -684,6 +685,13 @@ trajectory_reader = {
     "utrecht_pf5": read_utrecht_pf5_paths,
     "asdz_pf12": read_asdz_pf12_paths,
 }
+
+
+def read_trajectories(config) -> pd.DataFrame:
+    log.info("Reading trajectories")
+    env_name = config.params.env_name
+    trajectories = trajectory_reader[env_name](config)
+    return trajectories
 
 
 def get_background_image_local(config: DictConfig) -> Image.Image:

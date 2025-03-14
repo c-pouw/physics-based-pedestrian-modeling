@@ -2,11 +2,9 @@ import glob
 import logging
 import shutil
 from pathlib import Path
-from pprint import pformat
 
 import hydra
 import matplotlib.pyplot as plt
-from omegaconf import OmegaConf
 
 from physped.core.lattice_selection import evaluate_selection_range
 from physped.core.parametrize_potential import (
@@ -17,7 +15,10 @@ from physped.core.slow_dynamics import compute_slow_dynamics
 from physped.io.readers import trajectory_reader
 from physped.io.writers import save_piecewise_potential
 from physped.preprocessing.trajectories import preprocess_trajectories
-from physped.utils.config_utils import register_new_resolvers
+from physped.utils.config_utils import (
+    log_configuration,
+    register_new_resolvers,
+)
 from physped.visualization.plot_discrete_grid import plot_discrete_grid
 from physped.visualization.plot_histograms import (
     compute_joint_kl_divergence,
@@ -33,16 +34,11 @@ from physped.visualization.plot_trajectories import plot_trajectories
 log = logging.getLogger(__name__)
 
 
-# TODO: Convert main loop to a pipeline
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def model(config):
     env_name = config.params.env_name
-    log.debug("Configuration: \n%s", pformat(dict(config)))
-    log.critical("Environment name: %s", env_name)
-    log.info("Working directory %s", Path.cwd())
-    log.info("Project root %s", config.root_dir)
-
     plt.style.use(Path(config.root_dir) / config.plot_style)
+    log_configuration(config)
 
     log.info("READING TRAJECTORIES")
     trajectories = trajectory_reader[env_name](config)
@@ -53,13 +49,6 @@ def model(config):
 
     # TODO Check if input_ntrajs is still needed
     # config.params.input_ntrajs = len(preprocessed_trajectories.Pid.unique())
-
-    logging.info(
-        "MODELING PARAMETERS: \n%s",
-        pformat(
-            OmegaConf.to_container(config.params.model, resolve=True), depth=1
-        ),
-    )
 
     log.info("PROCESSING SLOW MODES")
     preprocessed_trajectories = compute_slow_dynamics(

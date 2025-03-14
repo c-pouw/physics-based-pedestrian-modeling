@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -10,9 +11,11 @@ def get_initial_dynamics(config: dict) -> np.ndarray:
     ntrajs = config.params.simulation.ntrajs
     match config.params.simulation.initial_dynamics.get_from:
         case "file":
-            initial_dynamics = np.load(
-                config.params.simulation.initial_dynamics.filename
+            folderpath = Path.cwd()  # / "initial_dynamics"
+            filename = (
+                folderpath / config.params.simulation.initial_dynamics.filename
             )
+            initial_dynamics = np.load(filename)
             if initial_dynamics.shape[0] < ntrajs:
                 raise ValueError(
                     f"Number of trajectories in "

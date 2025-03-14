@@ -1,7 +1,9 @@
 """Module to define utility functions for the configuration."""
 
+import logging
 import os
 from pathlib import Path
+from pprint import pformat
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,6 +11,25 @@ from hydra import compose, initialize
 from omegaconf import DictConfig, OmegaConf
 
 ROOT_DIR = Path(os.path.dirname(os.path.abspath(__file__))).parent
+
+log = logging.getLogger(__name__)
+
+
+def log_configuration(config: dict) -> None:
+    log.info(
+        (
+            "\n* Environment name: %s\n\n"
+            "* Working directory \n%s\n\n"
+            "* Project root \n%s\n\n"
+            "* Modeling parameters: \n%s"
+        ),
+        config.params.env_name,
+        Path.cwd(),
+        config.root_dir,
+        pformat(
+            OmegaConf.to_container(config.params.model, resolve=True), depth=1
+        ),
+    )
 
 
 def apply_periodic_conditions_to_the_angle_theta(theta: float):

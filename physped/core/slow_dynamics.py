@@ -152,14 +152,17 @@ def compute_slow_position(
     return df
 
 
-functions_to_compute_slow_dynamics = [
-    compute_slow_velocity,
-    transform_slow_velocity_to_polar_coordinates,
-    # apply_periodic_angular_conditions,
-    compute_slow_position,
-]
-
-compute_slow_dynamics = compose_functions(*functions_to_compute_slow_dynamics)
+def compute_slow_dynamics(preprocessed_trajectories, config):
+    log.info("Compute slow dynamics")
+    compute_slow_dynamics_pipeline = compose_functions(
+        compute_slow_velocity,
+        transform_slow_velocity_to_polar_coordinates,
+        # apply_periodic_angular_conditions,
+        compute_slow_position,
+    )
+    return compute_slow_dynamics_pipeline(
+        preprocessed_trajectories, config=config
+    )
 
 
 # def compute_slow_dynamics(df: pd.DataFrame, config: dict) -> pd.DataFrame:

@@ -227,13 +227,14 @@ def preprocess_trajectories(
     Returns:
         The preprocessed DataFrame with the trajectories.
     """
+    log.info("Preprocess trajectories")
     preprocessing_pipeline = compose_functions(
         rename_columns,
         prune_short_trajectories,
         add_trajectory_index,
         compute_velocity_from_positions,
         transform_fast_velocity_to_polar_coordinates,
-        save_preprocessed_trajectories,
+        # save_preprocessed_trajectories,
     )
     return preprocessing_pipeline(trajectories, config=config)
 

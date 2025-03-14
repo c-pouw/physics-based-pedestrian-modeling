@@ -22,8 +22,8 @@ def save_piecewise_potential(
         filename: The filenam to save the piecewise potential in.
         Defaults to "piecewise_potential.pickle".
     """
-    filepath = folderpath / filename
-    with open(filepath, "wb") as f:
+    folderpath.mkdir(parents=True, exist_ok=True)
+    with open(folderpath / filename, "wb") as f:
         pickle.dump(grid, f)
     log.info("Piecewise potential saved as %s.", filename)
 
@@ -38,6 +38,7 @@ def save_trajectories(
         folderpath: The folder to save the trajectories in.
         filename: The name of the file to save the trajectories in.
     """
+    folderpath.mkdir(parents=True, exist_ok=True)
     filepath = folderpath / filename
     trajectories.to_csv(filepath)
     log.info("Trajectories saved as %s.", filename)

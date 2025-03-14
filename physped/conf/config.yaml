@@ -3,24 +3,24 @@ defaults:
   - override hydra/job_logging: colorlog
   - override hydra/hydra_logging: colorlog
   - _self_
-read:
-  preprocessed_trajectories: False
-  piecewise_potential: False
-  simulated_trajectories: False
-save:
-  preprocessed_trajectories: True
-  piecewise_potential: True
-  simulated_trajectories: True
+# read:
+#   preprocessed_trajectories: False
+#   piecewise_potential: False
+#   simulated_trajectories: False
+# save:
+#   preprocessed_trajectories: True
+#   piecewise_potential: True
+#   simulated_trajectories: True
 filename:
-  preprocessed_trajectories: preprocessed_trajectories_with_tau${params.model.taux}.csv
-  piecewise_potential: piecewise_potential_with_${params.grid.name}.pickle
-  simulated_trajectories: simulated_trajectories_with_sigma${params.model.sigma}.csv
-plot:
-  preprocessed_trajectories: True
-  simulated_trajectories: True
-  histograms: True
-  grid: True
-  potential_at_selection: True
+  preprocessed_trajectories: preprocessed_trajectories.csv
+  piecewise_potential: piecewise_potential_${params.grid.name}.pickle
+  simulated_trajectories: simulated_trajectories_sigma${params.model.sigma}.csv
+# plot:
+#   preprocessed_trajectories: True
+#   simulated_trajectories: True
+#   histograms: True
+#   grid: True
+#   potential_at_selection: True
 plot_style: conf/science.mplstyle
 root_dir: ${get_root_dir:}
 trajectory_data_dir: data/trajectories
@@ -31,7 +31,7 @@ hydra:
     name: ${params.env_name}_${parameter_combinations}
     chdir: True
   run:
-    dir: outputs/${params.env_name}_tauu${params.model.tauu}/${params.grid.name}/${now:%Y-%m-%d_%H-%M-%S}
+    dir: outputs/${params.env_name}
   sweep:
     dir: multirun/${params.env_name}/${params.grid.name}
     subdir: job${hydra.job.num}-sigma${params.model.sigma}-tauu${params.model.tauu}-${params.grid.name}-${now:%Y-%m-%d_%H-%M-%S}
