@@ -8,7 +8,7 @@ from physped.core.pedestrian_initializer import (
     sample_dynamics_from_trajectories,
 )
 from physped.core.slow_dynamics import compute_slow_dynamics
-from physped.io.readers import read_preprocessed_trajectories_from_file
+from physped.io.readers import read_trajectories_from_file
 from physped.utils.config_utils import (
     log_configuration,
     register_new_resolvers,
@@ -25,8 +25,8 @@ def sample_and_save_dynamics_from_trajectories(config: dict):
     env_name = config.params.env_name
     n_trajs = config.params.simulation.ntrajs
     state = config.params.simulation.sample_state
-    preprocessed_trajectories = read_preprocessed_trajectories_from_file(
-        config
+    preprocessed_trajectories = read_trajectories_from_file(
+        filepath=Path.cwd() / config.filename.preprocessed_trajectories
     )
     preprocessed_trajectories = compute_slow_dynamics(
         preprocessed_trajectories, config=config

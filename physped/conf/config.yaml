@@ -15,12 +15,12 @@ filename:
   preprocessed_trajectories: preprocessed_trajectories.csv
   piecewise_potential: piecewise_potential_${params.grid.name}.pickle
   simulated_trajectories: simulated_trajectories_sigma${params.model.sigma}.csv
-# plot:
-#   preprocessed_trajectories: True
-#   simulated_trajectories: True
-#   histograms: True
-#   grid: True
-#   potential_at_selection: True
+plot:
+  preprocessed_trajectories: True
+  simulated_trajectories: True
+  histograms: True
+  grid: True
+  potential_at_selection: True
 plot_style: conf/science.mplstyle
 root_dir: ${get_root_dir:}
 trajectory_data_dir: data/trajectories

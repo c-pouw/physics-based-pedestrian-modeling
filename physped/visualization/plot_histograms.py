@@ -188,7 +188,7 @@ def save_joint_kl_divergence_to_file(
     kl_divergence["noise"] = params.model.sigma
     kl_divergence["joint_kl_divergence"] = joint_kl_divergence
 
-    with open(Path.cwd() / "kl_divergence.pkl", "wb") as f:
+    with open(Path.cwd() / "figures" / "kl_divergence.pkl", "wb") as f:
         pickle.dump(kl_divergence, f)
 
 
@@ -258,7 +258,7 @@ def plot_multiple_histograms(
         fontsize=7,
         loc="center",
     )
-    filepath = Path.cwd() / f"histograms_{params.env_name}.pdf"
-    # log.info("Saving histograms figure to %s.",
-    # filepath.relative_to(config.root_dir))
+    folderpath = Path.cwd() / "figures"
+    folderpath.mkdir(parents=True, exist_ok=True)
+    filepath = folderpath / f"histograms_{params.env_name}.pdf"
     plt.savefig(filepath)

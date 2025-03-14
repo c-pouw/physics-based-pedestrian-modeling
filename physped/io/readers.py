@@ -23,9 +23,7 @@ from physped.core.piecewise_potential import PiecewisePotential
 log = logging.getLogger(__name__)
 
 
-def read_preprocessed_trajectories_from_file(
-    config: DictConfig, **kwargs
-) -> pd.DataFrame:
+def read_trajectories_from_file(filepath: Path) -> pd.DataFrame:
     """Read preprocessed trajectories from a csv file.
 
     Mainly used to read intermediate outputs.
@@ -36,18 +34,9 @@ def read_preprocessed_trajectories_from_file(
     Returns:
         The preprocessed trajectory dataset.
     """
-    filepath = Path.cwd() / config.filename.preprocessed_trajectories
-    # if config.read.preprocessed_trajectories:
-    #     log.debug("Configuration 'read.preprocessed_trajectories'
-    # is set to True.")
-    try:
-        preprocessed_trajectories = pd.read_csv(filepath)
-        log.warning("Preprocessed trajectories read from file.")
-        # log.debug("Filepath %s", filepath.relative_to(config.root_dir))
-        return preprocessed_trajectories
-    except FileNotFoundError as e:
-        raise e
-        # log.error("Preprocessed trajectories not found: %s", e)
+    trajectories = pd.read_csv(filepath)
+    log.warning("Trajectories read from file.")
+    return trajectories
 
 
 def read_piecewise_potential(config: DictConfig) -> PiecewisePotential:
@@ -233,7 +222,9 @@ def read_wide_corridor_paths(config: DictConfig) -> pd.DataFrame:
     Returns:
         The trajectory dataset with paths in the wide corridor.
     """
-    trajectory_data_dir = Path(config.trajectory_data_dir)
+    trajectory_data_dir = (
+        Path(config.root_dir).parent / config.trajectory_data_dir
+    )
     file_path = trajectory_data_dir / "df_single_pedestrians_small.h5"
     df = pd.read_hdf(file_path)
     df.rename(

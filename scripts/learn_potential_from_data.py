@@ -7,7 +7,7 @@ from physped.core.parametrize_potential import (
     learn_potential_from_trajectories,
 )
 from physped.core.slow_dynamics import compute_slow_dynamics
-from physped.io.readers import read_preprocessed_trajectories_from_file
+from physped.io.readers import read_trajectories_from_file
 from physped.io.writers import save_piecewise_potential
 from physped.utils.config_utils import (
     log_configuration,
@@ -22,8 +22,9 @@ log = logging.getLogger(__name__)
 )
 def learn_potential_from_data(config):
     log_configuration(config)
-    preprocessed_trajectories = read_preprocessed_trajectories_from_file(
-        config
+
+    preprocessed_trajectories = read_trajectories_from_file(
+        filepath=Path.cwd() / config.filename.preprocessed_trajectories
     )
     preprocessed_trajectories = compute_slow_dynamics(
         preprocessed_trajectories, config=config

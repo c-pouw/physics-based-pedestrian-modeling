@@ -141,8 +141,9 @@ def plot_potential_at_slow_index(
     # if plot_params.highlight_selection:
     # ax1 = highlight_position_selection(ax1, params)
     ax2 = highlight_velocity_selection(ax2, params)
-
-    filepath = Path.cwd() / "potential_plot_at_slow_index.pdf"
+    folderpath = Path.cwd() / "figures"
+    folderpath.mkdir(parents=True, exist_ok=True)
+    filepath = folderpath / "potential_plot_at_slow_index.pdf"
     plt.savefig(filepath, bbox_inches="tight")
     # log.info("Saving plot of the grid to %s.",
     # filepath.relative_to(config.root_dir))
@@ -152,6 +153,3 @@ def plot_potential_at_slow_index(
     # ax.plot(traj.xf, traj.yf, ms=10, zorder=20, c = 'C0', lw = 0.5)
     # ax.plot(traj['xs'], traj['ys'], ms=10, zorder=20, linestyle = 'dashed',
     # c = 'C1', lw = 0.5)
-
-
-# %%

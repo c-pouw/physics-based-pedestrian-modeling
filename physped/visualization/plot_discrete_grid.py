@@ -103,7 +103,7 @@ def plot_discrete_grid(
         ax2 = highlight_velocity_selection(ax2, params)
 
     fig.suptitle(plot_params.title.figure, y=0.9)
-    filepath = Path.cwd() / (params.grid.name + ".pdf")
+    folderpath = Path.cwd() / "figures"
+    folderpath.mkdir(parents=True, exist_ok=True)
+    filepath = folderpath / (params.grid.name + ".pdf")
     plt.savefig(filepath, bbox_inches="tight")
-    # log.info("Saving plot of the grid to %s.",
-    # filepath.relative_to(config.root_dir))

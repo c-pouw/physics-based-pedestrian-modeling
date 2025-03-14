@@ -328,8 +328,10 @@ def plot_trajectories(
         fig.suptitle(
             title, x=0.5, y=traj_plot_params.y_title, ha="center", va="center"
         )
+    folderpath = Path.cwd() / "figures"
+    folderpath.mkdir(parents=True, exist_ok=True)
     filepath = (
-        Path.cwd()
+        folderpath
         / f"{trajectory_type}_trajectories_{traj_type}_{params.env_name}.pdf"
     )
     # log.info("Saving trajectory plot to %s.",

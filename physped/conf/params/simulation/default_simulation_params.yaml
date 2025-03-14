@@ -7,6 +7,6 @@ sample_origins_from: trajectories
 sample_state: 0
 initial_dynamics:
   get_from: file
-  filename: initial_dynamics/narrow_corridor_state_0_dynamics.npy
+  filename: initial_dynamics/${params.env_name}_state_0_dynamics.npy
   point: [0, 0, 0, 0, 0, 0, 0, 0]
   add_noise: false
