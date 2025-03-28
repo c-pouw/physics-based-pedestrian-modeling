@@ -1,22 +1,24 @@
+import logging
 from pathlib import Path
 
 import numpy as np
 
-from physped.io.readers import read_trajectories
-from physped.io.writers import save_trajectories
-from physped.preprocessing.trajectories import preprocess_trajectories
-from physped.core.pedestrian_initializer import (
-    sample_dynamics_from_trajectories,
-)
-from physped.core.slow_dynamics import compute_slow_dynamics
-from physped.io.readers import read_trajectories_from_file
+from physped.core.lattice_selection import evaluate_selection_range
 from physped.core.parametrize_potential import (
     learn_potential_from_trajectories,
 )
-from physped.io.writers import save_piecewise_potential
+from physped.core.pedestrian_initializer import (
+    sample_dynamics_from_trajectories,
+)
 from physped.core.pedestrian_simulator import simulate_pedestrians
-from physped.io.readers import read_piecewise_potential_from_file
-from physped.io.writers import save_trajectories
+from physped.core.slow_dynamics import compute_slow_dynamics
+from physped.io.readers import (
+    read_piecewise_potential_from_file,
+    read_trajectories,
+    read_trajectories_from_file,
+)
+from physped.io.writers import save_piecewise_potential, save_trajectories
+from physped.preprocessing.trajectories import preprocess_trajectories
 from physped.utils.config_utils import (
     log_configuration,
 )
@@ -30,8 +32,10 @@ from physped.visualization.plot_histograms import (
 from physped.visualization.plot_potential_at_slow_index import (
     plot_potential_at_slow_index,
 )
-from physped.core.lattice_selection import evaluate_selection_range
 from physped.visualization.plot_trajectories import plot_trajectories
+
+log = logging.getLogger(__name__)
+
 
 def read_and_preprocess_data(config):
     log_configuration(config)
@@ -84,6 +88,7 @@ def learn_potential_from_data(config):
         Path.cwd() / "potentials",
         config.filename.piecewise_potential,
     )
+
 
 def simulate_from_potential(config):
     log_configuration(config)
