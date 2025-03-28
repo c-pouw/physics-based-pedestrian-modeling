@@ -33,11 +33,11 @@ documentation = "https://c-pouw.github.io/physics-based-pedestrian-modeling/"
 
 [project.scripts]
 physped_cli = "physped.main:main"
-physped_preprocess_data = "scripts.read_and_preprocess_data:main"
-physped_learn_potential = "scripts.learn_potential_from_data:main"
-physped_sample_dynamics = "scripts.sample_dynamics_from_trajectories:main"
-physped_simulate_trajectories = "scripts.simulate_trajectories_from_potential:main"
-physped_plot_figures = "scripts.plot_figures:main"
+physped_preprocess_data = "physped.scripts.read_and_preprocess_data:main"
+physped_learn_potential = "physped.scripts.learn_potential_from_data:main"
+physped_sample_dynamics = "physped.scripts.sample_dynamics_from_trajectories:main"
+physped_simulate_trajectories = "physped.scripts.simulate_trajectories_from_potential:main"
+physped_plot_figures = "physped.scripts.plot_figures:main"
 
 [dependency-groups]
 dev = [

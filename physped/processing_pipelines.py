@@ -1,17 +1,24 @@
-import logging
 from pathlib import Path
 
-import hydra
+import numpy as np
 
-from physped.core.lattice_selection import evaluate_selection_range
-from physped.core.slow_dynamics import compute_slow_dynamics
-from physped.io.readers import (
-    read_piecewise_potential_from_file,
-    read_trajectories_from_file,
+from physped.io.readers import read_trajectories
+from physped.io.writers import save_trajectories
+from physped.preprocessing.trajectories import preprocess_trajectories
+from physped.core.pedestrian_initializer import (
+    sample_dynamics_from_trajectories,
 )
+from physped.core.slow_dynamics import compute_slow_dynamics
+from physped.io.readers import read_trajectories_from_file
+from physped.core.parametrize_potential import (
+    learn_potential_from_trajectories,
+)
+from physped.io.writers import save_piecewise_potential
+from physped.core.pedestrian_simulator import simulate_pedestrians
+from physped.io.readers import read_piecewise_potential_from_file
+from physped.io.writers import save_trajectories
 from physped.utils.config_utils import (
     log_configuration,
-    register_new_resolvers,
 )
 from physped.visualization.plot_discrete_grid import plot_discrete_grid
 from physped.visualization.plot_histograms import (
@@ -23,14 +30,76 @@ from physped.visualization.plot_histograms import (
 from physped.visualization.plot_potential_at_slow_index import (
     plot_potential_at_slow_index,
 )
+from physped.core.lattice_selection import evaluate_selection_range
 from physped.visualization.plot_trajectories import plot_trajectories
 
-log = logging.getLogger(__name__)
+def read_and_preprocess_data(config):
+    log_configuration(config)
+    trajectories = read_trajectories(config)
+    preprocessed_trajectories = preprocess_trajectories(
+        trajectories, config=config
+    )
+    save_trajectories(
+        preprocessed_trajectories,
+        folderpath=Path.cwd(),
+        filename=config.filename.preprocessed_trajectories,
+    )
 
 
-@hydra.main(
-    version_base=None, config_path="../physped/conf", config_name="config"
-)
+def sample_and_save_dynamics_from_trajectories(config: dict):
+    log_configuration(config)
+    env_name = config.params.env_name
+    n_trajs = config.params.simulation.ntrajs
+    state = config.params.simulation.sample_state
+    preprocessed_trajectories = read_trajectories_from_file(
+        filepath=Path.cwd() / config.filename.preprocessed_trajectories
+    )
+    preprocessed_trajectories = compute_slow_dynamics(
+        preprocessed_trajectories, config=config
+    )
+
+    dynamics = sample_dynamics_from_trajectories(
+        preprocessed_trajectories, n_trajs, state
+    )
+    folderpath = Path.cwd() / "initial_dynamics"
+    folderpath.mkdir(parents=True, exist_ok=True)
+    filename = f"{env_name}_state_{state}_dynamics.npy"
+    np.save(folderpath / filename, dynamics)
+
+
+def learn_potential_from_data(config):
+    log_configuration(config)
+
+    preprocessed_trajectories = read_trajectories_from_file(
+        filepath=Path.cwd() / config.filename.preprocessed_trajectories
+    )
+    preprocessed_trajectories = compute_slow_dynamics(
+        preprocessed_trajectories, config=config
+    )
+    piecewise_potential = learn_potential_from_trajectories(
+        preprocessed_trajectories, config
+    )
+    save_piecewise_potential(
+        piecewise_potential,
+        Path.cwd() / "potentials",
+        config.filename.piecewise_potential,
+    )
+
+def simulate_from_potential(config):
+    log_configuration(config)
+    filepath = Path.cwd() / "potentials" / config.filename.piecewise_potential
+    piecewise_potential = read_piecewise_potential_from_file(filepath)
+    simulated_trajectories = simulate_pedestrians(
+        piecewise_potential,
+        config,
+    )
+    save_trajectories(
+        simulated_trajectories,
+        Path.cwd() / "simulated_trajectories",
+        config.filename.simulated_trajectories,
+    )
+
+
 def plot_figures(config):
     log_configuration(config)
     preprocessed_trajectories = read_trajectories_from_file(
@@ -98,12 +167,3 @@ def plot_figures(config):
     if config.plot.potential_at_selection:
         log.info("Plot potential at selection.")
         plot_potential_at_slow_index(config, slow_indices, piecewise_potential)
-
-
-def main():
-    register_new_resolvers()
-    plot_figures()
-
-
-if __name__ == "__main__":
-    main()
