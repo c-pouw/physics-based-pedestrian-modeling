@@ -620,6 +620,7 @@ def read_asdz_pf12_paths_local(config: DictConfig) -> pd.DataFrame:
     Returns:
         The trajectory dataset with Amsterdam Zuid platform 1-2 paths
     """
+    # TODO Change path string to pathlib path
     file_list = glob.glob(
         config.trajectory_data_dir + "/Amsterdam*Zuid*1-2*.csv"
     )
