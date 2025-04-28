@@ -1,0 +1,41 @@
+physped package
+===============
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   physped.core
+   physped.io
+   physped.preprocessing
+   physped.utils
+   physped.visualization
+
+Submodules
+----------
+
+physped.main module
+-------------------
+
+.. automodule:: physped.main
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+physped.processing\_pipelines module
+------------------------------------
+
+.. automodule:: physped.processing_pipelines
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: physped
+   :members:
+   :undoc-members:
+   :show-inheritance:

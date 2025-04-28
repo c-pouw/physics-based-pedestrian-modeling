@@ -1,0 +1,21 @@
+physped.preprocessing package
+=============================
+
+Submodules
+----------
+
+physped.preprocessing.trajectories module
+-----------------------------------------
+
+.. automodule:: physped.preprocessing.trajectories
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: physped.preprocessing
+   :members:
+   :undoc-members:
+   :show-inheritance:

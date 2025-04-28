@@ -1,0 +1,93 @@
+physped.core package
+====================
+
+Submodules
+----------
+
+physped.core.digitizers module
+------------------------------
+
+.. automodule:: physped.core.digitizers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+physped.core.distribution\_approximator module
+----------------------------------------------
+
+.. automodule:: physped.core.distribution_approximator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+physped.core.langevin\_model module
+-----------------------------------
+
+.. automodule:: physped.core.langevin_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+physped.core.lattice module
+---------------------------
+
+.. automodule:: physped.core.lattice
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+physped.core.lattice\_selection module
+--------------------------------------
+
+.. automodule:: physped.core.lattice_selection
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+physped.core.parametrize\_potential module
+------------------------------------------
+
+.. automodule:: physped.core.parametrize_potential
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+physped.core.pedestrian\_initializer module
+-------------------------------------------
+
+.. automodule:: physped.core.pedestrian_initializer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+physped.core.pedestrian\_simulator module
+-----------------------------------------
+
+.. automodule:: physped.core.pedestrian_simulator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+physped.core.piecewise\_potential module
+----------------------------------------
+
+.. automodule:: physped.core.piecewise_potential
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+physped.core.slow\_dynamics module
+----------------------------------
+
+.. automodule:: physped.core.slow_dynamics
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: physped.core
+   :members:
+   :undoc-members:
+   :show-inheritance:
