@@ -696,11 +696,11 @@ wheels = [
 
 [[package]]
 name = "h11"
-version = "0.16.0"
+version = "0.15.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/01/ee/02a2c011bdab74c6fb3c75474d40b3052059d95df7e73351460c8588d963/h11-0.16.0.tar.gz", hash = "sha256:4e35b956cf45792e4caa5885e69fba00bdbc6ffafbfa020300e549b208ee5ff1", size = 101250 }
+sdist = { url = "https://files.pythonhosted.org/packages/2d/97/37b2c35d6e21fbaa1a066a6372712e7603f423d36ca1b32f6004eae8897e/h11-0.15.0.tar.gz", hash = "sha256:2a7db2d2beffd4e6c6bbe3a64305ab77d89087976e8aed8fdcff4b054744e72f", size = 100693 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/04/4b/29cac41a4d98d144bf5f6d33995617b185d14b22401f75ca86f384e87ff1/h11-0.16.0-py3-none-any.whl", hash = "sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86", size = 37515 },
+    { url = "https://files.pythonhosted.org/packages/be/df/b7f5fb41d8a028392661f3507b5d3ef41dafebee7b95dce68cf5697e3710/h11-0.15.0-py3-none-any.whl", hash = "sha256:ba64a7de94075657373ea90d9bd313a1429ba54868e702702ebeb089054f9812", size = 37476 },
 ]
 
 [[package]]
@@ -1546,7 +1546,7 @@ wheels = [
 
 [[package]]
 name = "physics-based-pedestrian-modeling"
-version = "0.3.5"
+version = "0.3.6"
 source = { editable = "." }
 dependencies = [
     { name = "h11" },
@@ -1592,7 +1592,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "h11", specifier = ">=0.16.0" },
+    { name = "h11", specifier = "==0.15" },
     { name = "hydra-colorlog", specifier = ">=1.2.0,<2.0.0" },
     { name = "hydra-core", specifier = ">=1.3.2,<2.0.0" },
     { name = "matplotlib", specifier = ">=3.8.4,<4.0.0" },
