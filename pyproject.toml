@@ -19,6 +19,7 @@ dependencies = [
     "hydra-colorlog<2.0.0,>=1.2.0",
     "urllib3<3.0.0,>=2.2.2",
     "requests<3.0.0,>=2.32.3",
+    "h11>=0.16.0",
 ]
 name = "physics-based-pedestrian-modeling"
 version = "0.3.4"
