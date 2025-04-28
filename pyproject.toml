@@ -22,7 +22,7 @@ dependencies = [
     "h11==0.15",
 ]
 name = "physics-based-pedestrian-modeling"
-version = "0.3.6"
+version = "0.3.7"
 description = "Python package to create physics-based pedestrian models from crowd measurements"
 readme = "README.md"
 
