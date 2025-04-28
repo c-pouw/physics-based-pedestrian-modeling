@@ -9,8 +9,8 @@ authors = [
 license = {text = "BSD-3-Clause"}
 requires-python = "~=3.11"
 dependencies = [
-    "pandas==2.1.4",
-    "numpy<2.0.0,>=1.26.4",
+    "pandas==2.2.2",
+    "numpy>2.0.0",
     "scipy<2.0.0,>=1.13.0",
     "tqdm<5.0.0,>=4.66.2",
     "sdeint<1.0.0,>=0.3.0",
