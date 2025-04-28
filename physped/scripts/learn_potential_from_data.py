@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import hydra
 
 from physped.processing_pipelines import learn_potential_from_data
