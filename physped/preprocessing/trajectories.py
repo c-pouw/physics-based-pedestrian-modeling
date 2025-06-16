@@ -56,6 +56,7 @@ def prune_short_trajectories(
     trajectories = trajectories[
         trajectories.traj_len > config.params.minimum_trajectory_length
     ].copy()
+    # TODO: Is a hardcopy needed?
     log.info(
         "Short trajectories with less than %s observations removed.",
         config.params.minimum_trajectory_length,

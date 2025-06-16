@@ -1,5 +1,5 @@
 defaults:
-  - params: narrow_corridor
+  - params: eindhoven_pf34
   - override hydra/job_logging: colorlog
   - override hydra/hydra_logging: colorlog
   - _self_

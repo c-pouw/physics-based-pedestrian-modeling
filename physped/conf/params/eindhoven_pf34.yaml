@@ -14,7 +14,7 @@ fps: 10
 minimum_trajectory_length: 30
 velocity_window_length: 10
 input_ntrajs: ???
-data_source: zenodo
+data_source: geert
 data_url: https://zenodo.org/api/records/
 data_record_id: 13784588
 # model:
@@ -36,7 +36,8 @@ colnames:
   xf: x_position_mm
   yf: y_position_mm
   Pid: object_identifier
-  time: time_ms
+  time: date_time_utc
+#  time: time_ms
 selection:
   point:
     x: 50
@@ -54,8 +55,9 @@ plot_style: physped/conf/science.mplstyle
 default_xlims: [45, 74]
 default_ylims: [-12, 6]
 background:
-  bg_source: zenodo
+  bg_source: local
   filename: 'EHV.Perron2.1_multisensor_1.png'
+  imgpath: 'data/EHV.Perron2.1_multisensor_1.png'
   alpha: 1
   xmin: -6039
   xmax: 75091

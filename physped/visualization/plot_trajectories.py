@@ -213,7 +213,7 @@ def plot_trajectories(
             plot_trajs["k"] < traj_plot_params.truncated_trajectory_length
         ]
 
-    fig = plt.figure(layout="constrained")
+    fig = plt.figure(layout="constrained", facecolor="#EDE7E1")
     fig.set_size_inches(traj_plot_params.figsize)
     spec = mpl.gridspec.GridSpec(
         ncols=2,
@@ -320,11 +320,13 @@ def plot_trajectories(
         "simulated": "simulated",
     }
     if traj_plot_params.plot_title:
-        title = (
-            f"Sample of {num_trajectories_to_plot}"
-            f" {traj_type_description[trajectory_type]}"
-            f" {traj_plot_params.title}"
-        )
+        # title = (
+        #     f"Sample of {num_trajectories_to_plot}"
+        #     f" {traj_type_description[trajectory_type]}"
+        #     f" {traj_plot_params.title}"
+        # )
+        title = f"{traj_type_description[trajectory_type].capitalize()} paths"
+
         fig.suptitle(
             title, x=0.5, y=traj_plot_params.y_title, ha="center", va="center"
         )
@@ -332,7 +334,7 @@ def plot_trajectories(
     folderpath.mkdir(parents=True, exist_ok=True)
     filepath = (
         folderpath
-        / f"{trajectory_type}_trajectories_{traj_type}_{params.env_name}.pdf"
+        / f"{trajectory_type}_trajectories_{traj_type}_{params.env_name}.png"
     )
     # log.info("Saving trajectory plot to %s.",
     # filepath.relative_to(config.root_dir))
