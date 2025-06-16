@@ -1,6 +1,9 @@
 # build sphix api docs and push to gh-pages branch
 name: Docs
 
+permissions:
+  contents: write
+
 on:
   push:
   pull_request:
