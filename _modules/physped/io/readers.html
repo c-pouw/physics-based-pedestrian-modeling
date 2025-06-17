@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.io.readers &mdash; Data-driven physics-based modeling of pedestrian dynamics 0.post1.dev0+gbf0ef31 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=9c8095b4"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0.post1.dev0+gbf0ef31
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#using-the-cli">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#available-environments">Available environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">physped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">physped.io.readers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for physped.io.readers</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Data readers for the physics based pedestrian modeling code.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">zipfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fnmatch</span><span class="w"> </span><span class="kn">import</span> <span class="n">fnmatch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">omegaconf</span><span class="w"> </span><span class="kn">import</span> <span class="n">DictConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.piecewise_potential</span><span class="w"> </span><span class="kn">import</span> <span class="n">PiecewisePotential</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="read_trajectories_from_file">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_trajectories_from_file">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_trajectories_from_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read preprocessed trajectories from a csv file.</span>
+
+<span class="sd">    Mainly used to read intermediate outputs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The preprocessed trajectory dataset.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">trajectories</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Trajectories read from file.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">trajectories</span></div>
+
+
+
+<div class="viewcode-block" id="read_piecewise_potential">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_piecewise_potential">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_piecewise_potential</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PiecewisePotential</span><span class="p">:</span>
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">piecewise_potential</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">piecewise_potential</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;Configuration &#39;read.simulated_trajectories&#39; is set to True.&quot;</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">piecewise_potential</span> <span class="o">=</span> <span class="n">read_piecewise_potential_from_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Piecewise potential read from file&quot;</span><span class="p">)</span>
+            <span class="c1"># log.debug(&quot;Filepath %s&quot;, filepath.relative_to(config.root_dir))</span>
+            <span class="k">return</span> <span class="n">piecewise_potential</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Piecewise potential not found: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="read_piecewise_potential_from_file">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_piecewise_potential_from_file">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_piecewise_potential_from_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PiecewisePotential</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read piecewise potential from file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filepath: Path to the file containing the piecewise potential.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The piecewise potential.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">piecewise_potential</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">piecewise_potential</span></div>
+
+
+
+<div class="viewcode-block" id="read_narrow_corridor_paths_local">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_narrow_corridor_paths_local">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_narrow_corridor_paths_local</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the narrow corridor paths archive from a local zip.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple containing two DataFrames:</span>
+
+<span class="sd">        - df_ltr: Paths of pedestrians walking from left to right.</span>
+<span class="sd">        - df_rtl: Paths of pedestrians walking from right to left.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">trajectory_data_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">trajectory_data_dir</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Start reading narrow corridor data set.&quot;</span><span class="p">)</span>
+    <span class="n">archive</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">trajectory_data_dir</span> <span class="o">/</span> <span class="s2">&quot;data.zip&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">archive</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;left-to-right.ssv&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">paths_ltr</span><span class="p">:</span>
+        <span class="n">paths_ltr</span> <span class="o">=</span> <span class="n">paths_ltr</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="n">df_ltr</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">paths_ltr</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">archive</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;right-to-left.ssv&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">paths_rtl</span><span class="p">:</span>
+        <span class="n">paths_rtl</span> <span class="o">=</span> <span class="n">paths_rtl</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="n">df_rtl</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">paths_rtl</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df_ltr</span><span class="p">,</span> <span class="n">df_rtl</span></div>
+
+
+
+<div class="viewcode-block" id="read_narrow_corridor_paths_4tu">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_narrow_corridor_paths_4tu">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_narrow_corridor_paths_4tu</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the narrow corridor paths archive from 4TU remote repository.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple containing two DataFrames:</span>
+
+<span class="sd">        - df_ltr: Paths of pedestrians walking from left to right.</span>
+<span class="sd">        - df_rtl: Paths of pedestrians walking from right to left.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://data.4tu.nl/ndownloader/items/&quot;</span>
+        <span class="s2">&quot;b8e30f8c-3931-4604-842a-77c7fb8ac3fc/versions/1&quot;</span>
+    <span class="p">)</span>
+    <span class="n">bytestring</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">link</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">bytestring</span><span class="o">.</span><span class="n">content</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outerzip</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">outerzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;data.zip&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">innerzip</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">innerzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;left-to-right.ssv&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">paths_ltr</span><span class="p">:</span>
+                <span class="n">paths_ltr</span> <span class="o">=</span> <span class="n">paths_ltr</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">innerzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;right-to-left.ssv&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">paths_rtl</span><span class="p">:</span>
+                <span class="n">paths_rtl</span> <span class="o">=</span> <span class="n">paths_rtl</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="n">df_ltr</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">paths_ltr</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="n">df_rtl</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">paths_rtl</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df_ltr</span><span class="p">,</span> <span class="n">df_rtl</span></div>
+
+
+
+<span class="n">narrow_corridor_path_reader</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;local&quot;</span><span class="p">:</span> <span class="n">read_narrow_corridor_paths_local</span><span class="p">,</span>
+    <span class="s2">&quot;4tu&quot;</span><span class="p">:</span> <span class="n">read_narrow_corridor_paths_4tu</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="read_intersecting_paths">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_intersecting_paths">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_intersecting_paths</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the intersecting paths data set.</span>
+
+<span class="sd">    The intersecting paths dataset is created by combining the left-to-right</span>
+<span class="sd">    and right-to-left paths from the narrow corridor dataset. The paths from</span>
+<span class="sd">    the right-to-left dataset are rotated by 90 degrees to create intersecting</span>
+<span class="sd">    paths.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The trajectory dataset with intersecting paths.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data_source</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">data_source</span>
+    <span class="n">df_ltr</span><span class="p">,</span> <span class="n">df_rtl</span> <span class="o">=</span> <span class="n">narrow_corridor_path_reader</span><span class="p">[</span><span class="n">data_source</span><span class="p">](</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="n">df_ltr</span><span class="p">[</span><span class="s2">&quot;X_SG&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_ltr</span><span class="p">[</span><span class="s2">&quot;X_SG&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.1</span>
+    <span class="n">df_ltr</span><span class="p">[</span><span class="s2">&quot;Y_SG&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_ltr</span><span class="p">[</span><span class="s2">&quot;Y_SG&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.05</span>
+
+    <span class="n">df_rtl</span><span class="p">[</span><span class="s2">&quot;X_SG&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_rtl</span><span class="p">[</span><span class="s2">&quot;X_SG&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.1</span>
+    <span class="n">df_rtl</span><span class="p">[</span><span class="s2">&quot;Y_SG&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_rtl</span><span class="p">[</span><span class="s2">&quot;Y_SG&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.05</span>
+
+    <span class="c1"># swap x and y coordinates to rotate by 90 degrees</span>
+    <span class="n">df_rtl</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="s2">&quot;X&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;X_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;Y_SG&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Y_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;X_SG&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;U_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;V_SG&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;V_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;U_SG&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df_ltr</span><span class="p">,</span> <span class="n">df_rtl</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished reading single paths data set.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="read_narrow_corridor_paths">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_narrow_corridor_paths">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_narrow_corridor_paths</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the narrow corridor data set.</span>
+
+<span class="sd">    The trajectories are read from local or remote sources based on the</span>
+<span class="sd">    configuration.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The trajectory dataset with single paths.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data_source</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">data_source</span>
+    <span class="n">df_ltr</span><span class="p">,</span> <span class="n">df_rtl</span> <span class="o">=</span> <span class="n">narrow_corridor_path_reader</span><span class="p">[</span><span class="n">data_source</span><span class="p">](</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df_ltr</span><span class="p">,</span> <span class="n">df_rtl</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;X_SG&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;X_SG&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.1</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Y_SG&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Y_SG&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.05</span>
+
+    <span class="c1"># Only keep the columns that are needed</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s2">&quot;Pid&quot;</span><span class="p">,</span> <span class="s2">&quot;Rstep&quot;</span><span class="p">,</span> <span class="s2">&quot;X_SG&quot;</span><span class="p">,</span> <span class="s2">&quot;Y_SG&quot;</span><span class="p">]]</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished reading single paths data set.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="read_wide_corridor_paths">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_wide_corridor_paths">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_wide_corridor_paths</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the wide corridor data set from a local file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The trajectory dataset with paths in the wide corridor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">trajectory_data_dir</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">root_dir</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">trajectory_data_dir</span>
+    <span class="p">)</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="n">trajectory_data_dir</span> <span class="o">/</span> <span class="s2">&quot;df_single_pedestrians_small.h5&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;X_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;xf&quot;</span><span class="p">,</span> <span class="s2">&quot;Y_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;yf&quot;</span><span class="p">,</span> <span class="s2">&quot;U_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;uf&quot;</span><span class="p">,</span> <span class="s2">&quot;V_SG&quot;</span><span class="p">:</span> <span class="s2">&quot;vf&quot;</span><span class="p">},</span>
+        <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;xf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;xf&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.4</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;yf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;yf&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.3</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;Pid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s2">&quot;Pid&quot;</span><span class="p">,</span> <span class="s2">&quot;day_id&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">ngroup</span><span class="p">()</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;Umean&gt;0.5&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">X0</span> <span class="o">-</span> <span class="n">df</span><span class="o">.</span><span class="n">X1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;Pid&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">uf</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">3.5</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="read_curved_paths_synthetic">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_curved_paths_synthetic">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_curved_paths_synthetic</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the synthetic curved paths data set.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The synthetic curved paths dataset.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">root_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">root_dir</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+    <span class="n">trajectory_data_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">trajectory_data_dir</span><span class="p">)</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">root_dir</span>
+        <span class="o">/</span> <span class="n">trajectory_data_dir</span>
+        <span class="o">/</span> <span class="s2">&quot;artificial_measurements_ellipse.parquet&quot;</span>
+    <span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="s2">&quot;xf&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="s2">&quot;yf&quot;</span><span class="p">,</span> <span class="s2">&quot;xdot&quot;</span><span class="p">:</span> <span class="s2">&quot;uf&quot;</span><span class="p">,</span> <span class="s2">&quot;ydot&quot;</span><span class="p">:</span> <span class="s2">&quot;vf&quot;</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<span class="c1"># def filter_trajectory(df, cutoff=0.16, order=4):</span>
+<span class="c1">#     b, a = signal.butter(order, cutoff, &quot;low&quot;)</span>
+<span class="c1">#     df = df.sort_values([&quot;particle&quot;, &quot;time&quot;])</span>
+<span class="c1">#     df = df.groupby(&quot;particle&quot;).filter(lambda x: len(x) &gt; 52)</span>
+
+<span class="c1">#     f_df = df.groupby(df[&quot;particle&quot;]).apply(</span>
+<span class="c1"># lambda x: pd.DataFrame(</span>
+<span class="c1"># signal.filtfilt(b, a, x[[&quot;x&quot;, &quot;y&quot;]].values, axis=0)))</span>
+<span class="c1">#     df[[&quot;x&quot;, &quot;y&quot;]] = f_df.set_index(df.index)</span>
+<span class="c1">#     return df</span>
+
+
+<span class="c1"># def savgol_smoothing(df: pd.DataFrame, smooth_colname,</span>
+<span class="c1"># groupby_colname=&quot;Pid&quot;):</span>
+<span class="c1">#     slow = df.groupby(groupby_colname)[smooth_colname].transform(</span>
+<span class="c1">#         lambda x: signal.savgol_filter(x, window_length=9,</span>
+<span class="c1"># polyorder=1, deriv=0, mode=&quot;interp&quot;)</span>
+<span class="c1">#     )</span>
+<span class="c1">#     return slow</span>
+
+
+<span class="c1"># def read_curved_paths(config) -&gt; pd.DataFrame:</span>
+<span class="c1">#     # Trajectories recorded during experiment 1</span>
+<span class="c1">#     trajectory_data_dir = Path(config.trajectory_data_dir)</span>
+<span class="c1">#     trajs = pd.read_csv(trajectory_data_dir / &quot;linecross-1.csv&quot;)</span>
+<span class="c1">#     # trajs = filter_trajectory(trajs)</span>
+<span class="c1">#     pid_column = &quot;particle&quot;</span>
+<span class="c1">#     time_column = &quot;time&quot;</span>
+
+<span class="c1">#     conversion_X = 2.30405921919033</span>
+<span class="c1">#     conversion_Y = 2.35579871138595</span>
+<span class="c1">#     trajs = trajs[trajs.frame &gt; 380].copy()</span>
+<span class="c1">#     trajs[&quot;x&quot;] = trajs[&quot;x&quot;] - np.mean(trajs[&quot;x&quot;]) - 30</span>
+<span class="c1">#     trajs[&quot;y&quot;] = trajs[&quot;y&quot;] - np.mean(trajs[&quot;y&quot;]) + 35</span>
+<span class="c1">#     trajs1 = trajs.copy()</span>
+
+<span class="c1">#     # Trajectories recorded during experiment 2</span>
+<span class="c1">#     trajs = pd.read_csv(trajectory_data_dir / &quot;linecross-2.csv&quot;)</span>
+<span class="c1">#     trajs = filter_trajectory(trajs)</span>
+<span class="c1">#     trajs = trajs[trajs.frame &gt; 380].copy()</span>
+<span class="c1">#     trajs[&quot;x&quot;] = trajs[&quot;x&quot;] - np.mean(trajs[&quot;x&quot;]) + 17</span>
+<span class="c1">#     trajs[&quot;y&quot;] = trajs[&quot;y&quot;] - np.mean(trajs[&quot;y&quot;]) + 33</span>
+<span class="c1">#     trajs[pid_column] += np.max(trajs1[pid_column])</span>
+<span class="c1">#     trajs2 = trajs.copy()</span>
+
+<span class="c1">#     trajs = pd.concat([trajs1, trajs2])</span>
+<span class="c1">#     trajs[&quot;x&quot;] = trajs[&quot;x&quot;] * conversion_X / 100</span>
+<span class="c1">#     trajs[&quot;y&quot;] = trajs[&quot;y&quot;] * conversion_Y / 100</span>
+
+<span class="c1">#     # trajs[&quot;v_x_m&quot;] = trajs[&quot;v_x_m&quot;].replace(-99, np.nan).interpolate()</span>
+<span class="c1">#     # trajs[&quot;v_y_m&quot;] = trajs[&quot;v_y_m&quot;].replace(-99, np.nan).interpolate()</span>
+
+<span class="c1">#     trajs[&quot;traj_len&quot;] =</span>
+<span class="c1"># trajs.groupby([pid_column])[pid_column].transform(&quot;size&quot;)</span>
+<span class="c1">#     trajs = trajs[trajs.traj_len &gt; 10].copy()</span>
+<span class="c1">#     trajs.sort_values(by=[pid_column, time_column], inplace=True)</span>
+<span class="c1">#     trajs[&quot;k&quot;] = trajs.groupby(pid_column)[pid_column].transform(</span>
+<span class="c1"># lambda x: np.arange(x.size))</span>
+<span class="c1">#     # trajs[&quot;kp&quot;] = trajs[&quot;k&quot;] // 320</span>
+<span class="c1">#     # trajs[&quot;new_pid&quot;] = trajs.apply(lambda x:</span>
+<span class="c1"># int(f&quot;{x[pid_column]:06}{x[&#39;kp&#39;]:04}&quot;), axis=1)</span>
+<span class="c1">#     # trajs[&quot;new_pid&quot;] = trajs[pid_column] * 100000 + trajs[&quot;kp&quot;] + 100</span>
+<span class="c1">#     trajs[&quot;x&quot;] = savgol_smoothing(trajs, &quot;x&quot;, pid_column)</span>
+<span class="c1"># # Smooth the noisy trajectories to get reasonable velocities</span>
+<span class="c1">#     trajs[&quot;y&quot;] = savgol_smoothing(trajs, &quot;y&quot;, pid_column)</span>
+<span class="c1">#     return trajs</span>
+
+
+<div class="viewcode-block" id="read_ehv_pf34_paths_geert">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_ehv_pf34_paths_geert">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_ehv_pf34_paths_geert</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the Eindhoven platform 3-4 paths data set from Geert.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The trajectory dataset with Eindhoven platform 3-4 paths</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">root_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">root_dir</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+    <span class="n">trajectory_data_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">trajectory_data_dir</span><span class="p">)</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">root_dir</span>
+        <span class="o">/</span> <span class="n">trajectory_data_dir</span>
+        <span class="o">/</span> <span class="s2">&quot;trajectories_EHV_platform_2_1_refined.parquet&quot;</span>
+    <span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s2">&quot;date_time_utc&quot;</span><span class="p">,</span> <span class="s2">&quot;Pid&quot;</span><span class="p">,</span> <span class="s2">&quot;xf&quot;</span><span class="p">,</span> <span class="s2">&quot;yf&quot;</span><span class="p">]]</span>
+
+    <span class="c1"># Rotate the domain</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">&quot;xf&quot;</span><span class="p">:</span> <span class="s2">&quot;yf&quot;</span><span class="p">,</span> <span class="s2">&quot;yf&quot;</span><span class="p">:</span> <span class="s2">&quot;xf&quot;</span><span class="p">,</span> <span class="s2">&quot;uf&quot;</span><span class="p">:</span> <span class="s2">&quot;vf&quot;</span><span class="p">,</span> <span class="s2">&quot;vf&quot;</span><span class="p">:</span> <span class="s2">&quot;uf&quot;</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="filter_part_of_the_domain">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.filter_part_of_the_domain">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">filter_part_of_the_domain</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">xcol</span><span class="o">=</span><span class="s2">&quot;x_pos&quot;</span><span class="p">,</span> <span class="n">ycol</span><span class="o">=</span><span class="s2">&quot;y_pos&quot;</span><span class="p">):</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">xcol</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">xmin</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">ycol</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">xmax</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="read_ehv_pf34_paths_local">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_ehv_pf34_paths_local">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_ehv_pf34_paths_local</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the Eindhoven platform 3-4 paths data set from a local file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The trajectory dataset with Eindhoven platform 3-4 paths</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">trajectory_data_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">trajectory_data_dir</span><span class="p">)</span>
+    <span class="n">glob_string</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">trajectory_data_dir</span><span class="p">)</span><span class="si">}</span><span class="s2">/ehv_pf34/*.parquet&quot;</span>
+    <span class="n">filelist</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">glob_string</span><span class="p">)</span>
+    <span class="n">df_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">filelist</span><span class="p">,</span> <span class="n">ascii</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="n">df_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">df_list</span><span class="p">)</span>
+
+    <span class="c1"># Rotate the domain by 90 degrees</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">({</span><span class="s2">&quot;x_pos&quot;</span><span class="p">:</span> <span class="s2">&quot;y_pos&quot;</span><span class="p">,</span> <span class="s2">&quot;y_pos&quot;</span><span class="p">:</span> <span class="s2">&quot;x_pos&quot;</span><span class="p">},</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Convert spatial coordinates from milimeters to meters</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x_pos&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y_pos&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">filter_part_of_the_domain</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mi">70</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="get_zenodo_data">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.get_zenodo_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_zenodo_data</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BytesIO</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Download data from Zenodo URL into memory&quot;&quot;&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="list_zenodo_files">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.list_zenodo_files">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">list_zenodo_files</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List all files in a Zenodo record, optionally filtered by pattern</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List of file information dictionaries</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">zenodo_repo_url</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">data_url</span>
+    <span class="n">data_record_id</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">data_record_id</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">zenodo_repo_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">data_record_id</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+
+    <span class="n">files</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;files&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">pattern</span><span class="p">:</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span> <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">],</span> <span class="n">pattern</span><span class="p">)]</span>
+
+    <span class="k">return</span> <span class="n">files</span></div>
+
+
+
+<div class="viewcode-block" id="read_parquet_from_zenodo">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_parquet_from_zenodo">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_parquet_from_zenodo</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read parquet file from Zenodo using Pandas</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DataFrame from Pandas</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get file information</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">list_zenodo_files</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;*.parquet&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">files</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;No matching files found in record </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">record_id</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Use first matching file if filename not specified</span>
+    <span class="n">file_info</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># TODO Reader for other files in the zenodo repo</span>
+    <span class="n">file_url</span> <span class="o">=</span> <span class="n">file_info</span><span class="p">[</span><span class="s2">&quot;links&quot;</span><span class="p">][</span><span class="s2">&quot;self&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Get data into memory</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">get_zenodo_data</span><span class="p">(</span><span class="n">file_url</span><span class="p">)</span>
+
+    <span class="c1"># Read with specified library</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;pyarrow&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="read_ehv_pf34_paths_zenodo">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_ehv_pf34_paths_zenodo">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_ehv_pf34_paths_zenodo</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the Eindhoven platform 3-4 paths data set from a local file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The trajectory dataset with Eindhoven platform 3-4 paths</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">read_parquet_from_zenodo</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span>
+        <span class="mi">10000000</span>
+    <span class="p">)</span>  <span class="c1"># TODO: Fix memory issues in a better way</span>
+
+    <span class="c1"># Convert spatial coordinates from milimeters to meters</span>
+    <span class="n">xcol</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">colnames</span><span class="o">.</span><span class="n">xf</span>
+    <span class="n">ycol</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">colnames</span><span class="o">.</span><span class="n">yf</span>
+    <span class="n">df</span><span class="p">[</span><span class="n">xcol</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+    <span class="n">df</span><span class="p">[</span><span class="n">ycol</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">filter_part_of_the_domain</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">xcol</span><span class="o">=</span><span class="n">xcol</span><span class="p">,</span> <span class="n">ycol</span><span class="o">=</span><span class="n">ycol</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<span class="n">ehv_pf34_path_reader</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;geert&quot;</span><span class="p">:</span> <span class="n">read_ehv_pf34_paths_geert</span><span class="p">,</span>
+    <span class="s2">&quot;local&quot;</span><span class="p">:</span> <span class="n">read_ehv_pf34_paths_local</span><span class="p">,</span>
+    <span class="s2">&quot;zenodo&quot;</span><span class="p">:</span> <span class="n">read_ehv_pf34_paths_zenodo</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="read_eindhoven_pf34_paths">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_eindhoven_pf34_paths">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_eindhoven_pf34_paths</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the Eindhoven platform 3-4 paths data set.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The trajectory dataset with Eindhoven platform 3-4 paths.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path_reader</span> <span class="o">=</span> <span class="n">ehv_pf34_path_reader</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">data_source</span><span class="p">]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">path_reader</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="read_asdz_pf34_paths_local">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_asdz_pf34_paths_local">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_asdz_pf34_paths_local</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">trajectory_data_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">trajectory_data_dir</span><span class="p">)</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">trajectory_data_dir</span> <span class="o">/</span> <span class="s2">&quot;Amsterdam Zuid - platform 3-4 - set1.csv&quot;</span>
+    <span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="read_asdz_pf34_paths_4tu">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_asdz_pf34_paths_4tu">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_asdz_pf34_paths_4tu</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://data.4tu.nl/file/7d78a5e3-6142-49fe-be03-e4c707322863/&quot;</span>
+        <span class="s2">&quot;40ea5cd9-95dc-4e3c-8760-7f4dd543eae7&quot;</span>
+    <span class="p">)</span>
+    <span class="n">bytestring</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">link</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">bytestring</span><span class="o">.</span><span class="n">content</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zipped_file</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">zipped_file</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+            <span class="s2">&quot;Amsterdam Zuid - platform 3-4 - set1.csv&quot;</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">paths</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<span class="n">asdz_pf34_path_reader</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;local&quot;</span><span class="p">:</span> <span class="n">read_asdz_pf34_paths_local</span><span class="p">,</span>
+    <span class="s2">&quot;4tu&quot;</span><span class="p">:</span> <span class="n">read_asdz_pf34_paths_4tu</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="read_asdz_pf34_paths">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_asdz_pf34_paths">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_asdz_pf34_paths</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">asdz_pf34_path_reader</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">data_source</span><span class="p">](</span><span class="n">config</span><span class="p">)</span>
+    <span class="c1"># Convert spatial coordinates from milimeters to meters</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x_pos&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y_pos&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="read_utrecht_pf5_paths_4tu">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_utrecht_pf5_paths_4tu">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_utrecht_pf5_paths_4tu</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the Utrecht Centraal platform 5 paths data set from 4TU.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The trajectory dataset with Utrecht Centraal platform 5 paths</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://data.4tu.nl/file/d4d548c6-d198-49b3-986c-e22319970a5e/&quot;</span>
+        <span class="s2">&quot;a58041fb-0318-4bee-9b2c-934bd8e5df83&quot;</span>
+    <span class="p">)</span>
+    <span class="n">bytestring</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">link</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">bytestring</span><span class="o">.</span><span class="n">content</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zipped_file</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">zipped_file</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+            <span class="s2">&quot;Utrecht Centraal - platform 5 - set99.csv&quot;</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">paths</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="read_utrecht_pf5_paths_local">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_utrecht_pf5_paths_local">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_utrecht_pf5_paths_local</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the Utrecht Centraal platform 5 paths data set from a local file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The trajectory dataset with Utrecht Centraal platform 5 paths.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">file_list</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">trajectory_data_dir</span> <span class="o">+</span> <span class="s2">&quot;/Utrecht*.csv&quot;</span><span class="p">)</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="n">file_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span></div>
+
+
+
+<span class="n">utrecht_pf5_path_reader</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;local&quot;</span><span class="p">:</span> <span class="n">read_utrecht_pf5_paths_local</span><span class="p">,</span>
+    <span class="s2">&quot;4tu&quot;</span><span class="p">:</span> <span class="n">read_utrecht_pf5_paths_4tu</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="read_utrecht_pf5_paths">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_utrecht_pf5_paths">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_utrecht_pf5_paths</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the Utrecht Centraal platform 5 paths data set.</span>
+
+<span class="sd">    The trajectories are read from local or remote sources based on the</span>
+<span class="sd">    configuration. The spatial coordinates of the trajectories are converted</span>
+<span class="sd">    from milimeters to meters.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The trajectory dataset with Utrecht Centraal platform 5 paths.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path_reader</span> <span class="o">=</span> <span class="n">utrecht_pf5_path_reader</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">data_source</span><span class="p">]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">path_reader</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="c1"># Only keep the columns that are needed</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="s2">&quot;x_pos&quot;</span><span class="p">,</span> <span class="s2">&quot;y_pos&quot;</span><span class="p">,</span> <span class="s2">&quot;tracked_object&quot;</span><span class="p">,</span> <span class="s2">&quot;timestampms&quot;</span><span class="p">]]</span>
+
+    <span class="c1"># Convert spatial coordinates from milimeters to meters</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x_pos&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y_pos&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="read_asdz_pf12_paths_4tu">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_asdz_pf12_paths_4tu">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_asdz_pf12_paths_4tu</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the Amsterdam Zuid platform 1-2 paths data set from 4TU.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The trajectory dataset with Amsterdam Zuid platform 1-2 paths</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://data.4tu.nl/file/af4ef093-69ef-4e1c-8fbc-c40c447c618c/&quot;</span>
+        <span class="s2">&quot;ca88bfc5-5a79-496a-8c90-433fa40929b9&quot;</span>
+    <span class="p">)</span>
+    <span class="n">bytestring</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">link</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">bytestring</span><span class="o">.</span><span class="n">content</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zipped_file</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">zipped_file</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+            <span class="s2">&quot;Amsterdam Zuid - platform 1-2 - set10.csv&quot;</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">paths</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">paths</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="read_asdz_pf12_paths_local">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_asdz_pf12_paths_local">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_asdz_pf12_paths_local</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the Amsterdam Zuid platform 1-2 paths data set from a local file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The trajectory dataset with Amsterdam Zuid platform 1-2 paths</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO Change path string to pathlib path</span>
+    <span class="n">file_list</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">trajectory_data_dir</span> <span class="o">+</span> <span class="s2">&quot;/Amsterdam*Zuid*1-2*.csv&quot;</span>
+    <span class="p">)</span>
+    <span class="n">file_path</span> <span class="o">=</span> <span class="n">file_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span></div>
+
+
+
+<span class="n">asdz_pf12_path_reader</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;local&quot;</span><span class="p">:</span> <span class="n">read_asdz_pf12_paths_local</span><span class="p">,</span>
+    <span class="s2">&quot;4tu&quot;</span><span class="p">:</span> <span class="n">read_asdz_pf12_paths_4tu</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="read_asdz_pf12_paths">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_asdz_pf12_paths">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_asdz_pf12_paths</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the Amsterdam Zuid platform 1-2 paths data set.</span>
+
+<span class="sd">    The trajectories are read from local or remote sources based on the</span>
+<span class="sd">    configuration. The spatial coordinates of the trajectories are converted</span>
+<span class="sd">    from milimeters to meters.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The trajectory dataset with Amsterdam Zuid platform 1-2 paths.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">asdz_pf12_path_reader</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">data_source</span><span class="p">](</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="c1"># Convert spatial coordinates from milimeters to meters</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;x_pos&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;y_pos&quot;</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<span class="n">trajectory_reader</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;narrow_corridor&quot;</span><span class="p">:</span> <span class="n">read_narrow_corridor_paths</span><span class="p">,</span>
+    <span class="s2">&quot;wide_corridor&quot;</span><span class="p">:</span> <span class="n">read_wide_corridor_paths</span><span class="p">,</span>
+    <span class="s2">&quot;intersecting_paths&quot;</span><span class="p">:</span> <span class="n">read_intersecting_paths</span><span class="p">,</span>
+    <span class="s2">&quot;curved_paths_synthetic&quot;</span><span class="p">:</span> <span class="n">read_curved_paths_synthetic</span><span class="p">,</span>
+    <span class="s2">&quot;eindhoven_pf34&quot;</span><span class="p">:</span> <span class="n">read_eindhoven_pf34_paths</span><span class="p">,</span>
+    <span class="s2">&quot;asdz_pf34&quot;</span><span class="p">:</span> <span class="n">read_asdz_pf34_paths</span><span class="p">,</span>
+    <span class="s2">&quot;utrecht_pf5&quot;</span><span class="p">:</span> <span class="n">read_utrecht_pf5_paths</span><span class="p">,</span>
+    <span class="s2">&quot;asdz_pf12&quot;</span><span class="p">:</span> <span class="n">read_asdz_pf12_paths</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="read_trajectories">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.read_trajectories">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_trajectories</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Reading trajectories&quot;</span><span class="p">)</span>
+    <span class="n">env_name</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">env_name</span>
+    <span class="n">trajectories</span> <span class="o">=</span> <span class="n">trajectory_reader</span><span class="p">[</span><span class="n">env_name</span><span class="p">](</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">trajectories</span></div>
+
+
+
+<div class="viewcode-block" id="get_background_image_local">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.get_background_image_local">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_background_image_local</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the background image from a local file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The background image as a PIL Image object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span>
+        <span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">root_dir</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">imgpath</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">image</span></div>
+
+
+
+<div class="viewcode-block" id="get_background_image_from_remote_zip">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.get_background_image_from_remote_zip">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_background_image_from_remote_zip</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read the background image from a remote archive.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The background image as a PIL Image object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">img_link_4tu</span>
+    <span class="n">bytestring</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">link</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+    <span class="n">archive</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">bytestring</span><span class="o">.</span><span class="n">content</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+    <span class="n">background_name</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">archive</span><span class="o">.</span><span class="n">namelist</span><span class="p">()</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.png&quot;</span><span class="p">)][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">with</span> <span class="n">archive</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">background_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">contents</span><span class="p">:</span>
+        <span class="n">image_data</span> <span class="o">=</span> <span class="n">contents</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="n">image_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">image_data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">image_array</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">image</span></div>
+
+
+
+<div class="viewcode-block" id="get_background_image_from_zenodo">
+<a class="viewcode-back" href="../../../physped.io.html#physped.io.readers.get_background_image_from_zenodo">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_background_image_from_zenodo</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read image file from Zenodo using PIL</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config: The configuration parameters.</span>
+<span class="sd">        filename: Name of file to read. If None, will read first image file</span>
+<span class="sd">        found</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        PIL Image object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get file information</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">filename</span> <span class="k">if</span> <span class="n">filename</span> <span class="k">else</span> <span class="s2">&quot;*.png&quot;</span>
+    <span class="p">)</span>  <span class="c1"># Can be extended to support other formats</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">list_zenodo_files</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">files</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;No matching image files found in record &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">data_record_id</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Use first matching file if filename not specified</span>
+    <span class="n">file_info</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">file_url</span> <span class="o">=</span> <span class="n">file_info</span><span class="p">[</span><span class="s2">&quot;links&quot;</span><span class="p">][</span><span class="s2">&quot;self&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Get data into memory</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">get_zenodo_data</span><span class="p">(</span><span class="n">file_url</span><span class="p">)</span>
+
+    <span class="c1"># Read image using PIL</span>
+    <span class="k">return</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+
+<span class="n">read_background_image</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;local&quot;</span><span class="p">:</span> <span class="n">get_background_image_local</span><span class="p">,</span>
+    <span class="s2">&quot;4tu&quot;</span><span class="p">:</span> <span class="n">get_background_image_from_remote_zip</span><span class="p">,</span>
+    <span class="s2">&quot;zenodo&quot;</span><span class="p">:</span> <span class="n">get_background_image_from_zenodo</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

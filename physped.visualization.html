@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.visualization package &mdash; Data-driven physics-based modeling of pedestrian dynamics 0.post1.dev0+gbf0ef31 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=9c8095b4"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Release History" href="release-history.html" />
+    <link rel="prev" title="physped.utils package" href="physped.utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0.post1.dev0+gbf0ef31
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#using-the-cli">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#available-environments">Available environments</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">physped</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="physped.html">physped package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="physped.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="physped.core.html">physped.core package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.io.html">physped.io package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.preprocessing.html">physped.preprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.utils.html">physped.utils package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">physped.visualization package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="physped.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.html#module-physped.main">physped.main module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.html#module-physped.processing_pipelines">physped.processing_pipelines module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.html#module-physped">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">physped</a></li>
+          <li class="breadcrumb-item"><a href="physped.html">physped package</a></li>
+      <li class="breadcrumb-item active">physped.visualization package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/physped.visualization.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="physped-visualization-package">
+<h1>physped.visualization package<a class="headerlink" href="#physped-visualization-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-physped.visualization.force_field">
+<span id="physped-visualization-force-field-module"></span><h2>physped.visualization.force_field module<a class="headerlink" href="#module-physped.visualization.force_field" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.force_field.clip_fields">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.force_field.</span></span><span class="sig-name descname"><span class="pre">clip_fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/visualization/force_field.html#clip_fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.force_field.clip_fields" title="Link to this definition">¶</a></dt>
+<dd><p>Clip fields.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.force_field.plot_quiver">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.force_field.</span></span><span class="sig-name descname"><span class="pre">plot_quiver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/visualization/force_field.html#plot_quiver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.force_field.plot_quiver" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the force field.</p>
+</dd></dl>
+
+</section>
+<section id="module-physped.visualization.plot_discrete_grid">
+<span id="physped-visualization-plot-discrete-grid-module"></span><h2>physped.visualization.plot_discrete_grid module<a class="headerlink" href="#module-physped.visualization.plot_discrete_grid" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_discrete_grid.plot_discrete_grid">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_discrete_grid.</span></span><span class="sig-name descname"><span class="pre">plot_discrete_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config:</span> <span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_indices:</span> <span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectories:</span> <span class="pre">~pandas.core.frame.DataFrame</span> <span class="pre">=</span> <span class="pre">Empty</span> <span class="pre">DataFrame</span> <span class="pre">Columns:</span> <span class="pre">[]</span> <span class="pre">Index:</span> <span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/visualization/plot_discrete_grid.html#plot_discrete_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_discrete_grid.plot_discrete_grid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-physped.visualization.plot_fields">
+<span id="physped-visualization-plot-fields-module"></span><h2>physped.visualization.plot_fields module<a class="headerlink" href="#module-physped.visualization.plot_fields" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_fields.calculate_offsets">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_fields.</span></span><span class="sig-name descname"><span class="pre">calculate_offsets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(2,</span> <span class="pre">3,</span> <span class="pre">4)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/visualization/plot_fields.html#calculate_offsets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_fields.calculate_offsets" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate offsets.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_fields.clip_fields">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_fields.</span></span><span class="sig-name descname"><span class="pre">clip_fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/visualization/plot_fields.html#clip_fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_fields.clip_fields" title="Link to this definition">¶</a></dt>
+<dd><p>Clip fields.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_fields.create_force_fields">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_fields.</span></span><span class="sig-name descname"><span class="pre">create_force_fields</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sliced_histogram</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_fields.html#create_force_fields"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_fields.create_force_fields" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_fields.infer_bounds_from_data">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_fields.</span></span><span class="sig-name descname"><span class="pre">infer_bounds_from_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><span class="pre">tuple</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_fields.html#infer_bounds_from_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_fields.infer_bounds_from_data" title="Link to this definition">¶</a></dt>
+<dd><p>Infer bounds from data.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_fields.plot_colorbar">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_fields.</span></span><span class="sig-name descname"><span class="pre">plot_colorbar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/contour_api.html#matplotlib.contour.QuadContourSet" title="(in Matplotlib v3.10.3)"><span class="pre">QuadContourSet</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_fields.html#plot_colorbar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_fields.plot_colorbar" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the colorbar.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_fields.plot_contourf_offset_field">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_fields.</span></span><span class="sig-name descname"><span class="pre">plot_contourf_offset_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'YlOrRd'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><span class="pre">tuple</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0.36)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_fields.html#plot_contourf_offset_field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_fields.plot_contourf_offset_field" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the offset field.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_fields.plot_force_field_of_selection">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_fields.</span></span><span class="sig-name descname"><span class="pre">plot_force_field_of_selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selection</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/visualization/plot_fields.html#plot_force_field_of_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_fields.plot_force_field_of_selection" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_fields.plot_pcolormesh_offset_field">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_fields.</span></span><span class="sig-name descname"><span class="pre">plot_pcolormesh_offset_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'YlOrRd'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><span class="pre">tuple</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0.36)</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_fields.html#plot_pcolormesh_offset_field"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_fields.plot_pcolormesh_offset_field" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the offset field.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_fields.plot_quiver_force_vectors">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_fields.</span></span><span class="sig-name descname"><span class="pre">plot_quiver_force_vectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparseness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_fields.html#plot_quiver_force_vectors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_fields.plot_quiver_force_vectors" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the force field.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_fields.plot_quiverkey">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_fields.</span></span><span class="sig-name descname"><span class="pre">plot_quiverkey</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.quiver.Quiver.html#matplotlib.quiver.Quiver" title="(in Matplotlib v3.10.3)"><span class="pre">Quiver</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_fields.html#plot_quiverkey"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_fields.plot_quiverkey" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the quiver key.</p>
+</dd></dl>
+
+</section>
+<section id="module-physped.visualization.plot_histograms">
+<span id="physped-visualization-plot-histograms-module"></span><h2>physped.visualization.plot_histograms module<a class="headerlink" href="#module-physped.visualization.plot_histograms" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_histograms.compute_joint_kl_divergence">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_histograms.</span></span><span class="sig-name descname"><span class="pre">compute_joint_kl_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">piecewise_potential</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="physped.core.html#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulated_paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_histograms.html#compute_joint_kl_divergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_histograms.compute_joint_kl_divergence" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_histograms.compute_joint_kl_divergence_with_volume">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_histograms.</span></span><span class="sig-name descname"><span class="pre">compute_joint_kl_divergence_with_volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">piecewise_potential</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="physped.core.html#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulated_paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_histograms.html#compute_joint_kl_divergence_with_volume"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_histograms.compute_joint_kl_divergence_with_volume" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_histograms.create_all_histograms">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_histograms.</span></span><span class="sig-name descname"><span class="pre">create_all_histograms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recorded_paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">simulated_paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/visualization/plot_histograms.html#create_all_histograms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_histograms.create_all_histograms" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_histograms.create_histogram">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_histograms.</span></span><span class="sig-name descname"><span class="pre">create_histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html#pandas.Series" title="(in pandas v2.3.0)"><span class="pre">Series</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><span class="pre">ndarray</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_histograms.html#create_histogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_histograms.create_histogram" title="Link to this definition">¶</a></dt>
+<dd><p>Create a histogram of the input values.</p>
+<p>Paramters:
+- values (pd.Series): A Pandas Series containing the values to bin.
+- bins (np.ndarray): An array of bin edges.</p>
+<p>Returns:
+- dict: A dictionary containing the bin edges, bin width, bin centers,
+counts, and PDF of the histogram.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_histograms.plot_histogram">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_histograms.</span></span><span class="sig-name descname"><span class="pre">plot_histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">histograms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">observable</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">hist_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_histograms.html#plot_histogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_histograms.plot_histogram" title="Link to this definition">¶</a></dt>
+<dd><p>Plot a histogram.</p>
+<p>Parameters:
+- ax (plt.Axes): The axes to plot the histogram on.
+- histograms (Dict[str, Any]): The histograms to plot.
+- observable (str): The observable to plot the histogram for.
+- hist_type (str): The type of histogram to plot.
+- kl_div (float): The KL divergence value for the histogram.</p>
+<p>Returns:
+- The axes object.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_histograms.plot_multiple_histograms">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_histograms.</span></span><span class="sig-name descname"><span class="pre">plot_multiple_histograms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">observables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">histograms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">histogram_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/visualization/plot_histograms.html#plot_multiple_histograms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_histograms.plot_multiple_histograms" title="Link to this definition">¶</a></dt>
+<dd><p>Plot histograms for all observables.</p>
+<p>Parameters:
+- ax (plt.Axes): The axes to plot the histogram on.
+- histograms (dict): The histograms to plot.
+- observable (str): The observable to plot the histogram for.
+- hist_type (str): The type of histogram to plot.
+- kl_div (float): The KL divergence value for the histogram.</p>
+<p>Returns:
+- The axes object.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_histograms.save_joint_kl_divergence_to_file">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_histograms.</span></span><span class="sig-name descname"><span class="pre">save_joint_kl_divergence_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">joint_kl_divergence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_histograms.html#save_joint_kl_divergence_to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_histograms.save_joint_kl_divergence_to_file" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-physped.visualization.plot_learn_piece_of_potential">
+<span id="physped-visualization-plot-learn-piece-of-potential-module"></span><h2>physped.visualization.plot_learn_piece_of_potential module<a class="headerlink" href="#module-physped.visualization.plot_learn_piece_of_potential" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_learn_piece_of_potential.learn_piece_of_potential_plot">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_learn_piece_of_potential.</span></span><span class="sig-name descname"><span class="pre">learn_piece_of_potential_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocessed_trajectories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">piecewise_potential</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="physped.core.html#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/visualization/plot_learn_piece_of_potential.html#learn_piece_of_potential_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_learn_piece_of_potential.learn_piece_of_potential_plot" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-physped.visualization.plot_potential_at_slow_index">
+<span id="physped-visualization-plot-potential-at-slow-index-module"></span><h2>physped.visualization.plot_potential_at_slow_index module<a class="headerlink" href="#module-physped.visualization.plot_potential_at_slow_index" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_potential_at_slow_index.plot_potential_at_slow_index">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_potential_at_slow_index.</span></span><span class="sig-name descname"><span class="pre">plot_potential_at_slow_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slow_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">piecewise_potential</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="physped.core.html#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/visualization/plot_potential_at_slow_index.html#plot_potential_at_slow_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_potential_at_slow_index.plot_potential_at_slow_index" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-physped.visualization.plot_trajectories">
+<span id="physped-visualization-plot-trajectories-module"></span><h2>physped.visualization.plot_trajectories module<a class="headerlink" href="#module-physped.visualization.plot_trajectories" title="Link to this heading">¶</a></h2>
+<p>Plot trajectories of particles in the metaforum dataset.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_trajectories.intended_path_label_generator">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_trajectories.</span></span><span class="sig-name descname"><span class="pre">intended_path_label_generator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/visualization/plot_trajectories.html#intended_path_label_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_trajectories.intended_path_label_generator" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_trajectories.plot_intended_path">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_trajectories.</span></span><span class="sig-name descname"><span class="pre">plot_intended_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_plot_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_trajectories.html#plot_intended_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_trajectories.plot_intended_path" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_trajectories.plot_position_trajectories_in_cartesian_coordinates">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_trajectories.</span></span><span class="sig-name descname"><span class="pre">plot_position_trajectories_in_cartesian_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'f'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_trajectories.html#plot_position_trajectories_in_cartesian_coordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_trajectories.plot_position_trajectories_in_cartesian_coordinates" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the trajectories of pedestrians in cartesian coordinates.</p>
+<p>Parameters:
+- ax (plt.Axes): The matplotlib Axes object to plot on.
+- df (pd.DataFrame): The DataFrame containing the particle data.</p>
+<p>Returns:
+- ax (plt.Axes): The modified matplotlib Axes object.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_trajectories.plot_trajectories">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_trajectories.</span></span><span class="sig-name descname"><span class="pre">plot_trajectories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">trajectory_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'f'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/visualization/plot_trajectories.html#plot_trajectories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_trajectories.plot_trajectories" title="Link to this definition">¶</a></dt>
+<dd><p>Plot trajectories of pedestrians.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajs</strong> (<em>pd.DataFrame</em>) – DataFrame containing the trajectories of</p></li>
+<li><p><strong>pedestrians.</strong></p></li>
+<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – Dictionary containing the plot parameters.</p></li>
+<li><p><strong>trajectory_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>optional</em>) – Type of trajectory. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_trajectories.plot_velocity_trajectories_in_cartesian_coordinates">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_trajectories.</span></span><span class="sig-name descname"><span class="pre">plot_velocity_trajectories_in_cartesian_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_trajectories.html#plot_velocity_trajectories_in_cartesian_coordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_trajectories.plot_velocity_trajectories_in_cartesian_coordinates" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the trajectories of particles in the metaforum dataset.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_trajectories.plot_velocity_trajectories_in_polar_coordinates">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_trajectories.</span></span><span class="sig-name descname"><span class="pre">plot_velocity_trajectories_in_polar_coordinates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'f'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_trajectories.html#plot_velocity_trajectories_in_polar_coordinates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_trajectories.plot_velocity_trajectories_in_polar_coordinates" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the trajectories of particles in the metaforum dataset.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_trajectories.plot_walls_in_environment">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_trajectories.</span></span><span class="sig-name descname"><span class="pre">plot_walls_in_environment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_plot_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_trajectories.html#plot_walls_in_environment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_trajectories.plot_walls_in_environment" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-physped.visualization.plot_utils">
+<span id="physped-visualization-plot-utils-module"></span><h2>physped.visualization.plot_utils module<a class="headerlink" href="#module-physped.visualization.plot_utils" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_utils.apply_polar_plot_style">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_utils.</span></span><span class="sig-name descname"><span class="pre">apply_polar_plot_style</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_utils.html#apply_polar_plot_style"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_utils.apply_polar_plot_style" title="Link to this definition">¶</a></dt>
+<dd><p>Applies a polar plot style to the given axes object.</p>
+<p>Parameters:
+- ax: The axes object to apply the polar plot style to.
+- params: A dictionary containing parameters for customizing the
+plot style.</p>
+<p>Returns:
+- The modified axes object.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_utils.apply_xy_plot_style">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_utils.</span></span><span class="sig-name descname"><span class="pre">apply_xy_plot_style</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_utils.html#apply_xy_plot_style"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_utils.apply_xy_plot_style" title="Link to this definition">¶</a></dt>
+<dd><p>Apply XY plot style to the given Axes object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ax</strong> (<em>plt.Axes</em>) – The Axes object to apply the style to.</p></li>
+<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – A dictionary containing the plot parameters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The modified Axes object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>plt.Axes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_utils.convert_rad_to_deg">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_utils.</span></span><span class="sig-name descname"><span class="pre">convert_rad_to_deg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_utils.html#convert_rad_to_deg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_utils.convert_rad_to_deg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_utils.highlight_grid_box">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_utils.</span></span><span class="sig-name descname"><span class="pre">highlight_grid_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">limits</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'k'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_utils.html#highlight_grid_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_utils.highlight_grid_box" title="Link to this definition">¶</a></dt>
+<dd><p>Highlight the selected grid box.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ax</strong> (<em>plt.Axes</em>) – The matplotlib Axes object to plot on.</p></li>
+<li><p><strong>limits</strong> (<em>Tuple</em>) – The limits of the grid box as a tuple (xlims, ylims).</p></li>
+<li><p><strong>c</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – The color of the highlight box. Default is “k” (black).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The modified matplotlib Axes object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>plt.Axes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_utils.highlight_position_selection">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_utils.</span></span><span class="sig-name descname"><span class="pre">highlight_position_selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_utils.html#highlight_position_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_utils.highlight_position_selection" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_utils.highlight_velocity_selection">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_utils.</span></span><span class="sig-name descname"><span class="pre">highlight_velocity_selection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_utils.html#highlight_velocity_selection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_utils.highlight_velocity_selection" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_utils.plot_cartesian_spatial_grid">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_utils.</span></span><span class="sig-name descname"><span class="pre">plot_cartesian_spatial_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.8</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_utils.html#plot_cartesian_spatial_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_utils.plot_cartesian_spatial_grid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_utils.plot_polar_labels">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_utils.</span></span><span class="sig-name descname"><span class="pre">plot_polar_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_utils.html#plot_polar_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_utils.plot_polar_labels" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_utils.plot_polar_velocity_grid">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_utils.</span></span><span class="sig-name descname"><span class="pre">plot_polar_velocity_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_utils.html#plot_polar_velocity_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_utils.plot_polar_velocity_grid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.visualization.plot_utils.plot_station_background">
+<span class="sig-prename descclassname"><span class="pre">physped.visualization.plot_utils.</span></span><span class="sig-name descname"><span class="pre">plot_station_background</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.3)"><span class="pre">Axes</span></a></span></span><a class="reference internal" href="_modules/physped/visualization/plot_utils.html#plot_station_background"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.visualization.plot_utils.plot_station_background" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the background image of the station.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ax</strong> (<em>plt.Axes</em>) – The matplotlib Axes object to plot on.</p></li>
+<li><p><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – A dictionary containing the parameters for plotting.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The modified matplotlib Axes object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>plt.Axes</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-physped.visualization">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-physped.visualization" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="physped.utils.html" class="btn btn-neutral float-left" title="physped.utils package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="release-history.html" class="btn btn-neutral float-right" title="Release History" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

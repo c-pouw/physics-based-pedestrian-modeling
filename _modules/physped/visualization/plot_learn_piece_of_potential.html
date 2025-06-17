@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.visualization.plot_learn_piece_of_potential &mdash; Data-driven physics-based modeling of pedestrian dynamics 0.post1.dev0+gbf0ef31 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=9c8095b4"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0.post1.dev0+gbf0ef31
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#using-the-cli">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#available-environments">Available environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">physped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">physped.visualization.plot_learn_piece_of_potential</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for physped.visualization.plot_learn_piece_of_potential</h1><div class="highlight"><pre>
+<span></span><span class="c1"># import glob</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="c1"># import shutil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="c1"># import hydra</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">norm</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.lattice_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">evaluate_selection_range</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.parametrize_potential</span><span class="w"> </span><span class="kn">import</span> <span class="n">digitize_trajectories_to_grid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.piecewise_potential</span><span class="w"> </span><span class="kn">import</span> <span class="n">PiecewisePotential</span>
+
+<span class="c1"># from physped.utils.config_utils import register_new_resolvers</span>
+<span class="c1"># from physped.visualization.plot_discrete_grid import plot_discrete_grid</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="learn_piece_of_potential_plot">
+<a class="viewcode-back" href="../../../physped.visualization.html#physped.visualization.plot_learn_piece_of_potential.learn_piece_of_potential_plot">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">learn_piece_of_potential_plot</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">preprocessed_trajectories</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">piecewise_potential</span><span class="p">:</span> <span class="n">PiecewisePotential</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">plot_params</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">learn_piece_of_potential_plot</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">evaluate_selection_range</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="c1"># filepath = Path.cwd().parent / config.filename.piecewise_potential</span>
+    <span class="c1"># piecewise_potential = read_piecewise_potential_from_file(filepath)</span>
+    <span class="c1"># piecewise_potential =</span>
+    <span class="c1"># read_piecewise_potential_from_file(Path.cwd().parent /</span>
+    <span class="c1"># &quot;piecewise_potential.pickle&quot;)</span>
+    <span class="c1"># selection = config.params.get(&quot;selection&quot;)</span>
+    <span class="c1"># log.info(&quot;Selection: %s&quot;, selection)</span>
+
+    <span class="c1"># selection_with_bins = \</span>
+    <span class="c1"># [[selection[d][0], piecewise_potential.bins[d]] for d in</span>
+    <span class="c1"># piecewise_potential.dimensions]</span>
+    <span class="c1"># grid_selection_by_indices = \</span>
+    <span class="c1"># [get_most_left_boundary(v, b) for v, b in selection_with_bins]</span>
+    <span class="c1"># log.info(&quot;Grid selection by indices: %s&quot;, grid_selection_by_indices)</span>
+
+    <span class="c1"># filepath = Path.cwd().parent / config.filename.preprocessed_trajectories</span>
+    <span class="c1"># preprocessed_trajectories = pd.read_csv(filepath)</span>
+    <span class="c1"># trajs = pd.read_csv(Path.cwd().parent / &quot;preprocessed_trajectories.csv&quot;)</span>
+    <span class="n">trajs</span> <span class="o">=</span> <span class="n">digitize_trajectories_to_grid</span><span class="p">(</span>
+        <span class="n">preprocessed_trajectories</span><span class="p">,</span> <span class="n">piecewise_potential</span><span class="o">.</span><span class="n">lattice</span>
+    <span class="p">)</span>
+
+    <span class="n">parametrization</span> <span class="o">=</span> <span class="n">piecewise_potential</span><span class="o">.</span><span class="n">parametrization</span><span class="p">[</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">range</span><span class="o">.</span><span class="n">x_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">range</span><span class="o">.</span><span class="n">y_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">range</span><span class="o">.</span><span class="n">r_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">range</span><span class="o">.</span><span class="n">theta_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">range</span><span class="o">.</span><span class="n">k_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="p">:,</span>
+        <span class="p">:,</span>
+    <span class="p">]</span>
+
+    <span class="c1"># fit_params = piecewise_potential.fit_params[</span>
+    <span class="c1">#     grid_selection_by_indices[0],</span>
+    <span class="c1">#     grid_selection_by_indices[1],</span>
+    <span class="c1">#     grid_selection_by_indices[2],</span>
+    <span class="c1">#     grid_selection_by_indices[3],</span>
+    <span class="c1">#     grid_selection_by_indices[4],</span>
+    <span class="c1">#     :,</span>
+    <span class="c1"># ]</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Fit parameters: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">parametrization</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">parametrization</span><span class="p">)</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No data for this selection. Exiting.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="n">grid_selection_by_indices</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">range</span><span class="o">.</span><span class="n">x_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">range</span><span class="o">.</span><span class="n">y_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">range</span><span class="o">.</span><span class="n">r_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">range</span><span class="o">.</span><span class="n">theta_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">range</span><span class="o">.</span><span class="n">k_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="p">]</span>
+    <span class="n">points_inside_grid_cell</span> <span class="o">=</span> <span class="n">trajs</span><span class="p">[</span>
+        <span class="n">trajs</span><span class="o">.</span><span class="n">slow_grid_indices</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">grid_selection_by_indices</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="s2">&quot;constrained&quot;</span><span class="p">)</span>
+    <span class="n">fit_dimensions</span> <span class="o">=</span> <span class="n">piecewise_potential</span><span class="o">.</span><span class="n">dist_approximation</span><span class="o">.</span><span class="n">fit_dimensions</span>
+    <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">fit_dimensions</span><span class="p">:</span>
+        <span class="n">fit_dimension_index</span> <span class="o">=</span> <span class="n">fit_dimensions</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">fit_dimension_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">fit_param_index</span> <span class="o">=</span> <span class="n">fit_dimension_index</span> <span class="o">*</span> <span class="mi">2</span>
+        <span class="c1"># ! This will break if the parametrization is not mu, sigma</span>
+        <span class="n">mu</span><span class="p">,</span> <span class="n">variance</span> <span class="o">=</span> <span class="n">parametrization</span><span class="p">[</span><span class="n">fit_param_index</span> <span class="p">:</span> <span class="p">(</span><span class="n">fit_param_index</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)]</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">variance</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">mu</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">mu</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">sigma</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">gauss_line</span><span class="p">,)</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C3&quot;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+
+        <span class="n">nbins</span> <span class="o">=</span> <span class="mi">50</span>
+        <span class="n">hist_bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
+            <span class="n">plot_params</span><span class="o">.</span><span class="n">xlimits</span><span class="p">[</span><span class="n">axis</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">plot_params</span><span class="o">.</span><span class="n">xlimits</span><span class="p">[</span><span class="n">axis</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">nbins</span>
+        <span class="p">)</span>
+        <span class="n">dbin</span> <span class="o">=</span> <span class="n">hist_bins</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">hist_bins</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">middle_bins</span> <span class="o">=</span> <span class="p">(</span><span class="n">hist_bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="n">hist_bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+
+        <span class="n">hist_conditioned</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span>
+            <span class="n">points_inside_grid_cell</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2">f&quot;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">hist_bins</span>
+        <span class="p">)</span>
+        <span class="n">hist_unconditioned</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">trajs</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2">f&quot;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="n">hist_bins</span><span class="p">)</span>
+
+        <span class="c1"># plt.plot(middle_bins, hist_conditioned /</span>
+        <span class="c1"># (np.sum(hist_unconditioned) * dbin), c=&quot;C0&quot;, zorder=5, lw=1.5)</span>
+        <span class="p">(</span><span class="n">pdf_line</span><span class="p">,)</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">middle_bins</span><span class="p">,</span>
+            <span class="n">hist_unconditioned</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">hist_unconditioned</span><span class="p">)</span> <span class="o">*</span> <span class="n">dbin</span><span class="p">),</span>
+            <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">,</span>
+            <span class="n">zorder</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+            <span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">fast_hist</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+            <span class="n">points_inside_grid_cell</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2">f&quot;</span><span class="p">],</span>
+            <span class="n">bins</span><span class="o">=</span><span class="n">hist_bins</span><span class="p">,</span>
+            <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">ec</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span>
+            <span class="n">fc</span><span class="o">=</span><span class="s2">&quot;#77AADD&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># pdf = plt.hist(</span>
+        <span class="c1">#     trajs[f&quot;{axis}f&quot;], bins=hist_bins, alpha=0.5, ec=&quot;k&quot;,</span>
+        <span class="c1"># fc=&quot;#88CCEE&quot;</span>
+        <span class="c1"># )</span>
+        <span class="n">fast_hist_patches</span> <span class="o">=</span> <span class="n">fast_hist</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">plot_params</span><span class="o">.</span><span class="n">xlimits</span><span class="p">[</span><span class="n">axis</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">plot_params</span><span class="o">.</span><span class="n">xlabel</span><span class="p">[</span><span class="n">axis</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">plot_params</span><span class="o">.</span><span class="n">ylabel</span><span class="p">[</span><span class="n">axis</span><span class="p">])</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">fast_hist_patches</span><span class="p">,</span> <span class="n">gauss_line</span><span class="p">,</span> <span class="n">pdf_line</span><span class="p">]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;Conditioned &quot;</span>
+        <span class="s2">&quot;$</span><span class="se">\\</span><span class="s2">mathbb</span><span class="si">{P}</span><span class="s2">(</span><span class="se">\\</span><span class="s2">vec</span><span class="si">{x}</span><span class="s2">, </span><span class="se">\\</span><span class="s2">vec</span><span class="si">{u}</span><span class="s2"> </span><span class="se">\\</span><span class="s2">,|</span><span class="se">\\</span><span class="s2">, </span><span class="se">\\</span><span class="s2">vec</span><span class="si">{x}</span><span class="s2">_s, </span><span class="se">\\</span><span class="s2">vec</span><span class="si">{u}</span><span class="s2">_s)$&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Fit of &quot;</span>
+        <span class="s2">&quot;$</span><span class="se">\\</span><span class="s2">mathbb</span><span class="si">{P}</span><span class="s2">(</span><span class="se">\\</span><span class="s2">vec</span><span class="si">{x}</span><span class="s2">, </span><span class="se">\\</span><span class="s2">vec</span><span class="si">{u}</span><span class="s2"> </span><span class="se">\\</span><span class="s2">,|</span><span class="se">\\</span><span class="s2">, </span><span class="se">\\</span><span class="s2">vec</span><span class="si">{x}</span><span class="s2">_s, </span><span class="se">\\</span><span class="s2">vec</span><span class="si">{u}</span><span class="s2">_s)$&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Unconditioned $</span><span class="se">\\</span><span class="s2">mathbb</span><span class="si">{P}</span><span class="s2">(</span><span class="se">\\</span><span class="s2">vec</span><span class="si">{x}</span><span class="s2">, </span><span class="se">\\</span><span class="s2">vec</span><span class="si">{u}</span><span class="s2">)$&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figlegend</span><span class="p">(</span>
+        <span class="n">lines</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">,</span>
+        <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">),</span>
+        <span class="n">bbox_transform</span><span class="o">=</span><span class="n">fig</span><span class="o">.</span><span class="n">transFigure</span><span class="p">,</span>
+        <span class="n">ncol</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;gaussian_fits_1d.pdf&quot;</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s2">&quot;tight&quot;</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Saved plot to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">filepath</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">root_dir</span><span class="p">))</span></div>
+
+
+
+<span class="c1"># @hydra.main(version_base=None, config_path=&quot;../../conf&quot;,</span>
+<span class="c1"># config_name=&quot;config&quot;)</span>
+<span class="c1"># def plot_piecewise_potential_fit(cfg):</span>
+<span class="c1">#     plt.style.use(str(cfg.root_dir / cfg.plot_style))</span>
+<span class="c1">#     plot_discrete_grid(cfg)</span>
+<span class="c1">#     learn_piece_of_potential_plot(cfg)</span>
+<span class="c1">#     output_figures = glob.glob(&quot;*.pdf&quot;)</span>
+<span class="c1">#     for figure in output_figures:</span>
+<span class="c1">#         shutil.copyfile(figure, Path.cwd().parent / figure)</span>
+
+
+<span class="c1"># if __name__ == &quot;__main__&quot;:</span>
+<span class="c1">#     register_new_resolvers()</span>
+<span class="c1">#     plot_piecewise_potential_fit()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.core.slow_dynamics &mdash; Data-driven physics-based modeling of pedestrian dynamics 0.post1.dev0+gbf0ef31 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=9c8095b4"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0.post1.dev0+gbf0ef31
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#using-the-cli">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#available-environments">Available environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">physped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">physped.core.slow_dynamics</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for physped.core.slow_dynamics</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">omegaconf</span><span class="w"> </span><span class="kn">import</span> <span class="n">DictConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">savgol_filter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm.contrib.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logging_redirect_tqdm</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.preprocessing.trajectories</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">transform_slow_velocity_to_polar_coordinates</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.utils.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">compose_functions</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="integrate_slow_velocity_single_path">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.slow_dynamics.integrate_slow_velocity_single_path">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">integrate_slow_velocity_single_path</span><span class="p">(</span>
+    <span class="n">x0</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">us</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute slow dynamics by integrating the slow velocity&quot;&quot;&quot;</span>
+    <span class="n">us</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">us</span><span class="p">)</span>
+    <span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">us</span><span class="p">)</span>
+    <span class="n">xs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">x0</span>  <span class="c1"># Initialize xs(0) to x(0)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">xs</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">xs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">us</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">xs</span></div>
+
+
+
+<div class="viewcode-block" id="low_pass_filter_single_path">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.slow_dynamics.low_pass_filter_single_path">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">low_pass_filter_single_path</span><span class="p">(</span>
+    <span class="n">fast</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">tau</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">dt</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute slow dynamics of single trajectory with low pass filter.&quot;&quot;&quot;</span>
+    <span class="n">fast</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">fast</span><span class="p">)</span>
+    <span class="n">slow</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">fast</span><span class="p">)</span>
+    <span class="n">slow</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">fast</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fast</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">slow</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">/</span> <span class="n">tau</span><span class="p">)</span> <span class="o">*</span> <span class="n">slow</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">/</span> <span class="n">tau</span> <span class="o">*</span> <span class="n">fast</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">slow</span></div>
+
+
+
+<span class="n">SLOW_ALGORITHMS</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<div class="viewcode-block" id="register_slow_algorithm">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.slow_dynamics.register_slow_algorithm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">register_slow_algorithm</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+        <span class="n">SLOW_ALGORITHMS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">fn</span>
+        <span class="k">return</span> <span class="n">fn</span>
+
+    <span class="k">return</span> <span class="n">decorator</span></div>
+
+
+
+<div class="viewcode-block" id="low_pass_filter_all_paths">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.slow_dynamics.low_pass_filter_all_paths">[docs]</a>
+<span class="nd">@register_slow_algorithm</span><span class="p">(</span><span class="s2">&quot;low_pass_filter&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">low_pass_filter_all_paths</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">grouped_paths</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;Pid&quot;</span><span class="p">)[</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;colname&quot;</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">grouped_paths</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">low_pass_filter_single_path</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;tau&quot;</span><span class="p">],</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dt&quot;</span><span class="p">])</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="use_fast_dynamics">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.slow_dynamics.use_fast_dynamics">[docs]</a>
+<span class="nd">@register_slow_algorithm</span><span class="p">(</span><span class="s2">&quot;use_fast_dynamics&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">use_fast_dynamics</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">df</span><span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;colname&quot;</span><span class="p">]]</span></div>
+
+
+
+<div class="viewcode-block" id="integrate_slow_velocity">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.slow_dynamics.integrate_slow_velocity">[docs]</a>
+<span class="nd">@register_slow_algorithm</span><span class="p">(</span><span class="s2">&quot;integrate_slow_velocity&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">integrate_slow_velocity</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">slow</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="n">logging_redirect_tqdm</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">traj_i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;Pid&quot;</span><span class="p">),</span>
+            <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Computing </span><span class="si">{</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;colname&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">s with </span><span class="si">{</span><span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;vel_col&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;trajs&quot;</span><span class="p">,</span>
+            <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Pid</span><span class="o">.</span><span class="n">unique</span><span class="p">()),</span>
+            <span class="n">miniters</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="n">x0</span> <span class="o">=</span> <span class="n">traj_i</span><span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;colname&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">slow_path</span> <span class="o">=</span> <span class="n">integrate_slow_velocity_single_path</span><span class="p">(</span>
+                <span class="n">x0</span><span class="p">,</span> <span class="n">traj_i</span><span class="p">[</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;vel_col&quot;</span><span class="p">]],</span> <span class="n">dt</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dt&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">slow</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">slow_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">slow</span></div>
+
+
+
+<div class="viewcode-block" id="savgol_smoothing">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.slow_dynamics.savgol_smoothing">[docs]</a>
+<span class="nd">@register_slow_algorithm</span><span class="p">(</span><span class="s2">&quot;savgol_smoothing&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">savgol_smoothing</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">slow</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;Pid&quot;</span><span class="p">)[</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;colname&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">savgol_filter</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span>
+            <span class="n">window_length</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;window_length&quot;</span><span class="p">],</span>
+            <span class="n">polyorder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">deriv</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;interp&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">slow</span></div>
+
+
+
+<div class="viewcode-block" id="get_slow_algorithm">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.slow_dynamics.get_slow_algorithm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_slow_algorithm</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">SLOW_ALGORITHMS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="compute_slow_velocity">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.slow_dynamics.compute_slow_velocity">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_slow_velocity</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">slow_velocity_algorithm</span> <span class="o">=</span> <span class="n">get_slow_algorithm</span><span class="p">(</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">slow_velocities_algorithm</span>
+    <span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Slow velocity algorithm: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">slow_velocity_algorithm</span><span class="p">)</span>
+
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;us&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">slow_velocity_algorithm</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">,</span>
+        <span class="n">colname</span><span class="o">=</span><span class="s2">&quot;uf&quot;</span><span class="p">,</span>
+        <span class="n">tau</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;tauu&quot;</span><span class="p">],</span>
+        <span class="n">dt</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;dt&quot;</span><span class="p">],</span>
+        <span class="n">window_length</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">minimum_trajectory_length</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;vs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">slow_velocity_algorithm</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">,</span>
+        <span class="n">colname</span><span class="o">=</span><span class="s2">&quot;vf&quot;</span><span class="p">,</span>
+        <span class="n">tau</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;tauu&quot;</span><span class="p">],</span>
+        <span class="n">dt</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;dt&quot;</span><span class="p">],</span>
+        <span class="n">window_length</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">minimum_trajectory_length</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="compute_slow_position">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.slow_dynamics.compute_slow_position">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_slow_position</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">slow_position_algorithm</span> <span class="o">=</span> <span class="n">get_slow_algorithm</span><span class="p">(</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">slow_positions_algorithm</span>
+    <span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Slow position algorithm: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">slow_position_algorithm</span><span class="p">)</span>
+
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;xs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">slow_position_algorithm</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">,</span>
+        <span class="n">colname</span><span class="o">=</span><span class="s2">&quot;xf&quot;</span><span class="p">,</span>
+        <span class="n">vel_col</span><span class="o">=</span><span class="s2">&quot;us&quot;</span><span class="p">,</span>
+        <span class="n">tau</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;taux&quot;</span><span class="p">],</span>
+        <span class="n">dt</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;dt&quot;</span><span class="p">],</span>
+        <span class="n">window_length</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">minimum_trajectory_length</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;ys&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">slow_position_algorithm</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">,</span>
+        <span class="n">colname</span><span class="o">=</span><span class="s2">&quot;yf&quot;</span><span class="p">,</span>
+        <span class="n">vel_col</span><span class="o">=</span><span class="s2">&quot;vs&quot;</span><span class="p">,</span>
+        <span class="n">tau</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;taux&quot;</span><span class="p">],</span>
+        <span class="n">dt</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="p">[</span><span class="s2">&quot;dt&quot;</span><span class="p">],</span>
+        <span class="n">window_length</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">minimum_trajectory_length</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+
+<div class="viewcode-block" id="compute_slow_dynamics">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.slow_dynamics.compute_slow_dynamics">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_slow_dynamics</span><span class="p">(</span><span class="n">preprocessed_trajectories</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Compute slow dynamics&quot;</span><span class="p">)</span>
+    <span class="n">compute_slow_dynamics_pipeline</span> <span class="o">=</span> <span class="n">compose_functions</span><span class="p">(</span>
+        <span class="n">compute_slow_velocity</span><span class="p">,</span>
+        <span class="n">transform_slow_velocity_to_polar_coordinates</span><span class="p">,</span>
+        <span class="c1"># apply_periodic_angular_conditions,</span>
+        <span class="n">compute_slow_position</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">compute_slow_dynamics_pipeline</span><span class="p">(</span>
+        <span class="n">preprocessed_trajectories</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="c1"># def compute_slow_dynamics(df: pd.DataFrame, config: dict) -&gt; pd.DataFrame:</span>
+<span class="c1">#     dt = config.params.model[&quot;dt&quot;]</span>
+<span class="c1">#     tauu = config.params.model[&quot;tauu&quot;]</span>
+<span class="c1">#     window_length = config.params.minimum_trajectory_length</span>
+<span class="c1">#     slow_velocity_algorithm = get_slow_algorithm(</span>
+<span class="c1"># config.params.model.slow_velocities_algorithm)</span>
+<span class="c1">#     log.info(&quot;Slow velocity algorithm: %s&quot;, slow_velocity_algorithm)</span>
+
+<span class="c1">#     df[&quot;us&quot;] = slow_velocity_algorithm(df, colname=&quot;uf&quot;, tau=tauu, dt=dt,</span>
+<span class="c1"># window_length=window_length)</span>
+<span class="c1">#     df[&quot;vs&quot;] = slow_velocity_algorithm(df, colname=&quot;vf&quot;, tau=tauu, dt=dt,</span>
+<span class="c1"># window_length=window_length)</span>
+<span class="c1">#     df = transform_slow_velocity_to_polar_coordinates(df, config)</span>
+<span class="c1">#     df[&quot;thetas&quot;] = periodic_angular_conditions(df[&quot;thetas&quot;],</span>
+<span class="c1"># config.params.grid.bins[&quot;theta&quot;])</span>
+
+<span class="c1">#     taux = config.params.model[&quot;taux&quot;]</span>
+<span class="c1">#     slow_position_algorithm = get_slow_algorithm(</span>
+<span class="c1"># config.params.model.slow_positions_algorithm)</span>
+<span class="c1">#     log.info(&quot;Slow position algorithm: %s&quot;, slow_position_algorithm)</span>
+
+<span class="c1">#     df[&quot;xs&quot;] = slow_position_algorithm(df, colname=&quot;xf&quot;, vel_col=&quot;us&quot;,</span>
+<span class="c1"># tau=taux, dt=dt, window_length=window_length)</span>
+<span class="c1">#     df[&quot;ys&quot;] = slow_position_algorithm(df, colname=&quot;yf&quot;, vel_col=&quot;vs&quot;,</span>
+<span class="c1"># tau=taux, dt=dt, window_length=window_length)</span>
+<span class="c1">#     return df</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

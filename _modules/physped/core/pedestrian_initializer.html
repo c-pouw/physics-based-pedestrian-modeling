@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.core.pedestrian_initializer &mdash; Data-driven physics-based modeling of pedestrian dynamics 0.post1.dev0+gbf0ef31 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=9c8095b4"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0.post1.dev0+gbf0ef31
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#using-the-cli">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#available-environments">Available environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">physped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">physped.core.pedestrian_initializer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for physped.core.pedestrian_initializer</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_initial_dynamics">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.pedestrian_initializer.get_initial_dynamics">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_initial_dynamics</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="n">ntrajs</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">ntrajs</span>
+    <span class="k">match</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">initial_dynamics</span><span class="o">.</span><span class="n">get_from</span><span class="p">:</span>
+        <span class="k">case</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span>
+            <span class="n">folderpath</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>  <span class="c1"># / &quot;initial_dynamics&quot;</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">folderpath</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">initial_dynamics</span><span class="o">.</span><span class="n">filename</span>
+            <span class="p">)</span>
+            <span class="n">initial_dynamics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">initial_dynamics</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">ntrajs</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Number of trajectories in &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">initial_dynamics</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s2"> is&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;less than </span><span class="si">{</span><span class="n">ntrajs</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="n">initial_dynamics</span> <span class="o">=</span> <span class="n">initial_dynamics</span><span class="p">[:</span><span class="n">ntrajs</span><span class="p">,</span> <span class="p">:]</span>
+            <span class="k">return</span> <span class="n">initial_dynamics</span>
+        <span class="k">case</span> <span class="s2">&quot;point&quot;</span><span class="p">:</span>
+            <span class="n">point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">initial_dynamics</span><span class="o">.</span><span class="n">point</span><span class="p">)</span>
+            <span class="n">initial_dynamics</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="p">(</span><span class="n">ntrajs</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">initial_dynamics</span>
+        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unknown initial_dynamics.get_from: &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">initial_dynamics</span><span class="o">.</span><span class="n">get_from</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="initialize_pedestrians">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.pedestrian_initializer.initialize_pedestrians">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">initialize_pedestrians</span><span class="p">(</span><span class="n">initial_dynamics</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add time, step, and Pid to the initial dynamics</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        initial_dynamics: The initial dynamics of the pedestrians expressed as</span>
+<span class="sd">        [xf, yf, uf, vf, xs, ys, us, vs]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The initial dynamics with the time, step, and Pid added</span>
+<span class="sd">        [xf, yf, uf, vf, xs, ys, us, vs, t, k, Pid]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pedestrian_initializations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="n">initial_dynamics</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">initial_dynamics</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="p">),</span>  <span class="c1"># Add start_time and start_k</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">initial_dynamics</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])[:,</span> <span class="kc">None</span><span class="p">],</span>  <span class="c1"># Add Pids</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">pedestrian_initializations</span></div>
+
+
+
+<div class="viewcode-block" id="sample_dynamics_from_trajectories">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.pedestrian_initializer.sample_dynamics_from_trajectories">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sample_dynamics_from_trajectories</span><span class="p">(</span>
+    <span class="n">trajectories</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">n_trajs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">state_n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">state_n</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;State n must be &gt;= -1&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">state_n</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># Sample from random point along each path</span>
+        <span class="n">states_to_sample_from</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">trajectories</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;Pid&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># state_n &gt;= 0:</span>
+        <span class="c1"># Sample from state n along each path</span>
+        <span class="n">states_to_sample_from</span> <span class="o">=</span> <span class="n">trajectories</span><span class="p">[</span>
+            <span class="n">trajectories</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">state_n</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">sampled_states</span> <span class="o">=</span> <span class="n">states_to_sample_from</span><span class="p">[</span>
+        <span class="p">[</span><span class="s2">&quot;xf&quot;</span><span class="p">,</span> <span class="s2">&quot;yf&quot;</span><span class="p">,</span> <span class="s2">&quot;uf&quot;</span><span class="p">,</span> <span class="s2">&quot;vf&quot;</span><span class="p">,</span> <span class="s2">&quot;xs&quot;</span><span class="p">,</span> <span class="s2">&quot;ys&quot;</span><span class="p">,</span> <span class="s2">&quot;us&quot;</span><span class="p">,</span> <span class="s2">&quot;vs&quot;</span><span class="p">]</span>
+    <span class="p">]</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">n_trajs</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Sampled </span><span class="si">%d</span><span class="s2"> origins from the input trajectories.&quot;</span><span class="p">,</span> <span class="n">n_trajs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sampled_states</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span></div>
+
+
+
+<span class="c1"># def potential_defined_at_slow_state(</span>
+<span class="c1">#     paths: pd.DataFrame, piecewise_potential: PiecewisePotential</span>
+<span class="c1"># ) -&gt; pd.DataFrame:</span>
+<span class="c1">#     # REQUIRED: Dataframe must have a column with the slow grid indices</span>
+<span class="c1">#     # TODO : Move this function to another module.</span>
+<span class="c1">#     # TODO : Change the slow_grid_indices to lists rather than tuples</span>
+<span class="c1">#     indices = np.array(list(paths[&quot;slow_grid_indices&quot;]))</span>
+<span class="c1">#     potential_defined = np.where(</span>
+<span class="c1">#         np.isnan(piecewise_potential.parametrization), False, True</span>
+<span class="c1">#     )</span>
+<span class="c1">#     # All free parameters must be defined</span>
+<span class="c1">#     potential_defined = np.all(potential_defined, axis=(-2, -1))</span>
+<span class="c1">#     paths[&quot;potential_defined&quot;] = potential_defined[</span>
+<span class="c1">#         indices[:, 0],</span>
+<span class="c1">#         indices[:, 1],</span>
+<span class="c1">#         indices[:, 2],</span>
+<span class="c1">#         indices[:, 3],</span>
+<span class="c1">#         indices[:, 4],</span>
+<span class="c1">#     ]</span>
+<span class="c1">#     return paths</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

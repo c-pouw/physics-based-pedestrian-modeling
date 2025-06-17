@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.visualization.plot_fields &mdash; Data-driven physics-based modeling of pedestrian dynamics 0.post1.dev0+gbf0ef31 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=9c8095b4"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0.post1.dev0+gbf0ef31
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#using-the-cli">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#available-environments">Available environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">physped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">physped.visualization.plot_fields</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for physped.visualization.plot_fields</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpl</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.parametrize_potential</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">extract_submatrix</span><span class="p">,</span>
+    <span class="n">make_grid_selection</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.utils.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">weighted_mean_of_matrix</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.visualization.plot_trajectories</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">apply_polar_plot_style</span><span class="p">,</span>
+    <span class="n">apply_xy_plot_style</span><span class="p">,</span>
+    <span class="n">highlight_grid_box</span><span class="p">,</span>
+    <span class="n">plot_station_background</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="plot_quiver_force_vectors">
+<a class="viewcode-back" href="../../../physped.visualization.html#physped.visualization.plot_fields.plot_quiver_force_vectors">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_quiver_force_vectors</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">,</span> <span class="n">fields</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">scale</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">sparseness</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the force field.&quot;&quot;&quot;</span>
+    <span class="c1"># scale = params[&quot;force_field_plot&quot;][&quot;scale&quot;]</span>
+    <span class="c1"># sparseness = params[&quot;force_field_plot&quot;][&quot;sparseness&quot;]</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span>
+        <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">][::</span><span class="n">sparseness</span><span class="p">],</span>
+        <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;Y&quot;</span><span class="p">][::</span><span class="n">sparseness</span><span class="p">],</span>
+        <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;dfx&quot;</span><span class="p">][::</span><span class="n">sparseness</span><span class="p">],</span>
+        <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;dfy&quot;</span><span class="p">][::</span><span class="n">sparseness</span><span class="p">],</span>
+        <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
+        <span class="n">pivot</span><span class="o">=</span><span class="s2">&quot;mid&quot;</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">quiverkey</span><span class="p">(</span>
+        <span class="n">q</span><span class="p">,</span>
+        <span class="n">X</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">Y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span>
+        <span class="n">U</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;Vectors: $f^{</span><span class="se">\\</span><span class="s2">prime }(x)=-{</span><span class="se">\\</span><span class="s2">frac {x-</span><span class="se">\\</span><span class="s2">mu }{</span><span class="se">\\</span><span class="s2">sigma ^</span><span class="si">{2}</span><span class="s2">}}f(x)$&quot;</span>
+        <span class="p">),</span>
+        <span class="n">labelpos</span><span class="o">=</span><span class="s2">&quot;E&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># ax = plot_quiverkey(ax, q)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span></div>
+
+
+
+<div class="viewcode-block" id="plot_quiverkey">
+<a class="viewcode-back" href="../../../physped.visualization.html#physped.visualization.plot_fields.plot_quiverkey">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_quiverkey</span><span class="p">(</span><span class="n">ax</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">mpl</span><span class="o">.</span><span class="n">quiver</span><span class="o">.</span><span class="n">Quiver</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the quiver key.&quot;&quot;&quot;</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">quiverkey</span><span class="p">(</span>
+        <span class="n">q</span><span class="p">,</span>
+        <span class="n">X</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">Y</span><span class="o">=</span><span class="mf">1.1</span><span class="p">,</span>
+        <span class="n">U</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;Vectors: $f^{</span><span class="se">\\</span><span class="s2">prime }(x)=-{</span><span class="se">\\</span><span class="s2">frac {x-</span><span class="se">\\</span><span class="s2">mu }{</span><span class="se">\\</span><span class="s2">sigma ^</span><span class="si">{2}</span><span class="s2">}}f(x)$&quot;</span>
+        <span class="p">),</span>
+        <span class="n">labelpos</span><span class="o">=</span><span class="s2">&quot;E&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span></div>
+
+
+
+<div class="viewcode-block" id="plot_pcolormesh_offset_field">
+<a class="viewcode-back" href="../../../physped.visualization.html#physped.visualization.plot_fields.plot_pcolormesh_offset_field">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_pcolormesh_offset_field</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">,</span> <span class="n">fields</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;YlOrRd&quot;</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.36</span><span class="p">)</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the offset field.&quot;&quot;&quot;</span>
+    <span class="n">bounds</span> <span class="o">=</span> <span class="n">bounds</span> <span class="ow">or</span> <span class="n">infer_bounds_from_data</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;offset&quot;</span><span class="p">])</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">vmax</span><span class="o">=</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">cs</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span>
+        <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">],</span>
+        <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;Y&quot;</span><span class="p">],</span>
+        <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;offset&quot;</span><span class="p">],</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+        <span class="n">shading</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+        <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_colorbar</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">cs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span></div>
+
+
+
+<div class="viewcode-block" id="plot_contourf_offset_field">
+<a class="viewcode-back" href="../../../physped.visualization.html#physped.visualization.plot_fields.plot_contourf_offset_field">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_contourf_offset_field</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">,</span> <span class="n">fields</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;YlOrRd&quot;</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.36</span><span class="p">)</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the offset field.&quot;&quot;&quot;</span>
+    <span class="n">bounds</span> <span class="o">=</span> <span class="n">bounds</span> <span class="ow">or</span> <span class="n">infer_bounds_from_data</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;offset&quot;</span><span class="p">])</span>
+    <span class="n">levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">20</span><span class="p">)</span>
+    <span class="n">cs</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span>
+        <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">],</span>
+        <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;Y&quot;</span><span class="p">],</span>
+        <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;offset&quot;</span><span class="p">],</span>
+        <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span>
+        <span class="n">corner_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">extend</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+        <span class="n">levels</span><span class="o">=</span><span class="n">levels</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_colorbar</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">cs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span></div>
+
+
+
+<div class="viewcode-block" id="infer_bounds_from_data">
+<a class="viewcode-back" href="../../../physped.visualization.html#physped.visualization.plot_fields.infer_bounds_from_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">infer_bounds_from_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Infer bounds from data.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">data</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="plot_colorbar">
+<a class="viewcode-back" href="../../../physped.visualization.html#physped.visualization.plot_fields.plot_colorbar">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_colorbar</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">,</span> <span class="n">cs</span><span class="p">:</span> <span class="n">mpl</span><span class="o">.</span><span class="n">contour</span><span class="o">.</span><span class="n">QuadContourSet</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the colorbar.&quot;&quot;&quot;</span>
+    <span class="n">cbar</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span>
+        <span class="n">cs</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+        <span class="n">shrink</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># label = &quot;$\\Delta V = 0.023\\log{\\left[\\mathbb{P}&quot;</span>
+    <span class="c1"># &quot;(y_s\\mid x_s,\\vec u_s)\\right]}$&quot;</span>
+    <span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span></div>
+
+
+
+<div class="viewcode-block" id="calculate_offsets">
+<a class="viewcode-back" href="../../../physped.visualization.html#physped.visualization.plot_fields.calculate_offsets">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_offsets</span><span class="p">(</span><span class="n">hist</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="n">Tuple</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate offsets.&quot;&quot;&quot;</span>
+    <span class="n">pos_hist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">hist</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+    <span class="n">pos_hist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pos_hist</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">pos_hist</span><span class="p">)</span>
+    <span class="n">offset_parameter</span> <span class="o">=</span> <span class="mf">0.023</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">offset_parameter</span> <span class="o">*</span> <span class="p">(</span>
+        <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">pos_hist</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">pos_hist</span><span class="p">))</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">offset</span></div>
+
+
+
+<div class="viewcode-block" id="clip_fields">
+<a class="viewcode-back" href="../../../physped.visualization.html#physped.visualization.plot_fields.clip_fields">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">clip_fields</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">clip</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Clip fields.&quot;&quot;&quot;</span>
+    <span class="c1"># clip = params[&quot;force_field_plot&quot;][&quot;clip&quot;]</span>
+    <span class="k">if</span> <span class="n">clip</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">clip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+    <span class="n">clip_min</span> <span class="o">=</span> <span class="o">-</span><span class="n">clip</span>
+    <span class="n">clip_max</span> <span class="o">=</span> <span class="n">clip</span>
+    <span class="n">par_fields</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">fields</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="n">par_fields</span><span class="p">:</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">field</span><span class="p">[</span><span class="n">field</span> <span class="o">==</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">field</span><span class="p">[</span><span class="n">field</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="n">fields</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">clip_min</span><span class="p">,</span> <span class="n">clip_max</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fields</span></div>
+
+
+
+<div class="viewcode-block" id="create_force_fields">
+<a class="viewcode-back" href="../../../physped.visualization.html#physped.visualization.plot_fields.create_force_fields">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_force_fields</span><span class="p">(</span><span class="n">grids</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">sliced_histogram</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="c1"># TODO: Move this to one of the core files</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">pos_histogram</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">sliced_histogram</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span>
+        <span class="n">grids</span><span class="o">.</span><span class="n">bin_centers</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">grids</span><span class="o">.</span><span class="n">bin_centers</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;ij&quot;</span>
+    <span class="p">)</span>
+    <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span>
+    <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;Y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Y</span>
+    <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;offset&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calculate_offsets</span><span class="p">(</span><span class="n">sliced_histogram</span><span class="p">)</span>
+
+    <span class="n">minimum_datapoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmean</span><span class="p">(</span><span class="n">pos_histogram</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span>
+    <span class="k">for</span> <span class="n">fit_param</span> <span class="ow">in</span> <span class="n">grids</span><span class="o">.</span><span class="n">fit_param_names</span><span class="p">:</span>
+        <span class="n">field</span> <span class="o">=</span> <span class="n">grids</span><span class="o">.</span><span class="n">selection</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">grids</span><span class="o">.</span><span class="n">fit_param_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">fit_param</span><span class="p">)]</span>
+        <span class="n">fields</span><span class="p">[</span><span class="n">fit_param</span><span class="p">]</span> <span class="o">=</span> <span class="n">weighted_mean_of_matrix</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">sliced_histogram</span><span class="p">)</span>
+        <span class="n">fields</span><span class="p">[</span><span class="n">fit_param</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+            <span class="n">pos_histogram</span> <span class="o">&gt;</span> <span class="n">minimum_datapoints</span><span class="p">,</span> <span class="n">fields</span><span class="p">[</span><span class="n">fit_param</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="p">)</span>
+
+    <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;dfx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;xmu&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;xvar&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;xvar&quot;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+    <span class="p">)</span>
+    <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;dfy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;Y&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;ymu&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;yvar&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">fields</span><span class="p">[</span><span class="s2">&quot;yvar&quot;</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">fields</span></div>
+
+
+
+<div class="viewcode-block" id="plot_force_field_of_selection">
+<a class="viewcode-back" href="../../../physped.visualization.html#physped.visualization.plot_fields.plot_force_field_of_selection">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_force_field_of_selection</span><span class="p">(</span><span class="n">grids</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
+    <span class="c1"># Create parameter selection</span>
+    <span class="n">grid_selection</span> <span class="o">=</span> <span class="n">make_grid_selection</span><span class="p">(</span><span class="n">grids</span><span class="p">,</span> <span class="n">selection</span><span class="p">)</span>
+    <span class="n">slices</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="nb">tuple</span><span class="p">(</span><span class="n">grid_selection</span><span class="p">[</span><span class="n">dim</span><span class="p">][</span><span class="s2">&quot;grid_ids&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">grids</span><span class="o">.</span><span class="n">dimensions</span>
+    <span class="p">]</span>
+
+    <span class="n">sliced_histogram</span> <span class="o">=</span> <span class="n">extract_submatrix</span><span class="p">(</span><span class="n">grids</span><span class="o">.</span><span class="n">histogram_slow</span><span class="p">,</span> <span class="n">slices</span><span class="p">)</span>
+
+    <span class="n">grids</span><span class="o">.</span><span class="n">selection</span> <span class="o">=</span> <span class="n">extract_submatrix</span><span class="p">(</span><span class="n">grids</span><span class="o">.</span><span class="n">parametrization</span><span class="p">,</span> <span class="n">slices</span><span class="p">)</span>
+
+    <span class="c1"># Create force fields</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="n">create_force_fields</span><span class="p">(</span><span class="n">grids</span><span class="p">,</span> <span class="n">sliced_histogram</span><span class="p">)</span>
+
+    <span class="c1"># Plot force fields</span>
+    <span class="n">force_field_params</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;force_field_plot&quot;</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="n">width_ratios</span> <span class="o">=</span> <span class="n">force_field_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;width_ratios&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="c1"># figsize = force_field_params.get(</span>
+    <span class="c1">#     &quot;figsize&quot;, (20, 8)</span>
+    <span class="c1"># )  # TODO change to figsize of mplstyle</span>
+    <span class="c1"># width_ratios = [4, 1]</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="s2">&quot;constrained&quot;</span><span class="p">)</span>
+    <span class="n">spec</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">gridspec</span><span class="o">.</span><span class="n">GridSpec</span><span class="p">(</span>
+        <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">width_ratios</span><span class="o">=</span><span class="n">width_ratios</span><span class="p">,</span>
+        <span class="n">wspace</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">hspace</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">figure</span><span class="o">=</span><span class="n">fig</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">plotid</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="n">plotid</span><span class="p">])</span>
+
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_pcolormesh_offset_field</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">apply_xy_plot_style</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+    <span class="n">clipped_fields</span> <span class="o">=</span> <span class="n">clip_fields</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;force_field_plot&quot;</span><span class="p">][</span><span class="s2">&quot;clip&quot;</span><span class="p">])</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_quiver_force_vectors</span><span class="p">(</span>
+        <span class="n">ax</span><span class="p">,</span>
+        <span class="n">clipped_fields</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;force_field_plot&quot;</span><span class="p">][</span><span class="s2">&quot;scale&quot;</span><span class="p">],</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;force_field_plot&quot;</span><span class="p">][</span><span class="s2">&quot;sparseness&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;station_paths&quot;</span><span class="p">:</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_station_background</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+    <span class="c1"># ax.set_xlabel(&quot;x [m]&quot;)</span>
+    <span class="c1"># ax.set_ylabel(&quot;y [m]&quot;)</span>
+
+    <span class="n">plotid</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="n">plotid</span><span class="p">],</span> <span class="n">polar</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># limits = create_grid_box_limits(</span>
+    <span class="c1">#     slices, grids.dimensions, grids.bins, obs=[&quot;r&quot;, &quot;theta&quot;]</span>
+    <span class="c1"># )</span>
+    <span class="n">selection_limits</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">grid_selection</span><span class="p">[</span><span class="n">obs</span><span class="p">][</span><span class="s2">&quot;periodic_bounds&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="s2">&quot;theta&quot;</span><span class="p">]</span>
+    <span class="p">]</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">highlight_grid_box</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">selection_limits</span><span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">apply_polar_plot_style</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+    <span class="c1"># xlims = selection[&quot;r&quot;]</span>
+    <span class="c1"># ylims = np.linspace(selection[&quot;theta&quot;][0], selection[&quot;theta&quot;][1], 100)</span>
+    <span class="c1"># print(xlims, np.divide(np.array(selection[&quot;theta&quot;]), np.pi))</span>
+    <span class="c1"># ax.fill_between(ylims, xlims[0], xlims[1], color=&quot;r&quot;, alpha=0.2)</span>
+    <span class="k">return</span> <span class="n">ax</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

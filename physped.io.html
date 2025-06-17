@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.io package &mdash; Data-driven physics-based modeling of pedestrian dynamics 0.post1.dev0+gbf0ef31 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=9c8095b4"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="physped.preprocessing package" href="physped.preprocessing.html" />
+    <link rel="prev" title="physped.core package" href="physped.core.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0.post1.dev0+gbf0ef31
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#using-the-cli">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#available-environments">Available environments</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">physped</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="physped.html">physped package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="physped.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="physped.core.html">physped.core package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">physped.io package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.preprocessing.html">physped.preprocessing package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.utils.html">physped.utils package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="physped.visualization.html">physped.visualization package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="physped.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.html#module-physped.main">physped.main module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.html#module-physped.processing_pipelines">physped.processing_pipelines module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="physped.html#module-physped">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">physped</a></li>
+          <li class="breadcrumb-item"><a href="physped.html">physped package</a></li>
+      <li class="breadcrumb-item active">physped.io package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/physped.io.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="physped-io-package">
+<h1>physped.io package<a class="headerlink" href="#physped-io-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-physped.io.readers">
+<span id="physped-io-readers-module"></span><h2>physped.io.readers module<a class="headerlink" href="#module-physped.io.readers" title="Link to this heading">¶</a></h2>
+<p>Data readers for the physics based pedestrian modeling code.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.filter_part_of_the_domain">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">filter_part_of_the_domain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xcol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x_pos'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ycol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'y_pos'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/io/readers.html#filter_part_of_the_domain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.filter_part_of_the_domain" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.get_background_image_from_remote_zip">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">get_background_image_from_remote_zip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Image</span></span></span><a class="reference internal" href="_modules/physped/io/readers.html#get_background_image_from_remote_zip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.get_background_image_from_remote_zip" title="Link to this definition">¶</a></dt>
+<dd><p>Read the background image from a remote archive.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The background image as a PIL Image object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.get_background_image_from_zenodo">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">get_background_image_from_zenodo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Image</span></span></span><a class="reference internal" href="_modules/physped/io/readers.html#get_background_image_from_zenodo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.get_background_image_from_zenodo" title="Link to this definition">¶</a></dt>
+<dd><p>Read image file from Zenodo using PIL</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – The configuration parameters.</p></li>
+<li><p><strong>filename</strong> – Name of file to read. If None, will read first image file</p></li>
+<li><p><strong>found</strong></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>PIL Image object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.get_background_image_local">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">get_background_image_local</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Image</span></span></span><a class="reference internal" href="_modules/physped/io/readers.html#get_background_image_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.get_background_image_local" title="Link to this definition">¶</a></dt>
+<dd><p>Read the background image from a local file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The background image as a PIL Image object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.get_zenodo_data">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">get_zenodo_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">BytesIO</span></span></span><a class="reference internal" href="_modules/physped/io/readers.html#get_zenodo_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.get_zenodo_data" title="Link to this definition">¶</a></dt>
+<dd><p>Download data from Zenodo URL into memory</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.list_zenodo_files">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">list_zenodo_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/physped/io/readers.html#list_zenodo_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.list_zenodo_files" title="Link to this definition">¶</a></dt>
+<dd><p>List all files in a Zenodo record, optionally filtered by pattern</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of file information dictionaries</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_asdz_pf12_paths">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_asdz_pf12_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_asdz_pf12_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_asdz_pf12_paths" title="Link to this definition">¶</a></dt>
+<dd><p>Read the Amsterdam Zuid platform 1-2 paths data set.</p>
+<p>The trajectories are read from local or remote sources based on the
+configuration. The spatial coordinates of the trajectories are converted
+from milimeters to meters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The trajectory dataset with Amsterdam Zuid platform 1-2 paths.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_asdz_pf12_paths_4tu">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_asdz_pf12_paths_4tu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_asdz_pf12_paths_4tu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_asdz_pf12_paths_4tu" title="Link to this definition">¶</a></dt>
+<dd><p>Read the Amsterdam Zuid platform 1-2 paths data set from 4TU.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The trajectory dataset with Amsterdam Zuid platform 1-2 paths</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_asdz_pf12_paths_local">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_asdz_pf12_paths_local</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_asdz_pf12_paths_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_asdz_pf12_paths_local" title="Link to this definition">¶</a></dt>
+<dd><p>Read the Amsterdam Zuid platform 1-2 paths data set from a local file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The trajectory dataset with Amsterdam Zuid platform 1-2 paths</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_asdz_pf34_paths">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_asdz_pf34_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_asdz_pf34_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_asdz_pf34_paths" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_asdz_pf34_paths_4tu">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_asdz_pf34_paths_4tu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_asdz_pf34_paths_4tu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_asdz_pf34_paths_4tu" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_asdz_pf34_paths_local">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_asdz_pf34_paths_local</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_asdz_pf34_paths_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_asdz_pf34_paths_local" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_curved_paths_synthetic">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_curved_paths_synthetic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_curved_paths_synthetic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_curved_paths_synthetic" title="Link to this definition">¶</a></dt>
+<dd><p>Read the synthetic curved paths data set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The synthetic curved paths dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_ehv_pf34_paths_geert">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_ehv_pf34_paths_geert</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_ehv_pf34_paths_geert"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_ehv_pf34_paths_geert" title="Link to this definition">¶</a></dt>
+<dd><p>Read the Eindhoven platform 3-4 paths data set from Geert.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The trajectory dataset with Eindhoven platform 3-4 paths</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_ehv_pf34_paths_local">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_ehv_pf34_paths_local</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_ehv_pf34_paths_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_ehv_pf34_paths_local" title="Link to this definition">¶</a></dt>
+<dd><p>Read the Eindhoven platform 3-4 paths data set from a local file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The trajectory dataset with Eindhoven platform 3-4 paths</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_ehv_pf34_paths_zenodo">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_ehv_pf34_paths_zenodo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_ehv_pf34_paths_zenodo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_ehv_pf34_paths_zenodo" title="Link to this definition">¶</a></dt>
+<dd><p>Read the Eindhoven platform 3-4 paths data set from a local file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The trajectory dataset with Eindhoven platform 3-4 paths</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_eindhoven_pf34_paths">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_eindhoven_pf34_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_eindhoven_pf34_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_eindhoven_pf34_paths" title="Link to this definition">¶</a></dt>
+<dd><p>Read the Eindhoven platform 3-4 paths data set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The trajectory dataset with Eindhoven platform 3-4 paths.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_intersecting_paths">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_intersecting_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_intersecting_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_intersecting_paths" title="Link to this definition">¶</a></dt>
+<dd><p>Read the intersecting paths data set.</p>
+<p>The intersecting paths dataset is created by combining the left-to-right
+and right-to-left paths from the narrow corridor dataset. The paths from
+the right-to-left dataset are rotated by 90 degrees to create intersecting
+paths.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The trajectory dataset with intersecting paths.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_narrow_corridor_paths">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_narrow_corridor_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_narrow_corridor_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_narrow_corridor_paths" title="Link to this definition">¶</a></dt>
+<dd><p>Read the narrow corridor data set.</p>
+<p>The trajectories are read from local or remote sources based on the
+configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The trajectory dataset with single paths.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_narrow_corridor_paths_4tu">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_narrow_corridor_paths_4tu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_narrow_corridor_paths_4tu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_narrow_corridor_paths_4tu" title="Link to this definition">¶</a></dt>
+<dd><p>Read the narrow corridor paths archive from 4TU remote repository.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>df_ltr: Paths of pedestrians walking from left to right.</p></li>
+<li><p>df_rtl: Paths of pedestrians walking from right to left.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple containing two DataFrames</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_narrow_corridor_paths_local">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_narrow_corridor_paths_local</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.13)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_narrow_corridor_paths_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_narrow_corridor_paths_local" title="Link to this definition">¶</a></dt>
+<dd><p>Read the narrow corridor paths archive from a local zip.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>df_ltr: Paths of pedestrians walking from left to right.</p></li>
+<li><p>df_rtl: Paths of pedestrians walking from right to left.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple containing two DataFrames</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_parquet_from_zenodo">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_parquet_from_zenodo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_parquet_from_zenodo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_parquet_from_zenodo" title="Link to this definition">¶</a></dt>
+<dd><p>Read parquet file from Zenodo using Pandas</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame from Pandas</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_piecewise_potential">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_piecewise_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="physped.core.html#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_piecewise_potential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_piecewise_potential" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_piecewise_potential_from_file">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_piecewise_potential_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.13)"><span class="pre">Path</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="physped.core.html#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_piecewise_potential_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_piecewise_potential_from_file" title="Link to this definition">¶</a></dt>
+<dd><p>Read piecewise potential from file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filepath</strong> – Path to the file containing the piecewise potential.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The piecewise potential.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_trajectories">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_trajectories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_trajectories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_trajectories" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_trajectories_from_file">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_trajectories_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.13)"><span class="pre">Path</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_trajectories_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_trajectories_from_file" title="Link to this definition">¶</a></dt>
+<dd><p>Read preprocessed trajectories from a csv file.</p>
+<p>Mainly used to read intermediate outputs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The preprocessed trajectory dataset.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_utrecht_pf5_paths">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_utrecht_pf5_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_utrecht_pf5_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_utrecht_pf5_paths" title="Link to this definition">¶</a></dt>
+<dd><p>Read the Utrecht Centraal platform 5 paths data set.</p>
+<p>The trajectories are read from local or remote sources based on the
+configuration. The spatial coordinates of the trajectories are converted
+from milimeters to meters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The trajectory dataset with Utrecht Centraal platform 5 paths.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_utrecht_pf5_paths_4tu">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_utrecht_pf5_paths_4tu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/io/readers.html#read_utrecht_pf5_paths_4tu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_utrecht_pf5_paths_4tu" title="Link to this definition">¶</a></dt>
+<dd><p>Read the Utrecht Centraal platform 5 paths data set from 4TU.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The trajectory dataset with Utrecht Centraal platform 5 paths</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_utrecht_pf5_paths_local">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_utrecht_pf5_paths_local</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/physped/io/readers.html#read_utrecht_pf5_paths_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_utrecht_pf5_paths_local" title="Link to this definition">¶</a></dt>
+<dd><p>Read the Utrecht Centraal platform 5 paths data set from a local file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The trajectory dataset with Utrecht Centraal platform 5 paths.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.readers.read_wide_corridor_paths">
+<span class="sig-prename descclassname"><span class="pre">physped.io.readers.</span></span><span class="sig-name descname"><span class="pre">read_wide_corridor_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></span><a class="reference internal" href="_modules/physped/io/readers.html#read_wide_corridor_paths"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.readers.read_wide_corridor_paths" title="Link to this definition">¶</a></dt>
+<dd><p>Read the wide corridor data set from a local file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – The configuration parameters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The trajectory dataset with paths in the wide corridor.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-physped.io.writers">
+<span id="physped-io-writers-module"></span><h2>physped.io.writers module<a class="headerlink" href="#module-physped.io.writers" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.writers.save_piecewise_potential">
+<span class="sig-prename descclassname"><span class="pre">physped.io.writers.</span></span><span class="sig-name descname"><span class="pre">save_piecewise_potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="physped.core.html#physped.core.piecewise_potential.PiecewisePotential" title="physped.core.piecewise_potential.PiecewisePotential"><span class="pre">PiecewisePotential</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">folderpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.13)"><span class="pre">Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'piecewise_potential.pickle'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/physped/io/writers.html#save_piecewise_potential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.writers.save_piecewise_potential" title="Link to this definition">¶</a></dt>
+<dd><p>Save piecewise potential</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> – The piecewise potential to save.</p></li>
+<li><p><strong>folderpath</strong> – The folder to save the piecewise potential in.</p></li>
+<li><p><strong>filename</strong> – The filenam to save the piecewise potential in.</p></li>
+<li><p><strong>&quot;piecewise_potential.pickle&quot;.</strong> (<em>Defaults to</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="physped.io.writers.save_trajectories">
+<span class="sig-prename descclassname"><span class="pre">physped.io.writers.</span></span><span class="sig-name descname"><span class="pre">save_trajectories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trajectories</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.3.0)"><span class="pre">DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">folderpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.13)"><span class="pre">Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/physped/io/writers.html#save_trajectories"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#physped.io.writers.save_trajectories" title="Link to this definition">¶</a></dt>
+<dd><p>Save trajectories</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trajectories</strong> – The trajectories to save.</p></li>
+<li><p><strong>folderpath</strong> – The folder to save the trajectories in.</p></li>
+<li><p><strong>filename</strong> – The name of the file to save the trajectories in.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-physped.io">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-physped.io" title="Link to this heading">¶</a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="physped.core.html" class="btn btn-neutral float-left" title="physped.core package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="physped.preprocessing.html" class="btn btn-neutral float-right" title="physped.preprocessing package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

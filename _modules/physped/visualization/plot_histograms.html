@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.visualization.plot_histograms &mdash; Data-driven physics-based modeling of pedestrian dynamics 0.post1.dev0+gbf0ef31 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=9c8095b4"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0.post1.dev0+gbf0ef31
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#using-the-cli">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#available-environments">Available environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">physped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">physped.visualization.plot_histograms</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for physped.visualization.plot_histograms</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.axes</span><span class="w"> </span><span class="kn">import</span> <span class="n">Axes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">entropy</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.parametrize_potential</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">add_trajectories_to_histogram</span><span class="p">,</span>
+    <span class="n">digitize_trajectories_to_grid</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.piecewise_potential</span><span class="w"> </span><span class="kn">import</span> <span class="n">PiecewisePotential</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="create_histogram">
+<a class="viewcode-back" href="../../../physped.visualization.html#physped.visualization.plot_histograms.create_histogram">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_histogram</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a histogram of the input values.</span>
+
+<span class="sd">    Paramters:</span>
+<span class="sd">    - values (pd.Series): A Pandas Series containing the values to bin.</span>
+<span class="sd">    - bins (np.ndarray): An array of bin edges.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - dict: A dictionary containing the bin edges, bin width, bin centers,</span>
+<span class="sd">    counts, and PDF of the histogram.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">counts</span><span class="p">,</span> <span class="n">bin_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span>
+    <span class="n">bin_width</span> <span class="o">=</span> <span class="n">bin_edges</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">bin_edges</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">bin_centers</span> <span class="o">=</span> <span class="n">bin_edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">bin_width</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">PDF</span> <span class="o">=</span> <span class="n">counts</span> <span class="o">/</span> <span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">*</span> <span class="n">bin_width</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;bin_edges&quot;</span><span class="p">:</span> <span class="n">bin_edges</span><span class="p">,</span>
+        <span class="s2">&quot;bin_width&quot;</span><span class="p">:</span> <span class="n">bin_width</span><span class="p">,</span>
+        <span class="s2">&quot;bin_centers&quot;</span><span class="p">:</span> <span class="n">bin_centers</span><span class="p">,</span>
+        <span class="s2">&quot;counts&quot;</span><span class="p">:</span> <span class="n">counts</span><span class="p">,</span>
+        <span class="s2">&quot;PDF&quot;</span><span class="p">:</span> <span class="n">PDF</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="create_all_histograms">
+<a class="viewcode-back" href="../../../physped.visualization.html#physped.visualization.plot_histograms.create_all_histograms">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_all_histograms</span><span class="p">(</span>
+    <span class="n">recorded_paths</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">simulated_paths</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">observables</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">histogram_plot</span><span class="o">.</span><span class="n">observables</span>
+    <span class="n">histograms</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">traj_type</span><span class="p">,</span> <span class="n">trajectories</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+        <span class="p">[</span><span class="s2">&quot;recorded&quot;</span><span class="p">,</span> <span class="s2">&quot;simulated&quot;</span><span class="p">],</span> <span class="p">[</span><span class="n">recorded_paths</span><span class="p">,</span> <span class="n">simulated_paths</span><span class="p">]</span>
+    <span class="p">):</span>
+        <span class="n">histograms</span><span class="p">[</span><span class="n">traj_type</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">observable</span> <span class="ow">in</span> <span class="n">observables</span><span class="p">:</span>
+            <span class="n">lims</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">histogram_plot</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">observable</span><span class="si">}</span><span class="s2">lims&quot;</span><span class="p">]</span>
+            <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">lims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lims</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">50</span><span class="p">)</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">trajectories</span><span class="p">[</span><span class="n">observable</span><span class="p">]</span>
+            <span class="n">histograms</span><span class="p">[</span><span class="n">traj_type</span><span class="p">][</span><span class="n">observable</span><span class="p">]</span> <span class="o">=</span> <span class="n">create_histogram</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">bins</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">histograms</span></div>
+
+
+
+<div class="viewcode-block" id="compute_joint_kl_divergence">
+<a class="viewcode-back" href="../../../physped.visualization.html#physped.visualization.plot_histograms.compute_joint_kl_divergence">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_joint_kl_divergence</span><span class="p">(</span>
+    <span class="n">piecewise_potential</span><span class="p">:</span> <span class="n">PiecewisePotential</span><span class="p">,</span>
+    <span class="n">simulated_paths</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="c1"># We compare the probability distributions of the actual dynamics for</span>
+    <span class="c1"># measurements and simulations</span>
+    <span class="n">recorded_paths_histogram</span> <span class="o">=</span> <span class="n">piecewise_potential</span><span class="o">.</span><span class="n">histogram</span>
+    <span class="n">simulated_paths</span> <span class="o">=</span> <span class="n">digitize_trajectories_to_grid</span><span class="p">(</span>
+        <span class="n">simulated_paths</span><span class="p">,</span> <span class="n">piecewise_potential</span><span class="o">.</span><span class="n">lattice</span>
+    <span class="p">)</span>
+    <span class="n">simulated_paths_histogram</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">recorded_paths_histogram</span><span class="p">)</span>
+    <span class="n">simulated_paths_histogram</span> <span class="o">=</span> <span class="n">add_trajectories_to_histogram</span><span class="p">(</span>
+        <span class="n">simulated_paths_histogram</span><span class="p">,</span> <span class="n">simulated_paths</span><span class="p">,</span> <span class="s2">&quot;fast_grid_indices&quot;</span>
+    <span class="p">)</span>
+    <span class="n">recorded_paths_histogram</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">recorded_paths_histogram</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">recorded_paths_histogram</span>
+    <span class="p">)</span>
+    <span class="n">simulated_paths_histogram</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">simulated_paths_histogram</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">simulated_paths_histogram</span>
+    <span class="p">)</span>
+    <span class="n">kl</span> <span class="o">=</span> <span class="n">entropy</span><span class="p">(</span>
+        <span class="n">recorded_paths_histogram</span><span class="p">,</span>
+        <span class="n">simulated_paths_histogram</span><span class="p">,</span>
+        <span class="n">nan_policy</span><span class="o">=</span><span class="s2">&quot;omit&quot;</span><span class="p">,</span>
+        <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">kl</span></div>
+
+
+
+<div class="viewcode-block" id="compute_joint_kl_divergence_with_volume">
+<a class="viewcode-back" href="../../../physped.visualization.html#physped.visualization.plot_histograms.compute_joint_kl_divergence_with_volume">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_joint_kl_divergence_with_volume</span><span class="p">(</span>
+    <span class="n">piecewise_potential</span><span class="p">:</span> <span class="n">PiecewisePotential</span><span class="p">,</span>
+    <span class="n">simulated_paths</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="n">histogram_measurements</span> <span class="o">=</span> <span class="n">piecewise_potential</span><span class="o">.</span><span class="n">histogram</span>
+    <span class="n">cell_volume</span> <span class="o">=</span> <span class="n">piecewise_potential</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">cell_volume</span>
+
+    <span class="n">simulated_paths</span> <span class="o">=</span> <span class="n">digitize_trajectories_to_grid</span><span class="p">(</span>
+        <span class="n">simulated_paths</span><span class="p">,</span> <span class="n">piecewise_potential</span><span class="o">.</span><span class="n">lattice</span>
+    <span class="p">)</span>
+    <span class="n">histogram_simulations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">histogram_measurements</span><span class="p">)</span>
+    <span class="n">histogram_simulations</span> <span class="o">=</span> <span class="n">add_trajectories_to_histogram</span><span class="p">(</span>
+        <span class="n">histogram_simulations</span><span class="p">,</span> <span class="n">simulated_paths</span><span class="p">,</span> <span class="s2">&quot;fast_grid_indices&quot;</span>
+    <span class="p">)</span>
+    <span class="n">histogram_simulations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">histogram_simulations</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">histogram_simulations</span>
+    <span class="p">)</span>
+    <span class="n">histogram_measurements</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">histogram_measurements</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">histogram_measurements</span>
+    <span class="p">)</span>
+
+    <span class="n">prob_dist_measurements</span> <span class="o">=</span> <span class="n">histogram_measurements</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span>
+        <span class="n">histogram_measurements</span>
+    <span class="p">)</span>
+    <span class="n">prob_dens_measurements</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">prob_dist_measurements</span><span class="p">,</span> <span class="n">cell_volume</span><span class="p">)</span>
+
+    <span class="n">prob_dist_simulations</span> <span class="o">=</span> <span class="n">histogram_simulations</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span>
+        <span class="n">histogram_simulations</span>
+    <span class="p">)</span>
+    <span class="n">prob_dens_simulations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">prob_dist_simulations</span><span class="p">,</span> <span class="n">cell_volume</span><span class="p">)</span>
+
+    <span class="c1"># Compute Kullback-Leibler divergence</span>
+    <span class="n">kl</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span>
+            <span class="n">prob_dist_measurements</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">prob_dens_measurements</span><span class="p">,</span> <span class="n">prob_dens_simulations</span><span class="p">)),</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">kl</span></div>
+
+
+
+<div class="viewcode-block" id="plot_histogram">
+<a class="viewcode-back" href="../../../physped.visualization.html#physped.visualization.plot_histograms.plot_histogram">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_histogram</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">:</span> <span class="n">Axes</span><span class="p">,</span>
+    <span class="n">histograms</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">observable</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">hist_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Axes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot a histogram.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - ax (plt.Axes): The axes to plot the histogram on.</span>
+<span class="sd">    - histograms (Dict[str, Any]): The histograms to plot.</span>
+<span class="sd">    - observable (str): The observable to plot the histogram for.</span>
+<span class="sd">    - hist_type (str): The type of histogram to plot.</span>
+<span class="sd">    - kl_div (float): The KL divergence value for the histogram.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - The axes object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ntrajs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;recorded&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">input_ntrajs</span><span class="p">,</span>
+        <span class="s2">&quot;simulated&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">ntrajs</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;recorded&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Measurements ($N =$ </span><span class="si">{</span><span class="n">ntrajs</span><span class="p">[</span><span class="s1">&#39;recorded&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;simulated&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Simulations ($N =$ </span><span class="si">{</span><span class="n">ntrajs</span><span class="p">[</span><span class="s1">&#39;simulated&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">histogram_plot_params</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">histogram_plot</span>
+    <span class="k">for</span> <span class="n">trajectory_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;recorded&quot;</span><span class="p">,</span> <span class="s2">&quot;simulated&quot;</span><span class="p">]:</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">trajectory_type</span><span class="p">]</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+            <span class="n">histograms</span><span class="p">[</span><span class="n">trajectory_type</span><span class="p">][</span><span class="n">observable</span><span class="p">][</span><span class="s2">&quot;bin_centers&quot;</span><span class="p">],</span>
+            <span class="n">histograms</span><span class="p">[</span><span class="n">trajectory_type</span><span class="p">][</span><span class="n">observable</span><span class="p">][</span><span class="n">hist_type</span><span class="p">],</span>
+            <span class="n">ec</span><span class="o">=</span><span class="n">histogram_plot_params</span><span class="p">[</span><span class="n">trajectory_type</span><span class="p">][</span><span class="s2">&quot;edgecolor&quot;</span><span class="p">],</span>
+            <span class="n">fc</span><span class="o">=</span><span class="n">histogram_plot_params</span><span class="p">[</span><span class="n">trajectory_type</span><span class="p">][</span><span class="s2">&quot;facecolor&quot;</span><span class="p">],</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+            <span class="n">s</span><span class="o">=</span><span class="n">histogram_plot_params</span><span class="p">[</span><span class="n">trajectory_type</span><span class="p">][</span><span class="s2">&quot;markersize&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">histogram_plot_params</span><span class="p">[</span><span class="n">observable</span><span class="p">][</span><span class="s2">&quot;xlabel&quot;</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">histogram_plot_params</span><span class="p">[</span><span class="n">observable</span><span class="p">][</span><span class="s2">&quot;ylabel&quot;</span><span class="p">][</span><span class="n">hist_type</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">ax</span></div>
+
+
+
+<div class="viewcode-block" id="save_joint_kl_divergence_to_file">
+<a class="viewcode-back" href="../../../physped.visualization.html#physped.visualization.plot_histograms.save_joint_kl_divergence_to_file">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_joint_kl_divergence_to_file</span><span class="p">(</span>
+    <span class="n">joint_kl_divergence</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">kl_divergence</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span>
+    <span class="n">kl_divergence</span><span class="p">[</span><span class="s2">&quot;env_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">env_name</span>
+    <span class="n">kl_divergence</span><span class="p">[</span><span class="s2">&quot;ntrajs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">ntrajs</span>
+    <span class="n">kl_divergence</span><span class="p">[</span><span class="s2">&quot;tauu&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">tauu</span>
+    <span class="n">kl_divergence</span><span class="p">[</span><span class="s2">&quot;dt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">dt</span>
+    <span class="n">kl_divergence</span><span class="p">[</span><span class="s2">&quot;noise&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">sigma</span>
+    <span class="n">kl_divergence</span><span class="p">[</span><span class="s2">&quot;joint_kl_divergence&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">joint_kl_divergence</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;figures&quot;</span> <span class="o">/</span> <span class="s2">&quot;kl_divergence.pkl&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">kl_divergence</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_multiple_histograms">
+<a class="viewcode-back" href="../../../physped.visualization.html#physped.visualization.plot_histograms.plot_multiple_histograms">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_multiple_histograms</span><span class="p">(</span>
+    <span class="n">observables</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">histograms</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">histogram_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot histograms for all observables.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - ax (plt.Axes): The axes to plot the histogram on.</span>
+<span class="sd">    - histograms (dict): The histograms to plot.</span>
+<span class="sd">    - observable (str): The observable to plot the histogram for.</span>
+<span class="sd">    - hist_type (str): The type of histogram to plot.</span>
+<span class="sd">    - kl_div (float): The KL divergence value for the histogram.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - The axes object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span>
+    <span class="n">width_single_panel</span> <span class="o">=</span> <span class="mf">1.77</span>
+    <span class="n">height_single_panel</span> <span class="o">=</span> <span class="mf">1.18</span>
+    <span class="n">subplot_grid</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">histogram_plot</span><span class="o">.</span><span class="n">subplot_grid</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span>
+        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span>
+            <span class="n">width_single_panel</span> <span class="o">*</span> <span class="n">subplot_grid</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">height_single_panel</span> <span class="o">*</span> <span class="n">subplot_grid</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="p">),</span>
+        <span class="n">layout</span><span class="o">=</span><span class="s2">&quot;constrained&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">hist_plot_params</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">histogram_plot</span>
+
+    <span class="k">for</span> <span class="n">plotid</span><span class="p">,</span> <span class="n">observable</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">observables</span><span class="p">):</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">subplot_grid</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">subplot_grid</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">plotid</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_histogram</span><span class="p">(</span>
+            <span class="n">ax</span><span class="p">,</span>
+            <span class="n">histograms</span><span class="p">,</span>
+            <span class="n">observable</span><span class="p">,</span>
+            <span class="n">hist_type</span><span class="o">=</span><span class="n">histogram_type</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">xlims</span> <span class="o">=</span> <span class="n">hist_plot_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">observable</span><span class="si">}</span><span class="s2">lims&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xlims</span><span class="p">)</span>
+        <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ymin</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># props = {&quot;facecolor&quot;: &quot;white&quot;, &quot;alpha&quot;: 1, &quot;edgecolor&quot;: &quot;black&quot;,</span>
+        <span class="c1"># &quot;lw&quot;: 0.5, &quot;pad&quot;: 1.6}</span>
+    <span class="c1">#     ax.text(</span>
+    <span class="c1">#         0.215,</span>
+    <span class="c1">#         0.92,</span>
+    <span class="c1">#         f&quot;$D_{{\\! K\\! L}}={kldiv:.3f}$&quot;,</span>
+    <span class="c1">#         transform=ax.transAxes,</span>
+    <span class="c1">#         ha=&quot;center&quot;,</span>
+    <span class="c1">#         va=&quot;center&quot;,</span>
+    <span class="c1">#         fontsize=6,</span>
+    <span class="c1">#         bbox=props,</span>
+    <span class="c1">#     )</span>
+
+    <span class="n">handles</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_legend_handles_labels</span><span class="p">()</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span>
+        <span class="n">handles</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">,</span>
+        <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">),</span>
+        <span class="n">ncol</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">fontsize</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+        <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">folderpath</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;figures&quot;</span>
+    <span class="n">folderpath</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">folderpath</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;histograms_</span><span class="si">{</span><span class="n">params</span><span class="o">.</span><span class="n">env_name</span><span class="si">}</span><span class="s2">.pdf&quot;</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

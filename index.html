@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data-driven physics-based modeling of pedestrian dynamics &mdash; Data-driven physics-based modeling of pedestrian dynamics 0.post1.dev0+gbf0ef31 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=9c8095b4"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Usage Notebook" href="usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0.post1.dev0+gbf0ef31
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#using-the-cli">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#available-environments">Available environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">physped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Data-driven physics-based modeling of pedestrian dynamics</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="data-driven-physics-based-modeling-of-pedestrian-dynamics">
+<h1>Data-driven physics-based modeling of pedestrian dynamics<a class="headerlink" href="#data-driven-physics-based-modeling-of-pedestrian-dynamics" title="Link to this heading">¶</a></h1>
+<p align="center">
+    <a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/" alt="Repository">
+           <img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white" /></a>
+        <!-- <a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml" alt="Integration Tests"> -->
+        <!--    <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml/badge.svg" /></a> -->
+    <a href="https://c-pouw.github.io/physics-based-pedestrian-modeling" alt="docs">
+           <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/docs.yml/badge.svg" /></a>
+    <a href="https://c-pouw.github.io/physics-based-pedestrian-modeling/reports/junit/report.html?sort=result">
+           <img src="https://c-pouw.github.io/physics-based-pedestrian-modeling/reports/junit/tests-badge.svg?dummy=8484744" alt="tests" /></a>
+    <a href="https://c-pouw.github.io/physics-based-pedestrian-modeling/reports/coverage/index.html?">
+           <img src="https://c-pouw.github.io/physics-based-pedestrian-modeling/reports/coverage/coverage-badge.svg?dummy=8484744" alt="coverage" /></a>
+    <a href="https://pypi.python.org/pypi/physics-based-pedestrian-modeling" alt="pypi version">
+       <img src="https://img.shields.io/pypi/v/physics-based-pedestrian-modeling.svg" /></a>
+    <a href="#">
+       <img src="https://img.shields.io/pypi/pyversions/physics-based-pedestrian-modeling" alt="PyPI - Python Version" /></a>
+    <a href="https://opensource.org/licenses/BSD-3-Clause">
+       <img src="https://img.shields.io/badge/License-BSD%203--Clause-orange.svg" alt="Licence" /></a>
+    <a href="https://github.com/psf/black">
+       <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black" /></a>
+</p>
+<p>Python package to create physics-based pedestrian models from pedestrian trajectory measurements. This package is an implementation of the data-driven generalized pedestrian model presented in:</p>
+<blockquote>
+<div><p>Pouw, C. A. S., van der Vleuten, G., Corbetta, A., &amp; Toschi, F. (2024). Data-driven physics-based modeling of pedestrian dynamics. Phys. Rev. E 110 (6 Dec. 2024), p. 064102. DOI: <a class="reference external" href="https://doi.org/10.1103/PhysRevE.110.064102">10.1103/PhysRevE.110.064102</a>.</p>
+</div></blockquote>
+<p><strong>Abstract.</strong> We introduce a data-driven physics-based generalized
+Langevin model that allows robust and generic modeling of pedestrian
+behavior across any environment where extensive pedestrian trajectory
+data is available. Our model effectively captures the complex
+interplay between the deterministic movements and stochastic
+fluctuations associated with walking.</p>
+<h3 align="center" style="vertical-align: middle;">
+        <a href="https://journals.aps.org/pre/accepted/ec075Ra2H081202d17c11029a2e965c33e4471521">
+           <img src="https://img.shields.io/badge/PRE-Manuscript-b31b1b?style=for-the-badge" alt="PRE" /></a>
+        <a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/" alt="Repository"><img src="https://img.shields.io/badge/Github-Software-%23181717?style=for-the-badge" /></a>
+    <a href="https://doi.org/10.5281/zenodo.13784588">
+           <img src="https://img.shields.io/badge/Zenodo-Dataset-%231682D4?style=for-the-badge" alt="Zenodo dataset"></a>
+    <a href="https://colab.research.google.com/github/c-pouw/physics-based-pedestrian-modeling/blob/master/usage_notebooks/physped_quick_start.ipynb"><img src="https://img.shields.io/badge/Google_Colab-Demonstration-%23F9AB00?style=for-the-badge"></a>
+</h3>
+</section>
+<section id="contents">
+<h1>Contents<a class="headerlink" href="#contents" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage Notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#using-the-cli">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html#available-environments">Available environments</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#narrow-corridor">Narrow corridor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#intersecting-walking-paths">Intersecting walking paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#train-station-platforms">Train station platforms</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">physped</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="physped.html">physped package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="release-history.html">Release History</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="release-history.html#version-0-3-0-2024-08-08">Version 0.3.0 (2024-08-08)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release-history.html#version-0-2-0-2024-08-01">Version 0.2.0 (2024-08-01)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="release-history.html#initial-release-2024-06-05">Initial Release (2024-06-05)</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage.html" class="btn btn-neutral float-right" title="Usage Notebook" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

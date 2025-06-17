@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.processing_pipelines &mdash; Data-driven physics-based modeling of pedestrian dynamics 0.post1.dev0+gbf0ef31 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=9c8095b4"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0.post1.dev0+gbf0ef31
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage Notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html#using-the-cli">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html#available-environments">Available environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">physped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">physped.processing_pipelines</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for physped.processing_pipelines</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.lattice_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">evaluate_selection_range</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.parametrize_potential</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">learn_potential_from_trajectories</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.pedestrian_initializer</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">sample_dynamics_from_trajectories</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.pedestrian_simulator</span><span class="w"> </span><span class="kn">import</span> <span class="n">simulate_pedestrians</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.slow_dynamics</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_slow_dynamics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.io.readers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">read_piecewise_potential_from_file</span><span class="p">,</span>
+    <span class="n">read_trajectories</span><span class="p">,</span>
+    <span class="n">read_trajectories_from_file</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.io.writers</span><span class="w"> </span><span class="kn">import</span> <span class="n">save_piecewise_potential</span><span class="p">,</span> <span class="n">save_trajectories</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.preprocessing.trajectories</span><span class="w"> </span><span class="kn">import</span> <span class="n">preprocess_trajectories</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.utils.config_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">log_configuration</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.visualization.plot_discrete_grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_discrete_grid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.visualization.plot_histograms</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">compute_joint_kl_divergence</span><span class="p">,</span>
+    <span class="n">create_all_histograms</span><span class="p">,</span>
+    <span class="n">plot_multiple_histograms</span><span class="p">,</span>
+    <span class="n">save_joint_kl_divergence_to_file</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.visualization.plot_potential_at_slow_index</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">plot_potential_at_slow_index</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.visualization.plot_trajectories</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_trajectories</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="read_and_preprocess_data">
+<a class="viewcode-back" href="../../physped.html#physped.processing_pipelines.read_and_preprocess_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_and_preprocess_data</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="n">log_configuration</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">trajectories</span> <span class="o">=</span> <span class="n">read_trajectories</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">preprocessed_trajectories</span> <span class="o">=</span> <span class="n">preprocess_trajectories</span><span class="p">(</span>
+        <span class="n">trajectories</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span>
+    <span class="p">)</span>
+    <span class="n">save_trajectories</span><span class="p">(</span>
+        <span class="n">preprocessed_trajectories</span><span class="p">,</span>
+        <span class="n">folderpath</span><span class="o">=</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span>
+        <span class="n">filename</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">preprocessed_trajectories</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="sample_and_save_dynamics_from_trajectories">
+<a class="viewcode-back" href="../../physped.html#physped.processing_pipelines.sample_and_save_dynamics_from_trajectories">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sample_and_save_dynamics_from_trajectories</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+    <span class="n">log_configuration</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">env_name</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">env_name</span>
+    <span class="n">n_trajs</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">ntrajs</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">sample_state</span>
+    <span class="n">preprocessed_trajectories</span> <span class="o">=</span> <span class="n">read_trajectories_from_file</span><span class="p">(</span>
+        <span class="n">filepath</span><span class="o">=</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">preprocessed_trajectories</span>
+    <span class="p">)</span>
+    <span class="n">preprocessed_trajectories</span> <span class="o">=</span> <span class="n">compute_slow_dynamics</span><span class="p">(</span>
+        <span class="n">preprocessed_trajectories</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span>
+    <span class="p">)</span>
+
+    <span class="n">dynamics</span> <span class="o">=</span> <span class="n">sample_dynamics_from_trajectories</span><span class="p">(</span>
+        <span class="n">preprocessed_trajectories</span><span class="p">,</span> <span class="n">n_trajs</span><span class="p">,</span> <span class="n">state</span>
+    <span class="p">)</span>
+    <span class="n">folderpath</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;initial_dynamics&quot;</span>
+    <span class="n">folderpath</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">env_name</span><span class="si">}</span><span class="s2">_state_</span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s2">_dynamics.npy&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">folderpath</span> <span class="o">/</span> <span class="n">filename</span><span class="p">,</span> <span class="n">dynamics</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="learn_potential_from_data">
+<a class="viewcode-back" href="../../physped.html#physped.processing_pipelines.learn_potential_from_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">learn_potential_from_data</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="n">log_configuration</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+    <span class="n">preprocessed_trajectories</span> <span class="o">=</span> <span class="n">read_trajectories_from_file</span><span class="p">(</span>
+        <span class="n">filepath</span><span class="o">=</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">preprocessed_trajectories</span>
+    <span class="p">)</span>
+    <span class="n">preprocessed_trajectories</span> <span class="o">=</span> <span class="n">compute_slow_dynamics</span><span class="p">(</span>
+        <span class="n">preprocessed_trajectories</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span>
+    <span class="p">)</span>
+    <span class="n">piecewise_potential</span> <span class="o">=</span> <span class="n">learn_potential_from_trajectories</span><span class="p">(</span>
+        <span class="n">preprocessed_trajectories</span><span class="p">,</span> <span class="n">config</span>
+    <span class="p">)</span>
+    <span class="n">save_piecewise_potential</span><span class="p">(</span>
+        <span class="n">piecewise_potential</span><span class="p">,</span>
+        <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;potentials&quot;</span><span class="p">,</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">piecewise_potential</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="simulate_from_potential">
+<a class="viewcode-back" href="../../physped.html#physped.processing_pipelines.simulate_from_potential">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">simulate_from_potential</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="n">log_configuration</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;potentials&quot;</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">piecewise_potential</span>
+    <span class="n">piecewise_potential</span> <span class="o">=</span> <span class="n">read_piecewise_potential_from_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="n">simulated_trajectories</span> <span class="o">=</span> <span class="n">simulate_pedestrians</span><span class="p">(</span>
+        <span class="n">piecewise_potential</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">save_trajectories</span><span class="p">(</span>
+        <span class="n">simulated_trajectories</span><span class="p">,</span>
+        <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;simulated_trajectories&quot;</span><span class="p">,</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">simulated_trajectories</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="plot_figures">
+<a class="viewcode-back" href="../../physped.html#physped.processing_pipelines.plot_figures">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_figures</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="n">log_configuration</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">preprocessed_trajectories</span> <span class="o">=</span> <span class="n">read_trajectories_from_file</span><span class="p">(</span>
+        <span class="n">filepath</span><span class="o">=</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">preprocessed_trajectories</span>
+    <span class="p">)</span>
+    <span class="n">preprocessed_trajectories</span> <span class="o">=</span> <span class="n">compute_slow_dynamics</span><span class="p">(</span>
+        <span class="n">preprocessed_trajectories</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span>
+    <span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">input_ntrajs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">preprocessed_trajectories</span><span class="o">.</span><span class="n">Pid</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span>
+    <span class="n">piecewise_potential</span> <span class="o">=</span> <span class="n">read_piecewise_potential_from_file</span><span class="p">(</span>
+        <span class="n">filepath</span><span class="o">=</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+        <span class="o">/</span> <span class="s2">&quot;potentials&quot;</span>
+        <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">piecewise_potential</span>
+    <span class="p">)</span>
+    <span class="n">simulated_trajectories</span> <span class="o">=</span> <span class="n">read_trajectories_from_file</span><span class="p">(</span>
+        <span class="n">filepath</span><span class="o">=</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span>
+        <span class="o">/</span> <span class="s2">&quot;simulated_trajectories&quot;</span>
+        <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">simulated_trajectories</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">preprocessed_trajectories</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plot preprocessed trajectories.&quot;</span><span class="p">)</span>
+        <span class="n">plot_trajectories</span><span class="p">(</span><span class="n">preprocessed_trajectories</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="s2">&quot;recorded&quot;</span><span class="p">)</span>
+        <span class="n">plot_trajectories</span><span class="p">(</span>
+            <span class="n">preprocessed_trajectories</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="s2">&quot;recorded&quot;</span><span class="p">,</span> <span class="n">traj_type</span><span class="o">=</span><span class="s2">&quot;s&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">simulated_trajectories</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plot simulated trajectories&quot;</span><span class="p">)</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">trajectory_plot</span><span class="o">.</span><span class="n">plot_intended_path</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">plot_trajectories</span><span class="p">(</span><span class="n">simulated_trajectories</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="s2">&quot;simulated&quot;</span><span class="p">)</span>
+        <span class="n">plot_trajectories</span><span class="p">(</span>
+            <span class="n">simulated_trajectories</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="s2">&quot;simulated&quot;</span><span class="p">,</span> <span class="n">traj_type</span><span class="o">=</span><span class="s2">&quot;s&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">histograms</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plot probability distribution comparison.&quot;</span><span class="p">)</span>
+        <span class="n">observables</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;xf&quot;</span><span class="p">,</span> <span class="s2">&quot;yf&quot;</span><span class="p">,</span> <span class="s2">&quot;uf&quot;</span><span class="p">,</span> <span class="s2">&quot;vf&quot;</span><span class="p">]</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">ntrajs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="n">simulated_trajectories</span><span class="o">.</span><span class="n">Pid</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="n">histograms</span> <span class="o">=</span> <span class="n">create_all_histograms</span><span class="p">(</span>
+            <span class="n">preprocessed_trajectories</span><span class="p">,</span> <span class="n">simulated_trajectories</span><span class="p">,</span> <span class="n">config</span>
+        <span class="p">)</span>
+        <span class="n">joint_kl_divergence</span> <span class="o">=</span> <span class="n">compute_joint_kl_divergence</span><span class="p">(</span>
+            <span class="n">piecewise_potential</span><span class="p">,</span> <span class="n">simulated_trajectories</span>
+        <span class="p">)</span>
+        <span class="n">save_joint_kl_divergence_to_file</span><span class="p">(</span><span class="n">joint_kl_divergence</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="n">plot_multiple_histograms</span><span class="p">(</span><span class="n">observables</span><span class="p">,</span> <span class="n">histograms</span><span class="p">,</span> <span class="s2">&quot;PDF&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+    <span class="n">config</span> <span class="o">=</span> <span class="n">evaluate_selection_range</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">selection</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">range</span>
+    <span class="n">slow_indices</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">selection</span><span class="o">.</span><span class="n">x_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">selection</span><span class="o">.</span><span class="n">y_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">selection</span><span class="o">.</span><span class="n">r_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">selection</span><span class="o">.</span><span class="n">theta_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">selection</span><span class="o">.</span><span class="n">k_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">grid</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plot the configuration of the grid.&quot;</span><span class="p">)</span>
+        <span class="n">plot_discrete_grid</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">slow_indices</span><span class="p">,</span> <span class="n">preprocessed_trajectories</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">potential_at_selection</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plot potential at selection.&quot;</span><span class="p">)</span>
+        <span class="n">plot_potential_at_slow_index</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">slow_indices</span><span class="p">,</span> <span class="n">piecewise_potential</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

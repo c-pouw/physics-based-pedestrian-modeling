@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.core.pedestrian_simulator &mdash; Data-driven physics-based modeling of pedestrian dynamics 0.post1.dev0+gbf0ef31 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=9c8095b4"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0.post1.dev0+gbf0ef31
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#using-the-cli">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#available-environments">Available environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">physped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">physped.core.pedestrian_simulator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for physped.core.pedestrian_simulator</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm.contrib.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logging_redirect_tqdm</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.langevin_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LangevinModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.parametrize_potential</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_grid_indices</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.pedestrian_initializer</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_initial_dynamics</span><span class="p">,</span>
+    <span class="n">initialize_pedestrians</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.piecewise_potential</span><span class="w"> </span><span class="kn">import</span> <span class="n">PiecewisePotential</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.utils.functions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">cartesian_to_polar_coordinates</span><span class="p">,</span>
+    <span class="n">periodic_angular_conditions</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="simulate_pedestrians">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.pedestrian_simulator.simulate_pedestrians">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">simulate_pedestrians</span><span class="p">(</span>
+    <span class="n">piecewise_potential</span><span class="p">:</span> <span class="n">PiecewisePotential</span><span class="p">,</span>
+    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span>
+
+    <span class="c1"># if config.read.simulated_trajectories:</span>
+    <span class="c1">#     return read_simulated_trajectories_from_file(config)</span>
+
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Simulate trajectories using the piecewise potential&quot;</span><span class="p">)</span>
+    <span class="n">initial_dynamics</span> <span class="o">=</span> <span class="n">get_initial_dynamics</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="n">origins</span> <span class="o">=</span> <span class="n">initialize_pedestrians</span><span class="p">(</span><span class="n">initial_dynamics</span><span class="p">)</span>
+
+    <span class="c1"># !Make sure that the potential is defined for the states we sample</span>
+    <span class="c1"># states_to_sample_from = potential_defined_at_slow_state(</span>
+    <span class="c1">#     states_to_sample_from, piecewise_potential</span>
+    <span class="c1"># )</span>
+    <span class="c1"># states_to_sample_from = states_to_sample_from[</span>
+    <span class="c1">#     states_to_sample_from[&quot;potential_defined&quot;]</span>
+    <span class="c1"># ].copy()</span>
+
+    <span class="n">evaluation_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+        <span class="n">parameters</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">end</span><span class="p">,</span>
+        <span class="n">parameters</span><span class="o">.</span><span class="n">simulation</span><span class="o">.</span><span class="n">step</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">trajectories</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">model</span> <span class="o">=</span> <span class="n">LangevinModel</span><span class="p">(</span><span class="n">piecewise_potential</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+    <span class="n">n_frames_back</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">fps</span> <span class="o">//</span> <span class="mi">2</span>  <span class="c1"># Go 0.5 second back</span>
+    <span class="k">with</span> <span class="n">logging_redirect_tqdm</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">starting_state</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+            <span class="n">origins</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">11</span><span class="p">],</span>
+            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Simulating trajectories&quot;</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;trajs&quot;</span><span class="p">,</span>
+            <span class="n">total</span><span class="o">=</span><span class="n">origins</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">miniters</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="n">first_trajectory_piece</span> <span class="o">=</span> <span class="n">simulate_trajectory_piece</span><span class="p">(</span>
+                <span class="n">model</span><span class="p">,</span> <span class="n">starting_state</span><span class="p">,</span> <span class="n">evaluation_time</span><span class="p">,</span> <span class="mi">0</span>
+            <span class="p">)</span>
+            <span class="n">pid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">first_trajectory_piece</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;Pid&quot;</span><span class="p">])</span>
+            <span class="n">trajectory_pieces</span> <span class="o">=</span> <span class="p">[</span><span class="n">first_trajectory_piece</span><span class="p">]</span>
+
+            <span class="k">while</span> <span class="n">check_restarting_conditions</span><span class="p">(</span>
+                <span class="n">trajectory_pieces</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">n_frames_back</span><span class="p">,</span> <span class="n">piecewise_potential</span>
+            <span class="p">):</span>
+                <span class="n">last_trajectory_piece</span> <span class="o">=</span> <span class="n">trajectory_pieces</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">no_last_trajectory_piece</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                    <span class="n">last_trajectory_piece</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;piece_id&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="n">restarting_state</span> <span class="o">=</span> <span class="n">last_trajectory_piece</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="n">n_frames_back</span><span class="p">]</span>
+                <span class="n">restarting_time</span> <span class="o">=</span> <span class="n">restarting_state</span><span class="p">[</span><span class="s2">&quot;t&quot;</span><span class="p">]</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;Pid </span><span class="si">%s</span><span class="s2"> piece </span><span class="si">%s</span><span class="s2">: Reverting </span><span class="si">%s</span><span class="s2"> frames -&gt; t = </span><span class="si">%.2f</span><span class="s2">.&quot;</span><span class="p">,</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">pid</span><span class="p">),</span>
+                    <span class="n">no_last_trajectory_piece</span><span class="p">,</span>
+                    <span class="n">n_frames_back</span><span class="p">,</span>
+                    <span class="n">restarting_time</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="n">last_trajectory_piece</span> <span class="o">=</span> <span class="n">last_trajectory_piece</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span>
+                    <span class="p">:</span> <span class="o">-</span><span class="n">n_frames_back</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="p">]</span>  <span class="c1"># strip frames from last trajectory piece</span>
+                <span class="n">trajectory_pieces</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">last_trajectory_piece</span>
+                <span class="n">frame_to_restart_from</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">restarting_state</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">])</span>
+
+                <span class="n">new_evaluation_time</span> <span class="o">=</span> <span class="n">evaluation_time</span><span class="p">[</span><span class="n">frame_to_restart_from</span><span class="p">:]</span>
+
+                <span class="n">no_new_traj_piece</span> <span class="o">=</span> <span class="n">no_last_trajectory_piece</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">new_trajectory_piece</span> <span class="o">=</span> <span class="n">simulate_trajectory_piece</span><span class="p">(</span>
+                    <span class="n">model</span><span class="p">,</span>
+                    <span class="n">restarting_state</span><span class="p">,</span>
+                    <span class="n">new_evaluation_time</span><span class="p">,</span>
+                    <span class="n">no_new_traj_piece</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">trajectory_pieces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_trajectory_piece</span><span class="p">)</span>
+
+            <span class="n">trajectory_pieces</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">trajectory_pieces</span><span class="p">)</span>
+            <span class="n">trajectories</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trajectory_pieces</span><span class="p">)</span>
+
+    <span class="n">trajectories</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">trajectories</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">trajectories</span><span class="p">[</span><span class="s2">&quot;rf&quot;</span><span class="p">],</span> <span class="n">trajectories</span><span class="p">[</span><span class="s2">&quot;thetaf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">cartesian_to_polar_coordinates</span><span class="p">(</span><span class="n">trajectories</span><span class="o">.</span><span class="n">uf</span><span class="p">,</span> <span class="n">trajectories</span><span class="o">.</span><span class="n">vf</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">trajectories</span><span class="p">[</span><span class="s2">&quot;rs&quot;</span><span class="p">],</span> <span class="n">trajectories</span><span class="p">[</span><span class="s2">&quot;thetas&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">cartesian_to_polar_coordinates</span><span class="p">(</span><span class="n">trajectories</span><span class="o">.</span><span class="n">us</span><span class="p">,</span> <span class="n">trajectories</span><span class="o">.</span><span class="n">vs</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">trajectories</span><span class="p">[</span><span class="s2">&quot;thetaf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">periodic_angular_conditions</span><span class="p">(</span>
+        <span class="n">trajectories</span><span class="p">[</span><span class="s2">&quot;thetaf&quot;</span><span class="p">],</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">bins</span><span class="p">[</span><span class="s2">&quot;theta&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">trajectories</span><span class="p">[</span><span class="s2">&quot;thetas&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">periodic_angular_conditions</span><span class="p">(</span>
+        <span class="n">trajectories</span><span class="p">[</span><span class="s2">&quot;thetas&quot;</span><span class="p">],</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">bins</span><span class="p">[</span><span class="s2">&quot;theta&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="c1"># if config.save.simulated_trajectories:</span>
+    <span class="c1">#     log.debug(</span>
+    <span class="c1">#         &quot;Configuration &#39;save.simulated_trajectories&#39; is set to True.&quot;</span>
+    <span class="c1">#     )</span>
+    <span class="c1">#     save_trajectories(</span>
+    <span class="c1">#         trajectories,</span>
+    <span class="c1">#         Path.cwd().parent,</span>
+    <span class="c1">#         config.filename.simulated_trajectories,</span>
+    <span class="c1">#     )</span>
+    <span class="k">return</span> <span class="n">trajectories</span></div>
+
+
+
+<span class="c1"># def sample_trajectory_origins_from_trajectories(piecewise_potential:</span>
+<span class="c1"># PiecewisePotential, parameters: dict) -&gt; np.ndarray:</span>
+<span class="c1">#     ntrajs = np.min([parameters.simulation.ntrajs, parameters.input_ntrajs])</span>
+<span class="c1">#     sampled_origins = piecewise_potential.trajectory_origins.sample(n=ntrajs)</span>
+<span class="c1">#     # Stacking to go from [x,y,u,v] to [x,y,u,v,xs,ys,us,vs]</span>
+<span class="c1">#     sampled_origins = np.hstack((sampled_origins, sampled_origins))</span>
+<span class="c1">#     log.info(&quot;Sampled %d origins from the input trajectories.&quot;, ntrajs)</span>
+<span class="c1">#     return sampled_origins</span>
+
+
+<div class="viewcode-block" id="read_simulated_trajectories_from_file">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.pedestrian_simulator.read_simulated_trajectories_from_file">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_simulated_trajectories_from_file</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Configuration &#39;read.simulated_trajectories&#39; is set to True.&quot;</span><span class="p">)</span>
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">config</span><span class="o">.</span><span class="n">filename</span><span class="o">.</span><span class="n">simulated_trajectories</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">simulated_trajectories</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Simulated trajectories read from file&quot;</span><span class="p">)</span>
+        <span class="c1"># log.debug(&quot;Filepath %s&quot;, filepath.relative_to(config.root_dir))</span>
+        <span class="k">return</span> <span class="n">simulated_trajectories</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Preprocessed trajectories not found: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="heatmap_zero_at_slow_state">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.pedestrian_simulator.heatmap_zero_at_slow_state">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">heatmap_zero_at_slow_state</span><span class="p">(</span>
+    <span class="n">piecewise_potential</span><span class="p">:</span> <span class="n">PiecewisePotential</span><span class="p">,</span> <span class="n">slow_state</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the heatmap is zero at the given position.</span>
+
+<span class="sd">    If the heatmap is zero it indicates that the spatial position was never</span>
+<span class="sd">    visited by a pedestrian in the input data.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        piecewise_potential: The piecewise potential object.</span>
+<span class="sd">        position: The position to check.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        True if the heatmap is zero at the given position, False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">heatmap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">piecewise_potential</span><span class="o">.</span><span class="n">histogram</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">slow_state_index</span> <span class="o">=</span> <span class="n">get_grid_indices</span><span class="p">(</span><span class="n">piecewise_potential</span><span class="p">,</span> <span class="n">slow_state</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">heatmap</span><span class="p">[</span><span class="n">slow_state_index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">slow_state_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">==</span> <span class="mi">0</span></div>
+
+
+
+<div class="viewcode-block" id="check_restarting_conditions">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.pedestrian_simulator.check_restarting_conditions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_restarting_conditions</span><span class="p">(</span><span class="n">traj</span><span class="p">,</span> <span class="n">n_frames_back</span><span class="p">,</span> <span class="n">piecewise_potential</span><span class="p">):</span>
+    <span class="c1"># traj is the last trajectory_piece</span>
+    <span class="n">last_trajectory_piece_too_short</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">traj</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">n_frames_back</span>
+    <span class="k">if</span> <span class="n">last_trajectory_piece_too_short</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Last trajectory piece has only </span><span class="si">%s</span><span class="s2"> frames. Not reverting.&quot;</span><span class="p">,</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">traj</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="n">trajectory_already_left_the_measurement_domain</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">heatmap_zero_at_slow_state</span><span class="p">(</span>
+            <span class="n">piecewise_potential</span><span class="p">,</span> <span class="n">traj</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][[</span><span class="s2">&quot;xs&quot;</span><span class="p">,</span> <span class="s2">&quot;ys&quot;</span><span class="p">,</span> <span class="s2">&quot;us&quot;</span><span class="p">,</span> <span class="s2">&quot;vs&quot;</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">]]</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">trajectory_already_left_the_measurement_domain</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Last trajectory piece already left the measurement domain. &quot;</span>
+            <span class="s2">&quot;Not reverting.&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="n">particle_left_the_lattice</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">traj</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">if</span> <span class="n">particle_left_the_lattice</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Last trajectory piece already left the lattice. Not reverting.&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="n">max_restarts</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">simulation_already_restarted_too_often</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">traj</span><span class="p">[</span><span class="s2">&quot;piece_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">max_restarts</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">simulation_already_restarted_too_often</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Simulation already restarted </span><span class="si">%s</span><span class="s2"> times. Not reverting.&quot;</span><span class="p">,</span>
+            <span class="n">max_restarts</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="simulate_trajectory_piece">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.pedestrian_simulator.simulate_trajectory_piece">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">simulate_trajectory_piece</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">LangevinModel</span><span class="p">,</span>
+    <span class="n">starting_state</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">evaluation_time</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">no_traj_piece</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">integration_output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">starting_state</span><span class="p">[:</span><span class="mi">11</span><span class="p">],</span> <span class="n">evaluation_time</span><span class="p">)</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;xf&quot;</span><span class="p">,</span> <span class="s2">&quot;yf&quot;</span><span class="p">,</span> <span class="s2">&quot;uf&quot;</span><span class="p">,</span> <span class="s2">&quot;vf&quot;</span><span class="p">,</span> <span class="s2">&quot;xs&quot;</span><span class="p">,</span> <span class="s2">&quot;ys&quot;</span><span class="p">,</span> <span class="s2">&quot;us&quot;</span><span class="p">,</span> <span class="s2">&quot;vs&quot;</span><span class="p">,</span> <span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="s2">&quot;Pid&quot;</span><span class="p">]</span>
+    <span class="n">trajectory_piece</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">integration_output</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
+    <span class="n">trajectory_piece</span><span class="o">.</span><span class="n">replace</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">trajectory_piece</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">trajectory_piece</span><span class="p">[</span><span class="s2">&quot;piece_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">no_traj_piece</span>
+    <span class="k">return</span> <span class="n">trajectory_piece</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

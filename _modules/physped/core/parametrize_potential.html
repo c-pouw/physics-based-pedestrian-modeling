@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.core.parametrize_potential &mdash; Data-driven physics-based modeling of pedestrian dynamics 0.post1.dev0+gbf0ef31 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=9c8095b4"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0.post1.dev0+gbf0ef31
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#using-the-cli">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#available-environments">Available environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">physped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">physped.core.parametrize_potential</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for physped.core.parametrize_potential</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Infer force fields from trajectories.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="c1"># from pathlib import Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">omegaconf</span><span class="w"> </span><span class="kn">import</span> <span class="n">DictConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">norm</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.digitizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">digitize_coordinates_to_lattice</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.distribution_approximator</span><span class="w"> </span><span class="kn">import</span> <span class="n">GaussianApproximation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.lattice</span><span class="w"> </span><span class="kn">import</span> <span class="n">Lattice</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.core.piecewise_potential</span><span class="w"> </span><span class="kn">import</span> <span class="n">PiecewisePotential</span>
+
+<span class="c1"># from physped.io.readers import read_piecewise_potential_from_file</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">physped.utils.functions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">compose_functions</span><span class="p">,</span>
+    <span class="n">periodic_angular_conditions</span><span class="p">,</span>
+    <span class="n">weighted_mean_of_two_matrices</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="learn_potential_from_trajectories">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.parametrize_potential.learn_potential_from_trajectories">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">learn_potential_from_trajectories</span><span class="p">(</span>
+    <span class="n">trajectories</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PiecewisePotential</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert trajectories to a grid of histograms and parameters.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        trajectories: A DataFrame of trajectories.</span>
+<span class="sd">        grid_bins: A dictionary of grid values for each dimension.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A dictionary of DiscreteGrid objects for storing histograms and</span>
+<span class="sd">        parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Start learning the piecewise potential&quot;</span><span class="p">)</span>
+    <span class="n">lattice</span> <span class="o">=</span> <span class="n">Lattice</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">bins</span><span class="p">)</span>
+    <span class="n">dist_approximation</span> <span class="o">=</span> <span class="n">GaussianApproximation</span><span class="p">()</span>
+    <span class="n">piecewise_potential</span> <span class="o">=</span> <span class="n">PiecewisePotential</span><span class="p">(</span><span class="n">lattice</span><span class="p">,</span> <span class="n">dist_approximation</span><span class="p">)</span>
+
+    <span class="n">trajectories</span> <span class="o">=</span> <span class="n">prepare_trajectories_for_lattice_parametrization</span><span class="p">(</span>
+        <span class="n">trajectories</span><span class="p">,</span> <span class="n">lattice</span><span class="o">=</span><span class="n">lattice</span>
+    <span class="p">)</span>
+
+    <span class="n">piecewise_potential</span><span class="o">.</span><span class="n">histogram</span> <span class="o">=</span> <span class="n">add_trajectories_to_histogram</span><span class="p">(</span>
+        <span class="n">piecewise_potential</span><span class="o">.</span><span class="n">histogram</span><span class="p">,</span> <span class="n">trajectories</span><span class="p">,</span> <span class="s2">&quot;fast_grid_indices&quot;</span>
+    <span class="p">)</span>
+    <span class="n">piecewise_potential</span><span class="o">.</span><span class="n">histogram_slow</span> <span class="o">=</span> <span class="n">add_trajectories_to_histogram</span><span class="p">(</span>
+        <span class="n">piecewise_potential</span><span class="o">.</span><span class="n">histogram_slow</span><span class="p">,</span> <span class="n">trajectories</span><span class="p">,</span> <span class="s2">&quot;slow_grid_indices&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">piecewise_potential</span><span class="o">.</span><span class="n">parametrization</span> <span class="o">=</span> <span class="n">parameterize_trajectories</span><span class="p">(</span>
+        <span class="n">piecewise_potential</span><span class="o">.</span><span class="n">parametrization</span><span class="p">,</span> <span class="n">trajectories</span><span class="p">,</span> <span class="n">config</span>
+    <span class="p">)</span>
+
+    <span class="n">piecewise_potential</span><span class="o">.</span><span class="n">reparametrize_to_curvature</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">piecewise_potential</span></div>
+
+
+
+<div class="viewcode-block" id="apply_periodic_angular_conditions">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.parametrize_potential.apply_periodic_angular_conditions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_periodic_angular_conditions</span><span class="p">(</span>
+    <span class="n">trajectories</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">lattice</span><span class="p">:</span> <span class="n">Lattice</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply periodic angular conditions to the trajectories.</span>
+
+<span class="sd">    This function makes sure that the angles are within the range of the</span>
+<span class="sd">    angular lattice bins.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        trajectories: the trajectory data set.</span>
+<span class="sd">        lattice: the lattice object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The trajectories with the angular conditions applied.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">theta_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">trajectories</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="s2">&quot;theta&quot;</span> <span class="ow">in</span> <span class="n">col</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">theta_cols</span><span class="p">:</span>
+        <span class="n">trajectories</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">periodic_angular_conditions</span><span class="p">(</span>
+            <span class="n">trajectories</span><span class="p">[</span><span class="n">col</span><span class="p">],</span> <span class="n">lattice</span><span class="o">.</span><span class="n">bins</span><span class="p">[</span><span class="s2">&quot;theta&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Periodic angular conditions applied to columns </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">theta_cols</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">trajectories</span></div>
+
+
+
+<div class="viewcode-block" id="digitize_trajectories_to_grid">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.parametrize_potential.digitize_trajectories_to_grid">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">digitize_trajectories_to_grid</span><span class="p">(</span>
+    <span class="n">trajectories</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">lattice</span><span class="p">:</span> <span class="n">Lattice</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Digitize trajectories to a lattice.</span>
+
+<span class="sd">    Adds a column to the dataframe with the trajectories that contains</span>
+<span class="sd">    the slow indices</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        grid_bins: The bins which define the lattice.</span>
+<span class="sd">        trajectories: The trajectories to digitize.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The trajectories with an extra column for the slow indices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">obs</span><span class="p">,</span> <span class="n">dynamics</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">dynamics</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="n">lattice</span><span class="o">.</span><span class="n">bins</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">dynamics</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;f&quot;</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">]</span>
+    <span class="p">]:</span>
+        <span class="k">if</span> <span class="n">obs</span> <span class="o">==</span> <span class="s2">&quot;k&quot;</span><span class="p">:</span>
+            <span class="n">dobs</span> <span class="o">=</span> <span class="n">obs</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dobs</span> <span class="o">=</span> <span class="n">obs</span> <span class="o">+</span> <span class="n">dynamics</span>
+        <span class="n">inds</span> <span class="o">=</span> <span class="n">digitize_coordinates_to_lattice</span><span class="p">(</span>
+            <span class="n">trajectories</span><span class="p">[</span><span class="n">dobs</span><span class="p">],</span> <span class="n">lattice</span><span class="o">.</span><span class="n">bins</span><span class="p">[</span><span class="n">obs</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">indices</span><span class="p">[</span><span class="n">dobs</span><span class="p">]</span> <span class="o">=</span> <span class="n">inds</span>
+
+    <span class="n">indices</span><span class="p">[</span><span class="s2">&quot;thetaf&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">indices</span><span class="p">[</span><span class="s2">&quot;rf&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="p">[</span><span class="s2">&quot;thetaf&quot;</span><span class="p">])</span>
+    <span class="n">indices</span><span class="p">[</span><span class="s2">&quot;thetas&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">indices</span><span class="p">[</span><span class="s2">&quot;rs&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">indices</span><span class="p">[</span><span class="s2">&quot;thetas&quot;</span><span class="p">])</span>
+
+    <span class="n">trajectories</span><span class="p">[</span><span class="s2">&quot;fast_grid_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+        <span class="nb">zip</span><span class="p">(</span>
+            <span class="n">indices</span><span class="p">[</span><span class="s2">&quot;xf&quot;</span><span class="p">],</span>
+            <span class="n">indices</span><span class="p">[</span><span class="s2">&quot;yf&quot;</span><span class="p">],</span>
+            <span class="n">indices</span><span class="p">[</span><span class="s2">&quot;rf&quot;</span><span class="p">],</span>
+            <span class="n">indices</span><span class="p">[</span><span class="s2">&quot;thetaf&quot;</span><span class="p">],</span>
+            <span class="n">indices</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">trajectories</span><span class="p">[</span><span class="s2">&quot;slow_grid_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+        <span class="nb">zip</span><span class="p">(</span>
+            <span class="n">indices</span><span class="p">[</span><span class="s2">&quot;xs&quot;</span><span class="p">],</span>
+            <span class="n">indices</span><span class="p">[</span><span class="s2">&quot;ys&quot;</span><span class="p">],</span>
+            <span class="n">indices</span><span class="p">[</span><span class="s2">&quot;rs&quot;</span><span class="p">],</span>
+            <span class="n">indices</span><span class="p">[</span><span class="s2">&quot;thetas&quot;</span><span class="p">],</span>
+            <span class="n">indices</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">trajectories</span></div>
+
+
+
+<span class="n">prepare_trajectories_for_lattice_parametrization</span> <span class="o">=</span> <span class="n">compose_functions</span><span class="p">(</span>
+    <span class="n">apply_periodic_angular_conditions</span><span class="p">,</span> <span class="n">digitize_trajectories_to_grid</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="add_trajectories_to_histogram">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.parametrize_potential.add_trajectories_to_histogram">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_trajectories_to_histogram</span><span class="p">(</span>
+    <span class="n">histogram</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">trajectories</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">groupbyindex</span><span class="p">:</span> <span class="nb">str</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add trajectories to a histogram.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        histogram: The histogram to add the trajectories to.</span>
+<span class="sd">        trajectories: The trajectories to add to the histogram.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The updated histogram.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">grid_index</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">trajectories</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">groupbyindex</span><span class="p">):</span>
+        <span class="n">histogram</span><span class="p">[</span><span class="n">grid_index</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">histogram</span></div>
+
+
+
+<div class="viewcode-block" id="parameterize_trajectories">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.parametrize_potential.parameterize_trajectories">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parameterize_trajectories</span><span class="p">(</span>
+    <span class="n">parametrization</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">trajectories</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fit trajectories to the lattice.</span>
+
+<span class="sd">    Fit the fast dynamics conditioned to the slow dynamics.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        parametrization: The initialized, empty, parametrization matrix.</span>
+<span class="sd">        trajectories: The trajectories to fit.</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The updated parametrization matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fit_output</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">trajectories</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;slow_grid_indices&quot;</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">fit_probability_distributions</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">fit_output</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">parametrization</span><span class="p">[</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">key</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished learning piecewise potential from trajectories.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">parametrization</span></div>
+
+
+
+<div class="viewcode-block" id="calculate_position_based_emperic_potential">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.parametrize_potential.calculate_position_based_emperic_potential">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_position_based_emperic_potential</span><span class="p">(</span>
+    <span class="n">histogram_slow</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span>
+<span class="p">):</span>
+    <span class="n">position_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">histogram_slow</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">position_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">position_counts</span> <span class="o">&lt;</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">minimum_fitting_threshold</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+        <span class="n">position_counts</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="mf">0.02</span>  <span class="c1"># TODO: Move to config</span>
+    <span class="n">position_based_emperic_potential</span> <span class="o">=</span> <span class="n">A</span> <span class="o">*</span> <span class="p">(</span>
+        <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">position_counts</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">histogram_slow</span><span class="p">))</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">position_based_emperic_potential</span></div>
+
+
+
+<div class="viewcode-block" id="accumulate_grids">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.parametrize_potential.accumulate_grids">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">accumulate_grids</span><span class="p">(</span>
+    <span class="n">cummulative_grids</span><span class="p">:</span> <span class="n">PiecewisePotential</span><span class="p">,</span> <span class="n">grids_to_add</span><span class="p">:</span> <span class="n">PiecewisePotential</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PiecewisePotential</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Accumulate grids by taking a weighted mean of the fit parameters.</span>
+
+<span class="sd">    The goal of this function is to sum PiecewisePotential objects.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cummulative_grids: The cumulative grids to add to.</span>
+<span class="sd">        grids_to_add: The grids to add to the cumulative grids.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The updated cumulative grids.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ! WARNING: This function needs to be tested. Seems to have a bug.</span>
+    <span class="c1"># ! Perhaps this needs to be a dunder class method i.e. __add__</span>
+    <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+        <span class="n">cummulative_grids</span><span class="o">.</span><span class="n">fit_param_names</span>
+    <span class="p">):</span>  <span class="c1"># Loop over all fit parameters</span>
+        <span class="c1"># accumulate fit parameters</span>
+        <span class="n">cummulative_grids</span><span class="o">.</span><span class="n">fit_params</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">weighted_mean_of_two_matrices</span><span class="p">(</span>
+                <span class="n">first_matrix</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span>
+                    <span class="n">cummulative_grids</span><span class="o">.</span><span class="n">fit_params</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">p</span><span class="p">]</span>
+                <span class="p">),</span>
+                <span class="n">counts_first_matrix</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">cummulative_grids</span><span class="o">.</span><span class="n">histogram</span><span class="p">),</span>
+                <span class="n">second_matrix</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span>
+                    <span class="n">grids_to_add</span><span class="o">.</span><span class="n">fit_params</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">p</span><span class="p">]</span>
+                <span class="p">),</span>
+                <span class="n">counts_second_matrix</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">grids_to_add</span><span class="o">.</span><span class="n">histogram</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="c1"># accumlate histogram</span>
+    <span class="n">cummulative_grids</span><span class="o">.</span><span class="n">histogram</span> <span class="o">+=</span> <span class="n">grids_to_add</span><span class="o">.</span><span class="n">histogram</span>
+    <span class="n">cummulative_grids</span><span class="o">.</span><span class="n">histogram_slow</span> <span class="o">+=</span> <span class="n">grids_to_add</span><span class="o">.</span><span class="n">histogram_slow</span>
+    <span class="k">return</span> <span class="n">cummulative_grids</span></div>
+
+
+
+<div class="viewcode-block" id="extract_submatrix">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.parametrize_potential.extract_submatrix">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_submatrix</span><span class="p">(</span>
+    <span class="n">matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">slicing_indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">tuple</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract a submatrix from a nd-matrix using periodic boundary conditions.</span>
+
+<span class="sd">    Periodicity is needed for the angular dimension.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        matrix: The input nd-matrix to slice.</span>
+<span class="sd">        slicing_indices: A list of slice tuples for each dimension of the</span>
+<span class="sd">        nd-matrix.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The submatrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">slice</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="nb">slice</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="nb">slice</span> <span class="ow">in</span> <span class="n">slicing_indices</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Slicing indices must be ascending.&quot;</span><span class="p">)</span>
+
+    <span class="n">reshape_dimension</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">slicing_indices</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">slicing_indices</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">*</span><span class="nb">slice</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="n">reshape_dimension</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+        <span class="o">%</span> <span class="n">matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="nb">slice</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">slicing_indices</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="n">matrix</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">slicing_indices</span><span class="p">)]</span></div>
+
+
+
+<div class="viewcode-block" id="fit_probability_distributions">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.parametrize_potential.fit_probability_distributions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fit_probability_distributions</span><span class="p">(</span>
+    <span class="n">group</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fits a group of data points and returns the fit parameters.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        group: The group of data points to fit the normal distribution to.</span>
+<span class="sd">        config: The configuration parameters.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A matrix containing the fit parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">group</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">minimum_fitting_threshold</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># ? Can we do better if we have multiple files?</span>
+    <span class="n">fit_func</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">fit</span>  <span class="c1"># * Other functions can be implemented here</span>
+    <span class="n">fit_parameters</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">variable</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s2">&quot;xf&quot;</span><span class="p">,</span> <span class="s2">&quot;yf&quot;</span><span class="p">,</span> <span class="s2">&quot;uf&quot;</span><span class="p">,</span> <span class="s2">&quot;vf&quot;</span><span class="p">]):</span>
+        <span class="n">mu</span><span class="p">,</span> <span class="n">std</span> <span class="o">=</span> <span class="n">fit_func</span><span class="p">(</span>
+            <span class="n">group</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span>
+        <span class="p">)</span>  <span class="c1"># fit normal distribution to fast modes</span>
+        <span class="n">fit_parameters</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">mu</span><span class="p">,</span>
+            <span class="n">std</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">]</span>  <span class="c1"># store mean and variance of normal distribution</span>
+    <span class="k">return</span> <span class="n">fit_parameters</span></div>
+
+
+
+<div class="viewcode-block" id="get_grid_indices">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.parametrize_potential.get_grid_indices">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_grid_indices</span><span class="p">(</span>
+    <span class="n">piecewise_potential</span><span class="p">:</span> <span class="n">PiecewisePotential</span><span class="p">,</span> <span class="n">point</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a point (xs, ys, thetas, rs), return the associated lattice</span>
+<span class="sd">    indices.</span>
+
+<span class="sd">    This function is 4-dimensional.</span>
+
+<span class="sd">    If the radial velocity is in the lowest bin, the angular velocity is</span>
+<span class="sd">    automatically also added to the lowest bin. In other words, the angular</span>
+<span class="sd">    velocities are not discretized for low radial velocity.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        potential: The piecewise potential.</span>
+<span class="sd">        point: A list with slow positions and velocities (xs, ys, thetas, rs).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A tuple of grid indices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ! Write a test for this function</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">val</span><span class="p">,</span> <span class="n">obs</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">piecewise_potential</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">bins</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="n">piecewise_potential</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">bins</span><span class="p">[</span><span class="n">obs</span><span class="p">]</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">indices</span><span class="p">,</span> <span class="n">digitize_coordinates_to_lattice</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="c1"># For r = 0 all theta are 0</span>
+    <span class="k">if</span> <span class="n">indices</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">indices</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># merge grid cells for low r_s</span>
+
+    <span class="k">return</span> <span class="n">indices</span></div>
+
+
+
+<div class="viewcode-block" id="get_boundary_coordinates_of_selection">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.parametrize_potential.get_boundary_coordinates_of_selection">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_boundary_coordinates_of_selection</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="n">observable</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the grid bounds of a given observable and value.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">observable</span> <span class="o">==</span> <span class="s2">&quot;theta&quot;</span><span class="p">:</span>
+        <span class="n">grid_sides</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">bins</span><span class="p">[(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)],</span>
+            <span class="n">bins</span><span class="p">[(</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)],</span>
+        <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">grid_sides</span> <span class="o">=</span> <span class="p">[</span><span class="n">bins</span><span class="p">[</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">bins</span><span class="p">[</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">]]]</span>
+    <span class="k">return</span> <span class="n">grid_sides</span></div>
+
+
+
+<div class="viewcode-block" id="selection_to_bounds">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.parametrize_potential.selection_to_bounds">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">selection_to_bounds</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="n">selection_coordinates</span><span class="p">,</span> <span class="n">dimension</span><span class="p">):</span>
+    <span class="n">selection_grid_indices</span> <span class="o">=</span> <span class="n">digitize_coordinates_to_lattice</span><span class="p">(</span>
+        <span class="n">selection_coordinates</span><span class="p">,</span> <span class="n">bins</span>
+    <span class="p">)</span>
+    <span class="n">selection_boundary_coordinates</span> <span class="o">=</span> <span class="n">get_boundary_coordinates_of_selection</span><span class="p">(</span>
+        <span class="n">bins</span><span class="p">,</span> <span class="n">dimension</span><span class="p">,</span> <span class="n">selection_grid_indices</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">selection_boundary_coordinates</span></div>
+
+
+
+<div class="viewcode-block" id="make_grid_selection">
+<a class="viewcode-back" href="../../../physped.core.html#physped.core.parametrize_potential.make_grid_selection">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_grid_selection</span><span class="p">(</span><span class="n">piecewise_potential</span><span class="p">,</span> <span class="n">selection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Make selection.&quot;&quot;&quot;</span>
+    <span class="c1"># TODO: Remove dependency on PiecewisePotential object</span>
+    <span class="n">grid_selection</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">observable</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">selection</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">observable</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="c1"># for observable, value in zip([&quot;x&quot;, &quot;y&quot;, &quot;r&quot;, &quot;theta&quot;],</span>
+        <span class="c1"># [x, y, r, theta, k]):</span>
+        <span class="n">grid_selection</span><span class="p">[</span><span class="n">observable</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># grid = grid.grid_observable[observable]</span>
+        <span class="n">grid_bins</span> <span class="o">=</span> <span class="n">piecewise_potential</span><span class="o">.</span><span class="n">lattice</span><span class="o">.</span><span class="n">bins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">observable</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">grid_bins</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>  <span class="c1"># if None select full grid</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">grid_bins</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">grid_bins</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>  <span class="c1"># if int select single value on grid</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>  <span class="c1"># if float select single value on grid</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">,</span> <span class="n">value</span><span class="p">]</span>
+
+        <span class="n">grid_selection</span><span class="p">[</span><span class="n">observable</span><span class="p">][</span><span class="s2">&quot;selection&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="n">grid_ids</span> <span class="o">=</span> <span class="n">digitize_coordinates_to_lattice</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">grid_bins</span><span class="p">)</span>
+        <span class="n">grid_selection</span><span class="p">[</span><span class="n">observable</span><span class="p">][</span><span class="s2">&quot;grid_ids&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grid_ids</span>
+        <span class="n">grid_boundaries</span> <span class="o">=</span> <span class="n">get_boundary_coordinates_of_selection</span><span class="p">(</span>
+            <span class="n">grid_bins</span><span class="p">,</span> <span class="n">observable</span><span class="p">,</span> <span class="n">grid_ids</span>
+        <span class="p">)</span>
+        <span class="n">grid_selection</span><span class="p">[</span><span class="n">observable</span><span class="p">][</span><span class="s2">&quot;bounds&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grid_boundaries</span>
+
+        <span class="k">if</span> <span class="n">observable</span> <span class="o">==</span> <span class="s2">&quot;theta&quot;</span><span class="p">:</span>
+            <span class="k">while</span> <span class="n">grid_boundaries</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">grid_boundaries</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">grid_boundaries</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+
+        <span class="n">grid_selection</span><span class="p">[</span><span class="n">observable</span><span class="p">][</span><span class="s2">&quot;periodic_bounds&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grid_boundaries</span>
+    <span class="k">return</span> <span class="n">grid_selection</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

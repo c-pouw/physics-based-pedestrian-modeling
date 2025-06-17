@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>physped.utils.config_utils &mdash; Data-driven physics-based modeling of pedestrian dynamics 0.post1.dev0+gbf0ef31 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=9c8095b4"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Data-driven physics-based modeling of pedestrian dynamics
+          </a>
+              <div class="version">
+                0.post1.dev0+gbf0ef31
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage Notebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#using-the-cli">Using the CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#available-environments">Available environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">physped</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Data-driven physics-based modeling of pedestrian dynamics</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">physped.utils.config_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for physped.utils.config_utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Module to define utility functions for the configuration.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pprint</span><span class="w"> </span><span class="kn">import</span> <span class="n">pformat</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hydra</span><span class="w"> </span><span class="kn">import</span> <span class="n">compose</span><span class="p">,</span> <span class="n">initialize</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">omegaconf</span><span class="w"> </span><span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">OmegaConf</span>
+
+<span class="n">ROOT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)))</span><span class="o">.</span><span class="n">parent</span>
+
+<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="log_configuration">
+<a class="viewcode-back" href="../../../physped.utils.html#physped.utils.config_utils.log_configuration">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">log_configuration</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">* Environment name: </span><span class="si">%s</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;* Working directory </span><span class="se">\n</span><span class="si">%s</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;* Project root </span><span class="se">\n</span><span class="si">%s</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;* Modeling parameters: </span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span>
+        <span class="p">),</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">env_name</span><span class="p">,</span>
+        <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">root_dir</span><span class="p">,</span>
+        <span class="n">pformat</span><span class="p">(</span>
+            <span class="n">OmegaConf</span><span class="o">.</span><span class="n">to_container</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">resolve</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="apply_periodic_conditions_to_the_angle_theta">
+<a class="viewcode-back" href="../../../physped.utils.html#physped.utils.config_utils.apply_periodic_conditions_to_the_angle_theta">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_periodic_conditions_to_the_angle_theta</span><span class="p">(</span><span class="n">theta</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply periodic conditions to the angle theta.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        theta (float): The angle theta.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: The angle theta after applying the periodic conditions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">theta</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="k">return</span> <span class="n">theta</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span></div>
+
+
+
+<div class="viewcode-block" id="create_grid_name">
+<a class="viewcode-back" href="../../../physped.utils.html#physped.utils.config_utils.create_grid_name">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_grid_name</span><span class="p">(</span><span class="n">grid_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+    <span class="n">grid_list</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;-</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="mi">10</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">grid_list</span><span class="p">]</span>
+    <span class="n">grid_name</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">grid_list</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">grid_name</span></div>
+
+
+
+<div class="viewcode-block" id="set_plot_style">
+<a class="viewcode-back" href="../../../physped.utils.html#physped.utils.config_utils.set_plot_style">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_plot_style</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">use_latex</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to set the plot style.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        use_latex: Whether to use LaTeX for the plot style or not.</span>
+<span class="sd">        Defaults to False.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">get_style</span> <span class="o">=</span> <span class="p">{</span><span class="kc">True</span><span class="p">:</span> <span class="s2">&quot;science&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">:</span> <span class="s2">&quot;science_no_latex&quot;</span><span class="p">}</span>
+    <span class="n">style</span> <span class="o">=</span> <span class="n">get_style</span><span class="p">[</span><span class="n">use_latex</span><span class="p">]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">root_dir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;conf/</span><span class="si">{</span><span class="n">style</span><span class="si">}</span><span class="s2">.mplstyle&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="register_new_resolvers">
+<a class="viewcode-back" href="../../../physped.utils.html#physped.utils.config_utils.register_new_resolvers">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">register_new_resolvers</span><span class="p">(</span><span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">OmegaConf</span><span class="o">.</span><span class="n">register_new_resolver</span><span class="p">(</span>
+        <span class="s2">&quot;get_root_dir&quot;</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">ROOT_DIR</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="n">replace</span>
+    <span class="p">)</span>
+    <span class="n">OmegaConf</span><span class="o">.</span><span class="n">register_new_resolver</span><span class="p">(</span>
+        <span class="s2">&quot;parse_pi&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="n">replace</span>
+    <span class="p">)</span>
+    <span class="n">OmegaConf</span><span class="o">.</span><span class="n">register_new_resolver</span><span class="p">(</span>
+        <span class="s2">&quot;generate_linear_bins&quot;</span><span class="p">,</span>
+        <span class="k">lambda</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">min</span><span class="p">,</span> <span class="nb">max</span> <span class="o">+</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">step</span><span class="p">),</span>
+        <span class="n">replace</span><span class="o">=</span><span class="n">replace</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">OmegaConf</span><span class="o">.</span><span class="n">register_new_resolver</span><span class="p">(</span>
+        <span class="s2">&quot;generate_angular_bins&quot;</span><span class="p">,</span>
+        <span class="k">lambda</span> <span class="nb">min</span><span class="p">,</span> <span class="n">segments</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">min</span><span class="p">,</span> <span class="nb">min</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">segments</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="n">replace</span><span class="o">=</span><span class="n">replace</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">OmegaConf</span><span class="o">.</span><span class="n">register_new_resolver</span><span class="p">(</span>
+        <span class="s2">&quot;cast_numpy_array&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="n">replace</span>
+    <span class="p">)</span>
+    <span class="n">OmegaConf</span><span class="o">.</span><span class="n">register_new_resolver</span><span class="p">(</span>
+        <span class="s2">&quot;apply_periodic_conditions_to_the_angle_theta&quot;</span><span class="p">,</span>
+        <span class="n">apply_periodic_conditions_to_the_angle_theta</span><span class="p">,</span>
+        <span class="n">replace</span><span class="o">=</span><span class="n">replace</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">OmegaConf</span><span class="o">.</span><span class="n">register_new_resolver</span><span class="p">(</span>
+        <span class="s2">&quot;inv_prop&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">x</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="n">replace</span>
+    <span class="p">)</span>
+    <span class="n">OmegaConf</span><span class="o">.</span><span class="n">register_new_resolver</span><span class="p">(</span>
+        <span class="s2">&quot;create_grid_name&quot;</span><span class="p">,</span> <span class="n">create_grid_name</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="n">replace</span>
+    <span class="p">)</span>
+    <span class="n">OmegaConf</span><span class="o">.</span><span class="n">register_new_resolver</span><span class="p">(</span>
+        <span class="s2">&quot;set_plot_style&quot;</span><span class="p">,</span> <span class="n">set_plot_style</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="n">replace</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="initialize_hydra_config">
+<a class="viewcode-back" href="../../../physped.utils.html#physped.utils.config_utils.initialize_hydra_config">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">initialize_hydra_config</span><span class="p">(</span><span class="n">env_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DictConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function to initialize the Hydra configuration.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        env_name: The name of the environment.</span>
+<span class="sd">            For example: &#39;narrow_corridor&#39;, &#39;intersecting_paths&#39;,</span>
+<span class="sd">            &#39;asdz_pf12&#39;, &#39;asdz_pf34&#39;, &#39;utrecht_pf5&#39;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The Hydra configuration.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">initialize</span><span class="p">(</span><span class="n">version_base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="s2">&quot;../conf&quot;</span><span class="p">):</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">compose</span><span class="p">(</span>
+            <span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="p">,</span>
+            <span class="n">return_hydra_config</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">overrides</span><span class="o">=</span><span class="p">[</span>
+                <span class="sa">f</span><span class="s2">&quot;params=</span><span class="si">{</span><span class="n">env_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">register_new_resolvers</span><span class="p">(</span><span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">config</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eindhoven University of Technology.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
