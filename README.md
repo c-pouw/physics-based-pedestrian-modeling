@@ -2,8 +2,8 @@
 <p align="center">
     <a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/" alt="Repository">
 	   <img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white" /></a>
-	<a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml" alt="Integration Tests">
-	   <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml/badge.svg" /></a>
+	<!-- <a href="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml" alt="Integration Tests"> -->
+	<!--    <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/integration-tests.yaml/badge.svg" /></a> -->
     <a href="https://c-pouw.github.io/physics-based-pedestrian-modeling" alt="docs">
 	   <img src="https://github.com/c-pouw/physics-based-pedestrian-modeling/actions/workflows/docs.yml/badge.svg" /></a>
     <a href="https://c-pouw.github.io/physics-based-pedestrian-modeling/reports/junit/report.html?sort=result">

@@ -7,7 +7,7 @@ authors = [
     {name = "Cas Pouw", email = "c.a.s.pouw@tue.nl"},
 ]
 license = {text = "BSD-3-Clause"}
-requires-python = "~=3.11"
+requires-python = ">=3.11"
 dependencies = [
     "pandas==2.2.2",
     "numpy>2.0.0",
